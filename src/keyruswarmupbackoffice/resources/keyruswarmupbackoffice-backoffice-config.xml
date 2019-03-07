@@ -10,7 +10,11 @@
  license agreement you entered into with SAP.
 -->
 <config xmlns="http://www.hybris.com/cockpit/config"
-	xmlns:na="http://www.hybris.com/cockpitng/config/notifications">
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
 
 	<context merge-by="module" component="editorareaactions" type="Consignment">
 		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
@@ -20,6 +24,56 @@
 			</y:group>
 		</y:actions>
     </context>
+
+	<!--Explorer Tree -->
+	<context component="explorer-tree" merge-by="module">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="hmc_treenode_delivery">
+					<explorer-tree:type-node code="DeliveryRule" id="hmc_typenode_deliveryrule"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<!-- Editor Area -->
+	<context merge-by="type" type="DeliveryRule" component="editor-area">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="code"/>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+			<editorArea:tab name="hmc.properties">
+				<editorArea:section name="hmc.deliveryrules.conditions">
+					<editorArea:attribute qualifier="postalCode"/>
+				</editorArea:section>
+				<editorArea:section name="hmc.deliveryrules.applicables">
+					<editorArea:attribute qualifier="percentageDiscount"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<!--   Simple Search -->
+	<context merge-by="type" type="DeliveryRule" component="simple-search">
+		<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+			<simple-search:field name="code"/>
+			<simple-search:field name="postalCode"/>
+		</simple-search:simple-search>
+	</context>
+
+	<!-- Advanced Search -->
+	<context type="DeliveryRule" component="advanced-search">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="code"/>
+				<advanced-search:field name="postalCode"/>
+				<advanced-search:field name="percentageDiscount"/>
+				<advanced-search:field name="creationtime"/>
+				<advanced-search:field name="modifiedtime"/>
+				<advanced-search:field name="pk" editor="com.hybris.cockpitng.editor.defaultlong"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
 
 	<!-- Notification Area-->
 	<context component="notification-area">
