@@ -130,13 +130,12 @@ public class ProductPageController extends AbstractPageController
 		final ProductData productData = productFacade.getProductForCodeAndOptions(productCode, extraOptions);
 
 		final String redirection = checkRequestUrl(request, response, productDataUrlResolver.resolve(productData));
-		if (StringUtils.isNotEmpty(redirection))
+		if (productData == null || StringUtils.isNotEmpty(redirection))
 		{
 			return redirection;
 		}
 
 		updatePageTitle(productCode, model);
-
 
 		populateProductDetailForDisplay(productCode, model, request, extraOptions);
 
