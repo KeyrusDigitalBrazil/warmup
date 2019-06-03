@@ -101,6 +101,7 @@ public class CartPageController extends AbstractCartPageController
 
 	private static final Logger LOG = Logger.getLogger(CartPageController.class);
 
+//	@Resource(name = "simpleBreadcrumbBuilder")
 	private ResourceBreadcrumbBuilder resourceBreadcrumbBuilder;
 
 	@Resource(name = "enumerationService")
