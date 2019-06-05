@@ -12,11 +12,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	   xmlns:context="http://www.springframework.org/schema/context"
-	   xmlns:util="http://www.springframework.org/schema/util"
 	   xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+           http://www.springframework.org/schema/context/spring-context.xsd">
 
      <context:annotation-config/>
 
@@ -551,4 +550,22 @@
 		<property name="itemCleanupHooks" ref="csTicketRetentionHooks"/>
 		<property name="ticketBusinessService" ref="ticketBusinessService"/>
 	</bean>
+
+	<!-- HYBRIS CHALLENGE -->
+	<alias name="defaultKeyrusMediaService" alias="mediaService"/>
+	<bean id="defaultKeyrusMediaService" class="br.com.keyrus.warmup.core.media.service.impl.DefaultKeyrusMediaService" parent="defaultMediaService">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultStampService" alias="stampService"/>
+	<bean id="defaultStampService" class="br.com.keyrus.warmup.core.stamp.service.impl.DefaultStampService" parent="abstractBusinessService">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="stampImportJobPerformable" class="br.com.keyrus.warmup.core.job.StampImportJobPerformable" parent="abstractJobPerformable">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="stampService" ref="stampService"/>
+	</bean>
+
 </beans>
