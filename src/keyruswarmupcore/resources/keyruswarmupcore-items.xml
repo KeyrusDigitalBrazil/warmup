@@ -32,6 +32,14 @@
             <value code="WHITE"/>
             <value code="YELLOW"/>
         </enumtype>
+        <enumtype generate="true" code="ReportStatus" autocreate="true" dynamic="true">
+            <value code="OK"/>
+            <value code="NOT_OK"/>
+        </enumtype>
+        <enumtype generate="true" code="ReportSource" autocreate="true" dynamic="true">
+            <value code="STAMP_IMPORT"/>
+        </enumtype>
+
     </enumtypes>
 
     <itemtypes>
@@ -114,7 +122,7 @@
         <typegroup name="Challenge">
 
             <itemtype code="Stamp" autocreate="true" generate="true" extends="GenericItem">
-                <description>Electronics color variant type that contains additional attribute describing variant color.</description>
+                <description>Stamp of a category.</description>
                 <deployment table="Stamp" typecode="20010"/>
                 <attributes>
                     <attribute qualifier="code" type="java.lang.String">
@@ -139,6 +147,28 @@
                 <attributes>
                     <attribute qualifier="stamp" type="Stamp">
                         <description>Category stamp.</description>
+                        <modifiers/>
+                        <persistence type="property"/>
+                    </attribute>
+                </attributes>
+            </itemtype>
+
+            <itemtype code="CustomReport" autocreate="true" generate="true" extends="GenericItem">
+                <description>Report with status and message of some sources.</description>
+                <deployment table="CustomReport" typecode="20011"/>
+                <attributes>
+                    <attribute qualifier="source" type="ReportSource">
+                        <description>Origin of the report.</description>
+                        <modifiers/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute qualifier="status" type="ReportStatus">
+                        <description>Status of the report.</description>
+                        <modifiers/>
+                        <persistence type="property"/>
+                    </attribute>
+                    <attribute qualifier="message" type="java.lang.String">
+                        <description>Error content of report.</description>
                         <modifiers/>
                         <persistence type="property"/>
                     </attribute>
