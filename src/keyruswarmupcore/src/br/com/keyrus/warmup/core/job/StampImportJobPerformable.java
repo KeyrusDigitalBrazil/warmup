@@ -2,8 +2,8 @@ package br.com.keyrus.warmup.core.job;
 
 import br.com.keyrus.warmup.core.enums.ReportSource;
 import br.com.keyrus.warmup.core.enums.ReportStatus;
+import br.com.keyrus.warmup.core.event.CustomReportEvent;
 import br.com.keyrus.warmup.core.media.service.KeyrusMediaService;
-import br.com.keyrus.warmup.core.report.service.CustomReportService;
 import br.com.keyrus.warmup.core.stamp.service.StampService;
 import de.hybris.platform.core.model.media.MediaModel;
 import de.hybris.platform.cronjob.enums.CronJobResult;
@@ -11,6 +11,7 @@ import de.hybris.platform.cronjob.enums.CronJobStatus;
 import de.hybris.platform.cronjob.model.CronJobModel;
 import de.hybris.platform.servicelayer.cronjob.AbstractJobPerformable;
 import de.hybris.platform.servicelayer.cronjob.PerformResult;
+import de.hybris.platform.servicelayer.event.EventService;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -28,9 +29,9 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
     public static final Logger LOG = Logger.getLogger(StampImportJobPerformable.class);
 
-    private CustomReportService customReportService;
     private KeyrusMediaService mediaService;
     private StampService stampService;
+    private EventService eventService;
 
     @Override
     public PerformResult perform(final CronJobModel cronJobModel) {
@@ -55,7 +56,8 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
                     final String message = "Stamp with code '" + stamp.getName() + "' created with success! ";
 
-                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.OK, message);
+                    eventService.publishEvent(new CustomReportEvent(ReportSource.STAMP_IMPORT, ReportStatus.OK, message));
+
                     LOG.info(message);
 
                     stamp.renameTo(new File(successFolder.getPath() + "/" +  stamp.getName()));
@@ -66,7 +68,8 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
                     stamp.renameTo(new File(errorFolder.getPath() + "/" + stamp.getName()));
 
-                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage());
+                    eventService.publishEvent(new CustomReportEvent(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage()));
+
                     LOG.error(message, e);
                 }
             }
@@ -79,7 +82,8 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
             final String message = "Problem trying to execute stamp import job!";
 
-            customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage());
+            eventService.publishEvent(new CustomReportEvent(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage()));
+
             LOG.error(message, e);
 
             return new PerformResult(CronJobResult.ERROR, CronJobStatus.ABORTED);
@@ -94,7 +98,7 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
         this.stampService = stampService;
     }
 
-    public void setCustomReportService(CustomReportService customReportService) {
-        this.customReportService = customReportService;
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
     }
 }
