@@ -1,7 +1,11 @@
 package br.com.keyrus.warmup.core.job;
 
+import br.com.keyrus.warmup.core.enums.ReportSource;
+import br.com.keyrus.warmup.core.enums.ReportStatus;
 import br.com.keyrus.warmup.core.media.service.KeyrusMediaService;
+import br.com.keyrus.warmup.core.report.service.CustomReportService;
 import br.com.keyrus.warmup.core.stamp.service.StampService;
+import de.hybris.platform.core.model.media.MediaModel;
 import de.hybris.platform.cronjob.enums.CronJobResult;
 import de.hybris.platform.cronjob.enums.CronJobStatus;
 import de.hybris.platform.cronjob.model.CronJobModel;
@@ -24,6 +28,7 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
     public static final Logger LOG = Logger.getLogger(StampImportJobPerformable.class);
 
+    private CustomReportService customReportService;
     private KeyrusMediaService mediaService;
     private StampService stampService;
 
@@ -31,6 +36,8 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
     public PerformResult perform(final CronJobModel cronJobModel) {
 
         final File stampFolder = getFolder("stamp.import.cronjob.folder");
+        final File successFolder = getFolder("stamp.import.cronjob.folder.success");
+        final File errorFolder = getFolder("stamp.import.cronjob.folder.error");
 
         try {
 
@@ -41,16 +48,40 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
             for (final File stamp : stamps) {
 
                 try {
-                    stampService.createStamp(getStampName(stamp), mediaService.createMediaModel(getStampName(stamp), stamp), getStampPriority(stamp));
-                    LOG.info("Stamp with code '" + stamp.getName() + "' created with success!");
+
+                    final MediaModel media = mediaService.createMediaModel(getStampName(stamp), stamp);
+
+                    stampService.createStamp(getStampName(stamp), media, getStampPriority(stamp));
+
+                    final String message = "Stamp with code '" + stamp.getName() + "' created with success! ";
+
+                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.OK, message);
+                    LOG.info(message);
+
+                    stamp.renameTo(new File(successFolder.getPath() + "/" +  stamp.getName()));
+
                 } catch (final Exception e) {
-                    LOG.error("Error trying to create media and stamp for file with code '" + stamp.getName() + "'!", e);
+
+                    final String message = "Error trying to create media and stamp for file with code '" + stamp.getName() + "'! ";
+
+                    stamp.renameTo(new File(errorFolder.getPath() + "/" + stamp.getName()));
+
+                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage() + e.getStackTrace());
+                    LOG.error(message, e);
                 }
             }
+
+            LOG.info("Stamp import job executed with success!");
 
             return new PerformResult(CronJobResult.SUCCESS, CronJobStatus.FINISHED);
 
         } catch (final Exception e) {
+
+            final String message = "Problem trying to execute stamp import job!";
+
+            customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage() + e.getStackTrace());
+            LOG.error(message, e);
+
             return new PerformResult(CronJobResult.ERROR, CronJobStatus.ABORTED);
         }
     }
@@ -61,5 +92,9 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
     public void setStampService(StampService stampService) {
         this.stampService = stampService;
+    }
+
+    public void setCustomReportService(CustomReportService customReportService) {
+        this.customReportService = customReportService;
     }
 }
