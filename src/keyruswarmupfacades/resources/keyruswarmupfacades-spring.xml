@@ -189,4 +189,28 @@
 	</bean>
 
 	<bean id="genderData" class="br.com.keyrus.warmup.facades.product.data.GenderData" scope="prototype"/>
+
+	<!-- HYBRIS CHALLENGE -->
+
+	<alias name="defaultStampPopulator" alias="stampPopulator"/>
+	<bean id="defaultStampPopulator" class="br.com.keyrus.warmup.facades.stamp.populator.StampPopulator">
+		<property name="imagePopulator" ref="imagePopulator"/>
+	</bean>
+
+	<alias name="defaultStampConverter" alias="stampConverter"/>
+	<bean id="defaultStampConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="br.com.keyrus.warmup.facades.stamp.data.StampData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="stampPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCustomProductPopulator" alias="productPopulator"/>
+	<bean name="defaultCustomProductPopulator" class="br.com.keyrus.warmup.facades.product.populator.CustomProductPopulator" parent="defaultProductPopulator">
+		<property name="stampConverter" ref="stampConverter"/>
+		<property name="stampService" ref="stampService"/>
+	</bean>
+
 </beans>

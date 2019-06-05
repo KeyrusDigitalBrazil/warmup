@@ -101,6 +101,12 @@
                     </div>
                 </div>
 
+                <div>
+                    <c:forEach items="${entry.product.stamps}" var="stamp">
+                        <img src="${fn:escapeXml(stamp.image.url)}" width="60" height="60"/>
+                    </c:forEach>
+                </div>
+
                 <c:if test="${ycommerce:doesPotentialPromotionExistForOrderEntryOrOrderEntryGroup(cartData, entry)}">
                     <c:forEach items="${cartData.potentialProductPromotions}" var="promotion">
                         <c:set var="displayed" value="false"/>
