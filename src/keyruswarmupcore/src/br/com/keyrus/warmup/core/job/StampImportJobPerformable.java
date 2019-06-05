@@ -66,7 +66,7 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
                     stamp.renameTo(new File(errorFolder.getPath() + "/" + stamp.getName()));
 
-                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage() + e.getStackTrace());
+                    customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage());
                     LOG.error(message, e);
                 }
             }
@@ -79,7 +79,7 @@ public class StampImportJobPerformable extends AbstractJobPerformable<CronJobMod
 
             final String message = "Problem trying to execute stamp import job!";
 
-            customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage() + e.getStackTrace());
+            customReportService.createCustomReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message + e.getMessage());
             LOG.error(message, e);
 
             return new PerformResult(CronJobResult.ERROR, CronJobStatus.ABORTED);
