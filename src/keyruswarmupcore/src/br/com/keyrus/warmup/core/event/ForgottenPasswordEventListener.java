@@ -51,6 +51,10 @@ public class ForgottenPasswordEventListener extends AbstractAcceleratorSiteEvent
 		return modelService;
 	}
 
+	public void setModelService(ModelService modelService){
+		this.modelService = modelService;
+	}
+
 	@Override
 	protected void onSiteEvent(final ForgottenPwdEvent event)
 	{
