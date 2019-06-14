@@ -551,4 +551,20 @@
 		<property name="itemCleanupHooks" ref="csTicketRetentionHooks"/>
 		<property name="ticketBusinessService" ref="ticketBusinessService"/>
 	</bean>
+
+	<!--Stamp Cronjob-->
+	<bean id="stampReadJobPerformable" class="br.com.keyrus.warmup.core.job.StampReadJobPerformable" parent="abstractJobPerformable" >
+		<property name="stampService" ref="stampService"/>
+
+	</bean>
+
+	<bean id="stampService" class="br.com.keyrus.warmup.core.service.impl.StampServiceImpl" parent="abstractBusinessService" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="mediaService" ref="customMediaService"/>
+	</bean>
+
+	<bean id="customMediaService" class="br.com.keyrus.warmup.core.service.impl.CustomMediaServiceImpl" parent="defaultMediaService"  >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
 </beans>
