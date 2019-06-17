@@ -7,5 +7,5 @@ import java.io.FileNotFoundException;
 
 public interface StampService {
 
-        StampModel createStamp(final File file);
+        void createStamp(final File file);
 }

@@ -9,7 +9,6 @@ import de.hybris.platform.servicelayer.cronjob.PerformResult;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +30,7 @@ public class StampReadJobPerformable extends AbstractJobPerformable<CronJobModel
     @Override
     public PerformResult perform(CronJobModel cronJobModel) {
 
-        try (Stream<Path> paths = Files.walk(Paths.get(folderPath))) {
+        try (Stream<Path> paths = Files.list(Paths.get(folderPath))) {
             paths.filter(Files::isRegularFile)
                     .filter(file -> validExtensions.contains(FilenameUtils.getExtension(file.toFile().getName())))
                     .forEach(file -> stampService.createStamp(file.toFile()));
