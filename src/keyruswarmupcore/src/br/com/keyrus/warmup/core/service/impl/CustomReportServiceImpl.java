@@ -12,7 +12,11 @@ public class CustomReportServiceImpl extends AbstractBusinessService implements 
     private static final Logger LOGGER = Logger.getLogger(CustomReportServiceImpl.class);
     @Override
     public CustomReportModel creatCustomeReport(ReportSource source, ReportStatus status, String message) {
-        LOGGER.info("creating custum report " +source.toString() + " " + status.toString() + " " + message);
+        if (status.equals(ReportStatus.OK)) {
+            LOGGER.info("creating custom report " +source.toString() + " " + status.toString() + " " + message);
+        }else{
+            LOGGER.error("creating custom report " +source.toString() + " " + status.toString() + " " + message);
+        }
         CustomReportModel report = getModelService().create(CustomReportModel.class);
         report.setSource(source);
         report.setStatus(status);
