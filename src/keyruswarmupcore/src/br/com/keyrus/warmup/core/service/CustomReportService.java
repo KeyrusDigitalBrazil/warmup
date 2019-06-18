@@ -6,5 +6,5 @@ import br.com.keyrus.warmup.core.model.CustomReportModel;
 
 public interface CustomReportService {
 
-    CustomReportModel creatCustomeReport(ReportSource source, ReportStatus status, String message);
+    CustomReportModel createCustomReport(ReportSource source, ReportStatus status, String message);
 }

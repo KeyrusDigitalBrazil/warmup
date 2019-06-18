@@ -2,11 +2,12 @@ package br.com.keyrus.warmup.core.service.impl;
 
 import br.com.keyrus.warmup.core.enums.ReportSource;
 import br.com.keyrus.warmup.core.enums.ReportStatus;
+import br.com.keyrus.warmup.core.event.CustomReportEvent;
 import br.com.keyrus.warmup.core.model.StampModel;
 import br.com.keyrus.warmup.core.service.CustomMediaService;
-import br.com.keyrus.warmup.core.service.CustomReportService;
 import br.com.keyrus.warmup.core.service.StampService;
 import de.hybris.platform.core.model.media.MediaModel;
+import de.hybris.platform.servicelayer.event.EventService;
 import de.hybris.platform.servicelayer.internal.service.AbstractBusinessService;
 import de.hybris.platform.servicelayer.search.FlexibleSearchService;
 import org.apache.log4j.Logger;
@@ -30,7 +31,7 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
 
     private FlexibleSearchService flexibleSearchService;
     private CustomMediaService mediaService;
-    private CustomReportService customReportService;
+    private EventService eventService;
 
     @Override
     public void createStamp(File file){
@@ -47,7 +48,7 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
             Path moveFile = Files.move(file.toPath(), Paths.get(folderSuccessPath + file.getName()));
             LOGGER.info("File moved to " + moveFile.toString());
             message = "the stamp " + name + " was imported.";
-            customReportService.creatCustomeReport(ReportSource.STAMP_IMPORT, ReportStatus.OK, message);
+            publishEvent(ReportSource.STAMP_IMPORT, ReportStatus.OK, message);
         }catch (Exception e){
             try {
                 Path moveFile = Files.move(file.toPath(), Paths.get(folderErrorPath + file.getName()));
@@ -55,8 +56,16 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
             }catch (Exception ex) {
             }
             message = "the file name " + file.getName() + " was not imported because " + e.getMessage();
-            customReportService.creatCustomeReport(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message);
+            publishEvent(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message);
         }
+    }
+
+    private void publishEvent(ReportSource source, ReportStatus status, String message){
+        CustomReportEvent customReportEvent = new CustomReportEvent();
+        customReportEvent.setReportSource(source);
+        customReportEvent.setReportStatus(status);
+        customReportEvent.setMessage(message);
+        eventService.publishEvent(customReportEvent);
     }
 
     private String nextValue(StringTokenizer nameParts){
@@ -98,11 +107,11 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
         this.mediaService = mediaService;
     }
 
-    public CustomReportService getCustomReportService() {
-        return customReportService;
+    public EventService getEventService() {
+        return eventService;
     }
 
-    public void setCustomReportService(CustomReportService customReportService) {
-        this.customReportService = customReportService;
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
     }
 }
