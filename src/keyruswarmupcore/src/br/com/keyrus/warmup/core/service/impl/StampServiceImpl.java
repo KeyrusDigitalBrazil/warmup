@@ -1,5 +1,6 @@
 package br.com.keyrus.warmup.core.service.impl;
 
+import br.com.keyrus.warmup.core.dao.StampDAO;
 import br.com.keyrus.warmup.core.enums.ReportSource;
 import br.com.keyrus.warmup.core.enums.ReportStatus;
 import br.com.keyrus.warmup.core.event.CustomReportEvent;
@@ -7,6 +8,7 @@ import br.com.keyrus.warmup.core.model.StampModel;
 import br.com.keyrus.warmup.core.service.CustomMediaService;
 import br.com.keyrus.warmup.core.service.StampService;
 import de.hybris.platform.core.model.media.MediaModel;
+import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.servicelayer.event.EventService;
 import de.hybris.platform.servicelayer.internal.service.AbstractBusinessService;
 import de.hybris.platform.servicelayer.search.FlexibleSearchService;
@@ -17,12 +19,17 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 public class StampServiceImpl extends AbstractBusinessService implements StampService {
 
     private static final Logger LOGGER = Logger.getLogger(StampServiceImpl.class);
+    @Value("${stamp.max.product:2}")
+    private Integer maxStamps;
+
 
     @Value("${stamp.folder.read:${HYBRIS_BIN_DIR}/../interfaces/stamps/success/}")
     private String folderSuccessPath;
@@ -32,6 +39,7 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
     private FlexibleSearchService flexibleSearchService;
     private CustomMediaService mediaService;
     private EventService eventService;
+    private StampDAO stampDAO;
 
     @Override
     public void createStamp(File file){
@@ -58,6 +66,14 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
             message = "the file name " + file.getName() + " was not imported because " + e.getMessage();
             publishEvent(ReportSource.STAMP_IMPORT, ReportStatus.NOT_OK, message);
         }
+    }
+    @Override
+    public List<StampModel> listProductStamps(ProductModel product){
+        List<StampModel> stamps = stampDAO.listStampByProduct(product);
+        return stamps.stream()
+                .sorted(Comparator.comparingInt(StampModel::getPriority))
+                .limit(maxStamps)
+                .collect(Collectors.toList());
     }
 
     private void publishEvent(ReportSource source, ReportStatus status, String message){
@@ -113,5 +129,13 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
 
     public void setEventService(EventService eventService) {
         this.eventService = eventService;
+    }
+
+    public StampDAO getStampDAO() {
+        return stampDAO;
+    }
+
+    public void setStampDAO(StampDAO stampDAO) {
+        this.stampDAO = stampDAO;
     }
 }
