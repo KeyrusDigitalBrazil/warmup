@@ -551,4 +551,39 @@
 		<property name="itemCleanupHooks" ref="csTicketRetentionHooks"/>
 		<property name="ticketBusinessService" ref="ticketBusinessService"/>
 	</bean>
+
+	<!--Stamp Cronjob-->
+	<bean id="stampReadJobPerformable" class="br.com.keyrus.warmup.core.job.StampReadJobPerformable" parent="abstractJobPerformable" >
+		<property name="stampService" ref="stampService"/>
+	</bean>
+
+	<bean id="stampService" class="br.com.keyrus.warmup.core.service.impl.StampServiceImpl" parent="abstractBusinessService" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="mediaService" ref="customMediaService"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="stampDAO" ref="stampDAO"/>
+	</bean>
+
+	<bean id="customMediaService" class="br.com.keyrus.warmup.core.service.impl.CustomMediaServiceImpl" parent="defaultMediaService"  >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<bean id="customReportService" class="br.com.keyrus.warmup.core.service.impl.CustomReportServiceImpl" parent="abstractBusinessService"/>
+
+	<bean id="stampInterceptor" class="br.com.keyrus.warmup.core.interceptors.StampInterceptor"/>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="stampInterceptor" />
+		<property name="typeCode" value="Stamp" />
+	</bean>
+
+	<bean name="customReportEventListener" class="br.com.keyrus.warmup.core.event.CustomReportListener" parent="abstractEventListener">
+		<property name="customReportService" ref="customReportService"/>
+	</bean>
+
+	<bean id="stampDAO" class="br.com.keyrus.warmup.core.dao.impl.StampDAOImpl" parent="abstractItemDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
 </beans>

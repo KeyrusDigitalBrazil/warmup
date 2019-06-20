@@ -38,6 +38,11 @@
 					</c:if>
 				</c:forEach>
 			</c:forEach>
+			<div>
+                <c:forEach items="${product.stamps}" var="stamp">
+                    <img src="${fn:escapeXml(stamp.image.url)}" alt="${fn:escapeXml(stamp.code)}" title="${fn:escapeXml(stamp.code)}" width="50" height="40"/>
+                </c:forEach>
+            </div>
 			<c:if test="${not empty entry.deliveryPointOfService.name}">
 				<div class="itemPickup"><span class="itemPickupLabel"><spring:theme code="popup.cart.pickup"/></span>&nbsp;${fn:escapeXml(entry.deliveryPointOfService.name)}</div>
 			</c:if>

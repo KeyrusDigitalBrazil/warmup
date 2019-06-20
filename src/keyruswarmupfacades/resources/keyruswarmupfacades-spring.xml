@@ -189,4 +189,26 @@
 	</bean>
 
 	<bean id="genderData" class="br.com.keyrus.warmup.facades.product.data.GenderData" scope="prototype"/>
+
+
+	<bean id="stampDataPopulator" class="br.com.keyrus.warmup.facades.populators.StampDataPopulator">
+		<property name="imageConverter" ref="imageConverter"/>
+	</bean>
+
+
+	<bean id="stampDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="br.com.keyrus.warmup.facades.product.data.StampData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="stampDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="customProductDataPopulator" alias="productPopulator"/>
+	<bean name="customProductDataPopulator" class="br.com.keyrus.warmup.facades.populators.CustomProductDataPopulator" parent="defaultProductPopulator">
+		<property name="stampDataConverter" ref="stampDataConverter"/>
+		<property name="stampService" ref="stampService"/>
+	</bean>
+
 </beans>

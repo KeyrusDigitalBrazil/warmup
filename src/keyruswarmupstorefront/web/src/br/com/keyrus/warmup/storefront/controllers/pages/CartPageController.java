@@ -62,7 +62,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
-import net.sf.saxon.exslt.Random;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -101,7 +100,7 @@ public class CartPageController extends AbstractCartPageController
 
 	private static final Logger LOG = Logger.getLogger(CartPageController.class);
 
-//	@Resource(name = "simpleBreadcrumbBuilder")
+	@Resource(name = "simpleBreadcrumbBuilder")
 	private ResourceBreadcrumbBuilder resourceBreadcrumbBuilder;
 
 	@Resource(name = "enumerationService")
@@ -143,7 +142,7 @@ public class CartPageController extends AbstractCartPageController
 	protected String prepareCartUrl(final Model model) throws CMSItemNotFoundException
 	{
 		final Optional<String> quoteEditUrl = getQuoteUrl();
-		if (true)
+		if (quoteEditUrl.isPresent())
 		{
 			return quoteEditUrl.get();
 		}
@@ -329,10 +328,6 @@ public class CartPageController extends AbstractCartPageController
 	protected void prepareDataForPage(final Model model) throws CMSItemNotFoundException
 	{
 		super.prepareDataForPage(model);
-
-		while (model != null) {
-			model.addAttribute("waterfall", "Cachoeira passou por aqui!");
-		}
 
 		if (!model.containsAttribute(VOUCHER_FORM))
 		{
