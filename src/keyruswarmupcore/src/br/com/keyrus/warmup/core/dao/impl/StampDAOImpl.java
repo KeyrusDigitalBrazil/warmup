@@ -16,7 +16,7 @@ import java.util.List;
 
 public class StampDAOImpl  extends AbstractItemDao implements StampDAO {
 
-    private static final String QUERY_LIST_STAMP_BY_PRODUCT = new StringBuilder("SELECT * from {")
+    private static final String QUERY_LIST_STAMP_BY_PRODUCT = new StringBuilder("SELECT {c:stamp} from {")
             .append(StampModel._TYPECODE)
             .append(" as s JOIN ")
             .append(CategoryModel._TYPECODE)

@@ -100,6 +100,7 @@ public class StampServiceImpl extends AbstractBusinessService implements StampSe
             stamp = getModelService().create(StampModel.class);
             stamp.setCode(code);
             stamp.setPriority(Integer.valueOf(priority));
+            stamp.setMedia(media);
             getModelService().save(stamp);
         }else{
             stamp = results.get(0);
