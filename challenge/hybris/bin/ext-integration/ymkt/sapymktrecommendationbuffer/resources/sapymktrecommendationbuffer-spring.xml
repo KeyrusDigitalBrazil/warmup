@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultRecommendationBufferDao" alias="recommendationBufferDao" />
+	<bean id="defaultRecommendationBufferDao" class="com.hybris.ymkt.recommendationbuffer.dao.impl.DefaultRecommendationBufferDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultRecommendationBufferService" alias="recommendationBufferService" />
+	<bean id="defaultRecommendationBufferService" class="com.hybris.ymkt.recommendationbuffer.service.impl.DefaultRecommendationBufferService">
+		<property name="modelService" ref="modelService" />
+		<property name="recommendationBufferDao" ref="recommendationBufferDao" />
+		<property name="enableRecommendationBuffer" value="#{configurationService.configuration.getProperty('sapymktrecommendationbuffer.enable')}" />
+		<property name="expiryOffset" value="#{configurationService.configuration.getProperty('sapymktrecommendationbuffer.expiryoffset')}" />
+	</bean>
+
+	<bean id="sapRecommendationCleanupCronJob" class="com.hybris.ymkt.recommendationbuffer.cronjobs.SapRecommendationCleanupCronJob" parent="abstractJobPerformable">
+		<property name="recommendationBufferService" ref="recommendationBufferService" />
+	</bean>
+
+</beans>

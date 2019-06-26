@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="ticket_open" class="de.hybris.platform.customerticketingfacades.data.StatusData">
+        <property name="id" value="OPEN"/>
+    </bean>
+    <bean id="ticket_inprocess" class="de.hybris.platform.customerticketingfacades.data.StatusData">
+        <property name="id" value="INPROCESS"/>
+    </bean>
+    <bean id="ticket_completed" class="de.hybris.platform.customerticketingfacades.data.StatusData">
+        <property name="id" value="COMPLETED"/>
+    </bean>
+    <bean id="ticket_closed" class="de.hybris.platform.customerticketingfacades.data.StatusData">
+        <property name="id" value="CLOSED"/>
+    </bean>
+
+	<alias name="defaultValidTransitions" alias="validTransitions"/>
+    <util:map id="defaultValidTransitions" key-type="de.hybris.platform.customerticketingfacades.data.StatusData">
+        <entry>
+            <key>
+                <ref bean="ticket_open"/>
+            </key>
+            <list>
+                <ref bean="ticket_closed"/>
+            </list>
+        </entry>
+        <entry>
+            <key>
+                <ref bean="ticket_inprocess"/>
+            </key>
+            <list>
+                <ref bean="ticket_closed"/>
+            </list>
+        </entry>
+        <entry>
+            <key>
+                <ref bean="ticket_completed"/>
+            </key>
+            <list>
+                <ref bean="ticket_inprocess"/>
+            </list>
+        </entry>
+        <entry>
+            <key>
+                <ref bean="ticket_closed"/>
+            </key>
+            <list>
+                <ref bean="ticket_inprocess"/>
+            </list>
+        </entry>
+    </util:map>
+    
+    <!-- CS Ticket Integration -->   
+    <alias name="defaultCustomerTicketingFacade" alias="defaultTicketFacade"/>
+	<bean id="defaultCustomerTicketingFacade" class="de.hybris.platform.customerticketingfacades.customerticket.DefaultCustomerTicketingFacade">
+		<property name="ticketService" ref="ticketService"/>
+		<property name="userService" ref="userService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+		<property name="ticketConverter" ref="ticketConverter"/>
+		<property name="ticketListConverter" ref="ticketListConverter"/>
+		<property name="statusMapping" ref="statusMapping" />
+		<property name="ticketPriority" ref="ticketPriority" />
+		<property name="ticketReason" ref="ticketReason" />
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="configurationService"  ref="configurationService"/>
+		<property name="associationStrategies">
+			<list>
+				<ref bean="ticketOrdersAssociationStrategy"/>
+				<ref bean="ticketCartsAssociationStrategy"/>
+			</list>
+		</property>
+        <property name="ticketAttachmentsService" ref="ticketAttachmentsService"/>
+    </bean>
+	
+	<alias name="defaultTicketConverter" alias="ticketConverter"/>
+    <bean id="defaultTicketConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="ticketData"/>
+        <property name="populators">
+            <list>
+                <ref bean="defaultTicketPopulator"/>
+            </list>
+        </property>
+    </bean>
+    
+    <alias name="defaultTicketListConverter" alias="ticketListConverter"/>
+    <bean id="defaultTicketListConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="ticketData"/>
+        <property name="populators">
+            <list>
+                <ref bean="defaultTicketListPopulator"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="ticketData" class="de.hybris.platform.customerticketingfacades.data.TicketData" scope="prototype"/>
+
+	<!-- This bean will be used to get the full details if the given ticket -->
+	<bean id="defaultTicketPopulator" class="de.hybris.platform.customerticketingfacades.converters.populators.DefaultTicketPopulator" >
+		<property name="statusMapping" ref="statusMapping"/>
+		<property name="validTransitions" ref="validTransitions"/>
+		<property name="ticketService" ref="ticketService"/>
+		<property name="ticketEventConverter" ref="ticketEventConverter" />
+	</bean>
+	
+	<!-- This bean will be used to get the basic details of the tickets, which are needed to display on listing page -->
+	<bean id="defaultTicketListPopulator" class="de.hybris.platform.customerticketingfacades.converters.populators.DefaultTicketListPopulator" >
+		<property name="statusMapping" ref="statusMapping"/>
+	</bean>
+	
+	<alias name="defaultTicketEventConverter" alias="ticketEventConverter"/>
+	<bean id="defaultTicketEventConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerticketingfacades.data.TicketEventData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ticketEventPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultTicketEventPopulator" alias="ticketEventPopulator"/>
+	<bean id="defaultTicketEventPopulator" class="de.hybris.platform.customerticketingfacades.converters.populators.DefaultTicketEventPopulator" >
+		<property name="statusMapping" ref="statusMapping"/>
+	</bean>
+	
+    <util:map id="statusMapping">
+        <entry key="New" value-ref="ticket_open"/>
+        <entry key="Open" value-ref="ticket_inprocess"/>
+        <entry key="Closed" value-ref="ticket_closed"/>
+    </util:map>
+
+    <alias name="csTicketStateTransitionMap" alias="ticketStateTransitionMap"/>
+    <util:map id="csTicketStateTransitionMap">
+        <entry>
+            <key>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.NEW"/>
+            </key>
+            <util:list>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+            </util:list>
+        </entry>
+        <entry>
+            <key>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+            </key>
+            <util:list>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+            </util:list>
+        </entry>
+        <entry>
+            <key>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.CLOSED"/>
+            </key>
+            <util:list>
+                <util:constant static-field="de.hybris.platform.ticket.enums.CsTicketState.OPEN"/>
+            </util:list>
+        </entry>
+    </util:map>
+    
+    <!-- Ticket Associated Objects -->
+    <bean id="ticketOrdersAssociationStrategy" class="de.hybris.platform.customerticketingfacades.strategies.TicketOrdersAssociationStrategy">
+    	<property name="ticketAssociationCoverter" ref="ticketAssociationCoverter"/>
+    </bean>
+    <bean id="ticketCartsAssociationStrategy" class="de.hybris.platform.customerticketingfacades.strategies.TicketCartsAssociationStrategy">
+    	<property name="ticketAssociationCoverter" ref="ticketAssociationCoverter"/>
+    </bean>
+			
+    <alias name="defaultTicketAssociationCoverter" alias="ticketAssociationCoverter"/>
+    <bean id="defaultTicketAssociationCoverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerticketingfacades.data.TicketAssociatedData"/>
+		<property name="populators">
+			<list merge="true">
+                <ref bean="ticketAssociationPopulator"/>
+			</list>
+		</property>
+    </bean>
+    
+    <alias name="defaultTicketAssociationPopulator" alias="ticketAssociationPopulator"/>
+	<bean id="defaultTicketAssociationPopulator" class="de.hybris.platform.customerticketingfacades.converters.populators.DefaultTicketAssociationPopulator" />
+    <!-- Ticket Associated Objects Ends-->
+    
+    <!-- CS Ticket Integration Ends -->
+
+	<!-- Defaults Starts -->
+	<alias name="defaultTicketPriority" alias="ticketPriority"/>
+	<bean id="defaultTicketPriority" class="java.lang.String">
+		<constructor-arg value="Low" />
+	</bean>
+	
+	<alias name="defaultTicketReason" alias="ticketReason"/>
+	<bean id="defaultTicketReason" class="java.lang.String">
+		<constructor-arg value="FirstContact" />
+	</bean> 
+	<!--  Defaults Ends -->
+</beans>

@@ -1,0 +1,72 @@
+<div data-ng-show="$ctrl.ready === true"
+    class="ySENewPageDisplayCondition">
+
+    <div class="page-condition-selector-wrapper form-group">
+
+        <label for="page-condition-selector-id"
+            class="control-label">{{ 'se.cms.page.condition.selection.label' | translate }}</label>
+        <ui-select id="page-condition-selector-id"
+            data-ng-model="$ctrl.conditionSelected"
+            class="form-control"
+            search-enabled="false"
+            theme="select2"
+            data-dropdown-auto-width="false"
+            data-ng-change="$ctrl.dataChanged()">
+            <ui-select-match id="select-type"
+                class="ySEPageRestr-picker--select__match">
+                {{ $ctrl.conditionSelected.label | translate }}
+            </ui-select-match>
+            <ui-select-choices repeat="c in $ctrl.conditions">
+                {{ c.label | translate }}
+            </ui-select-choices>
+        </ui-select>
+        <span class="help-inline">
+            <span class="help-block-inline">{{ $ctrl.conditionSelected.description | translate }}</span>
+        </span>
+    </div>
+
+    <div data-ng-if="$ctrl.showPrimarySelector()"
+        class="page-condition-primary-selector-wrapper form-group">
+        <label for="page-condition-primary-selector-id"
+            class="control-label">{{ 'se.cms.page.condition.primary.association.label' | translate }}</label>
+        <ui-select id="page-condition-primary-selector-id"
+            data-ng-model="$ctrl.primarySelected"
+            class="form-control"
+            search-enabled="true"
+            theme="select2"
+            data-dropdown-auto-width="false"
+            data-ng-change="$ctrl.dataChanged()">
+            <ui-select-match id="select-type"
+                class="ySEPageRestr-picker--select__match">
+                {{ $ctrl.primarySelected.name }}
+            </ui-select-match>
+            <ui-select-choices repeat="page in $ctrl.primaryPageChoices | filter:$select.search">
+                {{ page.name }}
+            </ui-select-choices>
+        </ui-select>
+        <span data-ng-show="$ctrl.primarySelected.label"
+            class="help-inline">
+            <span class="help-block-inline">{{ 'se.cms.page.label.label' | translate }}: {{ $ctrl.primarySelected.label }}</span>
+        </span>
+    </div>
+
+    <div data-ng-if="$ctrl.showHomePageWidget()">
+        <div class="se-component-homepage checkbox">
+            <input type="checkbox"
+                id="set-homepage-checkbox"
+                class="se-component-item--details"
+                name="clone-on-drop"
+                data-ng-change="$ctrl.homePageChanged()"
+                data-ng-model="$ctrl.homepage">
+            <label class="control-label se-component-homepage--label"
+                for="set-homepage-checkbox"
+                data-translate="se.cms.display.conditions.homepage.set" />
+        </div>
+        <label class="control-label se-component-homepage--label"
+            for="set-homepage-checkbox"
+            data-ng-if="$ctrl.showReplaceLabel">
+            {{ "se.cms.display.conditions.homepage.replace" | translate: { currentHomepage: $ctrl.currentHomePageName } }}
+        </label>
+    </div>
+
+</div>

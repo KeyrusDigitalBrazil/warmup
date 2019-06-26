@@ -1,0 +1,108 @@
+<div id="editConfigurationsBody-001"
+    class="perso-library">
+
+    <personalizationsmartedit-scroll-zone data-ng-if="scrollZoneElement != null"
+        data-is-transparent="true"
+        data-scroll-zone-id="'managerview'"
+        data-scroll-zone-visible="scrollZoneVisible"
+        data-get-element-to-scroll="getElementToScroll()"></personalizationsmartedit-scroll-zone>
+
+    <div class="perso-library__scroll-zone perso__scrollbar--hidden"
+        personalization-current-element="setScrollZoneElement"
+        personalization-infinite-scroll="addMoreItems()"
+        personalization-infinite-scroll-distance="2">
+        <div>
+            <h2 class="perso-library__header"
+                data-ng-bind="catalogName"></h2>
+            <div class="perso-library__search-area-layout">
+                <div class="perso-search perso-search-gutter perso-input-group">
+                    <div class="perso-input-group__addon">
+                        <span class="hyicon hyicon-search perso-search__search-icon"></span>
+                    </div>
+                    <input type="text"
+                        class="perso-input-group__input ng-pristine ng-untouched ng-valid"
+                        placeholder="{{ 'personalization.modal.manager.search.placeholder' | translate}}"
+                        ng-model="search.name"
+                        ng-keyup="searchInputKeypress($event)">
+                    </input>
+                    <div class="perso-input-group__addon">
+                        <span data-ng-show="search.name"
+                            class="glyphicon glyphicon-remove-sign perso-search__reset-icon"
+                            ng-click="search.name=''; searchInputKeypress($event)">
+                        </span>
+                    </div>
+                </div>
+                <div class="perso-library__filter-layout perso-library__filter-layout--mobile">
+                    <ui-select ng-model="search.status"
+                        theme="select2"
+                        title=""
+                        search-enabled="false">
+                        <ui-select-match>
+                            <span ng-bind="$select.selected.text | translate"></span>
+                        </ui-select-match>
+                        <ui-select-choices repeat="item in statuses"
+                            position="down">
+                            <span ng-bind="item.text | translate"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                </div>
+            </div>
+
+            <div data-ng-show="isSearchResultHidden()"
+                class="perso-library__search-results--fixed">
+                <span data-ng-bind="filteredCustomizationsCount"></span>
+                <span data-translate="personalization.modal.manager.search.result.label"></span>
+            </div>
+            <div class="perso-library__search-results">
+                <span data-ng-bind="filteredCustomizationsCount"></span>
+                <span data-translate="personalization.modal.manager.search.result.label"></span>
+            </div>
+
+            <button class="y-add y-add-btn perso-library__add-button"
+                type="button"
+                data-ng-click="openNewModal();">
+                <span class="hyicon hyicon-add"
+                    data-translate="personalization.modal.manager.add.button"></span>
+            </button>
+
+            <div class="y-tree perso-library__y-tree">
+                <!-- headers -->
+                <div data-ng-show="isSearchGridHeaderHidden()"
+                    class="y-tree-header y-tree-header--fixed">
+                    <data-ng-include src="'personalizationsmarteditManagerViewGridHeaderTemplate.html'"></data-ng-include>
+                </div>
+                <div class="y-tree-header">
+                    <data-ng-include src="'personalizationsmarteditManagerViewGridHeaderTemplate.html'"></data-ng-include>
+                </div>
+                <!--end y-tree-header-->
+
+                <div ui-tree="treeOptions"
+                    id="tree-root">
+                    <div ui-tree-nodes
+                        data-ng-model="customizations">
+                        <div data-ng-repeat="customization in customizations"
+                            data-ng-class="{'perso-library__angular-ui-tree-drag': customization.isDragging}"
+                            ui-tree-node
+                            data-ng-include="'personalizationsmarteditManagerViewNodeTemplate.html'"></div>
+                    </div>
+                </div>
+
+                <div class="pe-spinner--outer"
+                    data-ng-show="moreCustomizationsRequestProcessing">
+                    <div data-ng-include="'waitDialog.html'"></div>
+                </div>
+                <!--end customization-repeat-->
+            </div>
+            <!--end y-tree-->
+        </div>
+    </div>
+    <!--end scroll zone-->
+
+    <a class="perso-library__back-to-top-button"
+        title="{{'personalization.commons.button.title.backtotop' | translate}}"
+        data-ng-show="isReturnToTopButtonVisible()"
+        data-ng-click="scrollZoneReturnToTop()">
+        <span class="hyicon hyicon-top back-to-top"></span>
+    </a>
+
+</div>

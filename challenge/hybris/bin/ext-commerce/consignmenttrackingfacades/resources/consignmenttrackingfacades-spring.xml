@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultCarrierPopulator" alias="carrierPopulator" />
+	<bean id="defaultCarrierPopulator" class="de.hybris.platform.consignmenttrackingfacades.populators.DefaultCarrierPopulator">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultCarrierConverter" alias="carrierConverter"/>
+	<bean id="defaultCarrierConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.consignmenttrackingfacades.delivery.data.CarrierData"/>
+		<property name="populators">
+			<list>
+				<ref bean="carrierPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultConsignmentTrackingFacade" alias="consignmentTrackingFacade"/>
+	<bean id="defaultConsignmentTrackingFacade" class="de.hybris.platform.consignmenttrackingfacades.impl.DefaultConsignmentTrackingFacade">
+		<property name="consignmentConverter" ref="consignmentConverter" />
+		<property name="consignmentTrackingService" ref="consignmentTrackingService" />
+	</bean>
+	
+	<bean id="consignmentForTrackingPopulator" class="de.hybris.platform.consignmenttrackingfacades.populators.ConsignmentForTrackingPopulator">
+		<property name="carrierConverter" ref="carrierConverter" />
+		<property name="consignmentTrackingService" ref="consignmentTrackingService" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="consignmentConverter" />
+		<property name="add" ref="consignmentForTrackingPopulator" />
+	</bean>
+			
+</beans>

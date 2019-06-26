@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="abstractDemoPatch" class="de.hybris.platform.patchesdemo.release.AbstractDemoPatch" abstract="true" parent="abstractPatch"/>
+
+	<!-- Patch for release 1.0 configuration -->
+	<bean id="patch1x0" class="de.hybris.platform.patchesdemo.release.Patch1x0" parent="abstractDemoPatch"/>
+
+	<!-- Patch for release 2.0 configuration -->
+	<bean id="patch2x0" class="de.hybris.platform.patchesdemo.release.Patch2x0" parent="abstractDemoPatch"/>
+
+	<!-- Patch for release 2.1 configuration -->
+	<bean id="patch2x1" class="de.hybris.platform.patchesdemo.release.Patch2x1" parent="abstractDemoPatch"/>
+
+	<!-- Patch for release ERROR configuration - demo error handling -->
+	<bean id="minorErrorPatch" class="de.hybris.platform.patchesdemo.release.MinorErrorPatch" parent="abstractDemoPatch"/>
+	<bean id="majorErrorPatch" class="de.hybris.platform.patchesdemo.release.MajorErrorPatch" parent="abstractDemoPatch"/>
+
+	<bean id="patchesDemoSystemSetup" class="de.hybris.platform.patchesdemo.setup.PatchesDemoSystemSetup" parent="patchesSystemSetup">
+		<property name="patches">
+			<list>
+				<ref bean="patch1x0"/>
+				<ref bean="patch2x0"/>
+				<ref bean="patch2x1"/>
+				<ref bean="minorErrorPatch"/>
+				<ref bean="majorErrorPatch"/>
+			</list>
+		</property>
+	</bean>
+</beans>

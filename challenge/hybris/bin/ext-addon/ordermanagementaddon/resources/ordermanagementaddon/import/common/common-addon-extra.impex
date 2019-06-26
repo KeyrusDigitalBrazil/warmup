@@ -1,0 +1,82 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+
+# Consginment WORKFLOW
+$lang=en
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=$lang];owner(uid);description[lang=$lang];activationscript;visibleForPrincipals(uid)
+;ConsignmentTemplate;Consignment Template;admin;;;admingroup,warehouseadministratorgroup,warehousemanagergroup,warehouseagentgroup
+
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=$lang];description[lang=$lang];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;rendererTemplate(code);actionType(code)
+;NPR_Picking;Picking;;warehouseagentgroup;ConsignmentTemplate;false;;;start
+;NPR_Packing;Packing;;warehouseagentgroup;ConsignmentTemplate;false;;;normal
+;NPR_Shipping;Shipping;;warehouseagentgroup;ConsignmentTemplate;false;;;normal
+;NPR_Pickup;Pick up;;warehouseagentgroup;ConsignmentTemplate;false;;;normal
+;NPR_End;End of the Workflow;;warehouseagentgroup;ConsignmentTemplate;false;;;end
+
+INSERT_UPDATE AutomatedWorkflowActionTemplate;code[unique=true];name[lang=$lang];description[lang=$lang];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;rendererTemplate(code);actionType(code);jobHandler
+;NPR_Automated_Packing;Automated Packing;;warehouseagentgroup;ConsignmentTemplate;false;;;normal;taskAssignmentPackConsignmentAction
+;NPR_Automated_Shipping;Automated Shipping;;warehouseagentgroup;ConsignmentTemplate;false;;;normal;taskAssignmentShipConsignmentAction
+;NPR_Automated_Pickup;Automated Pick up;;warehouseagentgroup;ConsignmentTemplate;false;;;normal;taskAssignmentPickupConsignmentAction
+
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(code);description[allownull=true]
+;NPR001;Picked;NPR_Picking;
+;NPR002;Packed;NPR_Packing;
+;NPR003;Redirect to shipping;NPR_Automated_Packing;
+;NPR004;Redirect to pick up;NPR_Automated_Packing;
+;NPR005;Shipped;NPR_Shipping;
+;NPR006;Automated Shipping;NPR_Automated_Shipping;
+;NPR007;Picked up;NPR_Pickup;
+;NPR008;Automated Pick up;NPR_Automated_Pickup;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(code)[unique=true];target(code)[unique=true];andConnectionTemplate;qualifier
+;NPR001;NPR_Packing;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR002;NPR_Automated_Packing;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR003;NPR_Shipping;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR004;NPR_Pickup;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR005;NPR_Automated_Shipping;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR006;NPR_End;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR007;NPR_Automated_Pickup;false;WorkflowActionTemplateLinkTemplateRelation
+;NPR008;NPR_End;false;WorkflowActionTemplateLinkTemplateRelation
+
+
+
+###
+# ASN CANCELLATION WORKFLOW
+
+
+INSERT_UPDATE WorkflowTemplate;code[unique=true];name[lang=$lang];owner(uid);description[lang=$lang];activationscript;visibleForPrincipals(uid)
+;AsnTemplate;ASN Template;admin;;;admingroup,warehouseadministratorgroup,warehousemanagergroup
+
+INSERT_UPDATE AutomatedWorkflowActionTemplate;code[unique=true];name[lang=$lang];description[lang=$lang];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;rendererTemplate(code);actionType(code);jobHandler
+;ASN_Automated_ReallocateConsignments;Automated Reallocate Consignments;;warehouseadministratorgroup;AsnTemplate;false;;;start;taskReallocateConsignmentsOnAsnCancelAction
+;ASN_Automated_DeleteCancellationEvents;Automated Delete CancellationEvents;;warehouseadministratorgroup;AsnTemplate;false;;;normal;taskDeleteCancellationEventsOnAsnCancelAction
+;ASN_Automated_DeleteStockLevels;Automated Delete StockLevels;;warehouseadministratorgroup;AsnTemplate;false;;;normal;taskDeleteStockLevelsOnAsnCancelAction
+
+INSERT_UPDATE WorkflowActionTemplate;code[unique=true];name[lang=$lang];description[lang=$lang];principalAssigned(uid);workflow(code)[unique=true];sendEmail;emailAddress;rendererTemplate(code);actionType(code)
+;ASN_End;End of the Asn Workflow;;warehouseadministratorgroup;AsnTemplate;false;;;end
+
+INSERT_UPDATE WorkflowDecisionTemplate;code[unique=true];name[lang=$lang];actionTemplate(code);description[allownull=true]
+;ASN001;Reallocate Consignments After ASN cancel;ASN_Automated_ReallocateConsignments;
+;ASN002;Delete CancellationEvents After Asn Cancel;ASN_Automated_DeleteCancellationEvents;
+;ASN003;Delete StockLevels After ASN cancel;ASN_Automated_DeleteStockLevels;
+
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation;source(code)[unique=true];target(code)[unique=true];andConnectionTemplate;qualifier
+;ASN001;ASN_Automated_DeleteCancellationEvents;false;WorkflowActionTemplateLinkTemplateRelation
+;ASN002;ASN_Automated_DeleteStockLevels;false;WorkflowActionTemplateLinkTemplateRelation
+;ASN003;ASN_End;false;WorkflowActionTemplateLinkTemplateRelation
+
+####Constraints
+INSERT_UPDATE AdvancedShippingNoticeValidConstraint ; id[unique=true,allownull=true]        ; severity(code,itemtype(code)) ; target[allownull=true]                                           ; type(code)             ; constraintGroups(id)
+; AdvancedShippingNoticeValidConstraint ; ERROR:Severity                ; de.hybris.platform.warehousing.model.AdvancedShippingNoticeModel ; AdvancedShippingNotice ; default
+$de.hybris.platform.core.Registry.getApplicationContext().getBean(de.hybris.platform.validation.services.ValidationService.class).reloadValidationEngine()

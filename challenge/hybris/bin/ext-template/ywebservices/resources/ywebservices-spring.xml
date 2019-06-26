@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!--
+	The hybris platform provides one single Spring application context for beans located at the jalo layer.
+	Each extension can add beans to this context by specifying them at this configuration file.
+	 
+	You can use and/or redefine beans defined at configuration files of other extensions as well as
+	adding new one.
+		
+	If you want to locate this file at a different location or want to use several files for better,
+	structuring, please use the '<yourextension>.application-context' property at your project.properties file.
+	There you can specify a comma separated list of files where first is tried to find a file per classpath and
+	then per file system.
+
+	
+	If you want to configure beans for your web module please have a look at
+	your web/webroot/WEB-INF/<extname>-web-spring.xml.
+	-->
+	
+	<!--  Example how to override a manager -->
+	<!--
+	<bean id="core.productManager"   class="ywebservicespackage.jalo.YWebServicesProductManager" 	init-method="init"	destroy-method="destroy" />
+	-->
+	
+	
+ 	<!--  Example how to configure the class to use for jalo session creation -->
+	<!--
+	<bean id="jalosession"   class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="ywebservicespackage.jalo.YWebServicesJaloSession"/>
+	</bean>
+	-->
+
+	
+	<!--  Example how to override an item  -->
+	<!-- 
+	<bean id="de.hybris.platform.jalo.product.Product" class="ywebservicespackage.jalo.YWebServicesProduct" scope="prototype" />		
+ 	-->
+
+	<!--  
+	 Example how to register and use an AOP aspect 
+     Also see http://static.springframework.org/spring/docs/2.5.x/reference/aop.html	
+     -->
+	
+	<!-- 
+	<bean id="ywebservicesProfBean" class="ywebservicespackage.aop.YWebServicesProfilingAspect"/>
+	<aop:config proxy-target-class="true">
+  		<aop:aspect id="ywebservicesProfAspect" ref="ywebservicesProfBean" >
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="execution(* getModificationTime(..))" />  	            
+	   		<aop:around pointcut-ref="profiledMethods" method="profile" />
+  		</aop:aspect>
+	</aop:config>
+	 -->
+
+	
+	<!-- some other examples of a pointcut that matches everything:
+
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="bean(de.hybris.platform.jalo.user.Customer) &amp;&amp; 
+	      	            !execution(* getPK(..))" />  	            
+	       <aop:pointcut id="profiledMethods" expression="execution(* *(..))" />	
+	  -->
+	
+	
+	<!-- Beans needed for sample code -->
+ 
+	
+	<!-- Sample Converters and Populators -->
+	<bean id="ywebservicesSampleAddressPopulator" class="ywebservicespackage.populators.SampleAddressPopulator" />
+
+	<bean id="ywebservicesSampleAddressConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="ywebservicespackage.data.AddressData" />
+		<property name="populators">
+			<list>
+				<ref bean="ywebservicesSampleAddressPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ywebservicesSampleUserPopulator" class="ywebservicespackage.populators.SampleUserPopulator">
+		<property name="addressConverter" ref="ywebservicesSampleAddressConverter" />
+	</bean>
+
+	<bean id="ywebservicesSampleUserConverter" parent="defaultPopulatingConverter">
+		<property name="targetClass" value="ywebservicespackage.data.UserData" />
+		<property name="populators">
+			<list>
+				<ref bean="ywebservicesSampleUserPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Sample Services -->
+	<bean id="ywebservicesSampleUserService" class="ywebservicespackage.services.impl.SampleUserServicesImpl" />
+	
+ 	<!-- Sample facades -->
+	<alias name="ywebservicesDefaultSampleFacades" alias="ywebservicesSampleFacades"/>
+	<bean id="ywebservicesDefaultSampleFacades" class="ywebservicespackage.facades.impl.DefaultSampleFacades">
+		<property name="userConverter" ref="ywebservicesSampleUserConverter" />
+		<property name="sampleUserService" ref="ywebservicesSampleUserService" />
+	</bean>		
+			
+	<beans profile="tenant_junit">
+	<!-- Configuration needed for tests to run properly. -->
+		<util:list id="jaxbTypeAdaptersList">
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.DateAdapter</value>
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.VariableMapAdapter</value>
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.XSSStringAdapter</value>
+		</util:list>
+	
+	
+		<util:list id="jaxbContextClasses">
+			<value>java.lang.Long</value>
+			<value>java.lang.String</value>
+			<value>java.util.ArrayList</value>
+		</util:list>
+	
+		<bean id="jaxbWrapperSupport" class="de.hybris.platform.webservicescommons.jaxb.wrapper.JaxbWrapperSupport">
+		<property name="wrapperFactories">
+			<list>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbStringWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbLongWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbDoubleWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbListWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbMapWrapperFactory"/>
+			</list>
+		</property>
+		</bean>
+	</beans>
+</beans>

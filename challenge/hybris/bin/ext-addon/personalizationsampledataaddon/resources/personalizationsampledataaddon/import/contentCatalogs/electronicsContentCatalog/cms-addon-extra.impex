@@ -1,0 +1,136 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang = en
+$contentCatalog = electronicsContentCatalog
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]), CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$regulargroup = regulargroup
+$customergroup = customergroup
+$siteUid = electronics
+
+
+$defaultPassword = 12341234
+
+# Create Customer Group
+INSERT_UPDATE UserGroup; UID[unique = true]         ; groups(uid)[mode = append]
+                       ; electronics-cxmanagergroup ; cxmanagergroup
+                       ; electronics-cxusergroup    ; cxusergroup
+
+INSERT_UPDATE Employee; UID[unique = true]    ; password[default = $defaultPassword]; backOfficeLoginDisabled; groups(uid)[mode = append] ; name                                    ; description
+                      ; cxmanager-electronics ;                                     ;                        ; electronics-cxmanagergroup ; Personalization Manager For Electronics ; Personalization Manager For Electronics
+                      ; cxuser-electronics    ;                                     ;                        ; electronics-cxusergroup    ; Personalization User For Electronics    ; Personalization Read Only User For Electronics
+
+INSERT_UPDATE Employee; UID[unique = true]; groups(uid)[mode = append] ;
+                      ; cxmanager         ; electronics-cxmanagergroup ;
+                      ; cxuser            ; electronics-cxusergroup
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; readPrincipals(uid)[mode = append]                 ; writePrincipals(uid)[mode = append]
+                            ; electronicsContentCatalog ; Staged                ; electronics-cxusergroup                            ; electronics-cxmanagergroup
+                            ; electronicsContentCatalog ; Online                ; electronics-cxusergroup,electronics-cxmanagergroup ; cxmanager
+
+INSERT_UPDATE CxSegment; code[unique = true]; description                                   ;
+                       ; CATEGORY brand_10  ; Users who browse Canon products often         ;
+                       ; CATEGORY 577       ; Users who browse Webcams products often       ;
+                       ; CATEGORY 588       ; Users who browse Camera Lenses products often ;
+
+INSERT_UPDATE Customer; uid[unique = true]         ; groups(uid)   ; password[default = $defaultPassword]; name              ; &userref            ;
+                      ; alistair@hybris.com        ; customergroup ;                                     ; Alistair          ; alistair@hybris.com ;
+                      ; canonlover@hybris.com      ; customergroup ;                                     ; Canon Lover       ;                     ; canonlover@hybris.com      ;
+                      ; cameralenslover@hybris.com ; customergroup ;                                     ; Camera Lens Lover ;                     ; cameralenslover@hybris.com ;
+
+INSERT_UPDATE CxUserToSegment; segment(code)[unique = true]; user(uid)[unique = true]  ; affinity[default = 1]; baseSite(uid)[unique = true, default = $siteUid]
+                             ; CATEGORY brand_10           ; canonlover@hybris.com     ;                      ;
+                             ; CATEGORY 577                ; menvipgold@hybris.com     ;                      ;
+                             ; CATEGORY 588                ; menvipgold@hybris.com     ;                      ;
+                             ; CATEGORY 577                ; menover30@hybris.com      ;                      ;
+                             ; VIPGold                     ; vipgold@hybris.com        ;                      ;
+                             ; 20-29                       ; vipgold@hybris.com        ;                      ;
+                             ; VIPSilver                   ; vipsilver@hybris.com      ;                      ;
+                             ; VIPBronze                   ; vipbronze@hybris.com      ;                      ;
+                             ; Women                       ; women@hybris.com          ;                      ;
+                             ; Women                       ; womenvipgold@hybris.com   ;                      ;
+                             ; VIPGold                     ; womenvipgold@hybris.com   ;                      ;
+                             ; Women                       ; womenvipsilver@hybris.com ;                      ;
+                             ; VIPSilver                   ; womenvipsilver@hybris.com ;                      ;
+                             ; Men                         ; men@hybris.com            ;                      ;
+                             ; Men                         ; menvipbronze@hybris.com   ;                      ;
+                             ; VIPBronze                   ; menvipbronze@hybris.com   ;                      ;
+                             ; Men                         ; menvipgold@hybris.com     ;                      ;
+                             ; VIPGold                     ; menvipgold@hybris.com     ;                      ;
+                             ; 30-39                       ; menvipgold@hybris.com     ;                      ;
+                             ; Men                         ; menover30@hybris.com      ;                      ;
+                             ; 30-39                       ; menover30@hybris.com      ;                      ;
+                             ; 40-49                       ; menover30@hybris.com      ;                      ;
+                             ; 50-59                       ; menover30@hybris.com      ;                      ;
+                             ; 60-69                       ; menover30@hybris.com      ;                      ;
+                             ; 60-69                       ; menover30@hybris.com      ;                      ;
+                             ; 70-79                       ; menover30@hybris.com      ;                      ;
+                             ; 80-89                       ; menover30@hybris.com      ;                      ;
+                             ; 90-99                       ; menover30@hybris.com      ;                      ;
+
+INSERT_UPDATE CxCustomizationsGroup; code                          ; $contentCV[unique = true]
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxCustomizationsGroupExists(line, 1, impex, 1);"
+                                   ; electronicsCustomizationGroup ; ;
+
+#Cx Customizations
+INSERT_UPDATE CxCustomization; code[unique = true]; name           ; $contentCV[unique = true]; group(code, $contentCV)[default = 'electronicsCustomizationGroup']; status(code)[default = ENABLED]
+                             ; SummerSale         ; SummerSale     ;                          ;
+                             ; CategoryLovers     ; CategoryLovers ;                          ;
+                             ; VIPCust            ; VIPCust        ;                          ;
+
+UPDATE CxCustomizationsGroup; $contentCV[unique = true]; customizations(code, $contentCV)[mode = append]
+                            ;                          ; SummerSale,VIPCust,CategoryLovers
+
+INSERT_UPDATE CxVariation; code[unique = true]                                 ; name                                                ; $contentCV[unique = true]; enabled[default = true]; customization(code, $contentCV)[unique = true]; status(code)[default = ENABLED]
+                         ; canonLover                                          ; canonLover                                          ;                          ;                        ; CategoryLovers                                ;
+                         ; cameraLensesLover                                   ; cameraLensesLover                                   ;                          ;                        ; CategoryLovers                                ;
+                         ; VipGoldAndWomenNotCameraLensLoverOrOver30Man        ; VipGoldAndWomenNotCameraLensLoverOrOver30Man        ;                          ;                        ; VIPCust                                       ;
+                         ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ;                          ;                        ; SummerSale                                    ;
+                         ; VIPDefault                                          ; VIPDefault                                          ;                          ;                        ; VIPCust                                       ; DISABLED
+                         ; SummerSaleDefault                                   ; SummerSaleDefault                                   ;                          ;                        ; SummerSale                                    ; DISABLED
+
+INSERT_UPDATE CxSegmentTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]; $contentCV[unique = true]; segments(code)    ; groupBy(code)[default = 'OR'];
+                              ; trigger08          ; canonLover                                ;                          ; CATEGORY brand_10 ;
+                              ; trigger09          ; cameraLensesLover                         ;                          ; CATEGORY 588      ;
+
+INSERT_UPDATE CxExpressionTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]          ; $contentCV[unique = true]; expression;
+                                 ; expressionTrigger1 ; VipGoldAndWomenNotCameraLensLoverOrOver30Man        ;                          ; "{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""VIPGold""},{""type"":""groupExpression"",""elements"":[{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""Women""},{""type"":""negationExpression"",""element"":{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""CATEGORY 577""}],""operator"":""AND""}}],""operator"":""AND""},{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""30-39""},{""type"":""segmentExpression"",""code"":""Men""}],""operator"":""AND""}],""operator"":""OR""}],""operator"":""AND""}"
+                                 ; expressionTrigger2 ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ;                          ; "{""type"":""groupExpression"",""elements"":[{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""CATEGORY 577""},{""type"":""segmentExpression"",""code"":""CATEGORY 588""}],""operator"":""OR""},{""type"":""segmentExpression"",""code"":""30-39""},{""type"":""segmentExpression"",""code"":""Men""}],""operator"":""AND""}"
+
+INSERT_UPDATE CxDefaultTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]; $contentCV[unique = true];
+                              ; defaultTrigger1    ; VIPDefault                                ;
+                              ; defaultTrigger2    ; SummerSaleDefault                         ;
+
+UPDATE CxCustomization; code[unique = true]; name           ; $contentCV[unique = true]; variations(code, $contentCV)
+                      ; SummerSale         ; SummerSale     ;                          ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man,SummerSaleDefault ;
+                      ; CategoryLovers     ; CategoryLovers ;                          ; canonLover,cameraLensesLover                                          ;
+                      ; VIPCust            ; VIPCust        ;                          ; VipGoldAndWomenNotCameraLensLoverOrOver30Man,VIPDefault               ;
+
+#Cx Models
+INSERT_UPDATE CxCmsAction; containerId                     ; componentId                                                              ; code[unique = true]                                       ; type(code); target                 ; &actionRef                                                ; $contentCV[unique = true]; componentCatalog[default = $contentCatalog];
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxActionExists(line, 3, impex, 6);"
+                         ; Section1SlotHomepageCxContainer ; VipGoldAndWomenNotCameraLensLoverOrOver30ManHompageSplashBannerComponent ; actionVipGoldAndWomenNotCameraLensLoverOrOver30Man        ; PLAIN     ; cxCmsActionPerformable ; actionVipGoldAndWomenNotCameraLensLoverOrOver30Man        ;                          ;
+                         ; Section1SlotHomepageCxContainer ; loyalCustomersSplashBannerComponent                                      ; actionLoyalCustomers                                      ; PLAIN     ; cxCmsActionPerformable ; actionLoyalCustomers                                      ;                          ;
+                         ; Section1SlotHomepageCxContainer ; specialOffersSplashBannerComponent                                       ; actionSpecialOffers                                       ; PLAIN     ; cxCmsActionPerformable ; actionSpecialOffers                                       ;                          ;
+                         ; Section1SlotHomepageCxContainer ; variationCameraLensesElectronicsHomepageSplashBannerComponent            ; actionCameraLensesLover                                   ; PLAIN     ; cxCmsActionPerformable ; actionCameraLensesLover                                   ;                          ;
+                         ; Section1SlotHomepageCxContainer ; variationCanonLoverElectronicsHomepageSplashBannerComponent              ; actionCanonLover                                          ; PLAIN     ; cxCmsActionPerformable ; actionCanonLover                                          ;                          ;
+                         ; Section1SlotHomepageCxContainer ; variationCameraLensesElectronicsHomepageSplashBannerComponent            ; actionSummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ; PLAIN     ; cxCmsActionPerformable ; actionSummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ;                          ;
+
+UPDATE CxVariation; code[unique = true]                                 ; name                                                ; actions(&actionRef)[mode = append]                        ; enabled[default = true]; customization(code, $contentCV)[unique = true]
+                  ; canonLover                                          ; canonLover                                          ; actionCanonLover                                          ;                        ; CategoryLovers
+                  ; cameraLensesLover                                   ; cameraLensesLover                                   ; actionCameraLensesLover                                   ;                        ; CategoryLovers
+                  ; VipGoldAndWomenNotCameraLensLoverOrOver30Man        ; VipGoldAndWomenNotCameraLensLoverOrOver30Man        ; actionVipGoldAndWomenNotCameraLensLoverOrOver30Man        ;                        ; VIPCust
+                  ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ; SummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ; actionSummerSaleCameraLenseLoverOrWebcamLoverAndOver30Man ;                        ; SummerSale
+                  ; VIPDefault                                          ; VIPDefault                                          ; actionLoyalCustomers                                      ;                        ; VIPCust
+                  ; SummerSaleDefault                                   ; SummerSaleDefault                                   ; actionSpecialOffers                                       ;                        ; SummerSale
+
+INSERT_UPDATE CxDefaultPersonalizationCalculationCronJob; code[unique = true]             ; job(code)                                    ; singleExecutable; sessionLanguage(isocode); baseSites(uid)
+                                             ; cxDefaultPersonalizationCalculationCronJobElectronics ; cxDefaultPersonalizationCalculationJob ; false           ; en                      ; $siteUid ;

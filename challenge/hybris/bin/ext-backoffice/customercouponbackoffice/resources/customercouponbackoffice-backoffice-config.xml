@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch" 
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" 
+		xmlns:n="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+	<context type="CustomerCoupon" merge-by="type" parent="AbstractCoupon" component="editor-area" >
+		<editorArea:editorArea logic-handler="customerCouponEditorAreaLogicHandler">
+   			<editorArea:essentials>
+     			<editorArea:essentialSection name="text.couponcode.label">
+   				<editorArea:attribute qualifier="couponId"/>
+   				<editorArea:attribute qualifier="name"/>
+   				<editorArea:attribute qualifier="description"/>		
+			</editorArea:essentialSection>
+ 			</editorArea:essentials>
+     			<editorArea:tab name="tab.configuration.coupon">
+       			<editorArea:section name="sec.configuration.coupon.validity" position="0">
+			    	<editorArea:attribute qualifier="startDate">
+			    		<editorArea:editor-parameter>
+                               <editorArea:name>timeZoneReadOnly</editorArea:name>
+                               <editorArea:value>false</editorArea:value>
+                           </editorArea:editor-parameter>
+                           <editorArea:editor-parameter>
+                               <editorArea:name>selectedTimeZone</editorArea:name>
+                               <editorArea:value>GMT+00:00</editorArea:value>
+                           </editorArea:editor-parameter>
+                           <editorArea:editor-parameter>
+                               <editorArea:name>displayedTimeZones</editorArea:name>
+                               <editorArea:value>GMT-12:00,GMT-11:00,GMT-10:00,GMT-09:30,GMT-09:00,GMT-08:00,GMT-07:00,GMT-06:00,GMT-05:00,GMT-04:30,GMT-04:00,GMT-03:30,GMT-03:00,GMT-02:00,GMT-01:00,GMT+00:00,GMT+01:00,GMT+02:00,GMT+03:00,GMT+03:30,GMT+04:00,GMT+04:30,GMT+05:00,GMT+05:30,GMT+05:45,GMT+06:00,GMT+06:30,GMT+07:00,GMT+08:00,GMT+08:30,GMT+08:45,GMT+09:00,GMT+09:30,GMT+10:00,GMT+10:30,GMT+11:00,GMT+12:00,GMT+12:45,GMT+13:00,GMT+14:00</editorArea:value>
+                           </editorArea:editor-parameter>
+                       </editorArea:attribute>
+			    	<editorArea:attribute qualifier="endDate">
+			    		<editorArea:editor-parameter>
+                               <editorArea:name>timeZoneReadOnly</editorArea:name>
+                               <editorArea:value>false</editorArea:value>
+                           </editorArea:editor-parameter>
+                           <editorArea:editor-parameter>
+                               <editorArea:name>selectedTimeZone</editorArea:name>
+                               <editorArea:value>GMT+00:00</editorArea:value>
+                           </editorArea:editor-parameter>
+                           <editorArea:editor-parameter>
+                               <editorArea:name>displayedTimeZones</editorArea:name>
+                               <editorArea:value>GMT-12:00,GMT-11:00,GMT-10:00,GMT-09:30,GMT-09:00,GMT-08:00,GMT-07:00,GMT-06:00,GMT-05:00,GMT-04:30,GMT-04:00,GMT-03:30,GMT-03:00,GMT-02:00,GMT-01:00,GMT+00:00,GMT+01:00,GMT+02:00,GMT+03:00,GMT+03:30,GMT+04:00,GMT+04:30,GMT+05:00,GMT+05:30,GMT+05:45,GMT+06:00,GMT+06:30,GMT+07:00,GMT+08:00,GMT+08:30,GMT+08:45,GMT+09:00,GMT+09:30,GMT+10:00,GMT+10:30,GMT+11:00,GMT+12:00,GMT+12:45,GMT+13:00,GMT+14:00</editorArea:value>
+                           </editorArea:editor-parameter>
+			    	</editorArea:attribute>
+			    	<editorArea:attribute qualifier="active"/>
+				</editorArea:section>
+				<editorArea:section name="sec.configuration.coupon.assignment">
+					<editorArea:customPanel spring-bean="customerCouponAssignmentPanelRenderer">
+						<editorArea:attribute qualifier="assignable">
+					   		<editorArea:editor-parameter>
+								<editorArea:name>showOptionalField</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+					   	</editorArea:attribute>
+						<editorArea:attribute qualifier="campaignURL"/>
+						<editorArea:attribute qualifier="customers" editor="de.hybris.platform.customercouponbackoffice.editors.FindAssignedCustomers"/>
+					</editorArea:customPanel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	
+	<context type="Customer">
+		<context component="advanced-search" merge-by="type" parent="User">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="customerCoupons"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<context component="editor-area" merge-by="type" parent="User">
+			<editorArea:editorArea logic-handler="customerCouponEditorAreaLogicHandler">
+				<editorArea:tab name="tab.customercouponbackoffice.customers.coupon" position="4">
+					<editorArea:section name="section.customercouponbackoffice.coupons">
+						<editorArea:attribute qualifier="customerCoupons" label="label.customer.coupons" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<context component="cs-editor-area" merge-by="type" parent="User" principal="customersupportadministratorrole">
+			<editorArea:editorArea logic-handler="customerCouponEditorAreaLogicHandler">
+				<editorArea:tab name="tab.customercouponbackoffice.customers.coupon" position="4">
+					<editorArea:section name="section.customercouponbackoffice.coupons">
+						<editorArea:attribute qualifier="customerCoupons" label="label.customer.coupons" readonly="true"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+    
+</config>

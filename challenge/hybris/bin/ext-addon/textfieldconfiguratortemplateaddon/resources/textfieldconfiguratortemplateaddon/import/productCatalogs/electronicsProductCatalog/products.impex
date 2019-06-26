@@ -1,0 +1,52 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='check']
+
+# Root category of configurable categories
+INSERT_UPDATE Category;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;configurations;
+
+# Sample configurable categories with configurations
+INSERT_UPDATE ConfigurationCategory;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;engraving_powershot;configurations
+;chargers;configurations
+;engraving;configurations
+;engraving_largeFont;engraving
+;engraving_extraLargeFont;engraving
+;engraving_smallFont;engraving
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, $catalogVersion);qualifier
+;PowerShotA480_Engraved_Text;;;engraving_powershot;powershot_engravedText
+;PowerShotA480_Font_Type;;;engraving_powershot;powershot_fontType
+;PowerShotA480_Font_Size;;;engraving_powershot;powershot_fontSize
+;BC-TRP_Voltage;;;chargers;chargerVoltage
+;BC-TRP_Cable_Length;;;chargers;chargerCableLength
+;DSC_H20_Engraved_Text;;;engraving;engravedText
+;DSC_H20_Font_Type;;;engraving;fontType
+;DSC_H20_Font_Size;;;engraving;fontSize
+;DSC_H20_LargeFont;;;engraving_largeFont;fontSize
+;DSC_H20_ExtraLargeFont;;;engraving_extraLargeFont;fontSize
+;DSC_H20_SmallFont;;;engraving_smallFont;fontSize
+
+# Assign the categories to some products
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;$supercategories[mode='append']
+;1934793;;engraving_powershot
+;325234;;chargers
+;1978440;;engraving
+;1978440_red;;engraving_largeFont
+;1978440_blue;;engraving_smallFont
+;1978440_green;;engraving_extraLargeFont
+

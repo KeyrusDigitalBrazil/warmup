@@ -1,0 +1,424 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="solrserver_buildcallbacks" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<target name="installSolr">
+		<installSolr />
+	</target>
+
+	<target name="createSolrInstance" description="Creates a Solr instance [allowed parameters: -Dinstance.name -Dinstance.conf.dir -Dinstance.data.dir -Dinstance.log.dir].">
+		<callback extname="" target="before_createSolrInstance" />
+		<solrServerCommand command="createSolrInstance" />
+		<callback extname="" target="after_createSolrInstance" />
+	</target>
+
+	<target name="deleteSolrInstance" description="Deletes a Solr instance [allowed parameters: -Dinstance.name -Dinstance.conf.dir -Dinstance.data.dir -Dinstance.log.dir].">
+		<callback extname="" target="before_deleteSolrInstance" />
+
+		<input message="All config, data and log files will be deleted. Continue (y/n)?" validargs="y,n" addproperty="do.delete" defaultvalue="n" />
+
+		<if>
+			<equals arg1="${do.delete}" arg2="y" />
+			<then>
+				<solrServerCommand command="deleteSolrInstance" />
+			</then>
+		</if>
+
+		<callback extname="" target="after_deleteSolrInstance" />
+	</target>
+
+	<target name="startSolrServer" description="Starts a Solr server [allowed parameters: -Dinstance.name -Dinstance.hostname -Dinstance.port -Dinstance.mode -Dinstance.conf.dir -Dinstance.data.dir -Dinstance.log.dir -Dinstance.memory -Dinstance.javaoptions -Dinstance.zk.host -Dinstance.zk.upconfig -Dinstance.authtype -Dinstance.user -Dinstance.password -Dinstance.ssl.enabled -Dinstance.ssl.keyStoreType -Dinstance.ssl.keyStore -Dinstance.ssl.keyStorePassword -Dinstance.ssl.trustStoreType -Dinstance.ssl.trustStore -Dinstance.ssl.trustStorePassword -Dinstance.ssl.needClientAuth -Dinstance.ssl.wantClientAuth].">
+		<callback extname="" target="before_startSolrServer" />
+		<solrServerCommand command="startSolrServer" />
+		<callback extname="" target="after_startSolrServer" />
+	</target>
+
+	<target name="startSolrServers" description="Starts the Solr server that have autostart enabled.">
+		<callback extname="" target="before_startSolrServers" />
+		<solrServerCommand command="startSolrServers" />
+		<callback extname="" target="after_startSolrServers" />
+	</target>
+
+	<target name="stopSolrServer" description="Stops a Solr server [allowed parameters: -Dinstance.name -Dinstance.port -Dinstance.data.dir].">
+		<callback extname="" target="before_stopSolrServer" />
+		<solrServerCommand command="stopSolrServer" />
+		<callback extname="" target="after_stopSolrServer" />
+	</target>
+
+	<target name="stopSolrServers" description="Stops the Solr servers that have autostart enabled.">
+		<callback extname="" target="before_stopSolrServers" />
+		<solrServerCommand command="stopSolrServers" />
+		<callback extname="" target="after_stopSolrServers" />
+	</target>
+
+	<target name="uploadSolrConfig" description="Uploads configuration into a ZooKepeer instance. [allowed parameters: -Dinstance.name -Dinstance.port -Dinstance.mode -Dinstance.conf.dir -Dinstance.zk.host].">
+		<callback extname="" target="before_uploadSolrConfig" />
+		<solrServerCommand command="uploadSolrConfig" />
+		<callback extname="" target="after_uploadSolrConfig" />
+	</target>
+
+	<target name="configureSolrServer" description="Applies Hybris customizations on the Solr server [allowed parameters: -DsolrServerPath]">
+		<callback extname="" target="before_configureSolrServer" />
+
+		<fail message="'${solrServerPath}' path is not available, please set the 'solrServerPath' property to a valid path">
+			<condition>
+				<not>
+					<and>
+						<isset property="solrServerPath" />
+						<available file="${solrServerPath}" type="dir" />
+					</and>
+				</not>
+			</condition>
+		</fail>
+
+		<local name="solrServerVersion" />
+		<detectSolrServerVersion property="solrServerVersion" solrServerPath="${solrServerPath}" />
+
+		<fail message="failed to detect Solr server version">
+			<condition>
+				<not>
+					<isset property="solrServerVersion" />
+				</not>
+			</condition>
+		</fail>
+
+		<local name="versionPath" />
+		<solrVersionPathProperty name="versionPath" version="${solrServerVersion}" />
+		<property name="solrCustomizationsPath" value="${ext.solrserver.path}/resources/solr/${versionPath}/customizations" />
+
+		<configureSolrServer solrServerPath="${solrServerPath}" solrCustomizationsPath="${solrCustomizationsPath}" />
+
+		<callback extname="" target="after_configureSolrServer" />
+	</target>
+
+	<macrodef name="cleanupPreviousSolrVersions" description="Removes previous solr server/customizations versions from the solr directory.">
+		<attribute name="searchDirectory" />
+		<attribute name="currentVersion" />
+		<attribute name="versionType" />
+
+		<sequential>
+			<taskdef name="cleanupPreviousVersionsTask" classname="de.hybris.platform.solrserver.ant.CleanupPreviousVersionsTask" onerror="fail">
+				<classpath>
+					<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+					<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+					<pathelement path="${ext.solrserver.path}/classes" />
+					<fileset dir="${ext.solrserver.path}/bin" erroronmissingdir="false">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+			<cleanupPreviousVersionsTask searchDirectory="@{searchDirectory}" currentVersion="@{currentVersion}" versionType="@{versionType}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="solrServerCommand">
+		<attribute name="command" />
+		<sequential>
+			<taskdef name="solrServerCommandTask" classname="de.hybris.platform.solrserver.ant.SolrServerCommandTask" onerror="fail">
+				<classpath>
+					<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+					<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+					<pathelement path="${ext.solrserver.path}/classes" />
+					<fileset dir="${ext.solrserver.path}/bin" erroronmissingdir="false">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+
+			<solrServerCommandTask command="@{command}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="solrVersionPathProperty">
+		<attribute name="name" />
+		<attribute name="version" />
+		<sequential>
+			<taskdef name="solrVersionPathPropertyTask" classname="de.hybris.platform.solrserver.ant.SolrVersionPathPropertyTask" onerror="fail">
+				<classpath>
+					<pathelement path="${platformhome}/bootstrap/bin/ybootstrap.jar" />
+					<pathelement path="${platformhome}/bootstrap/bin/yant.jar" />
+					<fileset dir="${platformhome}/resources/ant/lib">
+						<include name="*.jar" />
+					</fileset>
+					<pathelement path="${ext.solrserver.path}/classes" />
+					<fileset dir="${ext.solrserver.path}/bin" erroronmissingdir="false">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+
+			<solrVersionPathPropertyTask name="@{name}" version="@{version}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="solrserver_after_build">
+		<sequential>
+			<installSolr />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="installSolr">
+		<sequential>
+			<local name="solrServerVersion" />
+			<property name="solrServerVersion" value="${solrserver.solr.server.version}" />
+
+			<local name="versionPath" />
+			<solrVersionPathProperty name="versionPath" version="${solrServerVersion}" />
+
+			<local name="solrCustomizationsVersion" />
+			<for list="${solrserver.solr.customizations.versions}" param="version">
+				<sequential>
+					<local name="tmpVersionPath" />
+					<solrVersionPathProperty name="tmpVersionPath" version="@{version}" />
+
+					<if>
+						<equals arg1="${versionPath}" arg2="${tmpVersionPath}" />
+						<then>
+							<property name="solrCustomizationsVersion" value="@{version}" />
+						</then>
+					</if>
+				</sequential>
+			</for>
+
+			<fail message="Could not find a version of the Solr customizations compatible with the Solr server [solrserver.solr.server.version: ${solrserver.solr.server.version}; solrserver.solr.customizations.versions: ${solrserver.solr.customizations.versions}]">
+				<condition>
+					<not>
+						<and>
+							<isset property="solrServerVersion" />
+							<isset property="solrCustomizationsVersion" />
+						</and>
+					</not>
+				</condition>
+			</fail>
+
+			<!-- Installs the Solr customizations for all supported version -->
+			<for list="${solrserver.solr.customizations.versions}" param="version">
+				<sequential>
+					<installSolrCustomizations version="@{version}" />
+				</sequential>
+			</for>
+
+			<!-- Installs the Solr server -->
+			<installSolrServer version="${solrServerVersion}" customizationsVersion="${solrCustomizationsVersion}" />
+
+			<!-- Clean up previous Solr server versions -->
+			<local name="solrPath" />
+			<property name="solrPath" value="${ext.solrserver.path}/resources/solr" />
+			<cleanupPreviousSolrVersions searchDirectory="${solrPath}" currentVersion="${solrServerVersion}" versionType="server" />
+
+			<!-- Clean up previous Solr customizations versions -->
+			<local name="solrCustomizationsVersions" />
+			<property name="solrCustomizationsVersions" value="${solrserver.solr.customizations.versions}" />
+			<cleanupPreviousSolrVersions searchDirectory="${solrPath}" currentVersion="${solrCustomizationsVersions}" versionType="customizations" />
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="installSolrCustomizations">
+		<attribute name="version" />
+		<sequential>
+			<local name="versionPath" />
+			<solrVersionPathProperty name="versionPath" version="@{version}" />
+			<local name="solrCustomizationsPath" />
+			<property name="solrCustomizationsPath" value="${ext.solrserver.path}/resources/solr/${versionPath}/customizations" />
+
+			<local name="meta.version" />
+			<property file="${solrCustomizationsPath}/meta.properties" prefix="meta." />
+
+			<!-- sets the meta version if not yet set -->
+			<property name="meta.version" value="" />
+
+			<echo message="--- Solr customizations ${versionPath} ---" />
+			<echo message="expectedVersion: @{version}" />
+			<echo message="currentVersion: ${meta.version}" />
+
+			<if>
+				<not>
+					<and>
+						<available file="${solrCustomizationsPath}" type="dir" />
+						<equals arg1="@{version}" arg2="${meta.version}" trim="true" />
+					</and>
+				</not>
+				<then>
+					<echo message="Installing Solr customizations [version=@{version}]" />
+
+					<downloadSolrArtifact groupId="${solrserver.solr.customizations.groupId}" artifactId="${solrserver.solr.customizations.artifactId}" version="@{version}" filesetId="solrCustomizationsZip" />
+
+					<delete dir="${solrCustomizationsPath}" />
+
+					<unzip dest="${solrCustomizationsPath}">
+						<fileset refid="solrCustomizationsZip" />
+					</unzip>
+
+					<propertyfile file="${solrCustomizationsPath}/meta.properties">
+						<entry key="version" value="@{version}" />
+					</propertyfile>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="installSolrServer">
+		<attribute name="version" />
+		<attribute name="customizationsVersion" />
+		<sequential>
+			<local name="versionPath" />
+			<solrVersionPathProperty name="versionPath" version="@{version}" />
+			<local name="solrServerPath" />
+			<property name="solrServerPath" value="${ext.solrserver.path}/resources/solr/${versionPath}/server" />
+			<local name="solrCustomizationsPath" />
+			<property name="solrCustomizationsPath" value="${ext.solrserver.path}/resources/solr/${versionPath}/customizations" />
+
+			<local name="meta.version" />
+			<local name="meta.customizationsVersion" />
+			<property file="${solrServerPath}/meta.properties" prefix="meta." />
+
+			<!-- sets the meta version if not yet set -->
+			<property name="meta.version" value="" />
+			<property name="meta.customizationsVersion" value="" />
+
+			<echo message="--- Solr server ${versionPath} ---" />
+			<echo message="expectedVersion: @{version}" />
+			<echo message="currentVersion: ${meta.version}" />
+			<echo message="expectedCustomizationsVersion: @{customizationsVersion}" />
+			<echo message="currentCustomizationsVersion: ${meta.customizationsVersion}" />
+
+			<if>
+				<not>
+					<and>
+						<available file="${solrServerPath}" type="dir" />
+						<equals arg1="@{version}" arg2="${meta.version}" trim="true" />
+						<equals arg1="@{customizationsVersion}" arg2="${meta.customizationsVersion}" trim="true" />
+					</and>
+				</not>
+				<then>
+					<echo message="Installing Solr server [version=@{version}, customizationsVersion=@{customizationsVersion}]" />
+
+					<downloadSolrArtifact groupId="${solrserver.solr.server.groupId}" artifactId="${solrserver.solr.server.artifactId}" version="@{version}" filesetId="solrServerZip" />
+
+					<delete dir="${solrServerPath}" />
+
+					<unzip dest="${solrServerPath}">
+						<fileset refid="solrServerZip" />
+						<cutdirsmapper dirs="1" />
+					</unzip>
+
+					<configureSolrServer solrServerPath="${solrServerPath}" solrCustomizationsPath="${solrCustomizationsPath}" />
+
+					<propertyfile file="${solrServerPath}/meta.properties">
+						<entry key="version" value="@{version}" />
+						<entry key="customizationsVersion" value="@{customizationsVersion}" />
+					</propertyfile>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="configureSolrServer">
+		<attribute name="solrServerPath" />
+		<attribute name="solrCustomizationsPath" />
+		<sequential>
+			<fail message="'${solrServerPath}' path is not available, please use a supported version">
+				<condition>
+					<not>
+						<and>
+							<isset property="solrServerPath" />
+							<available file="${solrServerPath}" type="dir" />
+						</and>
+					</not>
+				</condition>
+			</fail>
+
+			<fail message="'${solrCustomizationsPath}' path is not available, please use a supported version">
+				<condition>
+					<not>
+						<and>
+							<isset property="solrCustomizationsPath" />
+							<available file="${solrCustomizationsPath}" type="dir" />
+						</and>
+					</not>
+				</condition>
+			</fail>
+
+			<!-- delete files/directories -->
+
+			<local name="manifest.solr.deleteFiles" />
+			<local name="manifest.solr.deleteDirs" />
+			<property file="${solrCustomizationsPath}/manifest.properties" prefix="manifest." />
+
+			<for list="${manifest.solr.deleteFiles}" param="file">
+				<sequential>
+					<delete file="${solrServerPath}/@{file}" />
+				</sequential>
+			</for>
+
+			<for list="${manifest.solr.deleteDirs}" param="dir">
+				<sequential>
+					<delete dir="${solrServerPath}/@{dir}" />
+				</sequential>
+			</for>
+
+			<!-- copy files/directories -->
+
+			<copy todir="@{solrServerPath}" overwrite="true">
+				<fileset dir="@{solrCustomizationsPath}/files" includes="**" />
+			</copy>
+
+			<!-- apply patches -->
+
+			<for param="file">
+				<fileset dir="@{solrCustomizationsPath}/patches" erroronmissingdir="false" />
+				<sequential>
+					<patch patchfile="${file}" dir="@{solrServerPath}" strip="1" />
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="downloadSolrArtifact">
+		<attribute name="groupId" />
+		<attribute name="artifactId" />
+		<attribute name="version" />
+		<attribute name="filesetId" />
+		<sequential>
+			<artifact:dependencies filesetId="@{filesetId}">
+				<dependency groupId="@{groupId}" artifactId="@{artifactId}" version="@{version}" type="zip" />
+			</artifact:dependencies>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="detectSolrServerVersion">
+		<attribute name="property" />
+		<attribute name="solrServerPath" />
+		<sequential>
+			<path id="solr-core-jar">
+				<fileset dir="@{solrServerPath}/dist">
+					<include name="solr-core-*.jar" />
+				</fileset>
+			</path>
+
+			<pathconvert property="@{property}" refid="solr-core-jar">
+				<chainedmapper>
+					<mapper type="flatten" />
+					<mapper type="regexp" from="^solr-core-(.*)\.jar$$" to="\1" />
+				</chainedmapper>
+			</pathconvert>
+		</sequential>
+	</macrodef>
+
+</project>

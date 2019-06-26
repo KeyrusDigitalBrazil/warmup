@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean id="subscriptionBundleServicesSystemSetup" class="de.hybris.platform.subscriptionbundleservices.setup.SubscriptionBundleServicesSystemSetup" parent="commerceServicesSystemSetup" />
+
+    <alias alias="currentFactoryFindPricingStrategy" name="currentFactoryFindBundlePricingStrategy"/>
+    <bean id="currentFactoryFindBundlePricingStrategy" class="de.hybris.platform.configurablebundleservices.bundle.impl.FindBundlePricingWithCurrentPriceFactoryStrategy"  parent="currentFactoryFindSubscriptionPricingStrategy">
+        <property name="bundleRuleService" ref="bundleRuleService" />
+        <property name="subscriptionCommercePriceService" ref="subscriptionCommercePriceService"/>
+        <property name="subscriptionProductService" ref="subscriptionProductService"/>
+    </bean>
+
+    <alias alias="bundleCommercePlaceOrderMethodHook" name="defaultBundleCommercePlaceOrderMethodHook"/>
+    <bean id="defaultBundleCommercePlaceOrderMethodHook" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommercePlaceOrderMethodHook">
+        <property name="bundleCommerceCartService" ref="bundleCommerceCartService"/>
+        <property name="l10NService" ref="l10nService"/>
+    </bean>
+
+    <alias alias="commerceCartService" name="defaultBundleCommerceCartService" />
+    <alias alias="bundleCommerceCartService" name="defaultBundleCommerceCartService"/>
+    <bean id="defaultBundleCommerceCartService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommerceCartService"
+          parent="defaultSubscriptionCommerceCartService">
+        <property name="bundleTemplateService" ref="bundleTemplateService" />
+        <property name="sessionService" ref="sessionService" />
+        <property name="bundleCartEntryDao" ref="bundleCartEntryDao" />
+        <property name="orderEntryModifiableChecker" ref="bundleOrderEntryModifiableChecker"/>
+        <property name="removableChecker" ref="orderEntryRemoveableChecker" />
+        <property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+        <property name="bundleRuleService" ref="bundleRuleService" />
+        <property name="l10NService" ref="l10nService" />
+        <property name="entryGroupService" ref="entryGroupService" />
+    </bean>
+
+    <bean id="configurableBundlesCommercePlaceOrderMethodHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective" >
+        <property name="add" ref="bundleCommercePlaceOrderMethodHook" />
+        <property name="beforeClasses">
+            <list value-type="java.lang.Class">
+                <value>de.hybris.platform.subscriptionservices.subscription.impl.DefaultSubscriptionCommercePlaceOrderMethodHook</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="lowestBundlePriceValueProvider" class="de.hybris.platform.configurablebundleservices.search.solrfacetsearch.provider.impl.LowestBundlePriceValueProvider" parent="abstractPropertyFieldValueProvider" >
+        <property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+        <property name="bundleRuleService" ref="bundleRuleService"/>
+        <property name="priceService" ref="priceService" />
+        <property name="sessionService" ref="sessionService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="commercePriceService" ref="subscriptionCommercePriceService" />
+        <property name="subscriptionProductService" ref="subscriptionProductService" />
+    </bean>
+
+    <alias alias="orderEntryRemoveableChecker" name="bundleOrderEntryRemoveableChecker"/>
+    <bean id="bundleOrderEntryRemoveableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleOrderEntryRemoveableChecker"
+        parent="bundleCommerceOrderEntryRemoveableChecker">
+        <property name="subscriptionCommerceCartService" ref="subscriptionCommerceCartService" />
+    </bean>
+
+    <alias alias="commerceStockService" name="subscriptionCommerceStockService"/>
+    <bean id="subscriptionCommerceStockService"
+          parent="defaultCommerceStockService"
+          class="de.hybris.platform.commerceservices.stock.impl.SubscriptionCommerceStockService">
+        <property name="subscriptionProductService" ref="subscriptionProductService"/>
+    </bean>
+
+    <bean id="defaultBundleRuleService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleRuleService" parent="defaultBundleCommerceRuleService" />
+
+    <alias alias="bundleRuleService" name="defaultBundleRuleService"/>
+
+    <alias alias="bundleCartHookHelper" name="defaultSubscriptionBundleCartHookHelper"/>
+    <bean id="defaultSubscriptionBundleCartHookHelper" class="de.hybris.platform.subscriptionbundleservices.order.hook.impl.DefaultSubscriptionBundleCartHookHelper"
+        parent="defaultBundleCartHookHelper"/>
+
+    <alias alias="abstractAutoPickBundleComponentEditableChecker" name="autoPickBundleComponentEditableChecker"/>
+    <bean id="autoPickBundleComponentEditableChecker" abstract="true" class="de.hybris.platform.configurablebundleservices.bundle.impl.AutoPickBundleComponentEditableChecker"
+          parent="defaultAbstractBundleComponentEditableChecker">
+        <property name="orderEntryDao" ref="orderEntryDao"/>
+    </bean>
+
+    <alias alias="cartBundleComponentEditableChecker" name="autoPickCartBundleComponentEditableChecker"/>
+    <bean id="autoPickCartBundleComponentEditableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.AutoPickCartBundleComponentEditableChecker" parent="autoPickBundleComponentEditableChecker" >
+        <property name="orderEntryDao" ref="bundleCartEntryDao"/>
+        <property name="entryGroupService" ref="entryGroupService"/>
+    </bean>
+</beans>

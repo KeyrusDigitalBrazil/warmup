@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+	
+	
+    <context merge-by="module" parent="auto" component="explorer-tree">
+    <explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+        <explorer-tree:navigation-node id="backoffice.group.sapdigitalpayment.name">
+            <explorer-tree:type-node code="SAPDigitalPaymentConfiguration" id="SAPDigitalPaymentConfiguration"/>
+            <explorer-tree:type-node code="SAPDigitalPaymentClient" id="SAPDigitalPaymentClient"/>
+        </explorer-tree:navigation-node>
+        
+    </explorer-tree:explorer-tree>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="SAPDigitalPaymentConfiguration" component="listview">
+    <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+        <list-view:column qualifier="name"/>
+        <list-view:column qualifier="sapDigitalpaymentClient"/>
+        <list-view:column qualifier="baseUrl"/>
+    </list-view:list-view>
+    </context>
+    
+     <context merge-by="type" parent="GenericItem" type="SAPDigitalPaymentClient" component="listview">
+    <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+        <list-view:column qualifier="clientId"/>
+        <list-view:column qualifier="scope"/>
+        <list-view:column qualifier="authorizedGrantTypes"/>
+    </list-view:list-view>
+    </context>
+    
+    <context type="SAPDigitalPaymentConfiguration" component="advanced-search" merge-by="type" parent="GenericItem">
+    <advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch" xmlns="http://www.hybris.com/cockpitng/config/advancedsearch">
+       <field-list>
+           <field name="name"  selected="true" operator="startsWith" />
+	 </field-list>
+	 </advanced-search:advanced-search>
+	 </context>
+	 
+	 <context type="SAPDigitalPaymentClient" component="advanced-search" merge-by="type" parent="GenericItem">
+     <advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch" xmlns="http://www.hybris.com/cockpitng/config/advancedsearch">
+       <field-list>
+           <field name="clientId"  selected="true" operator="startsWith" />
+	 </field-list>
+	 </advanced-search:advanced-search>
+	 </context>
+	 
+	 
+	  <context merge-by="type" parent="GenericItem" type="SAPDigitalPaymentConfiguration" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:essentials xmlns="http://www.hybris.com/cockpitng/component/editorArea">
+                <essentialSection name="backoffice.essential">
+                    <attribute qualifier="name"/>
+                </essentialSection>
+            </editorArea:essentials>
+            <editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.sapdigitalpayment.configuration">
+                <section name="backoffice.section.sapdigitalpayment.core.config">
+                    <attribute qualifier="sapDigitalpaymentClient"/>
+                    <attribute qualifier="baseUrl"/>
+                </section>
+                <section name="backoffice.section.sapdigitalpayment.url.config">
+                    <attribute qualifier="companyCode"/>
+                    <attribute qualifier="customerCountry"/>
+                    <attribute qualifier="paymentMethod"/>
+                    <attribute qualifier="customParam"/>
+                </section>
+                <section name="backoffice.section.sapdigitalpayment.client.config">
+                    <attribute qualifier="maxRetry"/>
+                    <attribute qualifier="retryInterval"/>
+                    <attribute qualifier="timeOut"/>
+                    <attribute qualifier="pollCardDelay"/>
+                </section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    
+    
+    <context merge-by="type" parent="GenericItem" type="SAPDigitalPaymentClient" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:essentials xmlns="http://www.hybris.com/cockpitng/component/editorArea">
+                <essentialSection name="backoffice.essential">
+                    <attribute qualifier="clientId"/>
+                </essentialSection>
+            </editorArea:essentials>
+            <editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.sapdigitalpayment.client.configuration">
+                <section name="backoffice.section.sapdigitalpayment.client.core.config">
+                    <attribute qualifier="clientSecret" editor="com.hybris.cockpitng.editor.defaultpassword"/>
+                    <attribute qualifier="tokenUrl"/>
+                    <attribute qualifier="scope"/>
+                    <attribute qualifier="authorizedGrantTypes"/>
+                </section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    
+    <context type="SAPDigitalPaymentConfiguration" component="base" merge-by="type" parent="GenericItem">
+    <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+        <y:labels>
+            <y:label>name</y:label>
+        </y:labels>
+    </y:base>
+    </context>
+    
+      <context type="SAPDigitalPaymentClient" component="base" merge-by="type" parent="GenericItem">
+    <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+        <y:labels>
+            <y:label>clientId</y:label>
+        </y:labels>
+    </y:base>
+    </context>
+	 
+	 
+	<context type="SAPDigitalPaymentConfiguration" component="create-wizard">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"  id="sapDpWizard" title="create.sapdp.title">
+	
+	 <wz:prepare id="sapdpPrepare" >
+	 	<wz:initialize property="newSAPDP" type="SAPDigitalPaymentConfiguration" />
+	 </wz:prepare>
+	 
+	 <wz:step id="step1" label="create.sapdp.essential.label" sublabel="create.sapdp.essential.sublabel">>
+	 	<wz:content id="step1.content">
+	 		<wz:property-list root="newSAPDP">
+	 			<wz:property qualifier="name" />
+	 			<wz:property qualifier="sapDigitalpaymentClient" />
+	 			<wz:property qualifier="baseUrl" />
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step1.navigation" >
+	 	<wz:cancel />
+	 	<wz:next visible="!#empty(newSAPDP.name) AND newSAPDP.sapDigitalpaymentClient != null AND !#empty(newSAPDP.baseUrl)"/>
+	 	<wz:done visible="!#empty(newSAPDP.name) AND newSAPDP.sapDigitalpaymentClient != null AND !#empty(newSAPDP.baseUrl)" >
+	 		<wz:save property="newSAPDP" />
+	 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	 
+	 <wz:step id="step2" label="create.sapdp.urlparam.label" sublabel="create.sapdp.urlparam.sublabel">
+	 	<wz:content id="step2.content">
+	 		<wz:property-list root="newSAPDP">
+	 			<wz:property qualifier="companyCode" />
+	 			<wz:property qualifier="customerCountry" />
+	 			<wz:property qualifier="paymentMethod" /> 
+	 			<wz:property qualifier="customParam" /> 			 
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step2.navigation" >
+		 	<wz:cancel />
+		 	<wz:back />
+		 	<wz:next visible="!#empty(newSAPDP.name) AND newSAPDP.sapDigitalpaymentClient != null AND !#empty(newSAPDP.baseUrl)"/>
+		 	<wz:done visible="!#empty(newSAPDP.name) AND newSAPDP.sapDigitalpaymentClient != null AND !#empty(newSAPDP.baseUrl)" >
+		 		<wz:save property="newSAPDP" />
+		 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	 
+	 <wz:step id="step3" label="create.sapdp.clientconfig.label" sublabel="create.sapdp.clientconfig.sublabel">
+	 	<wz:content id="step3.content">
+	 		<wz:property-list root="newSAPDP">
+	 			<wz:property qualifier="maxRetry" />
+	 			<wz:property qualifier="retryInterval" />
+	 			<wz:property qualifier="timeOut" /> 
+	 			<wz:property qualifier="pollCardDelay" />			 
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step3.navigation" >
+		 	<wz:cancel />
+		 	<wz:back />
+		 	<wz:done visible="!#empty(newSAPDP.name) AND newSAPDP.sapDigitalpaymentClient != null AND !#empty(newSAPDP.baseUrl)" >
+		 		<wz:save property="newSAPDP" />
+		 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	</wz:flow>
+	</context>
+	
+	
+	<context type="SAPDigitalPaymentClient" component="create-wizard">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"  id="sapDpClientWizard" title="create.sapdp.client.title">
+	
+	 <wz:prepare id="sapdpClientPrepare" >
+	 	<wz:initialize property="newSAPDPClient" type="SAPDigitalPaymentClient" />
+	 </wz:prepare>
+	 
+	 <wz:step id="step1" label="create.sapdp.client.label" sublabel="create.sapdp.client.sublabel">>
+	 	<wz:content id="step1.content">
+	 		<wz:property-list root="newSAPDPClient">
+	 			<wz:property qualifier="clientId" />
+	 			<wz:property qualifier="clientSecret" editor="com.hybris.cockpitng.editor.defaultpassword"/>
+	 			<wz:property qualifier="tokenUrl" />
+	 			<wz:property qualifier="scope" />
+	 			<wz:property qualifier="authorizedGrantTypes" />
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step1.navigation" >
+	 	<wz:cancel />
+	 	<wz:done visible="!#empty(newSAPDPClient.clientId) AND !#empty(newSAPDPClient.clientSecret) AND !#empty(newSAPDPClient.tokenUrl)" >
+	 		<wz:save property="newSAPDPClient" />
+	 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	</wz:flow>
+	</context>
+
+</config>

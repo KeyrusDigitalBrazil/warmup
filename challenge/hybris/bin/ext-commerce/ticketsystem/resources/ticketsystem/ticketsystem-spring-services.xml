@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultTicketService" alias="ticketService"/>
+	<bean id="defaultTicketService" class="de.hybris.platform.ticket.service.impl.DefaultTicketService">
+		<property name="ticketDao" ref="ticketDao"/>
+		<property name="agentDao" ref="agentDao"/>
+		<property name="commentService" ref="commentService"/>
+		<property name="ticketSystemDomain" value="ticketSystemDomain"/>
+		<property name="ticketSystemComponent" value="ticketSystem"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="associatedTicketObjectResolverMap" ref="associatedTicketObjectResolverMap"/>
+	</bean>
+
+	<alias name="defaultTicketSearchService" alias="ticketSearchService"/>
+	<bean id="defaultTicketSearchService" class="de.hybris.platform.ticket.service.impl.DefaultTicketSearchService">
+		<property name="ticketDao" ref="ticketDao"/>
+	</bean>
+
+	<alias name="defaultTicketBusinessService" alias="ticketBusinessService"/>
+	<bean id="defaultTicketBusinessService" class="de.hybris.platform.ticket.service.impl.DefaultTicketBusinessService">
+        <property name="ticketParameterConverter" ref="ticketParameterConverter"/>
+		<property name="modelService" ref="modelService"/>
+        <!-- Strategies -->
+		<property name="ticketUpdateStrategy" ref="ticketUpdateStrategy"/>
+		<property name="ticketEventStrategy" ref="ticketEventStrategy"/>
+		<property name="ticketEventEmailStrategy" ref="ticketEventEmailStrategy"/>
+		<property name="ticketResolutionStrategy" ref="ticketResolutionStrategy"/>
+		<property name="ticketRenderStrategy" ref="ticketRenderStrategy"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+        <property name="userService" ref="userService"/>
+        <property name="ticketAttachmentsService" ref="ticketAttachmentsService"/>
+		<property name="timeService" ref="timeService"/>
+    </bean>
+
+</beans>

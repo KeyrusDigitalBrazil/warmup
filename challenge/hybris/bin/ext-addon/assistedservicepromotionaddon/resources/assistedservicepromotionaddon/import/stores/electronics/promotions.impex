@@ -1,0 +1,229 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE singlecodecoupon;couponId[unique=true];name;active;maxredemptionspercustomer;maxtotalredemptions;
+;"csa_coupon_Free 10 Shot Camera Coupon";"Free 10 shot camera coupon that can be applied to the cart during this session.";1;50;100;
+
+INSERT_UPDATE singlecodecoupon;couponId[unique=true];name;active;maxredemptionspercustomer;maxtotalredemptions;
+;"csa_coupon_Free Delivery Discount Coupon";"Free delivery discount coupon that can be applied to the cart during this session.";1;50;100;
+
+INSERT_UPDATE singlecodecoupon;couponId[unique=true];name;active;maxredemptionspercustomer;maxtotalredemptions;
+;"csa_coupon_5% Cart Discount Coupon";"5% cart discount coupon that can be applied to the cart during this session.";1;50;100;
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_500_05_percent_potential";"Potential 5% Discount for Cart Over $500.00";"Potential 5% discount elegible for carts over $500.00 when a CSA is assisting the customer.";250;true;"electronicsPromoGrp";"[
+  {
+    
+    ""definitionId"": ""y_cart_total"",
+    ""parameters"": {
+      ""value"": {
+        ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+        ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+        ""value"": {
+          ""USD"": 500
+        }
+      },
+      ""operator"": {
+        ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+        ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+        ""value"": ""LESS_THAN""
+      }
+    },
+    ""children"": []
+  }
+]";"[
+   {
+      ""definitionId"": ""y_trigger_message_parameterized_cart_total_threshold"",
+      ""parameters"": {
+         ""cart_total_threshold_parameter"": {
+            ""uuid"": ""db71cbc4-3c02-4452-82bb-70c01f0dad64"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 500
+            }
+         }
+      }
+   }
+]";"Spend another {db71cbc4-3c02-4452-82bb-70c01f0dad64} to increase the cart total to more than $500.00 to be eligible for a 5% discount.";
+
+
+
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_500_05_percent_applied";"Activated 5% Discount for Cart Over $500.00";"The cart total is over $500.00 therefore a 5% discount has been applied.";250;true;"electronicsPromoGrp";"[
+  {
+    ""definitionId"": ""y_cart_total"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 500
+            }
+         },
+         ""operator"": {
+            ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+            ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+            ""value"": ""GREATER_THAN_OR_EQUAL""
+         }
+      },
+      ""children"": []
+   }
+]";"[
+   {
+      ""definitionId"": ""y_order_percentage_discount"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""a8b73c28-46dd-4d8f-ae7f-41921660ff7e"",
+            ""type"": ""java.math.BigDecimal"",
+            ""value"": 5
+         }
+      }
+   }
+]";"The cart total is over $500.00 therefore a 5% discount has been applied.";
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_1000_10_discount";"Potential 10% Discount for Cart Over $1,000.00";"Potential 10% discount elegible for carts over $1,000.00 when a CSA is assisting the customer.";150;true;"electronicsPromoGrp";"[
+  {
+    
+    ""definitionId"": ""y_cart_total"",
+    ""parameters"": {
+      ""value"": {
+        ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+        ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+        ""value"": {
+          ""USD"": 1000
+        }
+      },
+      ""operator"": {
+        ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+        ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+        ""value"": ""LESS_THAN""
+      }
+    },
+    ""children"": []
+  }
+]";"[
+   {
+      ""definitionId"": ""y_trigger_message_parameterized_cart_total_threshold"",
+      ""parameters"": {
+         ""cart_total_threshold_parameter"": {
+            ""uuid"": ""db71cbc4-3c02-4452-82bb-70c01f0dad64"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 1000
+            }
+         }
+      }
+   }
+]";"Spend another {db71cbc4-3c02-4452-82bb-70c01f0dad64} to increase the cart total to more than $1,000.00 to be eligible for a 10% discount.";
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_1000_10_applied";"Activated 10% Discount for Cart Over $1,000.00";"Activated 10% discount applied to carts over $1,000.00 when a CSA is assisting the customer.";150;true;"electronicsPromoGrp";"[
+  {
+    ""definitionId"": ""y_cart_total"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 1000
+            }
+         },
+         ""operator"": {
+            ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+            ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+            ""value"": ""GREATER_THAN_OR_EQUAL""
+         }
+      },
+      ""children"": []
+   }
+]";"[
+   {
+      ""definitionId"": ""y_order_percentage_discount"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""a8b73c28-46dd-4d8f-ae7f-41921660ff7e"",
+            ""type"": ""java.math.BigDecimal"",
+            ""value"": 10
+         }
+      }
+   }
+]";"The cart total is over $1,000.00 therefore a 10% discount has been applied.";
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_1500_15_discount";"Potential 15% Discount for Cart Over $1,500.00";"Potential 15% discount elegible for carts over $1,500.00 when a CSA is assisting the customer.";50;true;"electronicsPromoGrp";"[
+  {
+    
+    ""definitionId"": ""y_cart_total"",
+    ""parameters"": {
+      ""value"": {
+        ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+        ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+        ""value"": {
+          ""USD"": 1500
+        }
+      },
+      ""operator"": {
+        ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+        ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+        ""value"": ""LESS_THAN""
+      }
+    },
+    ""children"": []
+  }
+]";"[
+   {
+      ""definitionId"": ""y_trigger_message_parameterized_cart_total_threshold"",
+      ""parameters"": {
+         ""cart_total_threshold_parameter"": {
+            ""uuid"": ""db71cbc4-3c02-4452-82bb-70c01f0dad64"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 1500
+            }
+         }
+      }
+   }
+]";"Spend another {db71cbc4-3c02-4452-82bb-70c01f0dad64} to increase the cart total to more than $1,500.00 to be eligible for a 15% discount.";
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name;description;priority;stackable[default=false];website(Identifier);conditions;actions;messageFired;
+;"csa_discount_cart_above_1500_15_applied";"Activated 15% Discount for Cart Over $1,500.00";"Activated 15% discount applied to carts over $1,500.00 when a CSA is assisting the customer.";50;true;"electronicsPromoGrp";"[
+  {
+    ""definitionId"": ""y_cart_total"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""f1e6d59c-56ae-4848-8d07-b7b2b0608106"",
+            ""type"": ""Map(ItemType(Currency),java.math.BigDecimal)"",
+            ""value"": {
+               ""USD"": 1500
+            }
+         },
+         ""operator"": {
+            ""uuid"": ""7e33261a-beff-4fff-bb5d-e42f5c685326"",
+            ""type"": ""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",
+            ""value"": ""GREATER_THAN_OR_EQUAL""
+         }
+      },
+      ""children"": []
+   }
+]";"[
+   {
+      ""definitionId"": ""y_order_percentage_discount"",
+      ""parameters"": {
+         ""value"": {
+            ""uuid"": ""a8b73c28-46dd-4d8f-ae7f-41921660ff7e"",
+            ""type"": ""java.math.BigDecimal"",
+            ""value"": 15
+         }
+      }
+   }
+]";"The cart total is over $1,500.00 therefore a 15% discount has been applied.";

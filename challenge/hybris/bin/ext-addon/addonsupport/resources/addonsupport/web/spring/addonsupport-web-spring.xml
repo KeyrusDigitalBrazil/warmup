@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (feedbackaddon/resources/feedbackaddon-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+		   http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/mvc
+	       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    <context:annotation-config/> 
+
+	<bean id="abstractJavaScriptMessageResourceAccessor" abstract="true"
+		class="de.hybris.platform.addonsupport.config.bundlesources.DefaultJavaScriptMessageResourcesAccessor">
+		<property name="cacheSeconds"
+			value="#{configurationService.configuration.getProperty('storefront.resourceBundle.cacheSeconds')}" />
+		<property name="resourceLoader">
+			<bean class="org.springframework.core.io.FileSystemResourceLoader" />
+		</property>
+		<property name="fallbackToSystemLocale" value="false" />
+	</bean>
+
+	<!-- Creating abstract bean for JS properties before view handler adaptee -->
+	<bean id="abstractBeforeViewJsPropsHandlerAdaptee" abstract="true"
+		class="de.hybris.platform.addonsupport.config.javascript.BeforeViewJsPropsHandlerAdaptee">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<!-- User Experience View Mappings: Map that contains the key value pairs for user experience view. The values are used to determine the 
+		respective view folders like desktop or responsive or mobile  -->
+	<util:map id="uiExperienceViewPrefixMap" key-type="de.hybris.platform.commerceservices.enums.UiExperienceLevel" value-type="java.lang.String">
+		<entry key="DESKTOP" value="${commerceservices.default.desktop.ui.experience:desktop}" />
+		<entry key="MOBILE" value="mobile" />
+	</util:map>
+	
+	<!-- Default CMS Component Renderer -->
+	<alias name="addOnJspIncludeCMSComponentRenderer" alias="genericAddOnCMSComponentRenderer" />
+	<bean id="addOnJspIncludeCMSComponentRenderer"
+		class="de.hybris.platform.addonsupport.renderer.impl.DefaultAddOnCMSComponentRenderer">
+		<property name="typeService" ref="typeService" />
+		<property name="uiExperienceService" ref="uiExperienceService" />
+		<property name="modelService" ref="modelService" />
+		<property name="cmsComponentService" ref="cmsComponentService" />
+		<property name="uiExperienceViewPrefixMap" ref="uiExperienceViewPrefixMap" />
+		<property name="unknownUiExperiencePrefix" value="${commerceservices.default.desktop.ui.experience:desktop}" />
+	</bean>
+
+	<alias name="addonCMSComponentRendererRegistry" alias="cmsComponentRendererRegistry" />
+	<bean id="addonCMSComponentRendererRegistry"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererRegistry"
+		parent="acceleratorCMSComponentRendererRegistry" />
+
+	<bean id="addonCmsComponentRendererMapping"
+		class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping"
+		abstract="true" />
+
+</beans>

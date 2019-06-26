@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="cmsSeItemData" alias="cmsSeItemData" />
+	<bean id="cmsSeItemData" class="de.hybris.platform.cmsfacades.data.ItemData" scope="prototype" />
+	
+	<alias name="defaultCmsSeProductSearchFacade" alias="cmsSeProductSearchFacade"/>
+	<bean name="defaultCmsSeProductSearchFacade" class="de.hybris.platform.cmssmarteditwebservices.products.facade.impl.DefaultProductSearchFacade">
+		<property name="productSearchFacade" ref="cmsProductSearchFacade"/>
+		<property name="productDataConverter" ref="cmsSeProductDataConverter"/>
+		<property name="categoryDataConverter" ref="cmsSeCategoryDataConverter"/>
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+	
+	<!-- converters and populators -->
+
+	<alias name="defaultCmsSeProductDataConverter" alias="cmsSeProductDataConverter" />
+	<bean id="defaultCmsSeProductDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmssmarteditwebservices.data.ProductData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeProductDataPopulator" />
+				<ref bean="cmsSeProductMediaDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsSeCategoryDataConverter" alias="cmsSeCategoryDataConverter" />
+	<bean id="defaultCmsSeCategoryDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmssmarteditwebservices.data.CategoryData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeCategoryDataPopulator" />
+				<ref bean="cmsSeCategoryMediaDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsSeProductDataPopulator" alias="cmsSeProductDataPopulator" />
+	<bean id="defaultCmsSeProductDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.products.facade.populator.ProductDataPopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="productService" ref="productService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<alias name="defaultCmsSeProductMediaDataPopulator" alias="cmsSeProductMediaDataPopulator" />
+	<bean id="defaultCmsSeProductMediaDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.products.facade.populator.ProductMediaDataPopulator">
+		<property name="mediaFacade" ref="mediaFacade"/>
+	</bean>
+
+	<alias name="defaultCmsSeCategoryDataPopulator" alias="cmsSeCategoryDataPopulator" />
+	<bean id="defaultCmsSeCategoryDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.products.facade.populator.CategoryDataPopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+	</bean>
+
+	<alias name="defaultCmsSeCategoryMediaDataPopulator" alias="cmsSeCategoryMediaDataPopulator" />
+	<bean id="defaultCmsSeCategoryMediaDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.products.facade.populator.CategoryMediaDataPopulator">
+		<property name="mediaFacade" ref="mediaFacade"/>
+	</bean>
+
+</beans>

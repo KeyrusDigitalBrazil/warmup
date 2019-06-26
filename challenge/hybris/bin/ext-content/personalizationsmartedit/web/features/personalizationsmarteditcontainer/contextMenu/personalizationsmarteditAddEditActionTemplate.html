@@ -1,0 +1,95 @@
+<div class="perso-customize-component">
+    <div class="perso-customize-component__title-layout">
+        <div data-ng-show='letterIndicatorForElement'
+            class="perso-customize-component__title-layout__letter-block">
+            <span data-ng-class="colorIndicatorForElement"
+                data-ng-bind="letterIndicatorForElement">
+            </span>
+        </div>
+        <div class="perso-customize-component__title-layout__cust-name perso-wrap-ellipsis"
+            data-ng-bind="selectedCustomization.name"
+            title="{{selectedCustomization.name}}">
+        </div>
+        <div class="perso-customize-component__title-layout__target-group-name perso-wrap-ellipsis"
+            data-ng-bind="'> '+ selectedVariation.name"
+            title="{{selectedVariation.name}}">
+        </div>
+    </div>
+
+    <dl class="perso-customize-component__data-list">
+        <label class="personalization-modal__label"
+            data-translate="personalization.modal.addeditaction.selected.mastercomponent.title"></label>
+        <dd>{{componentType}}</dd>
+    </dl>
+
+    <label class="control-label required"
+        data-translate="personalization.modal.addeditaction.selected.actions.title"></label>
+    <y-help data-template="'<span data-translate=personalization.modal.addeditaction.selected.actions.help.label></span>'">
+    </y-help>
+
+    <ui-select class="perso-customize-component__select2-container"
+        ng-model="action.selected"
+        theme="select2"
+        title=""
+        search-enabled="false">
+        <ui-select-match placeholder="{{'personalization.modal.addeditaction.dropdown.placeholder' | translate}}">
+            <span ng-bind="$select.selected.name"></span>
+        </ui-select-match>
+        <ui-select-choices repeat="item in actions"
+            position="down">
+            <span ng-bind="item.name "></span>
+        </ui-select-choices>
+    </ui-select>
+    <div class="perso-customize-component__select-group-label-layout">
+        <div data-ng-show="action.selected.id == 'use'">
+            <label class="control-label required"
+                data-translate="personalization.modal.addeditaction.selected.component.title"></label>
+        </div>
+        <has-multicatalog data-ng-show="action.selected.id == 'use'">
+            <div class="perso-customize-component__filter-layout">
+                <label class="personalization-modal__label perso-customize-component__filter-label"
+                    data-translate="personalization.commons.filter.label"></label>
+                <catalog-version-filter-dropdown data-on-select-callback="catalogVersionFilerChange(value)" />
+            </div>
+        </has-multicatalog>
+    </div>
+
+    <ui-select class="perso-customize-component__select2-container"
+        ng-show="action.selected.id == 'use'"
+        ng-model="component.selected"
+        ng-keyup="componentSearchInputKeypress($event, $select.search)"
+        theme="select2"
+        title=""
+        reset-search-input="false">
+        <ui-select-match placeholder="{{'personalization.modal.addeditaction.dropdown.componentlist.placeholder' | translate}}">
+            <span ng-bind="$select.selected.name | translate"></span>
+        </ui-select-match>
+        <ui-select-choices repeat="item in components"
+            position="down"
+            personalization-infinite-scroll="addMoreComponentItems()"
+            personalization-infinite-scroll-distance="2">
+            <div class="row">
+                <span class="col-md-7"
+                    ng-bind="item.name"></span>
+                <span class="col-md-5"
+                    ng-bind="item.typeCode"></span>
+            </div>
+        </ui-select-choices>
+    </ui-select>
+
+    <ui-select class="perso-customize-component__select2-container"
+        ng-show="action.selected.id == 'create'"
+        on-select="newComponentTypeSelectedEvent($item, $model)"
+        ng-model="newComponent.selected"
+        theme="select2"
+        title=""
+        search-enabled="false">
+        <ui-select-match placeholder="{{'personalization.modal.addeditaction.dropdown.componenttype.placeholder' | translate}}">
+            <span ng-bind="$select.selected.name"></span>
+        </ui-select-match>
+        <ui-select-choices repeat="item in newComponentTypes"
+            position="down">
+            <span ng-bind="item.i18nKey | translate"></span>
+        </ui-select-choices>
+    </ui-select>
+</div>

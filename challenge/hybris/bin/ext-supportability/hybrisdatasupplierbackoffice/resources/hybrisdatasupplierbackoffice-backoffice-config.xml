@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- [y] hybris Platform Copyright (c) 2017 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<context component="explorer-tree">
+		<explorer-tree:explorer-tree
+			xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:type-node id="GenericDataSupplierGenerationWizard" code="GenericDataSupplierGenerationWizard"/>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="GenericDataSupplierGenerationWizard" component="create-wizard"
+		module="hybrisdatasupplierbackoffice">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+			xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms" id="GenericDataSupplierGenerationWizard"
+			title="tab.genericdatasupplier.title">
+			<wz:prepare id="genericDataSupplierGenerationWizardPrepare">
+				<wz:initialize property="newConfig" type="ctx.TYPE_CODE" />
+			</wz:prepare>
+			<wz:step id="step1" label="tab.genericdatasupplier.apps">
+				<wz:content id="step1.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="dataHub" />
+						<wz:property qualifier="ems" />
+						<wz:property qualifier="sbg" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+					<wz:next>
+						<wz:if expression="newConfig.dataHub == True" target="step2" />
+						<wz:if expression="newConfig.ems == True" target="step3" />
+						<wz:if expression="newConfig.sbg == True" target="step4" />
+						<wz:if expression="newConfig.dataHub != True or newConfig.ems != True or newConfig.sbg != True" target="step4" />
+					</wz:next>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="tab.genericdatasupplier.datahubproperties">
+				<wz:content id="step2.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="datahubWebapp" />
+						<wz:property qualifier="datahubWebappXml" />
+						<wz:property qualifier="datahubPropertiesFile" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel />
+					<wz:back>
+					</wz:back>
+					<wz:next>
+						<wz:if expression="newConfig.ems == True" target="step3" />
+						<wz:if expression="newConfig.sbg == True" target="step4" />
+						<wz:if expression="newConfig.ems != True and newConfig.sbg != True"
+							target="step5" />
+					</wz:next>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step3" label="tab.genericdatasupplier.emsproperties">
+				<wz:content id="step3.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="emsWebapp" />
+						<wz:property qualifier="emsPomFile" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step3.navigation">
+					<wz:cancel />
+					<wz:back>
+						<wz:if expression="newConfig.dataHub == True" target="step2" />
+						<wz:if expression="newConfig.dataHub != True" target="step1" />
+					</wz:back>
+					<wz:next>
+						<wz:if expression="newConfig.sbg == True" target="step4" />
+						<wz:if expression="newConfig.sbg != True" target="step5" />
+					</wz:next>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step4" label="tab.genericdatasupplier.sbgproperties">
+				<wz:content id="step4.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="sbgWebapp" />
+						<wz:property qualifier="sbgPomFile" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step4.navigation">
+					<wz:cancel />
+					<wz:back>
+						<wz:if expression="newConfig.ems == True" target="step3" />
+						<wz:if expression="newConfig.dataHub == True" target="step2" />
+						<wz:if expression="newConfig.dataHub != True and newConfig.ems != True"
+							target="step1" />
+					</wz:back>
+					<wz:next />
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step5" label="tab.genericdatasupplier.additional">
+				<wz:info id="step5.intro" label="text.systemid.explanation"
+					position="bottom" />
+				<wz:content id="step5.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="savePayload" />
+						<wz:property qualifier="supplyDelay" />
+						<wz:property qualifier="sldregLocation" />
+						<wz:property qualifier="sldregConfigLocation" />
+						<wz:property qualifier="systemId" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step5.navigation">
+					<wz:cancel />
+					<wz:back>
+						<wz:if expression="newConfig.sbg == True" target="step4" />
+						<wz:if expression="newConfig.ems == True" target="step3" />
+						<wz:if expression="newConfig.dataHub == True" target="step2" />
+						<wz:if
+							expression="newConfig.dataHub != True and newConfig.ems != True  and newConfig.sbg != True"
+							target="step1" />
+					</wz:back>
+					<wz:next visible="newConfig.generatedWar != null" />
+					<wz:custom handler="defaultDataSupplierFlowActionHandler"
+						label="Generate" />
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step6" label="tab.genericdatasupplier.generatedwar">
+				<wz:info id="step6.intro" label="text.generatedwar.warning"
+					position="top" />
+				<wz:content id="step6.content">
+					<wz:property-list root="newConfig">
+						<wz:property qualifier="generatedWar" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step6.navigation">
+					<wz:cancel />
+					<wz:back />
+					<wz:done />
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+</config>

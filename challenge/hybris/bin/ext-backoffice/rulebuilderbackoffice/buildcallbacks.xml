@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="rulebuilderbackoffice_buildcallbacks">
+	<property name="rulebuilderbackofficeWebFragmentSrc" value="${ext.rulebuilderbackoffice.path}/resources/web-fragment.xml"/>
+	<property name="rulebuilderbackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_rulebuilderbackoffice.jar"/>
+
+	<macrodef name="rulebuilderbackoffice_after_clean">
+		<sequential>
+			<rulebuilderbackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="rulebuilderbackoffice_after_build">
+		<sequential>
+			<rulebuilderbackoffice_remove_web_fragment/>
+			<rulebuilderbackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="rulebuilderbackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${rulebuilderbackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${rulebuilderbackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="rulebuilderbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${rulebuilderbackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${rulebuilderbackofficeWebFragmentDestJar}">
+							<metainf file="${rulebuilderbackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+	<macrodef name="rulebuilderbackoffice_before_build">
+		<sequential>
+			<register_sass_extension extensionname="rulebuilderbackoffice"/>
+			<register_sass_extension extensionname="rulebuilderbackoffice" resources="resources" destination=""/>
+		</sequential>
+	</macrodef>
+</project>

@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ATTENTION: This is just an example file. You have to edit it according to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	<collectiontypes>
+		<collectiontype code="ProcessStateCollection" elementtype="ProcessState" autocreate="true" generate="true"
+						type="collection"/>
+		<collectiontype code="RecalculateActionStringCollection" elementtype="java.lang.String" autocreate="true" generate="false"
+						type="set"/>
+		<collectiontype code="ConsentTemplateCollection" elementtype="ConsentTemplate" autocreate="true" generate="false"
+						type="set"/>
+		<collectiontype code="BaseSitesCollection" elementtype="BaseSite" autocreate="true" generate="false"
+						type="set"/>
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="CxGroupingOperator" autocreate="true" generate="true" dynamic="false">
+			<value code="AND"><description>Group by AND</description></value>
+			<value code="OR"><description>Group by OR</description></value>
+		</enumtype>
+
+		<enumtype code="CxItemStatus" autocreate="true" generate="true" dynamic="false">
+			<value code="ENABLED"><description>Enabled state</description></value>
+			<value code="DISABLED"><description>Disabled state</description></value>
+			<value code="DELETED"><description>Soft deleted state</description></value>
+		</enumtype>
+
+		<enumtype code="CxCatalogLookupType" autocreate="true" generate="true" dynamic="false">
+			<value code="ALL_CATALOGS"><description>ALl catalogs in the session</description></value>
+		</enumtype>
+
+		<enumtype code="CxUserType" autocreate="true" generate="true" dynamic="false">
+			<value code="REGISTERED"><description>Registered customer</description></value>
+			<value code="ANONYMOUS"><description>Anonymous customer</description></value>
+			<value code="ALL"><description>All customers</description></value>
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+
+		<relation code="CxCustomizationToVariation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="customization" type="CxCustomization" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="variations" type="CxVariation" cardinality="many" collectiontype="list" ordered="true">
+			 	<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxGroupToCustomization" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="group" type="CxCustomizationsGroup" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="customizations" type="CxCustomization" cardinality="many" collectiontype="list" ordered="true">
+			 	<modifiers read="true" write="true" search="true" optional="true" partof="true"  />
+			</targetElement>
+		</relation>
+
+		<relation code="CxVariationToAction" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="variation" type="CxVariation" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="actions" type="CxAbstractAction" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxTriggerToVariation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="variation" type="CxVariation" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="triggers" type="CxAbstractTrigger" cardinality="many" >
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="CxSegmentToTrigger" autocreate="true" generate="true" localized="false">
+			<deployment table="CxSegmentToTrigger" typecode="3610" />
+			<sourceElement qualifier="triggers" type="CxSegmentTrigger" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="segments" type="CxSegment" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxSegmentToExpressionTrigger" autocreate="true" generate="true" localized="false">
+			<deployment table="CxSegment2ExpTrigger" typecode="3615" />
+			<sourceElement qualifier="expressionTriggers" type="CxExpressionTrigger" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="segments" type="CxSegment" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxSegmentToUserRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="segment" type="CxSegment" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="userToSegments" type="CxUserToSegment" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="CxUserToSegmentRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="userToSegments" type="CxUserToSegment" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxUserToCxResults" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="user" type="User" cardinality="one">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="cxResults" type="CxResults" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="CxPersProcToCatVer" generate="true" localized="false" autocreate="true">
+			<deployment table="CxPersProcToCatVer" typecode="3611"/>
+			<sourceElement qualifier="catalogVersions" type="CatalogVersion" cardinality="many" />
+			<targetElement qualifier="cxPersonalizationProcesses" type="CxPersonalizationProcess" cardinality="many" />
+		</relation>
+
+		<relation code="CxConfigToCxUrlVoterConfig" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="cxConfig" type="CxConfig" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="urlVoterConfigs" type="CxUrlVoterConfig" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="BaseSiteToCxConfig" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="baseSites" type="BaseSite" cardinality="many" collectiontype="set">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="cxConfig" type="CxConfig" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="true" unique="true"/>
+			</targetElement>
+		</relation>
+
+		<relation code="CxConfigToCxPeriodicVoterConfig" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="cxConfig" type="CxConfig" cardinality="one" >
+				<modifiers read="true" write="true" search="true" optional="false" unique="true"/>
+			</sourceElement>
+			<targetElement qualifier="periodicVoterConfigs " type="CxPeriodicVoterConfig" cardinality="many" collectiontype="set" >
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype generate="true" code="CxVariation" jaloclass="de.hybris.platform.personalizationservices.jalo.CxVariation" extends="GenericItem" autocreate="true">
+			<deployment table="CxVariation" typecode="3601" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"code,customization"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique identifier</description>
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+				   	<modifiers optional="false" unique="true"/>
+   					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="name">
+					<description>Name of variation</description>
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="active" type="boolean">
+					<description>Defines if the variation is active or not</description>
+					<persistence type="dynamic" attributeHandler="cxVariationActiveAttributeHandler"/>
+					<modifiers write="false" read="true" />
+				</attribute>
+				<!-- Enabled attribute is deprecated, please use Status instead -->
+				<attribute qualifier="enabled" type="boolean">
+					<description>Defines if the variation is enabled or not</description>
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<model>
+						<getter name="enabled" deprecated="true" default="true"/>
+						<setter name="enabled" deprecated="true" default="true"/>
+					</model>
+				</attribute>
+				<attribute qualifier="status" type="CxItemStatus">
+					<description>Contains current status of item</description>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("CxItemStatus", "ENABLED")</defaultvalue>
+					<model>
+						<getter name="status" default="true">
+							<nullDecorator>CxItemStatus.ENABLED</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute qualifier="rank" type="java.lang.Integer">
+					<description>Defines the rank (priority) of variation</description>
+					<persistence type="dynamic" attributeHandler="cxVariationRankAttributeHandler" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeCustomizationCatalogVersionIdx" unique="true">
+					<key attribute="code" />
+					<key attribute="customization" />
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="nameCustomizationCatalogVersionIdx" >
+					<key attribute="name" />
+					<key attribute="customization" />
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="customizationCatalogVersionIdx">
+					<key attribute="customization" />
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxCustomization" jaloclass="de.hybris.platform.personalizationservices.jalo.CxCustomization" extends="GenericItem" autocreate="true">
+			<deployment table="CxCustomization" typecode="3602" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"code"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique identifier</description>
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+				   	<modifiers optional="false" unique="true"/>
+   					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="name">
+					<description>Name of customization</description>
+					<persistence type="property"  />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="rank" type="java.lang.Integer">
+					<description>Defines the rank (priority) of the group</description>
+					<persistence type="dynamic" attributeHandler="cxCustomizationRankAttributeHandler" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<description>Description of customization</description>
+					<persistence type="property" />
+					<modifiers optional="true" />
+					<model>
+						<getter name="description" default="true" deprecated="true" deprecatedSince="1811"/>
+						<setter name="description" default="true" deprecated="true" deprecatedSince="1811"/>
+					</model>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="longDescription">
+					<description>Long description of customization</description>
+					<persistence type="property" >
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="active" type="boolean">
+					<description>Defines if the variation is active or not</description>
+					<persistence type="dynamic" attributeHandler="cxCustomizationActiveAttributeHandler"/>
+					<modifiers write="false" read="true" />
+				</attribute>
+				<attribute qualifier="status" type="CxItemStatus">
+					<description>Contains current status of item</description>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("CxItemStatus", "ENABLED")</defaultvalue>
+					<model>
+						<getter name="status" default="true">
+							<nullDecorator>CxItemStatus.ENABLED</nullDecorator>
+						</getter>
+					</model>
+				</attribute>
+				<attribute type="java.util.Date" qualifier="enabledStartDate">
+					<description>Date and time from which customization will be active</description>
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute type="java.util.Date" qualifier="enabledEndDate">
+					<description>Date and time till which customization will be active</description>
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="codeCatalogVersionIdx" unique="true">
+					<key attribute="code" />
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="nameCatalogVersionIdx">
+					<key attribute="name" />
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="catalogVersionIdx">
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxSegment" jaloclass="de.hybris.platform.personalizationservices.jalo.CxSegment"  autocreate="true">
+			<deployment table="CxSegment" typecode="3603" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="code">
+					<description>Unique code of the segment</description>
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="description">
+					<description>Description of segment</description>
+					<persistence type="property" >
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="codeIdx" unique="true">
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxAbstractAction" jaloclass="de.hybris.platform.personalizationservices.jalo.CxAbstractAction"
+			 autocreate="true" abstract="true"	extends="AbstractAction">
+			<deployment table="CxAbstractAction" typecode="3604" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"code,variation"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+				   	<modifiers optional="false" unique="true"/>
+   					<persistence type="property"/>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="affectedObjectKey">
+					<persistence type="dynamic" attributeHandler="cxAbstractActionAffectedObjectKeyAttributeHandler" />
+					<modifiers write="false" />
+				</attribute>
+				<attribute qualifier="rank" type="java.lang.Integer">
+					<description>Defines the rank (priority) of action</description>
+					<persistence type="dynamic" attributeHandler="cxAbstractActionRankAttributeHandler" />
+					<modifiers write="false" />
+				</attribute>
+			</attributes>
+
+			<indexes>
+				<index name="codeVariationCatalogVersionIdx" unique="true">
+					<key attribute="code"	 />
+					<key attribute="variation" />
+					<key attribute="catalogVersion" />
+				</index>
+
+				<index name="variationCatalogVersionIdx">
+					<key attribute="variation" />
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<itemtype generate="true" code="CxUserToSegment" jaloclass="de.hybris.platform.personalizationservices.jalo.CxUserToSegment" autocreate="true">
+			<deployment table="CxUserToSegment" typecode="3607" />
+			<attributes>
+				<attribute qualifier="provider" type="java.lang.String">
+					<description>Source from which segment assignemt was read e.g. yprofile system</description>
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="affinity" type="java.math.BigDecimal">
+					<description>The affinity of relation between user and segment. Range [0-1]</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="baseSite" type="BaseSite">
+					<description>BaseSite for which this relation is valid</description>
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxCustomizationsGroup" jaloclass="de.hybris.platform.personalizationservices.jalo.CxCustomizationsGroup" extends="GenericItem" autocreate="true">
+			<deployment table="CxCustomizationsGroup" typecode="3608" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Group code</description>
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+				   	<modifiers optional="false" unique="true"/>
+   					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="catalogVersionIdx" unique="true">
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxAbstractTrigger" jaloclass="de.hybris.platform.personalizationservices.jalo.CxAbstractTrigger" extends="GenericItem" autocreate="true" abstract="true">
+			<deployment table="CxAbstractTrigger" typecode="3609" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"code,variation"</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique identifier</description>
+                    <modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+				   	<modifiers optional="false" unique="true"/>
+   					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="codeVariationCatalogVersionIdx" unique="true">
+					<key attribute="code" />
+					<key attribute="variation" />
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="variationCatalogVersionIdx">
+					<key attribute="variation" />
+					<key attribute="catalogVersion" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxSegmentTrigger" jaloclass="de.hybris.platform.personalizationservices.jalo.CxSegmentTrigger" extends="CxAbstractTrigger" autocreate="true" abstract="false" >
+			<attributes>
+				<attribute qualifier="groupBy" type="CxGroupingOperator" >
+					<description>How segments are grouped</description>
+                    <modifiers read="true" write="true" optional="false" initial="true" unique="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxExpressionTrigger" jaloclass="de.hybris.platform.personalizationservices.jalo.CxExpressionTrigger" extends="CxAbstractTrigger" autocreate="true" abstract="false" >
+			<attributes>
+				<attribute qualifier="expression" type="java.lang.String" >
+					<description>How segments are grouped</description>
+                    <modifiers read="true" write="true" optional="false" initial="true" unique="false" />
+					<persistence type="property" >
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true" code="CxDefaultTrigger" jaloclass="de.hybris.platform.personalizationservices.jalo.CxDefaultTrigger" extends="CxAbstractTrigger" autocreate="true" abstract="false" >
+		</itemtype>
+
+		<itemtype code="CxPersonalizationProcess" extends="BusinessProcess"
+				autocreate="true" generate="true"
+				jaloclass="de.hybris.platform.personalizationservices.jalo.process.CxPersonalizationProcess">
+				<description>Personalization calculation process.</description>
+				<attributes>
+					<attribute qualifier="key" type="java.lang.String">
+						<modifiers read="true" write="true" />
+						<persistence type="property"/>
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="cxPersonalizationProcessKeyIdx" >
+						<key attribute="key" />
+					</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="CxPersonalizationProcessCleanupCronJob"
+				  jaloclass="de.hybris.platform.personalizationservices.jalo.process.CxPersonalizationProcessCleanupCronJob"
+				  extends="CronJob"
+				  autocreate="true"
+				  generate="true">
+			<attributes>
+				<attribute qualifier="processStates" type="ProcessStateCollection">
+					<description>Filter: Process states that will be taken into account during cleanup process</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="maxProcessAge" type="java.lang.String">
+					<description>After this time (counting from process creation date), CxPersonalizationProcesses with processStates will be deleted</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CxDefaultPersonalizationCalculationCronJob"
+				  jaloclass="de.hybris.platform.personalizationservices.jalo.process.CxDefaultPersonalizationCalculationCronJob"
+				  extends="CronJob"
+				  autocreate="true"
+				  generate="true">
+			<attributes>
+				<attribute type="BaseSitesCollection" qualifier="baseSites">
+					<description>BaseSites that should be calculated and stored with default personalization</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true"  code="CxResults" jaloclass="de.hybris.platform.personalizationservices.jalo.CxResults"  autocreate="true" >
+        	<deployment table="CxResults" typecode="3612" />
+            <attributes>
+                <attribute qualifier="key" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false" unique="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="sessionKey" type="java.lang.String">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="catalogVersion" type="CatalogVersion">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="results" type="java.lang.Object">
+                    <modifiers read="true" write="true" optional="false"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="calculationTime" type="java.util.Date">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false"/>
+				</attribute>
+                <attribute qualifier="anonymous" type="boolean">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="default" type="boolean">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="true" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<description>Mark for default results calculated for anonymous user</description>
+				</attribute>
+            </attributes>
+            <indexes>
+	            <index name="cxResultsKeyIdx" >
+		            <key attribute="key" />
+	            </index>
+				<index name="cxResultsSessionKeyIdx" >
+					<key attribute="sessionKey" />
+				</index>
+			</indexes>
+        </itemtype>
+
+		<itemtype generate="true"  code="CxConfig" jaloclass="de.hybris.platform.personalizationservices.jalo.config.CxConfig"  autocreate="true" >
+			<deployment table="CxConfig" typecode="3614" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique identifier</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="minAffinity" autocreate="true" type="java.math.BigDecimal">
+					<description>Minimum affinity for user to segment relation</description>
+					<defaultvalue>java.math.BigDecimal.valueOf(0.5)</defaultvalue>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="actionResultMaxRepeat" type="java.lang.Integer">
+					<description>Number of retires in case of action result load error caused by optimistic locking failure</description>
+					<defaultvalue>java.lang.Integer.valueOf(1)</defaultvalue>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userChangedActions" type="RecalculateActionStringCollection">
+					<description>Set of actions which should be called after user changed event</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="consentGivenActions" type="RecalculateActionStringCollection">
+					<description>Set of actions which should be called after user gives all required consents for personalization</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="calculationProcess" type="java.lang.String">
+					<description>Name of calculation process</description>
+					<defaultvalue>"defaultPersonalizationCalculationProcess"</defaultvalue>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="ignoreRecalcForAnonymous" type="java.lang.Boolean">
+					<description>Defines if experience recalculation for anonymous user should be ignored or not</description>
+					<persistence type="property" />
+					<modifiers optional="true" />
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+					<model>
+						<getter name="ignoreRecalcForAnonymous" default="true" deprecated="true" deprecatedSince="1808"/>
+						<setter name="ignoreRecalcForAnonymous" default="true" deprecated="true" deprecatedSince="1808"/>
+					</model>
+				</attribute>
+
+				<attribute qualifier="anonymousUserDefaultActions" type="RecalculateActionStringCollection">
+					<description>Set of actions which should be called when anonymous user makes first request</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="anonymousUserActions" type="RecalculateActionStringCollection">
+					<description>Set of actions which should be called when anonymous user makes subsequent request</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<model>
+						<getter name="anonymousUserActions" default="true" deprecated="true" deprecatedSince="1808"/>
+						<setter name="anonymousUserActions" default="true" deprecated="true" deprecatedSince="1808"/>
+					</model>
+				</attribute>
+				<attribute qualifier="anonymousUserMinRequestNumber" type="java.lang.Integer">
+					<description>Defines minimal number of requests between subsequent actions for anonymous user</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Integer.valueOf(-1)</defaultvalue>
+					<model>
+						<getter name="anonymousUserMinRequestNumber" default="true" deprecated="true" deprecatedSince="1808"/>
+						<setter name="anonymousUserMinRequestNumber" default="true" deprecated="true" deprecatedSince="1808"/>
+					</model>
+				</attribute>
+				<attribute qualifier="anonymousUserMinTime" type="java.lang.Long">
+					<description>Defines minimal time [ms] between subsequent actions for anonymous user</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+					<model>
+						<getter name="anonymousUserMinTime" default="true" deprecated="true" deprecatedSince="1808"/>
+						<setter name="anonymousUserMinTime" default="true" deprecated="true" deprecatedSince="1808"/>
+					</model>
+				</attribute>
+				<attribute qualifier="anonymousUserIgnoreOtherActions" type="java.lang.Boolean">
+					<description>Defines other voters should be considered for anonymous user</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<model>
+						<getter name="anonymousUserIgnoreOtherActions" default="true" deprecated="true" deprecatedSince="1808"/>
+						<setter name="anonymousUserIgnoreOtherActions" default="true" deprecated="true" deprecatedSince="1808"/>
+					</model>
+				</attribute>
+
+				<attribute qualifier="catalogLookup" type="CxCatalogLookupType">
+					<description>Type of lookup strategy used</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("CxCatalogLookupType", "ALL_CATALOGS")</defaultvalue>
+				</attribute>
+				<attribute qualifier="consentTemplates" type="ConsentTemplateCollection">
+					<description>Collection of ConsentTemplates</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute qualifier="userSegmentsStoreInSession" type="java.lang.Boolean">
+					<description>Defines if segments for registered user should be stored in session and save to database after session ends</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+
+				<attribute qualifier="occPersonalizationEnabled" type="java.lang.Boolean">
+					<description>Defines if personalization for Commerce Web Services is enabled</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="occTTL" autocreate="true" type="java.lang.Long">
+					<description>Time (in miliseconds) for which personalization calculation is valid</description>
+					<defaultvalue>java.lang.Long.valueOf(600000)</defaultvalue>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="occPersonalizationIdCookieEnabled" type="java.lang.Boolean">
+					<description>Defines if personalization id cookie for Commerce Web Services is enabled</description>
+					<modifiers read="true" write="true" optional="true"/>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true"  code="CxAbstractCalcConfig" jaloclass="de.hybris.platform.personalizationservices.jalo.config.CxAbstractCalcConfig"  autocreate="true" abstract="true">
+			<deployment table="CxAbstractCalcConfig" typecode="3616" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>Unique identifier</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="actions" type="RecalculateActionStringCollection">
+					<description>Collection of recalculate actions string representations</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userType" type="CxUserType">
+					<description>User type for which config is valid</description>
+					<modifiers read="true" write="true" />
+					<defaultvalue>em().getEnumerationValue("CxUserType", "ALL")</defaultvalue>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true"  code="CxUrlVoterConfig" jaloclass="de.hybris.platform.personalizationservices.jalo.config.CxUrlVoterConfig"  autocreate="true" extends="CxAbstractCalcConfig">
+			<deployment table="CxUrlVoterConfig" typecode="3613" />
+			<attributes>
+				<attribute qualifier="urlRegexp" type="java.lang.String">
+					<description>Url regexp</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype generate="true"  code="CxPeriodicVoterConfig" jaloclass="de.hybris.platform.personalizationservices.jalo.config.CxPeriodicVoterConfig"  autocreate="true" extends="CxAbstractCalcConfig">
+			<deployment table="CxPeriodicVoterConfig" typecode="3617" />
+			<attributes>
+				<attribute qualifier="userMinTime" type="java.lang.Long">
+					<description>Actions interval</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userMinRequestNumber" type="java.lang.Integer">
+					<description>Actions requiring request number</description>
+					<modifiers read="true" write="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- Cron Job for cleaning CxResults -->
+		<itemtype code="CxResultsCleaningCronJob" autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.personalizationservices.jalo.CxResultsCleaningCronJob"
+			extends="CronJob" >
+        	<attributes>
+            	<attribute qualifier="maxResultsAge" type="int">
+                	<description>After specified number of seconds cx results will be cleaned up. Default is 2 days.</description>
+                	<modifiers read="true" write="true" optional="false" />
+                	<persistence type="property" />
+					<defaultvalue>Integer.valueOf(172800)</defaultvalue>
+            	</attribute>
+  				<attribute qualifier="anonymous" type="boolean">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property"/>
+		            <defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+        	</attributes>
+    	</itemtype>
+
+		<itemtype code="RegExpConstraint" extends="AttributeConstraint"
+				  jaloclass="de.hybris.platform.validation.jalo.constraints.RegExpConstraint"
+				  autocreate="true" generate="true">
+			<description>Constraint which checks if value is correct regular expression.</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" />
+					<defaultvalue>de.hybris.platform.validation.annotations.RegExp.class</defaultvalue>
+				</attribute>
+				<attribute qualifier="notEmpty" type="boolean">
+					<description>Define if empty value is allowed</description>
+					<modifiers optional="false" initial="true" />
+					<persistence type="property" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

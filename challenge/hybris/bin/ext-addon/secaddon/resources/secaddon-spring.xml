@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+	
+	<bean id="secaddonCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2C</value>
+				<!--
+								<value>B2B</value>
+				-->
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false"/>
+				<property name="baseExtensionName" value="secaddon"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="secaddonSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener"  >
+		<property name="extensionName" value="secaddon" />
+	</bean>
+
+	<alias name="defaultTicketServiceClientAdapter" alias="ticketServiceClientAdapter"/>
+	<bean id="defaultTicketServiceClientAdapter" class="de.hybris.platform.secaddon.services.TicketServiceClientAdapter">
+		
+		<property name="sapCpServiceFactory" ref="sapCpServiceFactory"/>
+		
+		 <property name="modelService" ref="modelService" />
+		
+	</bean>
+
+	<alias name="defaultCustomerMappingAdapter" alias="customerMappingAdapter"/>
+	<bean id="defaultCustomerMappingAdapter" class="de.hybris.platform.secaddon.services.CustomerMappingAdapter">
+		
+		<property name="sapCpServiceFactory" ref="sapCpServiceFactory"/>
+		 
+	</bean>
+	
+	
+	
+
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter"/>
+		<property name="add" ref="defaultSecCustomerPopulator"/>
+	</bean>
+
+	<bean id="defaultSecCustomerPopulator" class="de.hybris.platform.secaddon.populators.DefaultSecCustomerPopulator"/>
+
+	<alias name="defaultTicketServiceFacade" alias="ticketServiceFacade"/>
+	<bean id="defaultTicketServiceFacade" class="de.hybris.platform.secaddon.facades.DefaultTicketServiceFacade">
+		<property name="ticketServiceClientAdapter" ref="ticketServiceClientAdapter"/>
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+		<property name="secTicketConverter" ref="secTicketConverter" />
+		<property name="secTranscriptConverter" ref="secTranscriptConverter" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="customerFacade" ref="customerFacade" />
+	</bean>
+
+	<alias name="defaultSecTicketConverter" alias="secTicketConverter"/>
+	<bean id="defaultSecTicketConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.secaddon.data.TicketSecData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="defaultSecTicketPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="defaultSecTicketPopulator" class="de.hybris.platform.secaddon.populators.DefaultSecTicketPopulator">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias name="defaultSecTranscriptConverter" alias="secTranscriptConverter"/>
+	<bean id="defaultSecTranscriptConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.secaddon.data.TranscriptSec"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="secTranscriptPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="secTranscriptPopulator" class="de.hybris.platform.secaddon.populators.DefaultSecTranscriptPopulator">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="customerFacade" ref="customerFacade"/>
+	</bean>
+</beans>

@@ -1,0 +1,40 @@
+#from /commerceservices/test/user-groups.impex"
+
+INSERT_UPDATE UserGroup;uid[unique=true];locname[lang=en];
+;salesemployeegroup;Sales Employee;
+;salesadmingroup;Sales Admin;
+;salesmanagergroup;Sales Manager;
+;salesapprovergroup;Sales Approver;
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;salesadmingroup;salesemployeegroup;
+;salesmanagergroup;salesemployeegroup;
+;salesapprovergroup;salesemployeegroup;
+
+# from /impex/essentialdata_usergroups.impex"
+
+INSERT_UPDATE UserGroup;uid[unique=true];locname[lang=en];
+;orgemployeegroup;Organization Employee Group;
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;orgemployeegroup;employeegroup;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;orgemployeegroup;;;;;;;;
+;;;;OrgUnit;+;+;+;-;-
+;;;;Employee;+;+;+;-;-
+$END_USERRIGHTS;;;;;;;;;
+
+# from /commercefacades/test/testQuoteFacade.impex
+INSERT_UPDATE UserGroup;uid[unique=true];locname[lang=en];
+;orgadmingroup;Organization Admin;
+;orgmanagergroup;Organization Manager;
+;orgapprovergroup;Organization Approver;
+;salesapprovergroup;Sales Approver;
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;orgadmingroup;orgemployeegroup;
+;orgmanagergroup;orgemployeegroup;
+;orgapprovergroup;orgemployeegroup;
+;salesapprovergroup;salesemployeegroup;

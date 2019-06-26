@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <alias name="defaultOmsB2bOrderFacade" alias="omsOrderFacade"/>
+    <bean id="defaultOmsB2bOrderFacade" parent="defaultOmsOrderFacade"
+          class="de.hybris.platform.b2bordermanagementfacades.order.impl.DefaultOmsB2bOrderFacade">
+        <property name="b2bCommerceCostCenterService" ref="b2bCommerceCostCenterService"/>
+        <property name="b2bOrderRequestReverseConverter" ref="b2bOrderRequestReverseConverter"/>
+    </bean>
+
+    <alias name="defaultB2bOrderRequestReverseConverter" alias="b2bOrderRequestReverseConverter"/>
+    <bean id="defaultB2bOrderRequestReverseConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.core.model.order.OrderModel"/>
+        <property name="populators">
+            <list>
+                <ref bean="b2bOrderRequestReversePopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultB2bOrderRequestReversePopulator" alias="b2bOrderRequestReversePopulator"/>
+    <bean id="defaultB2bOrderRequestReversePopulator"
+          class="de.hybris.platform.b2bordermanagementfacades.order.converters.populator.B2bOrderRequestReversePopulator" parent="defaultOrderRequestReversePopulator">
+    </bean>
+
+</beans>

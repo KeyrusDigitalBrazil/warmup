@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="sapDefaultSalesAreaService" name="defaultSalesAreaService" />
+	<bean id="defaultSalesAreaService" class="de.hybris.platform.sap.sapmodel.services.impl.DefaultSalesAreaService">
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="discountTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="Discount" />
+		<property name="rawType" value="RawHybrisDiscount" />
+		<property name="converter" ref="discountDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultDiscountDataHubTransferConfigurationConverter" alias="discountDataHubTransferConfigurationConverter" />
+	<bean id="defaultDiscountDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapDefaultDeliveryModeMappingPopulator" alias="sapDeliveryModeMappingPopulator" />
+	<bean id="sapDefaultDeliveryModeMappingPopulator" class="de.hybris.platform.sap.model.populators.DefaultDeliveryModeMappingPopulator"
+		scope="prototype" />
+
+	<alias name="sapDefaultDeliveryModeMappingDataHubConverter" alias="sapDeliveryModeMappingDataHubConverter" />
+	<bean id="sapDefaultDeliveryModeMappingDataHubConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapDeliveryModeMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="sapDeliveryModeMappingTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="SapDeliveryMode" />
+		<property name="rawType" value="RawHybrisDeliveryModeMapping" />
+		<property name="converter" ref="sapDeliveryModeMappingDataHubConverter" />
+	</bean>
+
+	<bean id="sapProductSalesAreaToCatalogMappingTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="SAPProductSalesAreaToCatalogMapping" />
+		<property name="rawType" value="RawHybrisProductSalesAreaToCatalogMapping" />
+		<property name="converter" ref="sapProductSalesAreaToCatalogMappingDataHubConverter" />
+	</bean>
+
+	<alias name="sapDefaultProductSalesAreaToCatalogMappingDataHubConverter" alias="sapProductSalesAreaToCatalogMappingDataHubConverter" />
+	<bean id="sapDefaultProductSalesAreaToCatalogMappingDataHubConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapProductCatalogMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="sapUnitDao" name="sapDefaultUnitDao" />
+	<bean id="sapDefaultUnitDao" class="de.hybris.platform.sap.sapmodel.daos.SAPDefaultUnitDao" parent="unitDao">
+	</bean>
+
+	<alias alias="sapUnitService" name="sapDefaultUnitService" />
+	<bean id="sapDefaultUnitService" class="de.hybris.platform.sap.sapmodel.services.impl.SAPDefaultUnitService" parent="unitService">
+		<property name="sapUnitDao" ref="sapUnitDao" />
+	</bean>
+
+	<alias alias="sapNetAttributeHandler" name="sapDefaultNetAttributeHandler" />
+	<bean id="sapDefaultNetAttributeHandler" class="de.hybris.platform.sap.sapmodel.daos.NetAttributeHandler">
+	</bean>
+
+	<bean id="sapPricingSalesAreaTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="SAPPricingSalesAreaToCatalog" />
+		<property name="rawType" value="RawPricingSalesAreaMapping" />
+		<property name="converter" ref="sapPricingSalesAreaDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultSapPricingSalesAreaDataHubTransferConfigurationConverter" alias="sapPricingSalesAreaDataHubTransferConfigurationConverter" />
+	<bean id="defaultSapPricingSalesAreaDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapPricingCatalogMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSapPricingCatalogMappingPopulator" alias="sapPricingCatalogMappingPopulator" />
+	<bean id="defaultSapPricingCatalogMappingPopulator" class="de.hybris.platform.sap.model.populators.SAPPricingCatalogMappingPopulator" />
+	
+	<!-- product -->
+	<alias name="defaultSapProductCatalogMappingPopulator" alias="sapProductCatalogMappingPopulator" />
+	<bean id="defaultSapProductCatalogMappingPopulator" class="de.hybris.platform.sap.model.populators.SAPProductCatalogMappingPopulator" />
+
+	<bean id="unitsTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="Unit" />
+		<property name="rawType" value="RawHybrisUnit" />
+		<property name="converter" ref="unitDataHubTransferConfigurationConverter" />
+	</bean>
+
+	<alias name="defaultUnitDataHubTransferConfigurationConverter" alias="unitDataHubTransferConfigurationConverter" />
+	<bean id="defaultUnitDataHubTransferConfigurationConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias alias="sapProductIDAttributeHandler" name="sapDefaultProductIDAttributeHandler" />
+	<bean id="sapDefaultProductIDAttributeHandler" class="de.hybris.platform.sap.sapmodel.daos.ProductIDAttributeHandler">
+	</bean>
+
+	<alias alias="sapPlantLogSysOrgService" name="defaultSapPlantLogSysOrgService" />
+	<bean id="defaultSapPlantLogSysOrgService" class="de.hybris.platform.sap.sapmodel.services.impl.DefaultSapPlantLogSysOrgService">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="sapLogicalSystemValidationInterceptor" class="de.hybris.platform.sap.sapmodel.jalo.interceptor.SapLogicalSystemValidationInterceptor"/>
+	
+	<bean id="sapLogicalSystemValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapLogicalSystemValidationInterceptor" />
+		<property name="typeCode" value="SAPLogicalSystem" />
+	</bean>
+
+    <bean id="sapPlantLogSysOrgValidationInterceptor" class="de.hybris.platform.sap.sapmodel.jalo.interceptor.SapPlantLogSysOrgValidationInterceptor"/>
+	
+	<bean id="SapPlantLogSysOrgValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapPlantLogSysOrgValidationInterceptor" />
+		<property name="typeCode" value="SAPPlantLogSysOrg" />
+	</bean>
+	
+	<bean id="sapLogicalSystemSaveListener" class="de.hybris.platform.sap.sapmodel.jalo.listener.SapLogicalSystemSaveListener">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="sapClassificationAttributeHelperImpl" alias="sapClassificationAttributeHelper" />
+	<bean id="sapClassificationAttributeHelperImpl" class="de.hybris.platform.sap.sapmodel.inbound.SapClassificationAttributeHelperImpl">
+		<property name="classificationService" ref="classificationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="productService" ref="productService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="cleanCharacteristicsEnabled" value="${sapmodel.inbound.product.cleanCharacteristicsEnabled}"></property>
+	</bean>
+	
+	<alias name="sapClassificationAttributeAuthorHelperImpl" alias="sapClassificationAttributeAuthorHelper" />
+	<bean id="sapClassificationAttributeAuthorHelperImpl"  
+	class="de.hybris.platform.sap.sapmodel.authors.SapClassificationAttributeAuthorHelperImpl">
+		<property name="classificationService" ref="classificationService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+</beans>

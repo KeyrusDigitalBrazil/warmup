@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition"
+		 name="cmsVersionGCProcess"
+		 start="collectRetainableCMSVersions"
+		 processClass="de.hybris.platform.cms2.model.processing.CMSVersionGCProcessModel"
+		 onError="error">
+
+	<action id="collectRetainableCMSVersions" bean="collectRetainableCMSVersionsGCProcessAction">
+		<transition name="SUCCEEDED" to="collectRelatedCMSVersions"/>
+		<transition name="FAILED" to="failed"/>
+		<transition name="ERROR" to="error"/>
+	</action>
+
+	<action id="collectRelatedCMSVersions" bean="collectRelatedCMSVersionsGCProcessAction">
+		<transition name="SUCCEEDED" to="removeCMSVersions"/>
+		<transition name="FAILED" to="failed"/>
+		<transition name="ERROR" to="error"/>
+	</action>
+
+	<action id="removeCMSVersions" bean="removeCMSVersionsGCProcessAction">
+		<transition name="SUCCEEDED" to="success"/>
+		<transition name="FAILED" to="failed"/>
+		<transition name="ERROR" to="error"/>
+	</action>
+
+	<end id="error" state="ERROR">An error occurred running the CMSVersion garbage collection process</end>
+	<end id="failed" state="FAILED">The CMSVersion garbage collection process failed</end>
+	<end id="success" state="SUCCEEDED">The CMSVersion garbage collection process ran successfully</end>
+
+</process>

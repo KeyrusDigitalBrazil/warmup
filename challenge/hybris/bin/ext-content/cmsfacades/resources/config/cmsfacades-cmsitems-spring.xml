@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<import resource="cmsfacades-cmsitems-converters-spring.xml" />
+	<import resource="cmsfacades-cmsitems-validators-spring.xml" />
+	
+	<alias name="defaultCMSItemFacade" alias="cmsItemFacade"/>
+	<bean name="defaultCMSItemFacade" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultCMSItemFacade">
+		<property name="cmsItemConverter" ref="cmsItemConverter"/>
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="modelService" ref="modelService"/>
+		<property name="itemTypePopulatorProvider" ref="cmsItemTypePopulatorProvider"/>
+		<property name="cmsItemSearchService" ref="cmsItemSearchService"/>
+		<property name="cmsItemSearchDataValidator" ref="cmsItemSearchDataValidator"/>
+		<property name="facadeValidationService" ref="facadeValidationService"/>
+		<property name="cmsItemSearchDataConverter" ref="cmsItemSearchDataConverter"/>
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider"/>
+		<property name="transactionManager" ref="txManager" />
+		<property name="typeService" ref="typeService"/>
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+		<property name="originalClonedItemProvider" ref="cmsOriginalClonedItemProvider" />
+		<property name="itemDataPopulatorProvider" ref="cmsItemDataPopulatorProvider"/>
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService" />
+ 	</bean>
+
+	<alias name="defaultCMSItemSearchDataValidator" alias="cmsItemSearchDataValidator" />
+	<bean name="defaultCMSItemSearchDataValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.CMSItemSearchDataValidator">
+		<property name="cmsItemSearchService" ref="cmsItemSearchService"/>
+	</bean>
+
+	<alias name="defaultBaseCMSItemConverter" alias="baseCMSItemConverter" />
+	<bean name="defaultBaseCMSItemConverter" class="de.hybris.platform.cmsfacades.cmsitems.converter.DefaultCMSItemConverter"
+			abstract="true">
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="cmsAdminItemService" ref="cmsAdminItemService"/>
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+		<property name="dateConverter" ref="cmsDateAttributeToDataContentConverter" /> <!-- Deprecated since 6.7 -->
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="baseAttributeContentValidator" ref="cmsBaseAttributeContentValidator"/>
+		<property name="extendedAttributeContentValidator" ref="cmsExtendedAttributeContentValidator"/>
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider"/>
+		<property name="cmsItemValidatorCreate" ref="cmsItemValidatorCreate" />
+		<property name="cmsItemValidatorUpdate" ref="cmsItemValidatorUpdate" />
+		<property name="validatableService" ref="cmsValidatableService" />
+		<property name="originalClonedItemProvider" ref="cmsOriginalClonedItemProvider" />
+		<property name="componentCloningStrategy" ref="cmsComponentCloningStrategy" />
+		<property name="cloneComponentContextProvider" ref="cmsCloneComponentContextProvider"/>
+		<property name="cloneAttributeStrategyConverter" ref="cmsCloneAttributeStrategyConverter"/>
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService"/>
+		<property name="cmsUserService" ref="cmsUserService"/>
+		<property name="cmsPermissionChecker" ref="cmsPermissionChecker" />
+		<property name="isCollectionPredicate" ref="isCollectionPredicate" />
+	</bean>	
+
+	<alias name="defaultCMSItemConverter" alias="cmsItemConverter"/>
+	<bean name="defaultCMSItemConverter" parent="baseCMSItemConverter">
+		<property name="attributeStrategyConverter" ref="cmsAttributeStrategyConverter"/>
+		<property name="attributeValueToRepresentationStrategy" ref="cmsAttributeValueToRepresentationStrategy" />
+		<property name="composedTypeToAttributeCollectionConverter" ref="cmsComposedTypeToAttributeCollectionConverter" />
+		<property name="customPopulators" ref="cmsItemConverterCustomPopulators" />
+		<property name="nestedOrPartOfAttributePredicate" ref="cmsNestedOrPartOfAttributePredicate" />
+	</bean>
+
+	<alias name="defaultCmsItemConverterCustomPopulators" alias="cmsItemConverterCustomPopulators" />
+	<util:list id="defaultCmsItemConverterCustomPopulators">
+		<ref bean="cmsItemDefaultAttributesPopulator" />
+		<ref bean="cmsItemUniqueIdentifierAttributePopulator" />
+	</util:list>
+
+	<alias name="defaultCmsAttributeContentConverterList" alias="cmsAttributeContentConverterList"/>
+	<util:list id="defaultCmsAttributeContentConverterList">
+		<!-- primitive content converters -->
+		<ref bean="cmsBooleanContentConverter"/>
+		<ref bean="cmsDateContentConverter"/>
+		<ref bean="cmsDoubleContentConverter"/>
+		<ref bean="cmsFloatContentConverter"/>
+		<ref bean="cmsIntegerContentConverter"/>
+		<ref bean="cmsLongContentConverter"/>
+		<ref bean="cmsStringContentConverter"/>
+		<ref bean="cmsEnumContentConverter"/>
+
+		<!-- cms item default content converter -->
+		<ref bean="cmsItemContentConverter"/>
+
+		<!-- other content converters -->
+		<ref bean="cmsMediaContentConverter"/>
+		<ref bean="cmsProductContentConverter"/>
+		<ref bean="cmsCategoryContentConverter"/>
+		<ref bean="cmsUserGroupContentConverter"/>
+		<ref bean="cmsCatalogVersionContentConverter"/>
+		<ref bean="cmsPageTypeContentConverter"/>
+		<ref bean="cmsLinkTargetContentConverter"/>
+		<ref bean="cmsNavigationEntryContentConverter"/>
+	</util:list>
+	
+	<alias name="defaultCmsAttributeStrategyConverter" alias="cmsAttributeStrategyConverter"/>
+	<bean name="defaultCmsAttributeStrategyConverter" class="de.hybris.platform.cms2.cmsitems.converter.impl.DefaultAttributeStrategyConverterProvider" parent="baseAttributeStrategyConverterProvider">
+		<property name="attributeContentConverters" ref="cmsAttributeContentConverterList"/>
+	</bean>
+	
+	<alias name="defaultCmsCloneAttributeContentConverterList" alias="cmsCloneAttributeContentConverterList"/>
+	<util:list id="defaultCmsCloneAttributeContentConverterList">
+	</util:list>
+	
+	<alias name="defaultCmsCloneAttributeStrategyConverter" alias="cmsCloneAttributeStrategyConverter"/>
+	<bean name="defaultCmsCloneAttributeStrategyConverter" class="de.hybris.platform.cms2.cmsitems.converter.impl.DefaultAttributeStrategyConverterProvider" parent="baseAttributeStrategyConverterProvider">
+		<property name="attributeContentConverters" ref="cmsCloneAttributeContentConverterList"/>
+	</bean>
+	
+	<alias name="defaultCmsItemTypePopulatorProvider" alias="cmsItemTypePopulatorProvider"/>
+	<bean id="defaultCmsItemTypePopulatorProvider" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultItemTypePopulatorProvider">
+		<property name="typeService" ref="typeService"/>
+		<property name="populatorsMap" ref="cmsContentItemTypePopulatorsMap"/>
+	</bean>
+
+	<util:map id="cmsContentItemTypePopulatorsMap">
+		<entry value-ref="cmsAbstractCMSComponentContentPopulator">
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel._TYPECODE"/>
+			</key>
+		</entry>
+		<entry value-ref="cmsAbstractPagePopulator">
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+			</key>
+		</entry>
+		<entry value-ref="cmsContentPagePopulator">
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.pages.ContentPageModel._TYPECODE"/>
+			</key>
+		</entry>
+		<entry value-ref="cmsContentSlotPopulator">
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.contents.contentslot.ContentSlotModel._TYPECODE"/>
+			</key>
+		</entry>
+		<entry value-ref="cmsNavigationNodePopulator">
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.navigation.CMSNavigationNodeModel._TYPECODE"/>
+			</key>
+		</entry>
+	</util:map>
+
+	<alias name="defaultCmsItemUniqueIdentifierAttributePopulator" alias="cmsItemUniqueIdentifierAttributePopulator" />
+	<bean name="defaultCmsItemUniqueIdentifierAttributePopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSItemUniqueIdentifierAttributePopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultCmsItemDefaultAttributesPopulator" alias="cmsItemDefaultAttributesPopulator" />
+	<bean name="defaultCmsItemDefaultAttributesPopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CmsItemDefaultAttributesPopulator">
+		<property name="dateConverter" ref="cmsDateAttributeToDataContentConverter"/>
+	</bean>
+
+	<alias name="defaultAttributeValueToRepresentationStrategy" alias="cmsAttributeValueToRepresentationStrategy" />
+	<bean name="defaultAttributeValueToRepresentationStrategy" class="de.hybris.platform.cmsfacades.cmsitems.converter.DefaultAttributeValueToRepresentationStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+		<property name="collectionToRepresentationConverter" ref="cmsCollectionToRepresentationConverter" />
+		<property name="cloneComponentContextProvider" ref="cmsCloneComponentContextProvider" />
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider" />
+	</bean>
+
+
+	
+	<!-- Item Populators -->
+	<bean id="cmsAbstractCMSComponentContentPopulator" parent="cmsCompositePopulator">
+		<property name="populators">
+			<list merge="true">
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.AbstractCMSComponentContentPopulator">
+					<property name="contentSlotAdminService" ref="cmsAdminContentSlotService"/>
+					<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+					<property name="validationDtoFactory" ref="validationDtoFactory"/>
+					<property name="componentTypeAllowedForContentSlotPredicate" ref="componentTypeAllowedForContentSlotPredicate"/>
+				</bean>
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.AbstractCMSComponentRestrictionsContentPopulator"/>
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSItemLinkToggleDataToModelPopulator">
+					<property name="cmsModelContainsLinkTogglePredicate" ref="cmsModelContainsLinkTogglePredicate" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<util:list id="cmsAbstractPageBasePopulatorsList">
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.ClonePagePopulator">
+			<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+			<property name="pageCloningStrategy" ref="cmsPageCloningStrategy"/>
+		</bean>
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.PageInitializerPopulator">
+			<property name="pageInitializer" ref="pageInitializer"/>
+			<property name="modelService" ref="modelService"/>
+		</bean>
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.AbstractCMSPageRestrictionsContentPopulator" />
+        <ref bean="cmsTrashPagePopulator" />
+	</util:list>
+
+	
+    <alias name="defaulCmsTrashPagePopulator" alias="cmsTrashPagePopulator" />
+    <bean id="defaulCmsTrashPagePopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.TrashPagePopulator" >
+        <property name="cmsNavigationService" ref="cmsNavigationService"/>
+        <property name="cmsAdminItemService" ref="cmsAdminItemService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="enumerationService" ref="enumerationService"/>
+    </bean>
+	
+	<util:list id="cmsContentPageTrashOrRestorePopulatorsList">
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.RestoreContentPagePopulator">
+			<property name="primaryPageWithLabelExistsPredicate" ref="cmsPrimaryPageWithLabelExistsPredicate"/>
+			<property name="pageVariationResolver" ref="cmsContentPageVariationResolver" />
+		</bean>
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.TrashContentPagePopulator" />
+	</util:list>
+	
+	<util:list id="cmsCategoryOrProductPageRestorePopulatorsList">
+		<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.CategoryOrProductPageRestorePopulator">
+			<property name="pageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry"/>
+			<property name="pageCanOnlyHaveOnePrimaryPredicate" ref="cmsPageCanOnlyHaveOnePrimaryPredicate"/>
+		</bean>
+	</util:list>
+	
+	<bean id="cmsAbstractPagePopulatorsList" class="org.springframework.beans.factory.config.ListFactoryBean">
+	    <property name="sourceList" 
+	        value="#{ T(org.apache.commons.collections.ListUtils).union(@cmsAbstractPageBasePopulatorsList, @cmsCategoryOrProductPageRestorePopulatorsList) }" />
+	</bean>
+	
+	<bean id="cmsContentPagePopulatorsList" class="org.springframework.beans.factory.config.ListFactoryBean">
+	    <property name="sourceList" 
+	        value="#{ T(org.apache.commons.collections.ListUtils).union(@cmsAbstractPageBasePopulatorsList, @cmsContentPageTrashOrRestorePopulatorsList) }" />
+	</bean>
+	
+
+	<alias name="defaultCmsAbstractPagePopulator" alias="cmsAbstractPagePopulator"/>
+	<bean id="defaultCmsAbstractPagePopulator" parent="cmsCompositePopulator">
+		<property name="populators" ref="cmsAbstractPagePopulatorsList" />
+	</bean>
+	
+	<alias name="defaultCmsContentPagePopulator" alias="cmsContentPagePopulator"/>
+	<bean id="defaultCmsContentPagePopulator" parent="cmsCompositePopulator">
+		<property name="populators" ref="cmsContentPagePopulatorsList" />
+	</bean>
+
+	<alias name="defaultCmsNavigationNodePopulator" alias="cmsNavigationNodePopulator"/>
+	<bean id="defaultCmsNavigationNodePopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSNavigationNodePopulator">
+		<property name="cmsNavigationService" ref="cmsNavigationService" />
+	</bean>
+
+	<alias name="defaultCmsContentSlotPopulator" alias="cmsContentSlotPopulator"/>
+	<bean id="defaultCmsContentSlotPopulator" parent="cmsCompositePopulator">
+		<property name="populators">
+			<list merge="true">
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.populators.CloneContentSlotPopulator">
+					<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+					<property name="contentSlotCloningStrategy" ref="cmsContentSlotCloningStrategy"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsItemSearchDataPopulator" alias="cmsItemSearchDataPopulator"/>
+	<bean id="defaultCmsItemSearchDataPopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSItemSearchDataPopulator"/>
+
+	<alias name="defaultCmsItemSearchDataPrototype" alias="cmsItemSearchDataPrototype"/>
+	<bean id="defaultCmsItemSearchDataPrototype" class="de.hybris.platform.cms2.data.CMSItemSearchData" scope="prototype"/>
+	
+	<alias name="defaultCmsItemSearchDataConverter" alias="cmsItemSearchDataConverter"/>
+	<bean id="defaultCmsItemSearchDataConverter" class="de.hybris.platform.cms2.common.functions.impl.DefaultConverter">
+		<property name="objectFactory">
+			<bean class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+				<property name="targetBeanName" value="defaultCmsItemSearchDataPrototype" />
+			</bean>
+		</property>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsItemSearchDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsOriginalClonedItemProvider" alias="cmsOriginalClonedItemProvider" />
+	<bean id="defaultCmsOriginalClonedItemProvider" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultOriginalClonedItemProvider">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+	</bean>
+	
+	<alias name="defaultCmsCloneComponentContextProvider" alias="cmsCloneComponentContextProvider" />
+	<bean id="defaultCmsCloneComponentContextProvider" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultCloneComponentContextProvider">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- Model to Data Predicates and Populators -->
+	<alias name="defaultCmsItemDataPopulatorProvider" alias="cmsItemDataPopulatorProvider" />
+	<bean id="defaultCmsItemDataPopulatorProvider" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultItemDataPopulatorProvider">
+		<property name="itemDataPredicatePopulatorListMap" ref="cmsAttributeDataPredicatePopulatorListMap"/>
+	</bean>
+
+	<alias name="defaultCmsAttributeDataPredicatePopulatorListMap" alias="cmsAttributeDataPredicatePopulatorListMap" />
+	<bean id="defaultCmsAttributeDataPredicatePopulatorListMap" class="org.springframework.beans.factory.config.MapFactoryBean" scope="singleton">
+		<property name="sourceMap">
+			<util:map key-type="java.util.function.Predicate" value-type="java.util.List" map-class="java.util.LinkedHashMap">
+				<entry>
+					<key>
+						<ref bean="cmsModelContainsLinkTogglePredicate" />
+					</key>
+					<list>
+						<ref bean="cmsItemLinkToggleModelToDataAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsComponentPredicate" />
+					</key>
+					<list>
+						<ref bean="cmsItemCloneableModelToDataAttributePopulator" />
+					</list>
+				</entry>
+			</util:map>
+		</property>
+	</bean>
+
+	<!-- Content API - GET :: Model to Data populators -->
+	<alias name="defaultItemLinkToggleModelToDataAttributePopulator" alias="cmsItemLinkToggleModelToDataAttributePopulator" />
+	<bean id="defaultItemLinkToggleModelToDataAttributePopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSItemLinkToggleModelToDataAttributePopulator" />
+	
+	<alias name="defaultItemCloneableModelToDataAttributePopulator" alias="cmsItemCloneableModelToDataAttributePopulator" />
+	<bean id="defaultItemCloneableModelToDataAttributePopulator" class="de.hybris.platform.cmsfacades.cmsitems.populators.CMSItemCloneableModelToDataAttributePopulator">
+		<property name="cmsItemCloneablePredicate" ref="cmsItemCloneablePredicate" />
+	</bean>
+
+	<!-- Functions -->
+	<alias name="collectionToRepresentationConverter" alias="cmsCollectionToRepresentationConverter" />
+	<bean name="collectionToRepresentationConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.CollectionToRepresentationConverter">
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider" />
+	</bean>
+
+	<alias name="defaultComposedTypeToAttributeCollectionConverter" alias="cmsComposedTypeToAttributeCollectionConverter" />
+	<bean name="defaultComposedTypeToAttributeCollectionConverter" class="de.hybris.platform.cmsfacades.cmsitems.converter.ComposedTypeToAttributeCollectionConverter">
+		<property name="blacklistedTypes" ref="cmsBlacklistedTypesList" />
+		<property name="typeBlacklistedAttributeMap" ref="cmsTypeBlacklistedAttributeMap" />
+	</bean>
+
+	<alias name="defaultBlacklistedTypesList" alias="cmsBlacklistedTypesList" />
+	<util:list id="defaultBlacklistedTypesList">
+		<value>GenericItem</value>
+		<value>BridgeAbstraction</value>
+		<value>LocalizableItem</value>
+		<value>ExtensibleItem</value>
+		<value>Item</value>
+	</util:list>
+
+	<alias name="defaultTypeBlacklistedAttributeMap" alias="cmsTypeBlacklistedAttributeMap" />
+	<util:map key-type="java.lang.String" value-type="java.lang.String" id="defaultTypeBlacklistedAttributeMap">
+		<entry key="Item" value="pk" />
+	</util:map>
+
+</beans>

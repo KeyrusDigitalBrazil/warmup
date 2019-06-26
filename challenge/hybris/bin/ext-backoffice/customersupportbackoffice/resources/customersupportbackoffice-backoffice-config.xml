@@ -1,0 +1,2281 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config" xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+        xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+        xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+        xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+        xmlns:n="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+        xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+	<context component="perspective-chooser" principal="orgemployeerole" merge-by="module" parent="commerceservicesbackoffice">
+		<y:perspective-chooser xmlns:y="http://www.hybris.com/cockpitng/config/perspectiveChooser">
+			<y:defaultPerspective name="organizationBackofficePerspective"/>
+			<y:authority name="orgemployeerole">
+				<y:perspective id="organizationBackofficePerspective"/>
+				<y:perspective id="CustomerSupport-Perspective"/>
+			</y:authority>
+		</y:perspective-chooser>
+	</context>
+
+	<context component="perspective-view-switcher" principal="customersupportadministratorrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="customersupportadministratorrole">
+				<vs:view id="CustomerSupport-Perspective"/>
+				<vs:view id="hmc2"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" principal="customersupportmanagerrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="customersupportmanagerrole">
+				<vs:view id="CustomerSupport-Perspective"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" principal="customersupportagentrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="customersupportagentrole">
+				<vs:view id="CustomerSupport-Perspective"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" principal="orgemployeerole" merge-by="module" parent="commerceservicesbackoffice">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="orgemployeerole">
+				<vs:view id="organizationBackofficePerspective"/>
+				<vs:view id="CustomerSupport-Perspective"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="notification-area" source="customersupportbackoffice" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="JustMessage" level="FAILURE">
+				<na:message>customersupportbackoffice.notification.messsage</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="SUCCESS">
+				<na:message>customersupportbackoffice.notification.messsage</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="INFO">
+				<na:message>customersupportbackoffice.notification.messsage</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="WARNING">
+				<na:message>customersupportbackoffice.notification.messsage</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<!-- Aministration perspective -->
+	<context component="explorer-tree" principal="customersupportadministratorrole" merge-by="module">
+		<n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree">
+			<n:type-node code="AuditReportData" id="customersupport_backoffice_explorerTree_personaldatareport" position="2"/>
+		</n:explorer-tree>
+	</context>
+
+	<context type="AuditReportData" component="editor-area" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole" merge-by="module">
+		<editorArea:editorArea name="Personal Data Report">
+			<editorArea:tab name="customersupport_backoffice_personaldatareport_tab_summary"
+							tooltipText="customersupport_backoffice_personaldatareport_tab_summary" position="0">
+				<editorArea:section name="customersupport_backoffice_personaldatareport_section_summary">
+					<editorArea:panel name="customersupport_backoffice_personaldatareport_tab_summary_panel">
+						<editorArea:attribute qualifier="auditReportConfig"
+											  editor="com.hybris.cockpitng.editor.defaultreferenceeditor"
+											  readonly="true">
+						</editorArea:attribute>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="hmc.media.section.general">
+					<editorArea:customPanel name="mediaSection" spring-bean="mediaItemUploadRenderer">
+						<editorArea:render-parameter>
+							<editorArea:name>dataModelProperty</editorArea:name>
+							<editorArea:value>currentObject</editorArea:value>
+						</editorArea:render-parameter>
+					</editorArea:customPanel>
+				</editorArea:section>
+				<editorArea:section name="hmc.properties" merge-mode="REPLACE">
+					<editorArea:attribute qualifier="URL" readonly="true"/>
+					<editorArea:attribute qualifier="mime"/>
+					<editorArea:attribute qualifier="realFileName"/>
+					<editorArea:attribute qualifier="mediaFormat"/>
+					<editorArea:attribute qualifier="mediaContainer"/>
+					<editorArea:attribute qualifier="supercategories"/>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.administration" position="99" merge-mode="REPLACE">
+				<editorArea:section name="hmc.section.metadata">
+					<editorArea:attribute qualifier="pk"/>
+					<editorArea:attribute qualifier="itemtype"/>
+					<editorArea:attribute qualifier="creationtime"/>
+					<editorArea:attribute qualifier="modifiedtime"/>
+					<editorArea:attribute qualifier="owner"/>
+				</editorArea:section>
+				<editorArea:section name="hmc.section.saved.values">
+					<editorArea:attribute qualifier="savedValues"/>
+				</editorArea:section>
+				<editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				<editorArea:section name="hmc.section.copies">
+					<editorArea:attribute qualifier="synchronizedCopies"/>
+					<editorArea:attribute qualifier="synchronizationSources"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- Explorer Tree-->
+    <context component="cs-explorer-tree" module="customersupportbackoffice" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+        <n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree" title="customer_support">
+
+			<n:type-node code="CsTicket" id="customersupport_backoffice_explorerTree_tickets"/>
+			<n:type-node code="CustomerReview" id="customersupport_backoffice_explorerTree_reviews"/>
+            <n:type-node code="Customer" id="customersupport_backoffice_explorerTree_customers"/>
+            <n:type-node code="AuditReportData" id="customersupport_backoffice_explorerTree_personaldatareport"/>
+
+            <n:type-node id="customersupportbackoffice.typenode.order.all" />
+            <n:type-node id="customersupportbackoffice.typenode.all.returns" />
+
+        </n:explorer-tree>
+    </context>
+
+    <context component="cs-explorer-tree" module="customersupportbackoffice" principal="orgemployeerole">
+        <n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree" title="customer_support">
+			<n:type-node code="Quote" id="customersupport_backoffice_explorerTree_quotes" />
+        </n:explorer-tree>
+    </context>
+
+    <!-- Customers -->
+    <context component="cs-listview" type="User" module="customersupportbackoffice">
+        <list-view:list-view>
+            <list-view:column qualifier="name" label="customersupport_backoffice_customers_customername"/>
+            <list-view:column qualifier="uid" />
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="User" type="Customer" component="cs-listview" module="customersupportbackoffice" >
+        <list-view:list-view>
+            <list-view:column qualifier="creationtime" sortable="true" label="customersupport_backoffice_customers_creationtime"/>
+            <list-view:column qualifier="type" sortable="true" label="customersupport_backoffice_customers_type"/>
+        </list-view:list-view>
+    </context>
+
+    <context type="Customer" component="cs-simple-search" module="customersupportbackoffice">
+        <simple-search:simple-search>
+	        <simple-search:field name="uid" />
+	        <simple-search:field name="customerID" />
+	        <simple-search:field name="name" />
+	        <simple-search:sort-field name="modifiedtime" asc="false" />
+        </simple-search:simple-search>
+    </context>
+
+	<!--Refine By -->
+	<context type="Order" component="customersupportbackoffice-refine-by" module="customersupportbackoffice" >
+		<rb:refine-by xmlns:rb="http://www.hybris.com/customersupportbackoffice/config/customersupportrefineby">
+			<rb:field-list name="fieldList">
+				<rb:search-field name="status">
+					<rb:search-value label="customersupportbackoffice.refineby.orders.open">
+							<rb:group-member-value value="CHECKED_VALID"/>
+							<rb:group-member-value value="CHECKED_INVALID"/>
+							<rb:group-member-value value="ON_VALIDATION"/>
+							<rb:group-member-value value="PAYMENT_AUTHORIZED"/>
+							<rb:group-member-value value="PAYMENT_NOT_AUTHORIZED"/>
+							<rb:group-member-value value="PAYMENT_AMOUNT_RESERVED"/>
+							<rb:group-member-value value="PAYMENT_AMOUNT_NOT_RESERVED"/>
+							<rb:group-member-value value="PAYMENT_CAPTURED"/>
+							<rb:group-member-value value="PAYMENT_NOT_CAPTURED"/>
+							<rb:group-member-value value="FRAUD_CHECKED"/>
+							<rb:group-member-value value="ORDER_SPLIT"/>
+							<rb:group-member-value value="PROCESSING_ERROR"/>
+							<rb:group-member-value value="WAIT_FRAUD_MANUAL_CHECK"/>
+					</rb:search-value>
+					<rb:search-value label="customersupportbackoffice.refineby.orders.onhold">
+							<rb:group-member-value value="SUSPENDED"/>
+					</rb:search-value>
+					<rb:search-value uniqueValue="COMPLETED" label="customersupportbackoffice.refineby.orders.completed"/>
+					<rb:search-value label="customersupportbackoffice.refineby.orders.cancelled">
+						<rb:group-member-value value="CANCELLING"/>
+						<rb:group-member-value value="CANCELLED"/>
+					</rb:search-value>
+				</rb:search-field>
+			</rb:field-list>
+		</rb:refine-by>
+	</context>
+
+	<context type="ReturnRequest" component="customersupportbackoffice-refine-by" module="customersupportbackoffice">
+		<rb:refine-by xmlns:rb="http://www.hybris.com/customersupportbackoffice/config/customersupportrefineby">
+			<rb:field-list name="fieldList">
+				<rb:search-field name="status">
+					<rb:search-value uniqueValue="APPROVAL_PENDING" label="customersupportbackoffice.refineby.returns.approval.pending"/>
+				</rb:search-field>
+			</rb:field-list>
+		</rb:refine-by>
+	</context>
+
+   <!-- Editor Area configuration starts -->
+	<context type="Item" component="cs-editor-area">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="hmc.administration" position="99">
+				<editorArea:section name="hmc.section.metadata">
+					<editorArea:attribute qualifier="pk" />
+					<editorArea:attribute qualifier="itemtype" />
+					<editorArea:attribute qualifier="creationtime" />
+					<editorArea:attribute qualifier="modifiedtime" />
+					<editorArea:attribute qualifier="owner" />
+				</editorArea:section>
+				<editorArea:section name="hmc.section.saved.values">
+					<editorArea:attribute qualifier="savedValues" />
+				</editorArea:section>
+                <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				<editorArea:section name="hmc.section.copies">
+					<editorArea:attribute qualifier="synchronizedCopies" />
+					<editorArea:attribute qualifier="synchronizationSources" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="Principal" component="cs-editor-area">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="uid" />
+					<editorArea:attribute qualifier="name" />
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+			<editorArea:tab name="hmc.tab.personalization" position="15" tooltipText="customersupport_backoffice_customer_tab_personalization_desc">
+				<editorArea:section name="hmc.section.personalization.rules">
+                    <editorArea:attribute qualifier="allSearchRestrictions" description="hmc.text.principal.personalization"/>
+				</editorArea:section>
+				<editorArea:section name="hmc.section.catalogversion.rights">
+					<editorArea:attribute qualifier="writableCatalogVersions" />
+					<editorArea:attribute qualifier="readableCatalogVersions" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="Principal" type="User" component="cs-editor-area" module="customersupportbackoffice">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="customersupport_backoffice_customer_tab_summary" position="0" tooltipText="customersupport_backoffice_customer_tab_summary_desc">
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_carts">
+                	<editorArea:panel name="customersupport_backoffice_user_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="carts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" label="customersupport_backoffice_tab_customer_associations_cart" readonly="true">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_savedCarts">
+                	<editorArea:panel name="customersupport_backoffice_user_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="savedCarts" label="customersupport_backoffice_tab_customer_associations_section_savedCarts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" readonly="true">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>forwardURL</editorArea:name>
+                                <editorArea:value>/my-account/saved-carts</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_orders">
+                	<editorArea:panel name="customersupport_backoffice_orders_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="orders" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+                			<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isSimpleSelectEnabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>selectedItemsMaxSize</editorArea:name>
+                                <editorArea:value>5</editorArea:value>
+                            </editorArea:editor-parameter>
+                		</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_paymentMethods">
+                	<editorArea:panel name="customersupport_backoffice_paymentMethods_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultPaymentInfo" label="customersupport_backoffice_tab_customer_associations_defaultPaymentMethod">
+							<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							 </editorArea:editor-parameter>
+							 <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="paymentInfos" label="customersupport_backoffice_tab_customer_associations_paymentMethods">
+	                		<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+	                </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_addresses" >
+                	<editorArea:panel name="customersupport_backoffice_addresses_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultShipmentAddress">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="defaultPaymentAddress">
+							<editorArea:editor-parameter>
+									<editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+									<editorArea:value>cs-editor-area</editorArea:value>
+								 </editorArea:editor-parameter>
+							</editorArea:attribute>
+	                	<editorArea:attribute qualifier="addresses">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_tickets">
+					<editorArea:panel name="customersupport_backoffice_tickets_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="tickets" editor="com.hybris.cockpitng.editor.simpleselectlisteditor">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>selectedItemsMaxSize</editorArea:name>
+                                <editorArea:value>5</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                            <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupportbackoffice.customer.section.reviews">
+                	<editorArea:panel colspan="2" rowspan="2" name="">
+	                    <editorArea:attribute qualifier="customerReviews" label="customersupportbackoffice.customer.section.reviews" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+	                    	<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>5</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+	                    </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+			<editorArea:tab name="customersupport_backoffice_customer_tab_profile" position="1" tooltipText="customersupport_backoffice_customer_tab_profile_desc">
+				<editorArea:section name="hmc.properties">
+					<editorArea:attribute qualifier="sessionLanguage" position="1"/>
+					<editorArea:attribute qualifier="sessionCurrency" position="2"/>
+					<editorArea:attribute qualifier="groups" position="3"/>
+					<editorArea:attribute qualifier="description" position="4"/>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.orders" position="2" tooltipText="customersupport_backoffice_customer_tab_orders_desc">
+				<editorArea:section name="customersupport_backoffice_tab_customer_associations_section_carts">
+                	<editorArea:panel name="customersupport_backoffice_carts_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="carts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" readonly="true" label="customersupport_backoffice_tab_customer_orders_cart">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_savedCarts">
+                	<editorArea:panel name="customersupport_backoffice_user_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="savedCarts" label="customersupport_backoffice_tab_customer_associations_section_savedCarts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" readonly="true">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>forwardURL</editorArea:name>
+                                <editorArea:value>/my-account/saved-carts</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_orders">
+                	<editorArea:panel name="customersupport_backoffice_customerAssociationsOrders_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="orders" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+                			<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isSimpleSelectEnabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+                		</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.password" position="7" tooltipText="customersupport_backoffice_customer_tab_password_desc">
+				<editorArea:section name="hmc.password">
+                    <editorArea:customPanel name="userPasswordPanelRenderer" spring-bean="userPasswordPanelRenderer"/>
+                    <editorArea:panel name="">
+						<editorArea:attribute qualifier="passwordQuestion" description="hmc.text.passwordQuestion.description"/>
+						<editorArea:attribute qualifier="lastLogin" description="hmc.text.lastLogin.description"/>
+						<editorArea:attribute qualifier="loginDisabled" label="hmc.text.password.logindisabled"/>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.community" position="6" tooltipText="customersupport_backoffice_customer_tab_reviews_desc">
+                <editorArea:section name="customersupportbackoffice.customer.section.reviews">
+                	<editorArea:panel colspan="2" rowspan="2" name="">
+	                    <editorArea:attribute qualifier="customerReviews" label="customersupportbackoffice.customer.section.reviews" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+	                    	<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+	                    </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+			<editorArea:tab name="hmc.administration" position="99">
+				<editorArea:section name="hmc.common">
+					<editorArea:attribute qualifier="userprofile" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+    <context merge-by="type" parent="User" type="Customer" component="cs-editor-area" principal="customersupportadministratorrole">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="name" position="1"/>
+					<editorArea:attribute qualifier="uid" position="2"/>
+					<editorArea:attribute qualifier="customerID" position="3" readonly="true"/>
+					<editorArea:attribute qualifier="originalUid" position="4" readonly="true"/>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+
+			<editorArea:tab name="hmc.customerpayments" position="3" tooltipText="customersupport_backoffice_customer_tab_customerpayment_desc">
+				<editorArea:section name="hmc.customerpayments.method.section">
+					<editorArea:panel name="customersupport_backoffice_customerPayments_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultPaymentInfo" label="customersupport_backoffice_tab_customer_associations_defaultPaymentMethod">
+							<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							 </editorArea:editor-parameter>
+							 <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="paymentInfos" label="customersupport_backoffice_tab_customer_associations_paymentMethods">
+	                		<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+	                	</editorArea:attribute>
+	                </editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+
+			<editorArea:tab name="hmc.addresses" position="4" tooltipText="customersupport_backoffice_customer_tab_customeraddress_desc">
+                 <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_addresses">
+                    <editorArea:panel name="customersupport_backoffice_customerAssociationsAddresses_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultShipmentAddress">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="defaultPaymentAddress">
+							<editorArea:editor-parameter>
+									<editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+									<editorArea:value>cs-editor-area</editorArea:value>
+								 </editorArea:editor-parameter>
+							</editorArea:attribute>
+	                	<editorArea:attribute qualifier="addresses">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+	                </editorArea:panel>
+                 </editorArea:section>
+            </editorArea:tab>
+			<editorArea:tab name="customersupport_backoffice_tab_tickets" position="5" tooltipText="customersupport_backoffice_customer_tab_tickets_desc">
+				<editorArea:section name="customersupport_backoffice_tickets_tab_section_tickets">
+					<editorArea:panel name="customersupport_backoffice_ticketsTab_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="tickets" editor="com.hybris.cockpitng.editor.simpleselectlisteditor">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+            <editorArea:tab name="hmc.customerprices" position="8" tooltipText="customersupport_backoffice_customer_tab_prices_desc">
+				<editorArea:section name="hmc.customerprices">
+					<editorArea:attribute qualifier="Europe1PriceFactory_UTG" />
+					<editorArea:attribute qualifier="Europe1PriceFactory_UPG" />
+					<editorArea:attribute qualifier="Europe1PriceFactory_UDG" />
+					<editorArea:attribute qualifier="europe1Discounts" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.personalization" position="9" />
+			<editorArea:tab name="hmc.administration" />
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="Principal" type="User" component="cs-editor-area" module="customersupportbackoffice" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="Customer Details">
+			<editorArea:tab name="customersupport_backoffice_customer_tab_summary_agents" position="0" tooltipText="customersupport_backoffice_customer_tab_summary_desc">
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_carts">
+					<editorArea:panel name="customersupport_backoffice_user_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="carts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" readonly="true">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                 <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_savedCarts">
+                	<editorArea:panel name="customersupport_backoffice_user_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="savedCarts" label="customersupport_backoffice_tab_customer_associations_section_savedCarts" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor" readonly="true">
+	                		<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>forwardURL</editorArea:name>
+                                <editorArea:value>/my-account/saved-carts</editorArea:value>
+                            </editorArea:editor-parameter>
+	                	</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_orders">
+                	<editorArea:panel name="customersupport_backoffice_orders_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="orders" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+                			<editorArea:editor-parameter>
+						        <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+						        <editorArea:value>true</editorArea:value>
+						    </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isSimpleSelectEnabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>selectedItemsMaxSize</editorArea:name>
+                                <editorArea:value>5</editorArea:value>
+                            </editorArea:editor-parameter>
+                		</editorArea:attribute>
+                	</editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_paymentMethods">
+                	<editorArea:panel name="customersupport_backoffice_paymentMethods_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultPaymentInfo" label="customersupport_backoffice_tab_customer_associations_defaultPaymentMethod">
+							<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							 </editorArea:editor-parameter>
+							 <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="paymentInfos" label="customersupport_backoffice_tab_customer_associations_paymentMethods">
+	                		<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+	                	</editorArea:attribute>
+	                </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_addresses" >
+                	<editorArea:panel name="customersupport_backoffice_addresses_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultShipmentAddress">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="defaultPaymentAddress">
+							<editorArea:editor-parameter>
+									<editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+									<editorArea:value>cs-editor-area</editorArea:value>
+								 </editorArea:editor-parameter>
+							</editorArea:attribute>
+	                	<editorArea:attribute qualifier="addresses">
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                             </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tab_customer_associations_section_tickets">
+					<editorArea:panel name="customersupport_backoffice_tickets_panel" colspan="2" rowspan="2">
+                		<editorArea:attribute qualifier="tickets" editor="com.hybris.cockpitng.editor.simpleselectlisteditor">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>selectedItemsMaxSize</editorArea:name>
+                                <editorArea:value>5</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                            <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupportbackoffice.customer.section.reviews">
+                	<editorArea:panel colspan="2" rowspan="2" name="">
+	                    <editorArea:attribute qualifier="customerReviews" label="customersupportbackoffice.customer.section.reviews" editor="com.hybris.cockpitng.editor.asmdeeplinklisteditor">
+	                    	<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>5</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+	                    </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="User" type="Customer" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="Customer Details Payments Tab">
+			<editorArea:tab name="hmc.customerpayments" position="3" tooltipText="customersupport_backoffice_customer_tab_customerpayment_desc">
+				<editorArea:section name="hmc.customerpayments.method.section">
+					<editorArea:panel name="customersupport_backoffice_customerPayments_panel" colspan="2" rowspan="2">
+	                	<editorArea:attribute qualifier="defaultPaymentInfo" label="customersupport_backoffice_tab_customer_associations_defaultPaymentMethod">
+							<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							 </editorArea:editor-parameter>
+							 <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+						</editorArea:attribute>
+	                	<editorArea:attribute qualifier="paymentInfos" label="customersupport_backoffice_tab_customer_associations_paymentMethods">
+	                		<editorArea:editor-parameter>
+	                			<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+	                			<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>selectedItemsMaxSize</editorArea:name>
+								<editorArea:value>15</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>disableRemoveReference</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+	                	</editorArea:attribute>
+	                </editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" parent="customersupportadministratorrole" type="Customer" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="hmc.administration" merge-mode="remove"/>
+			<editorArea:tab name="hmc.tab.personalization" merge-mode="remove"/>
+			<editorArea:tab name="hmc.customerprices" merge-mode="remove"/>
+			<editorArea:tab name="hmc.customerpayments" merge-mode="remove"/>
+			<editorArea:tab name="customersupport_backoffice_customer_tab_summary"  merge-mode="remove"/>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" parent="customersupportadministratorrole" type="Address" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="hmc.administration" merge-mode="remove"/>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" parent="customersupportadministratorrole" type="PaymentInfo" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="hmc.administration" merge-mode="remove"/>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- Personal Data Report -->
+	<context type="AuditReportData" component="cs-editor-area" merge-by="component" parent="editor-area"
+			 principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea >
+			<editorArea:tab name="customersupport_backoffice_personaldatareport_tab_summary"
+							tooltipText="customersupport_backoffice_personaldatareport_tab_summary" position="0">
+				<editorArea:section name="customersupport_backoffice_personaldatareport_section_summary">
+					<editorArea:panel name="customersupport_backoffice_personaldatareport_tab_summary_panel">
+						<editorArea:attribute qualifier="auditReportConfig"
+											  editor="com.hybris.cockpitng.editor.defaultreferenceeditor"
+											  readonly="true">
+						</editorArea:attribute>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	
+	<context merge-by="type" parent="GenericItem" component="cs-listview" type="AuditReportData" module="customersupportbackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="code" hflex="true" />
+			<list-view:column qualifier="auditRootItem" hflex="true" />
+		</list-view:list-view>
+	</context>
+
+	<context type="AuditReportData" component="cslistviewactions" principal="customersupportmanagerrole,customersupportagentrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects" triggerOnKeys="#del"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="AuditReportData" component="cslistviewactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects" triggerOnKeys="#del"/>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<!-- Editor Area configuration ends -->
+
+    <context type="Customer" component="editorAreaDynamicForms" merge-by="module">
+        <df:dynamicForms>
+            <df:attribute id="snapshot-dsAddress" qualifier="defaultShipmentAddress" triggeredOn="defaultShipmentAddress" visibleIf="defaultShipmentAddress!=null" />
+            <df:attribute id="snapshot-dpAddress" qualifier="defaultPaymentAddress" triggeredOn="defaultPaymentAddress" visibleIf="defaultPaymentAddress!=null" />
+			<df:attribute id="snapshot-dpInfo" qualifier="defaultPaymentInfo" triggeredOn="defaultPaymentInfo" visibleIf="!paymentInfos.isEmpty()" />
+            <df:section id="snapshot-carts" qualifier="customersupport_backoffice_tab_customer_associations_section_carts" triggeredOn="carts" visibleIf="!carts.isEmpty()" />
+            <df:section id="snapshot-savedCarts" qualifier="customersupport_backoffice_tab_customer_associations_section_savedCarts" triggeredOn="savedCarts" visibleIf="!savedCarts.isEmpty()" />
+            <df:section id="snapshot-orders" qualifier="customersupport_backoffice_tab_customer_associations_section_orders" triggeredOn="orders" visibleIf="!orders.isEmpty()" />
+            <df:section id="snapshot-paymentInfos" qualifier="customersupport_backoffice_tab_customer_associations_section_paymentMethods" triggeredOn="paymentInfos" visibleIf="!paymentInfos.isEmpty()" />
+            <df:section id="snapshot-reviews" qualifier="customersupportbackoffice.customer.section.reviews" triggeredOn="customerReviews" visibleIf="!customerReviews.isEmpty()" />
+        </df:dynamicForms>
+    </context>
+
+    <!-- Tickets -->
+    <context type="CsTicket" component="cs-simple-search" module="customersupportbackoffice">
+        <simple-search:simple-search>
+        	<simple-search:field name="ticketID" />
+            <simple-search:sort-field name="modifiedtime" asc="false"/>
+        </simple-search:simple-search>
+    </context>
+
+	<context merge-by="type" parent="GenericItem" type="CsTicket" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list>
+                <advanced-search:field name="state" selected="true" />
+            </advanced-search:field-list>
+        </advanced-search:advanced-search>
+    </context>
+
+    <context component="cs-listview" type="CsTicket" module="customersupportbackoffice">
+        <list-view:list-view>
+            <list-view:column qualifier="ticketID" label="customersupport_backoffice_tickets_ticketID" />
+            <list-view:column qualifier="customer.name" label="customersupport_backoffice_tickets_customername"/>
+            <list-view:column qualifier="creationtime" label="customersupport_backoffice_tickets_creationTime"/>
+            <list-view:column qualifier="modifiedtime" label="customersupport_backoffice_tickets_lastModifiedTime"/>
+            <list-view:column qualifier="baseSite" label="customersupport_backoffice_tickets_site"/>
+            <list-view:column qualifier="state" label="customersupport_backoffice_tickets_status" spring-bean="ticketStatusCellRenderer"/>
+            <list-view:column qualifier="priority" label="customersupport_backoffice_tickets_priority"/>
+            <list-view:column qualifier="category" label="customersupport_backoffice_tickets_category"/>
+            <list-view:column qualifier="headline" label="customersupport_backoffice_tickets_subject"/>
+        </list-view:list-view>
+    </context>
+
+	<context type="Quote" component="cs-simple-search" module="customersupportbackoffice">
+        <simple-search:simple-search>
+        	<simple-search:field name="code" />
+            <simple-search:sort-field name="modifiedtime" asc="false"/>
+        </simple-search:simple-search>
+    </context>
+	<context type="Quote" component="cs-listview" module="customersupportbackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="code"/>
+			<list-view:column qualifier="name"/>
+			<list-view:column qualifier="state"/>
+			<list-view:column qualifier="assignee"/>
+			<list-view:column qualifier="creationtime"/>
+			<list-view:column qualifier="modifiedtime"/>
+			<list-view:column qualifier="user"/>
+		</list-view:list-view>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="CsTicket" component="cs-editor-area" principal="customersupportadministratorrole" module="customersupportbackoffice" >
+        <editorArea:editorArea name="csTicket">
+            <editorArea:tab name="customersupport_backoffice_ticket_tab_details" tooltipText="customersupport_backoffice_ticket_tab_details_desc">
+               <editorArea:section name="hmc.tab.section.ticket.details" position="1">
+                    <editorArea:attribute qualifier="customer" readonly="true" label="customersupport_backoffice_tickets_customername">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableRemoveReference</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="baseSite" readonly="true" label="customersupport_backoffice_tickets_site">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableRemoveReference</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="headline" readonly="true" label="customersupport_backoffice_tickets_subject"/>
+                    <editorArea:attribute qualifier="creationtime" readonly="true" label="customersupport_backoffice_tickets_creationTime"/>
+                    <editorArea:attribute qualifier="state" editor="com.hybris.cockpitng.editor.ticket.state" label="customersupport_backoffice_tickets_status"/>
+                    <editorArea:attribute qualifier="category" editor="com.hybris.cockpitng.editor.ticket.category" label="customersupport_backoffice_tickets_category"/>
+                    <editorArea:attribute qualifier="order" editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.asmdeeplinkreferenceeditor, {updateAssociatedEditorDecorator})" label="customersupport_backoffice_tickets_details_associatedTo">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>showASMPrefix</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>referenceSearchCondition_user</editorArea:name>
+                            <editorArea:value>{parentObject.customer}</editorArea:value>
+                        </editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>disableDisplayingDetails</editorArea:name>
+							<editorArea:value>true</editorArea:value>
+						</editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="priority" editor="com.hybris.cockpitng.editor.ticket.priority" label="customersupport_backoffice_tickets_priority"/>
+                    <editorArea:attribute qualifier="assignedAgent" editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.defaultreferenceeditor, {updateAgentEditorDecorator})" label="customersupport_backoffice_ticketForm.assignedAgent">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="assignedGroup" editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.defaultreferenceeditor, {updateAgentGroupEditorDecorator})" label="customersupport_backoffice_ticketForm.assignedGroup">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_section_ticket_correspondence" position="2">
+                    <editorArea:customPanel name="correspondencePanel" spring-bean="correspondenceRenderer" position="2"/>
+                </editorArea:section>
+                <editorArea:section name="customersupport_backoffice_tickets_tickets" position="3">
+                   <editorArea:panel colspan="2" rowspan="2" name="">
+                		<editorArea:attribute qualifier="tickets" editor="com.hybris.cockpitng.editor.simpleselectlisteditor" label="customersupport_backoffice_tickets_tickets_ticketsList">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>renderOnDemandSize</editorArea:name>
+                                <editorArea:value>5</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                            <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.ticket.history" tooltipText="customersupport_backoffice_ticket_tab_history_desc">
+                <editorArea:section name="hmc.tab.section.ticket.history">
+                    <editorArea:attribute qualifier="events">
+                    	<editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" parent="customersupportadministratorrole" type="CsTicket" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole">
+		<editorArea:editorArea name="">
+			<editorArea:tab name="hmc.administration" merge-mode="remove"/>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- Customer Reviews -->
+	<context component="cs-listview" type="CustomerReview" module="customersupportbackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="rating"/>
+			<list-view:column qualifier="approvalStatus" label="customersupport_backoffice_reviews_approvalStatus"/>
+			<list-view:column qualifier="blocked" spring-bean="reviewsBlockedCellRenderer"/>
+			<list-view:column qualifier="creationtime" label="customersupport_backoffice_reviews_creationTime" />
+			<list-view:column qualifier="modifiedtime" label="customersupport_backoffice_reviews_modifiedTime" />
+			<list-view:column qualifier="user.name" label="customersupport_backoffice_customers_customername" />
+			<list-view:column qualifier="product" width="80%"/>
+			<list-view:column qualifier="headline" width="80%"/>
+		</list-view:list-view>
+	</context>
+
+	<context type="CustomerReview" component="cs-simple-search" module="customersupportbackoffice">
+		<simple-search:simple-search>
+			<simple-search:sort-field name="modifiedtime" asc="false"/>
+		</simple-search:simple-search>
+	</context>
+
+	<context merge-by="module" parent="GenericItem" type="CustomerReview" component="cs-editor-area" module="customersupportbackoffice" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+        <editorArea:editorArea>
+            <editorArea:essentials>
+                <editorArea:essentialSection name="hmc.essential">
+                    <editorArea:attribute qualifier="product" editor="com.hybris.cockpitng.editor.asmdeeplinkreferenceeditor">
+                    	<editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="rating" readonly="true"/>
+					<editorArea:attribute qualifier="creationtime" label="customersupport_backoffice_reviews_creationTime"/>
+                    <editorArea:attribute qualifier="blocked" editor="com.hybris.cockpitng.editor.boolean.dropdown"/>
+                </editorArea:essentialSection>
+            </editorArea:essentials>
+            <editorArea:tab name="customersupportbackoffice.customerreview.section.productReviews" position="2">
+                <editorArea:section name="customersupportbackoffice.customerreview.section.productReviews">
+                	<editorArea:panel rowspan="2" colspan="2" name="">
+                    	<editorArea:attribute qualifier="headline" readonly="true"/>
+                    	<editorArea:attribute qualifier="comment" xmlns="http://www.hybris.com/cockpitng/component/editorArea" readonly="true">
+	                        <editor-parameter>
+	                            <name>rows</name>
+	                            <value>5</value>
+	                        </editor-parameter>
+                    	</editorArea:attribute>
+                    	<editorArea:attribute qualifier="alias" readonly="true"/>
+	                    <editorArea:attribute qualifier="approvalStatus" label="customersupportbackoffice.customer.section.reviews.approvalStatus"/>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context merge-by="type" parent="AbstractOrder" type="Quote" component="cs-editor-area">
+		<editorArea:editorArea name="quotes">
+			<editorArea:tab name="hmc.properties">
+				<editorArea:section name="hmc.common">
+					<editorArea:attribute qualifier="name"/>
+					<editorArea:attribute qualifier="description" />
+					<editorArea:attribute qualifier="state" />
+					<editorArea:attribute qualifier="expirationTime"/>
+					<editorArea:attribute qualifier="assignee" />
+					<editorArea:attribute qualifier="user" editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.asmdeeplinkreferenceeditor, {updateAssociatedEditorDecorator})" >
+						<editorArea:editor-parameter>
+							<editorArea:name>forwardURL</editorArea:name>
+                            <editorArea:value>/my-account/my-quotes/</editorArea:value>
+                        </editorArea:editor-parameter>
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+							<editorArea:value>true</editorArea:value>
+                       	</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" type="Quote" component="cs-editor-area" principal="customersupportadministratorrole">
+		<editorArea:editorArea name="quotes">
+			<editorArea:tab name="hmc.administration" position="99"/>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" parent="customersupportadministratorrole" type="Quote" component="cs-editor-area" principal="customersupportmanagerrole,customersupportagentrole,orgemployeerole">
+		<editorArea:editorArea name="quotes">
+			<editorArea:tab name="hmc.administration" merge-mode="remove"/>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="principal" type="CustomerReview" component="cs-editor-area" principal="customersupportadministratorrole">
+		<editorArea:editorArea name="customer reviews">
+			<editorArea:tab name="hmc.administration" position="99"/>
+		</editorArea:editorArea>
+	</context>
+
+    <!-- Wizards -->
+	<context component="create-wizard" type="Customer" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+		<wz:flow id="CustomerWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="custPrepare">
+				<wz:initialize property="customersupport_backoffice_customerForm" template-bean="customerForm"/>
+            </wz:prepare>
+            <wz:step id="step1" label="customersupport.create.customer.essential.label" sublabel="customersupport.create.customer.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="customersupport_backoffice_customerForm">
+                        <wz:property qualifier="site" type="Reference(BaseSite)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" />
+						<wz:property qualifier="title" type="Reference(Title)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" />
+						<wz:property qualifier="name" type="java.lang.String" />
+						<wz:property qualifier="email" type="java.lang.String" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(customersupport_backoffice_customerForm.name) and !#empty(customersupport_backoffice_customerForm.email) and customersupport_backoffice_customerForm.title != null and customersupport_backoffice_customerForm.site != null"/>
+                    <wz:custom visible="!#empty(customersupport_backoffice_customerForm.name) and !#empty(customersupport_backoffice_customerForm.email) and customersupport_backoffice_customerForm.title != null and customersupport_backoffice_customerForm.site != null"
+                               handler="createCustomerWizardHandler" label="Done"/>
+				</wz:navigation>
+			</wz:step>
+            <wz:step id="step2" label="customersupport.create.customer.optional.label" sublabel="customersupport.create.customer.optional.sublabel">
+                <wz:content id="step2.content">
+                    <wz:property-list root="customersupport_backoffice_customerForm">
+                        <wz:property qualifier="address.streetname" type="java.lang.String" />
+                        <wz:property qualifier="address.streetnumber" type="java.lang.String" />
+                        <wz:property qualifier="address.town" type="java.lang.String" />
+						<wz:property qualifier="address.country" type="Reference(Country)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" />
+                        <wz:property qualifier="address.region" type="Reference(Region)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" >
+                            <wz:editor-parameter>
+                                <wz:name>referenceSearchCondition_country</wz:name>
+                                <wz:value>{parentObject.address.country}</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                        <wz:property qualifier="address.postalcode" type="java.lang.String" />
+                        <wz:property qualifier="address.phone1" type="java.lang.String" />
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+                    <wz:custom handler="createCustomerWizardHandler" label="Done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context type="Customer"  component="configurableFlowDynamicForms" merge-by="module">
+        <df:dynamicForms modelProperty="customersupport_backoffice_customerForm">
+            <df:attribute id="address.region" disabledIf="address.country==null || address.country.regions==null || address.country.regions.empty" qualifier="address.region" triggeredOn="address.country" />
+        </df:dynamicForms>
+    </context>
+
+    <context type="CsTicket" component="create-wizard" module="customersupportbackoffice" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole" >
+        <wz:flow id="csTicketWizard" title="create.title(ctx.TYPE_CODE)" >
+            <wz:prepare id="csTicketPrepare">
+                <wz:initialize property="customersupport_backoffice_ticketForm" template-bean="ticketForm"/>
+            </wz:prepare>
+            <wz:step id="step1" label="create.csTicket.essential.label" sublabel="create.csTicket.essential.sublabel" merge-mode="remove">
+                <wz:content id="step1.content">
+                    <wz:property-list root="customersupport_backoffice_ticketForm">
+                        <wz:property qualifier="subject" type="String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+                        <wz:property qualifier="intervention" type="de.hybris.platform.ticket.enums.CsInterventionType" editor="com.hybris.cockpitng.editor.nonoptionalenum"/>
+                        <wz:property qualifier="category" type="de.hybris.platform.ticket.enums.CsTicketCategory" editor="com.hybris.cockpitng.editor.nonoptionalenum"/>
+                        <wz:property qualifier="priority" type="de.hybris.platform.ticket.enums.CsTicketPriority" editor="com.hybris.cockpitng.editor.nonoptionalenum" />
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:next visible="!#empty(customersupport_backoffice_ticketForm.subject)" default-target="step2"/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step2" label="create.csTicket.association.label" sublabel="create.csTicket.association.sublabel">
+                <wz:content id="step2.content">
+                    <wz:property-list root="customersupport_backoffice_ticketForm">
+                        <wz:property qualifier="message" type="String" editor="com.hybris.cockpitng.editor.defaulttext">
+                            <wz:editor-parameter>
+                                <wz:name>rows</wz:name>
+                                <wz:value>3</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                        <wz:property qualifier="basesite" type="Reference(BaseSite)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+						<wz:property qualifier="customer" type="Reference(Customer)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+                        <wz:property qualifier="assignedTo" type="Reference(AbstractOrder)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" >
+                            <wz:editor-parameter>
+                                <wz:name>referenceSearchCondition_user</wz:name>
+                                <wz:value>{parentObject.customer}</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:cancel/>
+                    <wz:back />
+                    <wz:next default-target="step3"/>
+                    <wz:custom visible="!#empty(customersupport_backoffice_ticketForm.subject) AND customersupport_backoffice_ticketForm.basesite != null AND customersupport_backoffice_ticketForm.customer != null AND !#empty(customersupport_backoffice_ticketForm.message)" label="customersupport_backoffice_tickets_wizard_done" handler="createTicketHandler"/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step3" label="create.csTicket.assignment.label" sublabel="create.csTicket.assignment.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property-list root="customersupport_backoffice_ticketForm">
+                        <wz:property qualifier="assignedAgent" type="Reference(Employee)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+                        <wz:property qualifier="assignedGroup" type="Reference(CsAgentGroup)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor">
+                            <wz:editor-parameter>
+                                <wz:name>referenceSearchCondition_groups_contains</wz:name>
+                                <wz:value>{parentObject.rootGroup}</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:cancel/>
+                    <wz:back />
+                    <wz:custom visible="!#empty(customersupport_backoffice_ticketForm.subject) AND customersupport_backoffice_ticketForm.basesite != null AND customersupport_backoffice_ticketForm.customer != null AND !#empty(customersupport_backoffice_ticketForm.message)" label="customersupport_backoffice_tickets_wizard_done" handler="createTicketHandler"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context type="csTicketCloseWizard" component="create-wizard">
+        <wz:flow id="csTicketCloseWizard" title="customersupport_backoffice_closeTicketForm.title" >
+            <wz:prepare id="csCloseTicketPrepare">
+                <wz:initialize property="customersupport_backoffice_closeTicketForm" template-bean="closeTicketForm"/>
+            </wz:prepare>
+            <wz:step id="step1" label="customersupport_backoffice_closeTicketForm.title">
+                <wz:content id="step1.content">
+                    <wz:property-list root="customersupport_backoffice_closeTicketForm">
+                        <wz:property qualifier="resolution" type="Reference(de.hybris.platform.ticket.enums.CsResolutionType)" editor="com.hybris.cockpitng.editor.nonoptionalenum"/>
+                    </wz:property-list>
+                    <wz:custom-view  id="replyto" lang="zul">
+						<wz:renderer spring-bean="ticketsContactTypeRenderer"/>
+		            </wz:custom-view>
+                    <wz:property-list root="customersupport_backoffice_closeTicketForm">
+						<wz:property qualifier="message" type="String" editor="com.hybris.cockpitng.editor.defaulttext">
+                            <wz:editor-parameter>
+                                <wz:name>rows</wz:name>
+                                <wz:value>3</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:custom visible="!#empty(customersupport_backoffice_closeTicketForm.message)" label="customersupport_backoffice_closeTicketForm.done" handler="closeTicketHandler"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context type="csTicketReopenWizard" component="create-wizard">
+        <wz:flow id="csTicketReopenWizard" title="customersupport_backoffice_reopenTicketForm.title" >
+            <wz:prepare id="csReopenTicketPrepare">
+                <wz:initialize property="customersupport_backoffice_reopenTicketForm" template-bean="reopenTicketForm"/>
+            </wz:prepare>
+            <wz:step id="step1" label="customersupport_backoffice_reopenTicketForm.title">
+                <wz:content id="step1.content">
+					<wz:custom-view  id="replyto" lang="zul">
+						<wz:renderer spring-bean="ticketsContactTypeRenderer"/>
+		            </wz:custom-view>
+                    <wz:property-list root="customersupport_backoffice_reopenTicketForm">
+                        <wz:property qualifier="message" type="String"
+                                     editor="com.hybris.cockpitng.editor.defaulttext">
+                            <wz:editor-parameter>
+                                <wz:name>rows</wz:name>
+                                <wz:value>3</wz:value>
+                            </wz:editor-parameter>
+                        </wz:property>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:custom visible="!#empty(customersupport_backoffice_reopenTicketForm.message)" label="customersupport_backoffice_reopenTicketForm_done" handler="reopenTicketHandler"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context type="CsTicket"  component="configurableFlowDynamicForms" merge-by="module">
+        <df:dynamicForms modelProperty="customersupport_backoffice_ticketForm">
+            <df:attribute id="assignedTo" qualifier="assignedTo" triggeredOn="customer" disabledIf="customer==null"/>
+        </df:dynamicForms>
+    </context>
+
+
+	<context component="create-wizard" type="Address" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole" >
+		<wz:flow id="AddressWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="addrPrepare">
+				<wz:initialize property="customersupport_backoffice_addressForm" template-bean="addressForm"/>
+				<wz:assign property="customersupport_backoffice_addressForm.owner" value="ctx.parentObject" />
+			</wz:prepare>
+            <wz:step id="step1" label="create.address.essential.label" sublabel="create.address.essential.sublabel">
+				<wz:content id="step1.content">
+				<wz:property-list root="customersupport_backoffice_addressForm">
+					<wz:property qualifier="title" type="Reference(Title)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" />
+					<wz:property qualifier="firstName" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="lastName" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="addressLine1" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="addressLine2" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="town"  type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="country" type="Reference(Country)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" />
+					<wz:property qualifier="region" type="Reference(Region)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" >
+						<wz:editor-parameter>
+							<wz:name>referenceSearchCondition_country</wz:name>
+							<wz:value>{parentObject.country}</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="postalcode" type="java.lang.String"  editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="phone1" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext"/>
+					<wz:property qualifier="shippingAddress" >
+						<wz:editor-parameter>
+							<wz:name>showOptionalField</wz:name>
+							<wz:value>false</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="billingAddress" >
+						<wz:editor-parameter>
+							<wz:name>showOptionalField</wz:name>
+							<wz:value>false</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+				</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:custom visible="(customersupport_backoffice_addressForm.title != null) AND !#empty(customersupport_backoffice_addressForm.addressLine1) AND !#empty(customersupport_backoffice_addressForm.town)
+						AND (customersupport_backoffice_addressForm.country != null) AND !#empty(customersupport_backoffice_addressForm.postalcode)
+						AND (customersupport_backoffice_addressForm.shippingAddress == true || customersupport_backoffice_addressForm.billingAddress == true)"
+						label="customersupport_backoffice_addressForm_wizard_done" handler="createAddressHandler"/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context component="create-wizard" type="AuditReportData" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole" >
+		<wz:flow id="CreateAuditReportWizard" title="create.title(ctx.TYPE_CODE)" >
+			<wz:prepare>
+				<wz:initialize property="auditReportWizardData" template-bean="auditReportWizardData" />
+				<wz:assign property="auditReportWizardData.reportName" value="ctx.reportName" />
+				<wz:assign property="auditReportWizardData.auditReportConfig" value="ctx.preselectedConfig" />
+				<wz:assign property="auditReportWizardData.sourceItem" value="ctx.parentObject" />
+				<wz:assign property="auditReportWizardData.audit" value="ctx.audit" />
+			</wz:prepare>
+			<wz:step id="step1" label="Provide report details">
+				<wz:content id="step1.content">
+					<wz:property-list root="auditReportWizardData">
+						<wz:property qualifier="reportName" type="java.lang.String" editor="com.hybris.cockpitng.editor.defaulttext" >
+							<wz:editor-parameter>
+								<wz:name>disableDisplayingDetails</wz:name>
+								<wz:value>true</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property qualifier="auditReportConfig" type="FixedValuesReference(java.lang.String)">
+							<wz:editor-parameter>
+								<wz:name>dataModelProperty</wz:name>
+								<wz:value>ctx.allowedConfigCodes</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property qualifier="sourceItem" type="Reference(Item)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor" readonly="true">
+							<wz:editor-parameter>
+								<wz:name>disableDisplayingDetails</wz:name>
+								<wz:value>true</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property qualifier="audit" type="java.lang.Boolean" editor="com.hybris.cockpitng.editor.defaultboolean">
+							<wz:editor-parameter>
+								<wz:name>trueLabel</wz:name>
+								<wz:value>auditReportDataGenerationTrueLabel</wz:value>
+							</wz:editor-parameter>
+							<wz:editor-parameter>
+								<wz:name>falseLabel</wz:name>
+								<wz:value>auditReportDataGenerationFalseLabel</wz:value>
+							</wz:editor-parameter>
+							<wz:editor-parameter>
+								<wz:name>showOptionalField</wz:name>
+								<wz:value>false</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property qualifier="exportedLanguages" type="MultiReference-LIST(Language)"/>
+						<wz:property qualifier="auditReportTemplate" type="Reference(AuditReportTemplate)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:custom label="Create" handler="createAuditReportWizardHandler" visible="!#empty(auditReportWizardData.reportName) AND !#empty(auditReportWizardData.auditReportConfig)
+					AND auditReportWizardData.sourceItem != null AND auditReportWizardData.auditReportTemplate != null"/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+
+	<context type="Address"  component="configurableFlowDynamicForms" merge-by="module">
+        <df:dynamicForms modelProperty="customersupport_backoffice_addressForm">
+            <df:attribute id="region" disabledIf="country==null || country.regions==null || country.regions.empty" qualifier="region" triggeredOn="country" />
+        </df:dynamicForms>
+    </context>
+
+    <context type="CsTicket" component="collection-browser" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+        <cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+            <cb:available-molds>
+                <cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+            </cb:available-molds>
+        </cb:collection-browser>
+    </context>
+
+    <context type="Customer" component="collection-browser" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+        <cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+            <cb:available-molds>
+                <cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+            </cb:available-molds>
+        </cb:collection-browser>
+    </context>
+	<context type="CustomerReview" component="collection-browser" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+			<cb:available-molds>
+				<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+			</cb:available-molds>
+		</cb:collection-browser>
+	</context>
+    <!-- ________________ -->
+
+    <!-- ORDER MANAGEMENT -->
+    <!-- ________________ -->
+
+
+	<!--Simple Search -->
+	<context merge-by="type" parent="GenericItem" type="ReturnRequest" component="cs-simple-search">
+		<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+			<field xmlns="http://www.hybris.com/cockpitng/config/simplesearch" name="RMA"/>
+		</simple-search:simple-search>
+	</context>
+
+	<!--Simple Search -->
+	<context merge-by="type" parent="GenericItem" type="Order" component="cs-simple-search">
+		<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+			<field xmlns="http://www.hybris.com/cockpitng/config/simplesearch" name="code" />
+		</simple-search:simple-search>
+	</context>
+
+    <!--
+    OMS list view
+    -->
+    <context type="Order" component="cs-listview">
+        <list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+            <list:column qualifier="code" label="customersupportbackoffice.order.listview.ordernumber"/>
+            <list:column qualifier="user" label="customersupportbackoffice.order.details.customer"/>
+            <list:column qualifier="date" label="customersupportbackoffice.order.listview.date "/>
+            <list:column qualifier="deliveryMode" />
+            <list:column qualifier="status" label="customersupportbackoffice.order.listview.status" />
+        </list:list-view>
+    </context>
+    <context type="Order" component="collection-browser">
+      <cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+         <cb:available-molds>
+             <cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+         </cb:available-molds>
+      </cb:collection-browser>
+    </context>
+    <context type="ReturnRequest" component="cs-listview">
+        <list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+            <list:column qualifier="RMA" label="customersupportbackoffice.returns.listview.rma" />
+            <list:column qualifier="order.code" label="customersupportbackoffice.order.details.ordernumber"/>
+            <list:column qualifier="order.user" label="customersupportbackoffice.order.details.customer"/>
+            <list:column qualifier="creationtime" label="customersupportbackoffice.order.details.created"/>
+            <list:column qualifier="status" />
+        </list:list-view>
+    </context>
+    <context type="ReturnRequest" component="collection-browser">
+      <cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+         <cb:available-molds>
+             <cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+         </cb:available-molds>
+      </cb:collection-browser>
+    </context>
+
+    <!--
+    OMS Editors config
+    -->
+    <context parent="GenericItem" type="Order" component="cs-editor-area">
+        <editorArea:editorArea name="Order editor area">
+            <editorArea:tab name="customersupportbackoffice.order.tab.details">
+                <editorArea:section name="customersupportbackoffice.section.order.general.information" columns="3">
+                    <editorArea:attribute qualifier="user" label="customersupportbackoffice.order.details.customer" readonly="true" >
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="date" label="customersupportbackoffice.order.details.created" readonly="true" />
+                    <editorArea:attribute qualifier="status" label="customersupportbackoffice.order.details.orderstatus" readonly="true" />
+                    <editorArea:attribute qualifier="deliveryMode" label="customersupportbackoffice.order.details.shipmentmethod" >
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="paymentAddress" label="customersupportbackoffice.order.details.billaddress">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                            <editorArea:value>cs-editor-area</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="deliveryAddress" label="customersupportbackoffice.order.details.shipaddress" >
+                        <editorArea:editor-parameter>
+                            <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                            <editorArea:value>cs-editor-area</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                </editorArea:section>
+                <editorArea:section name="customersupportbackoffice.section.order.hierarchy.linedetails">
+                    <editorArea:panel name="customersupport_backoffice_lineDetails_panel">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="entries" readonly="true">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewOrderEntries</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+                <editorArea:section name="customersupportbackoffice.section.order.general.totals" columns="3">
+					<editorArea:customPanel name="customersupportbackoffice.order.details.total" spring-bean="totalPriceWithTaxRenderer"/>
+                    <editorArea:attribute qualifier="currency" readonly="true" />
+                    <editorArea:attribute qualifier="subtotal" readonly="true" >
+						<editorArea:editor-parameter>
+							<editorArea:name>numberFormat</editorArea:name>
+							<editorArea:value>##0.00</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+                    <editorArea:attribute qualifier="totalTax" label="customersupportbackoffice.order.details.taxes" readonly="true">
+						<editorArea:editor-parameter>
+							<editorArea:name>numberFormat</editorArea:name>
+							<editorArea:value>##0.00</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+                    <editorArea:attribute qualifier="deliveryCost" label="customersupportbackoffice.order.details.shipping" readonly="true">
+						<editorArea:editor-parameter>
+							<editorArea:name>numberFormat</editorArea:name>
+							<editorArea:value>##0.00</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+                    <editorArea:attribute qualifier="totalDiscounts" label="customersupportbackoffice.order.details.orderdiscount" readonly="true">
+						<editorArea:editor-parameter>
+							<editorArea:name>numberFormat</editorArea:name>
+							<editorArea:value>##0.00</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="customersupportbackoffice.order.tab.consignments">
+                <editorArea:section name="customersupportbackoffice.section.order.hierarchy.consignments">
+                    <editorArea:panel name="customersupport_backoffice_consignments_panel">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="consignments" readonly="true" label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewConsignments</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="customersupportbackoffice.order.tab.payment">
+                <editorArea:section name="customersupportbackoffice.section.order.hierarchy.paymenttransaction">
+                    <editorArea:panel name="customersupport_backoffice_transactions_panel">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="paymentTransactions" readonly="true" label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewPaymentTransactions
+                                </editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="customersupportbackoffice.order.tab.order.history">
+                <editorArea:section name="customersupportbackoffice.section.order.hierarchy.order.history">
+                    <editorArea:panel name="Order History">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="historyEntries" readonly="true" label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewOrderHistoryEntries</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="customersupportbackoffice.order.tab.fraud">
+                <editorArea:section name="customersupportbackoffice.section.order.hierarchy.fraudreport">
+                    <editorArea:panel name="customersupport_backoffice_fraudReport_panel">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="fraudReports" readonly="true" label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>referenceSelected/editorArea/editorAreaConfigCtx</editorArea:name>
+                                <editorArea:value>cs-editor-area</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewFraudReports</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+	<context type="PaymentInfo"  component="cs-editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+            <editorArea:tab name="hmc.addresses">
+                <editorArea:section name="customersupport_backoffice_popup_paymentinfo_section_paymentmethod">
+                    <editorArea:attribute qualifier="ccOwner" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_nameOnCard" />
+					<editorArea:attribute qualifier="type" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_cardType" />
+					<editorArea:attribute qualifier="number" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_CardNumber" />
+					<editorArea:attribute qualifier="issueNumber" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_issueNumber" />
+					<editorArea:attribute qualifier="validFromMonth" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_startMonth "/>
+					<editorArea:attribute qualifier="validFromYear" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_startYear" />
+					<editorArea:attribute qualifier="validToMonth" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_expiryMonth" />
+					<editorArea:attribute qualifier="validToYear" readonly="true" label="customersupport_backoffice_popup_paymentinfo_section_paymentmethod_expiryYear" />
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+	</context>
+
+    <context merge-by="module" parent="GenericItem" type="Address" component="cs-editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.addresses">
+                <editorArea:section name="customersupport_backoffice_address_header">
+                	<editorArea:attribute qualifier="title" label="customersupport_backoffice_customerForm.title" />
+                	<editorArea:attribute qualifier="firstName" label="customersupport_backoffice_addressForm.firstName"/>
+                	<editorArea:attribute qualifier="lastName" label="customersupport_backoffice_addressForm.lastName"/>
+                    <editorArea:attribute qualifier="line1" label="customersupport_backoffice_address_line1" />
+                    <editorArea:attribute qualifier="line2" label="customersupport_backoffice_address_line2" />
+					<editorArea:attribute qualifier="town" label="customersupport_backoffice_address_town" />
+                    <editorArea:attribute qualifier="region" label="customersupport_backoffice_address_state" />
+                    <editorArea:attribute qualifier="postalcode" label="customersupport_backoffice_address_postalcode" />
+                    <editorArea:attribute qualifier="country" label="customersupport_backoffice_address_country" />
+					<editorArea:attribute qualifier="phone1" label="customersupport_backoffice_address_phone1" />
+					<editorArea:attribute qualifier="shippingAddress" label="customersupport_backoffice_address_shippingAddress"/>
+					<editorArea:attribute qualifier="billingAddress" label="customersupport_backoffice_address_billingAddress"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="module" parent="GenericItem" type="PaymentTransaction" component="cs-editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="customersupportbackoffice.tab.general">
+                <editorArea:section name="customersupportbackoffice.section.order.general.properties">
+                    <editorArea:attribute qualifier="code" readonly="true" />
+                    <editorArea:attribute qualifier="info" readonly="true">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+                            <editorArea:value>true</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="paymentProvider" readonly="true" />
+                    <editorArea:attribute qualifier="plannedAmount"	readonly="true" >
+                        <editorArea:editor-parameter>
+                            <editorArea:name>numberFormat</editorArea:name>
+                            <editorArea:value>###.00</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+                    <editorArea:attribute qualifier="requestId"	readonly="true" />
+                </editorArea:section>
+                <editorArea:section	name="customersupportbackoffice.section.paymenttransactions.entries">
+                    <editorArea:panel name="customersupport_backoffice_paymentTransactionsEntries_panel">
+                        <editorArea:attribute	editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="entries" readonly="true">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewPaymentTransactionEntries
+                                </editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context merge-by="module" parent="GenericItem" type="ReturnRequest" component="cs-editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="customersupportbackoffice.tab.general">
+                <editorArea:section name="customersupportbackoffice.section.returns.rma.properties">
+                    <editorArea:panel name="customersupport_backoffice_rma_panel">
+                        <editorArea:attribute qualifier="RMA" readonly="true" label="customersupportbackoffice.returnrequest.rma"/>
+                    </editorArea:panel>
+                    <editorArea:panel name="customersupport_backoffice_returnRequestOrder_panel">
+                        <editorArea:attribute qualifier="order" readonly="true" label="customersupportbackoffice.returnrequest.order.number">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                    <editorArea:customPanel name="customersupportbackoffice.panel.order.general.shipaddress" spring-bean="orderNestedAttributePanelRenderer">
+                        <editorArea:attribute qualifier="order.deliveryCost" readonly="true" />
+                    </editorArea:customPanel>
+					<editorArea:customPanel name="customersupport_backoffice_refundDeliveryCost_panel" spring-bean="refundDeliveryCostRenderer"/>
+					<editorArea:customPanel name="customersupportbackoffice.panel.order.general.refundAmount" spring-bean="refundAmountRenderer"/>
+					<editorArea:panel name="customersupport_backoffice_status_panel">
+						<editorArea:attribute qualifier="status" readonly="true"/>
+					</editorArea:panel>
+					<editorArea:customPanel name="customersupportbackoffice.panel.order.general.totalDiscount" spring-bean="totalDiscountRenderer"/>
+				</editorArea:section>
+                <editorArea:section
+                        name="customersupportbackoffice.section.returns.hierarchy.descendants">
+                    <editorArea:panel name="customersupport_backoffice_returnEntries_panel" >
+                        <editorArea:attribute editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="returnEntries"
+                            label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewRefundEntries</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>restrictToType</editorArea:name>
+								<editorArea:value>RefundEntry</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>inlineEditing</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context merge-by="module" parent="GenericItem" type="FraudReport" component="cs-editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="customersupportbackoffice.tab.general">
+                <editorArea:section name="customersupportbackoffice.section.order.report">
+                    <editorArea:panel name="customersupport_backoffice_fraudReportSymptomScorings_panel">
+                        <editorArea:attribute
+                                editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+                                qualifier="fraudSymptomScorings" readonly="true" label="customersupportbackoffice.section.entries">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>referenceListViewFraudSymptomScoring</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableDisplayingDetails</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>disableRemoveReference</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+                                <editorArea:value>true</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <!--
+      OMS ListView
+    -->
+    <context merge-by="type" parent="GenericItem" type="OrderHistoryEntry" component="referenceListViewOrderHistoryEntries">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="timestamp" label="customersupportbackoffice.order.listview.date"/>
+            <list-view:column qualifier="description" />
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="GenericItem" type="FraudReport" component="referenceListViewFraudReports">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="code" />
+            <list-view:column qualifier="provider" />
+            <list-view:column qualifier="status" />
+            <list-view:column qualifier="explanation" />
+            <list-view:column qualifier="timestamp" />
+            <list-view:column spring-bean="fraudCheckButtonCellRenderer" label="customersupportbackoffice.order.hierarchy.actions" />
+        </list-view:list-view>
+    </context>
+
+    <context type="ReturnEntry" component="referenceListViewRefundEntries">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="orderEntry.product.code" label="customersupportbackoffice.returnentry.orderentry.product.code" spring-bean="nullSafeListCellRenderer"/>
+            <list-view:column qualifier="orderEntry.product.name" label="customersupportbackoffice.returnentry.orderentry.product.name" spring-bean="nullSafeListCellRenderer"/>
+            <list-view:column qualifier="orderEntry.basePrice" />
+			<list-view:column qualifier="amount" label="customersupportbackoffice.returnentry.refundamount" spring-bean="refundEntryAmountRenderer"/>
+			<list-view:column qualifier="expectedQuantity+''" label="customersupportbackoffice.expectedQuantity" />
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="GenericItem" type="FraudSymptomScoring" component="referenceListViewFraudSymptomScoring">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="name" />
+            <list-view:column qualifier="score" />
+            <list-view:column qualifier="explanation" />
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="GenericItem" type="PaymentTransaction" component="referenceListViewPaymentTransactions">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="info" />
+            <list-view:column qualifier="paymentProvider" label="customersupportbackoffice.order.paymenttransaction.provider"/>
+            <list-view:column qualifier="plannedAmount" label="customersupportbackoffice.order.paymenttransaction.amount" spring-bean="paymentTransactionAmountRenderer"/>
+            <list-view:column qualifier="requestId" label="customersupportbackoffice.order.paymenttransaction.requestid"/>
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="module" parent="GenericItem" type="PaymentTransactionEntry" component="referenceListViewPaymentTransactionEntries">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="time"/>
+            <list-view:column qualifier="type"/>
+			<list-view:column qualifier="requestId"/>
+			<list-view:column qualifier="amount" spring-bean="amountRenderer" label="customersupportbackoffice.order.paymenttransaction.amount"/>
+			<list-view:column qualifier="transactionStatus" spring-bean="nullSafeListCellRenderer"/>
+			<list-view:column qualifier="transactionStatusDetails" spring-bean="nullSafeListCellRenderer"/>
+		</list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="GenericItem" type="OrderEntry" component="referenceListViewOrderEntries">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="product.code" label="customersupportbackoffice.order.hierarchy.productcode" />
+            <list-view:column qualifier="product.name" label="customersupportbackoffice.order.hierarchy.productname" />
+            <list-view:column qualifier="currency"  spring-bean="currencyTypeRenderer"  label="customersupportbackoffice.order.hierarchy.currency" />
+            <list-view:column qualifier="basePrice" label="customersupportbackoffice.order.hierarchy.itemprice" spring-bean="orderEntryAmountRenderer" />
+            <list-view:column qualifier="quantity" label="customersupportbackoffice.order.hierarchy.qty" />
+            <list-view:column qualifier="totalPrice" label="customersupportbackoffice.order.hierarchy.totalprice" spring-bean="orderEntryAmountRenderer" />
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="type" parent="GenericItem" type="Consignment" component="referenceListViewConsignments">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="code" label="customersupportbackoffice.order.tab.consignments.code"/>
+            <list-view:column qualifier="trackingID"/>
+            <list-view:column qualifier="deliveryMode"/>
+            <list-view:column qualifier="status"/>
+			<list-view:column spring-bean="paymentCaptureManualReleaseButtonCellRenderer" label="customersupportbackoffice.order.consignment.payment.release" />
+			<list-view:column spring-bean="taxCommitManualReleaseButtonCellRenderer" label="customersupportbackoffice.order.consignment.tax.release" />
+        </list-view:list-view>
+    </context>
+
+    <!-- Actions -->
+    <context component="cslistviewactions" type="GenericItem">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="selectedObjects"/>
+                <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context component="cslistviewactions" type="GenericItem" merge-by="principal" principal="customersupportmanagerrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="GenericItem" component="cslistviewactions" merge-by="principal" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="GenericItem" component="cseditorareaactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Item" component="listviewactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Item" component="editorareaactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Product" component="editorareaactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="CatalogVersion" component="editorareaactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Media" component="editorareaactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Order" component="editorareaactions" merge-by="module" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="cseditorareaactions" type="Order" merge-by="type">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.cancelorderaction" property="currentObject" />
+                <y:action action-id="de.hybris.ordermanagementbackoffice.actions.returns.createreturnrequestaction" property="currentObject" />
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualpaymentvoidaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualpaymentcaptureaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualtaxvoidaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualtaxcommitaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualtaxrequoteaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualpaymentreauthaction" property="currentObject"/>
+				<y:action action-id="de.hybris.ordermanagementbackoffice.actions.order.manualdeliverycostcommitaction" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context type="Address" component="collectioneditorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <!-- leave empty to disable delete action or provide action-id to add custom action -->
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context type="Address" component="collectioneditorareaactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+
+	<context type="PaymentTransaction" component="collectioneditorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <!-- leave empty to disable delete action or provide action-id to add custom action -->
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context type="PaymentTransaction" component="collectioneditorareaactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="FraudReport" component="collectioneditorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <!-- leave empty to disable delete action or provide action-id to add custom action -->
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context type="FraudReport" component="collectioneditorareaactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+    <!--
+    Base configs
+    -->
+    <context type="CsTicket" component="base" merge-by="type" parent="GenericItem" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole" >
+        <y:base>
+            <y:labels>
+                <y:label>ticketID + ' - ' +  headline</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="Customer" component="base" merge-by="type" parent="User" principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole" >
+        <y:base>
+            <y:labels>
+                <y:label>name + ' - ' +  uid</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+	<context type="Product" component="base" merge-by="type" parent="GenericItem"  principal="customersupportadministratorrole,customersupportagentrole,customersupportmanagerrole">
+		<y:base>
+			<y:labels>
+				<y:label> ( name ?: '' ) + ' ['+ code +']' </y:label>
+			</y:labels>
+			<y:preview urlQualifier="thumbnail?:picture" />
+		</y:base>
+	</context>
+    <context type="BaseSite" component="base">
+        <y:base>
+            <y:labels>
+                <y:label>uid+ ' - ' +name</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="CreditCardPaymentInfo" component="base" merge-by="type" parent="PaymentInfo" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+        <y:base>
+            <y:labels>
+                <y:label>type+ ' - ' +number+ ' - ' +validToMonth+ ' - ' +validToYear+ ' - ' +user.name+ ' - ' +@labelService.getObjectLabel(billingAddress)</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="AbstractOrder" component="base" merge-by="type" parent="GenericItem" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+        <y:base>
+            <y:labels>
+                <y:label>code+ ' - '+date+' - '+totalPrice+ (status != null ? ' - '+status : '')</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="ReturnRequest" component="base">
+        <y:base>
+            <y:labels>
+                <y:label>code</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+
+	<context type="RefundEntry" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>returnRequest.code</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+
+	<context type="Principal" component="editorareaactions" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Principal" component="collectioneditorareaactions" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+
+
+	<context type="CustomerReview" component="base" merge-by="type" parent="GenericItem">
+        <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:labels>
+                <y:label>rating+ ' - ' + approvalStatus +' - ' + blocked +' - ' + headline</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+
+    <context component="cslistviewactions" type="CustomerReview" >
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+			</y:group>
+		</y:actions>
+	</context>
+    <context component="cslistviewactions" type="CustomerReview" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData" />
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="selectedObjects"/>
+			</y:group>
+		</y:actions>
+	</context>
+	<context component="cslistviewactions" type="CustomerReview" principal="customersupportmanagerrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.listview.action.export.csv" property="exportColumnsAndData" />
+			</y:group>
+		</y:actions>
+	</context>
+	<context type="CustomerReview" component="cseditorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+            	<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context type="CustomerReview" component="cseditorareaactions" principal="customersupportadministratorrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+            	<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context component="cslistviewactions" type="Customer" merge-by="type" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.createauditreport" property="focusedObjects">
+					<y:parameter>
+						<y:name>reportDateFormat</y:name>
+						<y:value>yyyy-MM-dd HH:mm:ss</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>preselectedReportConfigName</y:name>
+						<y:value>PersonalDataReport</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="cseditorareaactions" type="Customer" merge-by="type" principal="customersupportmanagerrole,customersupportagentrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.createauditreport" property="currentObject">
+					<y:parameter>
+						<y:name>reportDateFormat</y:name>
+						<y:value>yyyy-MM-dd HH:mm:ss</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>preselectedReportConfigName</y:name>
+						<y:value>PersonalDataReport</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="cseditorareaactions" type="Customer" merge-by="type" principal="customersupportadministratorrole">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.createauditreport" property="currentObject">
+					<y:parameter>
+						<y:name>reportDateFormat</y:name>
+						<y:value>yyyy-MM-dd HH:mm:ss</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>preselectedReportConfigName</y:name>
+						<y:value>PersonalDataReport</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.toggleitemlock" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+	
+</config>

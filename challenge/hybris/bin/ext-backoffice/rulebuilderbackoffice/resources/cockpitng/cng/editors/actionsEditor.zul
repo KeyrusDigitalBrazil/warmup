@@ -1,0 +1,93 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<?component name="togglebutton" extends="button" class="de.hybris.platform.rulebuilderbackoffice.components.ToggleButton"?>
+
+<zk xmlns:h="xhtml">
+	<div viewModel="@id('vm') @init(widgetSettings.editorViewModelClass)"
+		sclass="yrb-actions-editor">
+		<div sclass="yrb-action-breadcrumbs">
+			<html content="@bind(vm.actionBreadcrumbs)" />
+		</div>
+		<borderlayout height="450px">
+			<center autoscroll="true">
+				<div sclass="yrb-actions">
+					<template name="actions">
+						<forEach items="@bind(tree.children)" var="treeNode">
+							<div draggable="ruleAction" droppable="ruleAction,ruleActionDefinition"
+								onDrop="@command('dropAction', target=treeNode, isDropPlaceholder=false, source=event.dragged.attributes['draggableSource'])"
+								sclass="@load('yrb-action yrb-action-'.concat(treeNode.data.actionDefinition.id))" action="@ref(treeNode.data)"
+								actionDefinition="@ref(treeNode.data.actionDefinition)">
+
+								<custom-attributes draggableSource="${treeNode}" />
+
+								<div sclass="yrb-action-handle" />
+
+								<div sclass="yrb-action-content">
+									<groupbox mold="3d" closable="@load(not empty action.parameters)"
+										open="@bind(action.expanded)">
+										<caption zclass="yrb-action-caption">
+											<div zclass="yrb-node" />
+											<if test="@load(not empty action.parameters)">
+												<h:i
+													class="@bind(action.expanded ? 'z-icon-caret-down' : 'z-icon-caret-right')" />
+											</if>
+											<label value="@load(actionDefinition.name)" />
+											<button onClick="@command('removeAction', treeNode=treeNode)"
+												iconSclass="z-icon-times-circle-o" zclass="yrb-delete-btn ye-delete-btn" />
+										</caption>
+										<apply template="actionParameters" parameters="@ref(action.parameters)" />
+									</groupbox>
+								</div>
+							</div>
+						</forEach>
+
+						<div draggable="" droppable="ruleAction,ruleActionDefinition"
+							onDrop="@command('dropAction', target=tree, isDropPlaceholder=true, source=event.dragged.attributes['draggableSource'])"
+							sclass="yrb-actions-drop-placeholder">
+							<label
+								value="@load(c:l('de.hybris.platform.rulebuilderbackoffice.editors.actionseditor.dropActionsHere'))" />
+						</div>
+					</template>
+
+					<template name="actionParameters" src="/cng/editors/parameters.zul" />
+
+					<apply template="actions" tree="@ref(vm.actions)" />
+				</div>
+			</center>
+			<east title="@load(c:l('de.hybris.platform.rulebuilderbackoffice.editors.actionseditor.availableActions'))"
+				splittable="false" collapsible="true" autoscroll="true" width="25%">
+
+				<listbox id="actionDefinitions" model="@load(vm.actionDefinitions)" sclass="yrb-action-definitions"
+					sizedByContent="true" span="true">
+					<listhead>
+						<listheader />
+					</listhead>
+					<template name="model:group">
+						<listgroup>
+							<listcell>
+								<if test="@load(not empty each.category.icon.url)">
+									<image src="@load('~'.concat(each.category.icon.url))" />
+								</if>
+								<label value="@load(each.category.name)" />
+							</listcell>
+						</listgroup>
+					</template>
+					<template name="model">
+						<listitem checkable="false" draggable="ruleActionDefinition" sclass="yrb-action-definition">
+							<custom-attributes draggableSource="${each}" />
+							<listcell label="@load(each.actionDefinition.name)" />
+						</listitem>
+					</template>
+				</listbox>
+			</east>
+		</borderlayout>
+	</div>
+</zk>

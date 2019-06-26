@@ -1,0 +1,447 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+	<import resource="promotionengineservices-compiler-spring.xml" />
+
+	<alias name="droolsRuleBasedPromotionsContextValidator" alias="ruleBasedPromotionsContextValidator" />
+	<bean id="droolsRuleBasedPromotionsContextValidator" class="de.hybris.platform.promotionengineservices.validators.impl.DefaultRuleBasedPromotionsContextValidator">
+		<property name="catalogVersionToRuleEngineContextMappingDao" ref="catalogVersionToRuleEngineContextMappingDao" />
+	</bean>
+
+	<alias name="defaultPromotionEngineService" alias="promotionEngineService"/>
+	<alias name="promotionEngineService" alias="promotionsService"/>
+	<bean id="defaultPromotionEngineService" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionEngineService" >
+		<property name="commerceRuleEngineService" ref="commerceRuleEngineService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="ruleEngineContextDao" ref="ruleEngineContextDao"/>
+		<property name="ruleActionService" ref="ruleActionService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="strategies" ref="actionStrategies"/>
+		<property name="promotionDao" ref="promotionDao"/>
+		<property name="factContextFactory" ref="factContextFactory"/>
+		<property name="defaultPromotionsService" ref="defaultPromotionsService"/>
+		<property name="promotionSourceRuleDao" ref="promotionSourceRuleDao"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="configurationService" ref="configurationService" />
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="ruleEngineContextForCatalogVersionsFinderStrategy" ref="ruleEngineContextForCatalogVersionsFinderStrategy" />
+		<property name="ruleEngineContextFinderStrategy" ref="ruleEngineContextFinderStrategy"/>
+		<property name="ruleBasedPromotionsContextValidator" ref="ruleBasedPromotionsContextValidator"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="productUtils" ref="productUtils"/>
+	</bean>
+	
+	<bean id="abstractRuleActionStrategy" abstract="true" class="de.hybris.platform.promotionengineservices.action.impl.AbstractRuleActionStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="promotionActionService" ref="promotionActionService"/>
+		<property name="calculationService" ref="calculationService" />
+		<property name="extendedOrderDao" ref="extendedOrderDao" />
+		<property name="forceImmediateRecalculation" value="false" />
+		<property name="ruleActionMetadataHandlers" ref="ruleActionMetadataHandlers"/>
+		<property name="promotionResultUtils" ref="promotionResultUtils"/>
+		<property name="actionUtils" ref="actionUtils"/>
+	</bean>
+	
+	<util:map id="ruleActionMetadataHandlers"/>
+	
+	<alias name="defaultPromotionCartRaoProvider" alias="promotionCartRaoProvider"/>
+	<bean id="defaultPromotionCartRaoProvider" parent="cartRaoProvider"/>
+	
+	<alias name="defaultPromotionDeliveryModeRaoProvider" alias="promotionDeliveryModeRaoProvider"/>
+	<bean id="defaultPromotionDeliveryModeRaoProvider" parent="deliveryModeRaoProvider"/>
+	
+	<alias name="defaultPromotionProductRaoProvider" alias="promotionProductRaoProvider"/>
+	<bean id="defaultPromotionProductRaoProvider" parent="productRaoProvider"/>
+
+	<alias name="defaultPromotionEntryGroupRaoProvider" alias="promotionEntryGroupRaoProvider"/>
+	<bean id="defaultPromotionEntryGroupRaoProvider" parent="entryGroupRaoProvider"/>
+
+	<alias name="defaultCustomerSupportRAOProvider" alias="customerSupportRAOProvider" />
+	<bean id="defaultCustomerSupportRAOProvider" class="de.hybris.platform.promotionengineservices.rao.providers.DefaultCustomerSupportRAOProvider">
+		<property name="commerceCustomerSupportService" ref="commerceCustomerSupportService"/>
+	</bean>
+
+	<alias name="defaultPromotionEvaluationTimeRRDProvider" alias="promotionEvaluationTimeRRDProvider" />
+	<bean id="defaultPromotionEvaluationTimeRRDProvider" parent="evaluationTimeRRDProvider"/>
+
+	<util:map id="orderPromotionRaoProviders">
+        <entry key="de.hybris.platform.core.model.order.AbstractOrderModel">
+			<util:list>
+				<ref bean="promotionCartRaoProvider"/>
+				<ref bean="promotionEntryGroupRaoProvider"/>
+				<ref bean="promotionDeliveryModeRaoProvider"/>
+				<ref bean="customerSupportRAOProvider"/>
+				<ref bean="campaignRaoProvider"/>
+			</util:list>
+		</entry>
+        <entry key="de.hybris.platform.promotions.model.PromotionGroupModel">
+			<util:list>
+				<ref bean="websiteGroupRaoProvider"/>
+			</util:list>
+		</entry>
+        <entry key="java.util.Date">
+			<util:list>
+				<ref bean="promotionEvaluationTimeRRDProvider"/>
+			</util:list>
+		</entry>
+    </util:map>
+    
+	<util:map id="productPromotionRaoProviders">
+        <entry key="de.hybris.platform.core.model.product.ProductModel">
+			<util:list>
+				<ref bean="promotionProductRaoProvider"/>
+				<ref bean="customerSupportRAOProvider"/>
+			</util:list>
+		</entry>
+        <entry key="de.hybris.platform.promotions.model.PromotionGroupModel">
+			<util:list>
+				<ref bean="websiteGroupRaoProvider"/>
+			</util:list>
+		</entry>
+    </util:map>
+    
+    <bean id="defaultPromotionOrderRaoProvidersMapping" depends-on="raoProviders" parent="mapMergeDirective" >
+		<property name="key" value="PROMOTION_ORDER"/>
+		<property name="value" ref="orderPromotionRaoProviders"/>
+	</bean>
+	
+	<bean id="defaultPromotionProductRaoProvidersMapping" depends-on="raoProviders" parent="mapMergeDirective" >
+		<property name="key" value="PROMOTION_PRODUCT"/>
+		<property name="value" ref="productPromotionRaoProviders"/>
+	</bean>
+	
+	<alias name="defaultOrderAdjustTotalActionStrategy" alias="orderTotalAdjustActionStrategy"/>
+	<bean id="defaultOrderAdjustTotalActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderAdjustTotalActionStrategy" >
+		<property name="promotionAction" value="de.hybris.platform.promotionengineservices.model.RuleBasedOrderAdjustTotalActionModel"></property>
+	</bean>
+
+	<alias name="defaultShippingActionStrategy" alias="shippingActionStrategy"/>
+	<bean id="defaultShippingActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultShippingActionStrategy" >
+		<property name="deliveryModeDao" ref="deliveryModeDao"/>
+		<property name="promotionAction" value="de.hybris.platform.promotionengineservices.model.RuleBasedOrderChangeDeliveryModeActionModel"/>
+	</bean>
+	
+	<alias name="defaultOrderEntryAdjustActionStrategy" alias="orderEntryAdjustActionStrategy"/>
+	<bean id="defaultOrderEntryAdjustActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultOrderEntryAdjustActionStrategy" >
+		<property name="promotionAction" value="de.hybris.platform.promotionengineservices.model.RuleBasedOrderEntryAdjustActionModel"/>
+	</bean>
+	
+	<alias name="defaultAddProductToCartActionStrategy" alias="addProductToCartActionStrategy"/>
+	<bean id="defaultAddProductToCartActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultAddProductToCartActionStrategy">
+		<property name="productService" ref="productService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="orderUtils" ref="orderUtils"/>
+		<property name="ruleEngineCalculationService" ref="ruleEngineCalculationService"/>
+		<property name="promotionAction" value="de.hybris.platform.promotionengineservices.model.RuleBasedOrderAddProductActionModel"/>
+	</bean>
+	
+	<alias name="defaultPotentialPromotionMessageActionStrategy" alias="potentialPromotionMessageActionStrategy"/>
+	<bean id="defaultPotentialPromotionMessageActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.promotionengineservices.action.impl.DefaultPotentialPromotionMessageActionStrategy" >
+		<property name="promotionAction" value="de.hybris.platform.promotionengineservices.model.RuleBasedPotentialPromotionMessageActionModel"/>
+	</bean>
+
+	<alias alias="actionStrategies" name="defaultActionStrategies"/>
+	<util:list id="defaultActionStrategies">
+		<ref bean="defaultOrderAdjustTotalActionStrategy"/>
+		<ref bean="defaultOrderEntryAdjustActionStrategy"/>
+		<ref bean="defaultShippingActionStrategy"/>
+		<ref bean="defaultAddProductToCartActionStrategy"/>
+		<ref bean="defaultPotentialPromotionMessageActionStrategy"/>
+	</util:list>
+
+	<util:map id="promotionActionStrategiesMapping">
+		<entry key="defaultRuleOrderFixedDiscountRAOAction" value-ref="orderTotalAdjustActionStrategy" />
+		<entry key="defaultRuleOrderPercentageDiscountRAOAction" value-ref="orderTotalAdjustActionStrategy" />
+		<entry key="defaultRuleOrderEntryFixedDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+	    <entry key="defaultRuleOrderEntryPercentageDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+	    <entry key="defaultRulePartnerOrderEntryFixedDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+        <entry key="defaultRulePartnerOrderEntryPercentageDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+		<entry key="defaultRuleFreeGiftRAOAction" value-ref="addProductToCartActionStrategy" />	
+		<entry key="defaultRuleFreeGiftToBundleRAOAction" value-ref="addProductToCartActionStrategy" />
+		<entry key="defaultRuleAddFreeProductDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />				
+		<entry key="defaultRuleOrderEntryFixedPriceRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+        <entry key="defaultRulePartnerOrderEntryFixedPriceRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+		<entry key="defaultRuleChangeDeliveryModeRAOAction" value-ref="shippingActionStrategy" />
+		<entry key="defaultRuleTargetBundlePriceRAOAction" value-ref="orderTotalAdjustActionStrategy" />
+		<entry key="defaultFreeProductDiscountRAOAction" value-ref="orderEntryAdjustActionStrategy" />
+		<entry key="defaultRuleTriggerMessageRAOAction" value-ref="potentialPromotionMessageActionStrategy" />
+		<entry key="defaultRuleOrderEntryGroupFixedDiscountRAOAction" value-ref="orderTotalAdjustActionStrategy" />
+		<entry key="defaultRuleOrderPercentageDiscountExcludedProductsRAOAction" value-ref="orderTotalAdjustActionStrategy" />
+		<entry key="defaultRuleOrderEntryPercentageDiscountWithStrategyRAOAction" value-ref="orderEntryAdjustActionStrategy" />		
+	</util:map>
+
+	<alias name="defaultPromoRuleActionService" alias="ruleActionService"/>
+	<bean id="defaultPromoRuleActionService" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionRuleActionService" 
+		parent="defaultRuleActionService">
+		<property name="actionStrategiesMapping" ref="promotionActionStrategiesMapping"/>
+		<property name="promotionActionService" ref="promotionActionService"/>
+		<property name="promotionResultUtils" ref="promotionResultUtils"/>
+	</bean>
+
+	<alias name="defaultPromotionActionService" alias="promotionActionService"/>
+	<bean id="defaultPromotionActionService" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionActionService" >
+		<property name="modelService" ref="modelService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="extendedOrderDao" ref="extendedOrderDao"/>
+		<property name="productDao" ref="productDao"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="moduleVersioningService" ref="moduleVersioningService"/>
+		<property name="promotionResultService" ref="promotionResultService"/>
+		<property name="cartService" ref="cartService"/>
+	</bean>
+	
+	<alias name="defaultPromotionEngineResultService" alias="promotionEngineResultService"/>
+	<alias name="promotionEngineResultService" alias="promotionResultService"/>
+	<bean id="defaultPromotionEngineResultService" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultPromotionEngineResultService">
+		<property name="defaultPromotionResultService" ref="defaultPromotionResultService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="ruleParametersService" ref="ruleParametersService"/>
+		<property name="couponCodeRetrievalStrategy" ref="couponCodeRetrievalStrategy" />
+		<property name="modelService" ref="modelService"/>
+		<property name="resolutionStrategies">
+			<map>
+				<entry key="Map(ItemType(Currency),java.math.BigDecimal)" value-ref="currencyAmountResolutionStrategy" />
+				<entry key="ItemType(Product)" value-ref="productResolutionStrategy" />
+				<entry key="List(ItemType(Product))" value-ref="productListResolutionStrategy" />
+				<entry key="ItemType(Category)" value-ref="categoryResolutionStrategy" />
+				<entry key="List(ItemType(Category))" value-ref="categoryListResolutionStrategy" />
+				<entry key="java.lang.Integer" value-ref="objectResolutionStrategy" />
+			</map>
+		</property>
+	</bean>
+	
+	<alias name="noopCouponCodeRetrievalStrategy" alias="couponCodeRetrievalStrategy"/>
+	<bean id="noopCouponCodeRetrievalStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.coupons.impl.NoOpCouponCodeRetrievalStrategy" />
+	
+	<alias name="defaultCurrencyAmountResolutionStrategy" alias="currencyAmountResolutionStrategy"/>
+	<bean id="defaultCurrencyAmountResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultCurrencyAmountResolutionStrategy">
+		<property name="promotionResultUtils" ref="promotionResultUtils"/>
+	</bean>
+
+	<alias name="defaultProductResolutionStrategy" alias="productResolutionStrategy"/>
+	<bean id="defaultProductResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultProductResolutionStrategy" >
+		<property name="productService" ref="productService"></property>
+	</bean>
+
+	<alias name="defaultProductListResolutionStrategy" alias="productListResolutionStrategy"/>
+	<bean id="defaultProductListResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultListResolutionStrategy" >
+		<property name="resolutionStrategy" ref="productResolutionStrategy" />
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultCategoryResolutionStrategy" alias="categoryResolutionStrategy"/>
+	<bean id="defaultCategoryResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultCategoryResolutionStrategy" >
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+
+	<alias name="defaultCategoryListResolutionStrategy" alias="categoryListResolutionStrategy"/>
+	<bean id="defaultCategoryListResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultListResolutionStrategy" >
+		<property name="resolutionStrategy" ref="categoryResolutionStrategy" />
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultObjectResolutionStrategy" alias="objectResolutionStrategy"/>
+	<bean id="defaultObjectResolutionStrategy" class="de.hybris.platform.promotionengineservices.promotionengine.impl.DefaultObjectResolutionStrategy" />
+		
+	<aop:aspectj-autoproxy />
+ 	<bean class="de.hybris.platform.promotionengineservices.aspect.ActionLogger"/>
+
+	<alias alias="promotionDao" name="defaultPromotionDao"/>
+	<bean id="defaultPromotionDao" class="de.hybris.platform.promotionengineservices.dao.impl.DefaultPromotionDao" parent="abstractItemDao" />
+
+	<alias name="defaultWebsiteGroupRaoConverter" alias="websiteGroupRaoConverter" />
+	<bean id="defaultWebsiteGroupRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.WebsiteGroupRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="websiteGroupRaoPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultWebsiteGroupRaoPopulator" alias="websiteGroupRaoPopulator" />
+	<bean id="defaultWebsiteGroupRaoPopulator"
+		class="de.hybris.platform.promotionengineservices.converters.populator.WebsiteGroupRaoPopulator">
+	</bean>
+
+	<alias name="defaultWebsiteGroupRaoProvider" alias="websiteGroupRaoProvider" />
+	<bean id="defaultWebsiteGroupRaoProvider" class="de.hybris.platform.promotionengineservices.rao.providers.DefaultWebsiteGroupRAOProvider">
+		<property name="websiteGroupRaoConverter" ref="websiteGroupRaoConverter"></property>
+	</bean>
+
+	<alias name="defaultPromotionSourceRuleGenericDao" alias="promotionSourceRuleGenericDao"/>
+	<bean name="defaultPromotionSourceRuleGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="PromotionSourceRule"/>
+	</bean>
+	
+	<bean id="promotionRulePrepareInterceptor" class="de.hybris.platform.promotionengineservices.interceptors.PromotionRulePrepareInterceptor">
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="ruleCompilerContextFactory" ref="ruleCompilerContextFactory" />
+		<property name="ruleDao" ref="ruleDao"/>
+	</bean>
+	<bean id="promotionRulePrepareInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="promotionRulePrepareInterceptor"/>
+		<property name="typeCode" value="AbstractRuleEngineRule"/>
+	</bean>
+	
+	<alias alias="promotionSourceRuleDao" name="defaultPromotionSourceRuleDao"/>
+	<bean id="defaultPromotionSourceRuleDao" class="de.hybris.platform.promotionengineservices.dao.impl.DefaultPromotionSourceRuleDao" parent="abstractItemDao" />
+	
+	<bean id="promotionEngineHistoricalRuleContentProvider" class="de.hybris.platform.promotionengineservices.versioning.impl.PromotionEngineHistoricalRuleContentProvider"/>
+	
+	<bean depends-on="historicalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="promotionEngineHistoricalRuleContentProvider"/>
+	</bean>
+	
+	<bean depends-on="actionSupplementStrategies" parent="listMergeDirective">
+		<property name="add" ref="cartTotalThresholdPotentialPromotionMessageActionSupplementStrategy"/>
+	</bean>
+
+	<bean depends-on="actionSupplementStrategies" parent="listMergeDirective">
+		<property name="add" ref="qualifyingCategoryPotentialPromotionMessageActionSupplementStrategy"/>
+	</bean>
+	
+	<bean depends-on="actionSupplementStrategies" parent="listMergeDirective">
+		<property name="add" ref="qualifyingProductPotentialPromotionMessageActionSupplementStrategy"/>
+	</bean>
+	
+	<alias alias="cartTotalThresholdPotentialPromotionMessageActionSupplementStrategy" name="defaultCartTotalThresholdPotentialPromotionMessageActionSupplementStrategy"/>
+	<bean id="defaultCartTotalThresholdPotentialPromotionMessageActionSupplementStrategy" class="de.hybris.platform.promotionengineservices.action.strategies.CartTotalThresholdPotentialPromotionMessageActionSupplementStrategy"/>
+	
+	<alias alias="qualifyingCategoryPotentialPromotionMessageActionSupplementStrategy" name="defaultQualifyingCategoryPotentialPromotionMessageActionSupplementStrategy"/>
+	<bean id="defaultQualifyingCategoryPotentialPromotionMessageActionSupplementStrategy" class="de.hybris.platform.promotionengineservices.action.strategies.QualifyingCategoryPotentialPromotionMessageActionSupplementStrategy"/>
+
+	<alias alias="qualifyingProductPotentialPromotionMessageActionSupplementStrategy" name="defaultQualifyingProductPotentialPromotionMessageActionSupplementStrategy"/>
+	<bean id="defaultQualifyingProductPotentialPromotionMessageActionSupplementStrategy" class="de.hybris.platform.promotionengineservices.action.strategies.QualifyingProductPotentialPromotionMessageActionSupplementStrategy"/>
+
+
+	<alias name="defaultReportPromotionService" alias="reportPromotionService" />
+	<bean id="defaultReportPromotionService"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.impl.DefaultReportPromotionService">
+		<property name="promotionEngineResultsConverter" ref="reportPromotionEngineResultsConverter" />
+	</bean>
+
+	<alias name="defaultReportPromotionEngineResultsConverter" alias="reportPromotionEngineResultsConverter" />
+	<bean id="defaultReportPromotionEngineResultsConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+				  value="de.hybris.platform.promotionengineservices.promotionengine.report.data.PromotionEngineResults" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="reportPromotionEngineResultsPopulator" />
+				<ref bean="reportNonDiscountPromotionEngineResultsClassifyingPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultReportPromotionEngineResultsPopulator" alias="reportPromotionEngineResultsPopulator" />
+	<bean id="defaultReportPromotionEngineResultsPopulator"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.PromotionEngineResultsPopulator">
+		<property name="orderDiscountPromotionsConverter" ref="reportOrderLevelPromotionEngineResultsConverter" />
+		<property name="orderEntryDiscountPromotionConverter" ref="reportOrderEntryLevelPromotionEngineResultsConverter" />
+	</bean>
+
+	<alias name="defaultReportNonDiscountPromotionEngineResultsClassifyingPopulator" alias="reportNonDiscountPromotionEngineResultsClassifyingPopulator" />
+	<bean id="defaultReportNonDiscountPromotionEngineResultsClassifyingPopulator"
+	class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.NonDiscountPromotionEngineResultsClassifyingPopulator">
+		<property name="promotionResultConverter" ref="reportPromotionEngineResultConverter" />
+	</bean>
+
+
+	<bean id="abstractPromotionEngineResultPopulator" abstract="true"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.AbstractPromotionEngineResultPopulator">
+		<property name="ruleBasedPromotionActionDao" ref="ruleBasedPromotionActionDao" />
+		<property name="promotionResultPopulator" ref="reportPromotionEngineResultConverter" />
+		<property name="actionUtils" ref="actionUtils" />
+	</bean>
+
+	<alias name="defaultRuleBasedPromotionActionDao" alias="ruleBasedPromotionActionDao" />
+	<bean id="defaultRuleBasedPromotionActionDao"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.dao.impl.DefaultRuleBasedPromotionActionDao" />
+
+
+	<alias name="defaultReportOrderLevelPromotionEngineResultsConverter" alias="reportOrderLevelPromotionEngineResultsConverter" />
+	<bean id="defaultReportOrderLevelPromotionEngineResultsConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+				  value="de.hybris.platform.promotionengineservices.promotionengine.report.data.OrderLevelPromotionEngineResults" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="reportOrderDiscountPromotionEngineResultsPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultReportOrderDiscountPromotionEngineResultsPopulator" alias="reportOrderDiscountPromotionEngineResultsPopulator" />
+	<bean id="defaultReportOrderDiscountPromotionEngineResultsPopulator"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.OrderDiscountPromotionEngineResultsPopulator"
+		  parent="abstractPromotionEngineResultPopulator" />
+
+
+	<alias name="defaultReportOrderEntryLevelPromotionEngineResultsConverter" alias="reportOrderEntryLevelPromotionEngineResultsConverter" />
+	<bean id="defaultReportOrderEntryLevelPromotionEngineResultsConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+				  value="de.hybris.platform.promotionengineservices.promotionengine.report.data.OrderEntryLevelPromotionEngineResults" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="reportOrderEntryDiscountPromotionEngineResultsPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultReportOrderEntryDiscountPromotionEngineResultsPopulator" alias="reportOrderEntryDiscountPromotionEngineResultsPopulator" />
+	<bean id="defaultReportOrderEntryDiscountPromotionEngineResultsPopulator"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.OrderEntryDiscountPromotionEngineResultsPopulator"
+		  parent="abstractPromotionEngineResultPopulator" />
+
+
+	<alias name="defaultReportPromotionEngineResultConverter" alias="reportPromotionEngineResultConverter" />
+	<bean id="defaultReportPromotionEngineResultConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+				  value="de.hybris.platform.promotionengineservices.promotionengine.report.data.PromotionEngineResult" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="reportPromotionEngineResultPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultReportPromotionEngineResultPopulator" alias="reportPromotionEngineResultPopulator" />
+	<bean id="defaultReportPromotionEngineResultPopulator"
+		  class="de.hybris.platform.promotionengineservices.promotionengine.report.populators.PromotionEngineResultPopulator">
+		<property name="promotionResultService" ref="promotionResultService" />
+	</bean>
+
+	<alias name="defaultActionUtils" alias="actionUtils" />
+	<bean id="defaultActionUtils" class="de.hybris.platform.promotionengineservices.util.ActionUtils" />
+
+	<alias name="defaultPromotionResultUtils" alias="promotionResultUtils" />
+	<bean id="defaultPromotionResultUtils"
+		  class="de.hybris.platform.promotionengineservices.util.PromotionResultUtils">
+		<property name="cartService" ref="cartService" />
+	</bean>
+	
+	<bean id="promotionEngineServicesSystemSetup" class="de.hybris.platform.promotionengineservices.promotionengine.setup.impl.PromotionEngineServicesSystemSetup" parent="abstractRuleEngineSystemSetup" />
+
+</beans>

@@ -1,0 +1,73 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$defaultPassword=1234
+
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)
+;employeemanagergroup;employeegroup;
+;supergroup;;
+;group1;supergroup;
+;group2;supergroup;
+;subgroup1;group1;
+
+INSERT_UPDATE User;UID[unique=true];groups(uid)[append=true];password[default=$defaultPassword];
+;employeemanager;employeemanagergroup;;
+;user1;employeegroup,supergroup;;
+;user2;employeegroup,group2;;
+;user3;employeegroup,group1,group2;;
+
+INSERT_UPDATE UserRight;code[unique=true];
+;globalpermission1;
+
+
+$START_USERRIGHTS
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm;
+User;user1;;;;;;;;;
+;;;;User;+;;;;;;
+;;;;Item.owner;+;;;;;;
+
+User;user2;;;;;;;;;
+;;;;User;;-;;;;
+;;;;Item.owner;;-;;;;
+
+UserGroup;group1;;;;;;;;;
+;;;;User;+;;;;;;
+;;;;Item.owner;+;;;;;;
+
+UserGroup;group2;;;;;;;;;
+;;;;User;+;+;+;+;+;
+;;;;Item.owner;+;+;+;+;+;
+
+UserGroup;subgroup1;;;;;;;;
+;;;;AbstractOrder;+;;;;;
+
+$END_USERRIGHTS
+
+
+#Catalog Permissions
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog
+;catalog1;catalog1;true
+;catalog2;catalog2;true
+
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;readPrincipals(uid)[mode=append];writePrincipals(uid)[mode=append]
+;catalog1;Staged;false;user1,group1;group2
+;catalog1;Online;true;;
+;catalog2;Online;true;group1;
+
+$sourceContentCV=sourceVersion(catalog(id[default=catalog1]),version[default='Staged'])[unique=true,default='catalog1:Staged']
+$targetContentCV=targetVersion(catalog(id[default=catalog1]),version[default='Online'])[unique=true,default='catalog1:Online']
+
+INSERT_UPDATE CatalogVersionSyncJob; code[unique=true]; syncPrincipals(uid)[mode=append]; syncPrincipalsOnly;$sourceContentCV;$targetContentCV
+;sync catalog1:Staged->Online;user1,group1;true;;
+
+

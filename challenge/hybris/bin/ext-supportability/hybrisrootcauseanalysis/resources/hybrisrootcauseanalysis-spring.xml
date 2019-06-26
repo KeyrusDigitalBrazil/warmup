@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+            
+    <!-- EXCEPTION ANALYSIS -->
+	<bean id="sapLoggingProxyListener" class="de.hybris.e2e.hybrisrootcauseanalysis.exceptionanalysis.SAPLoggingProxyListener" init-method="init" />
+    <bean id="sapLoggingConfigChangeListener" class="de.hybris.e2e.hybrisrootcauseanalysis.exceptionanalysis.SAPLoggingConfigChangeListener" init-method="init" />
+
+
+	<!-- TECHNICAL MONITORING -->
+	<bean id="heartbeatService" class="de.hybris.e2e.hybrisrootcauseanalysis.technicalmonitoring.services.impl.DefaultHeartbeatService" />
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+	<!-- CHANGE ANALYSIS -->
+		
+	<!-- properties service changes -->
+	<bean id="abstractPropertiesChanges" abstract="true">
+		<property name="sorted" value="true" />
+		<property name="nameFile" value="e2echangeanalysis.properties"/><!-- Name of the file under data/nameFolder -->
+	</bean> 
+	
+	<bean id="defaultSolrChanges" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.services.impl.DefaultSolrChangesService" parent="abstractPropertiesChanges">
+		<property name="solrFacetSearchConfigDao" ref="solrFacetSearchConfigDao"/>
+		<property name="nameFile" value="solr.properties"/><!-- Name of the file under data/nameFolder -->
+	</bean>
+	
+	<bean id="defaultLicenceChanges" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.services.impl.DefaultLicenceChangesService" parent="abstractPropertiesChanges">
+		<property name="nameFile" value="licence.properties"/><!-- Name of the file under data/nameFolder -->
+	</bean>
+	<!--END : properties service changes -->
+	
+	<!-- xml service changes -->
+	<bean id="abstractXmlChanges" abstract="true">
+		<property name="mediaService" ref="mediaService" />
+	</bean>
+	
+	<bean id="defaultBackofficeChanges" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.services.impl.DefaultXmlChangesService" parent="abstractXmlChanges">
+		<property name="nameFile" value="backoffice.xml" />
+		<property name="code" value="cockpitng-config" />
+	</bean>	
+	<!-- END : xml service changes -->
+	
+	
+	<!-- File Services -->
+	<bean id="abstractFileService" abstract="true">
+		<property name="nameFolder" value="e2erootcauseanalysis"/><!-- Name of the folder in data -->
+	</bean>
+	<bean id="defaultE2EXmlFileService" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.services.impl.DefaultXmlFileService" parent="abstractFileService"></bean>
+	<bean id="defaultE2EPropertiesFileService" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.services.impl.DefaultPropertiesFileService" parent="abstractFileService"></bean>
+	<!-- END : File Services -->
+	
+	<!-- Job -->
+	<bean id="e2eChangeAnalysisFilesJob" class="de.hybris.e2e.hybrisrootcauseanalysis.changeanalysis.job.E2EChangeAnalysisFilesJob">
+		<property name="changesPropertiesList">
+			<list>
+				<ref bean="defaultSolrChanges" />
+				<ref bean="defaultLicenceChanges" />
+			</list>
+		</property>
+		<property name="changesXmlList">
+			<list>
+				<ref bean="defaultBackofficeChanges" />				
+			</list>
+		</property>
+		<property name="propertiesFileService" ref="defaultE2EPropertiesFileService"/>
+		<property name="xmlFileService" ref="defaultE2EXmlFileService" />
+	</bean>
+	<!-- END : Job -->
+	
+</beans>

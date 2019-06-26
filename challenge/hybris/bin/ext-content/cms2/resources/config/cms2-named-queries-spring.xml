@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- Common beans -->
+	
+	<alias alias="namedQueryFactory" name="defaultNamedQueryFactory" />
+	<bean id="defaultNamedQueryFactory" class="de.hybris.platform.cms2.namedquery.service.impl.DefaultNamedQueryFactory">
+		<property name="namedQueryMap" ref="namedQueryMap" />
+	</bean>
+
+	<alias alias="flexibleSearchNamedQueryConverter" name="defaultFlexibleSearchNamedQueryConverter" />
+	<bean id="defaultFlexibleSearchNamedQueryConverter" class="de.hybris.platform.cms2.namedquery.service.impl.FlexibleSearchNamedQueryConverter">
+		<property name="defaultPageSize" value="${cms2.namedquery.default.pagesize}" />
+	</bean>
+
+	<alias alias="flexibleSearchNamedQueryService" name="defaultFlexibleSearchNamedQueryService" />
+	<bean id="defaultFlexibleSearchNamedQueryService" class="de.hybris.platform.cms2.namedquery.service.impl.FlexibleSearchNamedQueryService">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="namedQueryFactory" ref="namedQueryFactory" />
+		<property name="flexibleSearchNamedQueryConverter" ref="flexibleSearchNamedQueryConverter" />
+	</bean>
+
+
+	<alias name="flexibleCMSItemSearchService" alias="cmsItemSearchService" />
+	<bean name="flexibleCMSItemSearchService" class="de.hybris.platform.cms2.cmsitems.service.impl.DefaultFlexibleCMSItemSearchService">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="flexibleSearchAttributeValueConverter" ref="flexibleSearchAttributeValueConverter"/>
+		<property name="typeService" ref="typeService" />
+		<property name="sortStatementFormatters" ref="cmsSortStatementFormatters" />
+		<property name="defaultSortStatementFormatter" ref="cmsDefaultSortStatementFormatter" />
+		<property name="cmsItemSearchTypeBlacklistMap" ref="cmsItemSearchTypeBlacklistMap" />
+		<property name="searchHelper" ref="cmsSearchHelper" />
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService"/>
+	</bean>
+
+	<alias name="defaultCmsItemSearchTypeBlacklistMap" alias="cmsItemSearchTypeBlacklistMap" />
+	<util:map id="defaultCmsItemSearchTypeBlacklistMap">
+		<entry>
+			<key>
+				<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+			</key>
+ 			<util:list>
+				<util:constant static-field="de.hybris.platform.cms2.model.pages.CatalogPageModel._TYPECODE"/>
+			</util:list> 
+		</entry>
+	</util:map>
+
+
+	<!-- SortStatmentFormatters -->
+	<alias name="defaultSortStatementFormatters" alias="cmsSortStatementFormatters" />
+	<util:list id="defaultSortStatementFormatters">
+		<ref bean="cmsStringSortStatementFormatter" />
+		<ref bean="cmsItemtypeSortStatementFormatter" />
+	</util:list>
+	
+	<alias name="defaultStringSortStatementFormatter" alias="cmsStringSortStatementFormatter" />
+	<bean name="defaultStringSortStatementFormatter" class="de.hybris.platform.cms2.cmsitems.service.impl.StringSortStatementFormatter" />
+
+	<alias name="defaultItemtypeSortStatementFormatter" alias="cmsItemtypeSortStatementFormatter" />
+	<bean name="defaultItemtypeSortStatementFormatter" class="de.hybris.platform.cms2.cmsitems.service.impl.ItemtypeSortStatementFormatter" />
+
+	<alias name="defaultSortStatementFormatter" alias="cmsDefaultSortStatementFormatter" />
+	<bean name="defaultSortStatementFormatter" class="de.hybris.platform.cms2.cmsitems.service.impl.DefaultSortStatementFormatter" />
+
+
+	<!-- NamedQueries -->
+
+	<alias name="defaultNamedQueryMap" alias="namedQueryMap" />
+	<util:map id="defaultNamedQueryMap">
+		<entry key="namedQueryUserGroupByText" value="SELECT {pk} FROM {UserGroup} WHERE ( LOWER({name}) LIKE LOWER(?name) OR LOWER({uid}) LIKE LOWER(?uid) )" />
+		<entry key="namedQueryCMSVersionByItemUid" value="SELECT {pk} FROM {CMSVersion} WHERE {itemUid} = ?itemUid AND {itemCatalogVersion} = ?itemCatalogVersion AND {label} IS NOT NULL" />
+		<entry key="namedQueryCMSVersionByItemUidWithLabel" value="SELECT {pk} FROM {CMSVersion} WHERE {itemUid} = ?itemUid AND {itemCatalogVersion} = ?itemCatalogVersion AND LOWER({label}) LIKE LOWER(?mask)" />
+	</util:map>
+
+
+	<!-- NamedQuerySearchService beans -->
+
+	<alias name="defaultUserGroupNamedQuerySearchService" alias="cmsUserGroupNamedQuerySearchService" />
+	<bean id="defaultUserGroupNamedQuerySearchService" class="de.hybris.platform.cms2.usergroups.service.impl.DefaultUserGroupNamedQuerySearchService">
+		<property name="namedQueryService" ref="flexibleSearchNamedQueryService" />
+	</bean>
+
+</beans>

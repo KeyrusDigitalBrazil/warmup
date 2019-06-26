@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkCustomerIsReplicated" name="sap-subscription-order-process"
+		 processClass="de.hybris.platform.orderprocessing.model.OrderProcessModel" onError="error">
+
+	<action id="checkCustomerIsReplicated" bean="checkCustomerIsReplicatedAction">
+		<transition name="OK"  to="sendSubscriptionOrderToSCPI" />
+		<transition name="NOK" to="error" />
+	</action>		
+	
+
+	<action id="sendSubscriptionOrderToSCPI" bean="sapSubscriptionOrderSendAction">
+		<transition name="OK"  to="setConfirmationStatus" />
+		<transition name="NOK" to="error" />
+	</action>		
+
+	<action id="setConfirmationStatus" bean="sapSubscriptionOrderConfirmationAction">
+		<transition name="OK"  to="success" />
+		<transition name="NOK" to="error" />
+	</action>
+
+	<end id="error" state="ERROR">Failed to create SAP Subscription Order</end>
+	<end id="success" state="SUCCEEDED">Successfully created SAPSubscription Order</end>
+
+
+</process>
+

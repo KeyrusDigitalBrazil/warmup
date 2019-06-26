@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	   xmlns:util="http://www.springframework.org/schema/util">
+
+	<!--Cell Service START-->
+	<alias name="defaultStringCellValue" alias="stringCellValue"/>
+	<bean id="defaultStringCellValue" class="com.hybris.backoffice.excel.template.cell.StringCellValue"/>
+
+	<alias name="defaultNumericCellValue" alias="numericCellValue"/>
+	<bean id="defaultNumericCellValue" class="com.hybris.backoffice.excel.template.cell.NumericCellValue">
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultFormulaCellValue" alias="formulaCellValue"/>
+	<bean id="defaultFormulaCellValue" class="com.hybris.backoffice.excel.template.cell.FormulaCellValue"/>
+
+	<alias name="defaultDataCellValue" alias="dataCellValue"/>
+	<bean id="defaultDataCellValue" class="com.hybris.backoffice.excel.template.cell.DataCellValue"/>
+
+	<alias name="defaultExcelCellService" alias="excelCellService"/>
+	<bean id="defaultExcelCellService" class="com.hybris.backoffice.excel.template.cell.DefaultExcelCellService">
+		<property name="cellValues">
+			<list>
+				<ref bean="stringCellValue"/>
+				<ref bean="numericCellValue"/>
+				<ref bean="formulaCellValue"/>
+				<ref bean="dataCellValue"/>
+			</list>
+		</property>
+	</bean>
+	<!--Cell Service End-->
+
+	<!--Sheet Service Start-->
+	<alias name="defaultExcelSheetService" alias="excelSheetService"/>
+	<bean id="defaultExcelSheetService" class="com.hybris.backoffice.excel.template.sheet.DefaultExcelSheetService">
+		<property name="collectionFormatter" ref="collectionFormatter"/>
+		<property name="excelCellService" ref="excelCellService"/>
+		<property name="excelSheetNamingStrategy" ref="excelSheetNamingStrategy"/>
+		<property name="attributeNameFormatter" ref="displayNameAttributeNameFormatter"/>
+		<property name="excludedSheets">
+			<list>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					CLASSIFICATION_TYPE_SYSTEM
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					HEADER_PROMPT
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					PK
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					TYPE_SYSTEM
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					TYPE_TEMPLATE
+				</value>
+			</list>
+		</property>
+		<property name="excelWorkbookService" ref="excelWorkbookService"/>
+	</bean>
+	<!--Sheet Service End-->
+
+	<!--Header Service Start-->
+	<alias name="defaultExcelHeaderService" alias="excelHeaderService"/>
+	<bean id="defaultExcelHeaderService" class="com.hybris.backoffice.excel.template.header.DefaultExcelHeaderService">
+		<property name="attributeNameFormatter" ref="displayNameAttributeNameFormatter"/>
+		<property name="collectionFormatter" ref="collectionFormatter"/>
+		<property name="excelCellService" ref="excelCellService"/>
+		<property name="excelSheetService" ref="excelSheetService"/>
+		<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	<!--Header Service End-->
+
+	<!--Workbook Service Start-->
+	<alias name="defaultExcelWorkbookService" alias="excelWorkbookService"/>
+	<bean id="defaultExcelWorkbookService"
+		  class="com.hybris.backoffice.excel.template.workbook.DefaultExcelWorkbookService"/>
+	<!--Workbook Service End-->
+
+	<alias name="defaultMandatoryExcelMarkAppender" alias="mandatoryExcelMarkAppender"/>
+	<bean id="defaultMandatoryExcelMarkAppender" class="com.hybris.backoffice.excel.template.populator.appender.MandatoryExcelMarkAppender">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultUniqueExcelMarkAppender" alias="uniqueExcelMarkAppender"/>
+	<bean id="defaultUniqueExcelMarkAppender" class="com.hybris.backoffice.excel.template.populator.appender.UniqueExcelMarkAppender">
+		<property name="uniqueFilter" ref="uniqueCheckingFilter"/>
+	</bean>
+
+	<alias name="defaultMultivalueExcelMarkAppender" alias="multivalueExcelMarkAppender"/>
+	<bean id="defaultMultivalueExcelMarkAppender" class="com.hybris.backoffice.excel.template.populator.appender.MultivalueExcelMarkAppender"/>
+
+	<alias name="defaultReadonlyExcelMarkAppender" alias="readonlyExcelMarkAppender"/>
+	<bean id="defaultReadonlyExcelMarkAppender" class="com.hybris.backoffice.excel.template.populator.appender.ReadonlyExcelMarkAppender"/>
+
+	<alias name="defaultDisplayNameAttributeNameFormatter" alias="displayNameAttributeNameFormatter"/>
+	<bean id="defaultDisplayNameAttributeNameFormatter"
+		  class="com.hybris.backoffice.excel.template.DisplayNameAttributeNameFormatter">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="appenders">
+			<util:list>
+				<ref bean="mandatoryExcelMarkAppender"/>
+				<ref bean="uniqueExcelMarkAppender"/>
+				<ref bean="multivalueExcelMarkAppender"/>
+				<ref bean="readonlyExcelMarkAppender"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelTemplateService" alias="excelTemplateService"/>
+	<bean id="defaultExcelTemplateService" class="com.hybris.backoffice.excel.template.DefaultExcelTemplateService">
+		<property name="cellService" ref="excelCellService"/>
+		<property name="headerService" ref="excelHeaderService"/>
+		<property name="sheetService" ref="excelSheetService"/>
+		<property name="workbookService" ref="excelWorkbookService"/>
+
+		<property name="attributeNameFormatter" ref="displayNameAttributeNameFormatter"/>
+
+		<property name="typeService" ref="typeService"/>
+
+		<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+		<property name="excelSheetNamingStrategy" ref="excelSheetNamingStrategy"/>
+	</bean>
+
+	<alias name="defaultExcelAttributeTypeSystemService" alias="excelAttributeTypeSystemService"/>
+	<bean id="defaultExcelAttributeTypeSystemService" class="com.hybris.backoffice.excel.importing.ExcelAttributeTypeSystemService">
+		<property name="cellService" ref="excelCellService"/>
+		<property name="collectionFormatter" ref="excelCollectionFormatter"/>
+	</bean>
+
+	<alias name="defaultExcelClassificationTypeSystemService" alias="excelClassificationTypeSystemService"/>
+	<bean id="defaultExcelClassificationTypeSystemService" class="com.hybris.backoffice.excel.importing.ExcelClassificationTypeSystemService">
+		<property name="cellService" ref="excelCellService"/>
+		<property name="collectionFormatter" ref="excelCollectionFormatter"/>
+	</bean>
+
+</beans>

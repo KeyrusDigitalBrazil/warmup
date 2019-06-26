@@ -1,0 +1,46 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE MediaFolder;qualifier[unique=true];path[unique=true]
+;kie-modules;kie-modules
+
+INSERT_UPDATE Catalog;id[unique=true];
+;testMappingCatalog;
+
+INSERT_UPDATE CatalogVersion;version[unique=true];catalog(id)[unique=true];
+;Staged;testMappingCatalog;
+;Online;testMappingCatalog;
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;promotions-module-junit;hybris-rules;promotions-junit;1.0.0;PROMOTION;true;0;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;promotions-base-junit;promotions-module-junit;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)
+;promotions-session-junit;promotions-base-junit;STATEFUL
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit;
+;promotions-junit-context;promotions-session-junit;200;
+
+INSERT_UPDATE CatalogVersionToRuleEngineContextMapping;context(name)[unique=true];catalogVersion(catalog(id),version)[unique=true]
+;promotions-junit-context;testMappingCatalog:Online
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;promoGroup1;
+;promoGroup2;
+
+UPDATE DroolsKIEModule;name[unique=true];defaultKIEBase(name)
+;promotions-module-junit;promotions-base-junit
+
+UPDATE DroolsKIEBase;name[unique=true];defaultKIESession(name)
+;promotions-base-junit;promotions-session-junit
+

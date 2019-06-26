@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="backofficeMainSlot">
+		<widget id="pcmbackoffice" widgetDefinitionId="com.hybris.cockpitng.flexiblelayout" slotId="perspectives"
+		        template="false" title="pcmbackoffice.cockpit.perspective">
+
+			<widget id="pcmbackoffice-state-save-null" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">#root</setting>
+				<setting key="socketDataType_$T" type="String">java.util.List</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-collectionBrowser-list-propextractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">(#root instanceof T(java.util.List)) ? #root : {#root}</setting>
+				<setting key="socketDataType_$T" type="String">java.util.List</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-state-save-initial-propextractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">{storeInWidgetModel: #root}</setting>
+				<setting key="socketDataType_$T" type="String">java.util.LinkedHashMap</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-state-prepare-collection-propextractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">{removeFromWidgetModel: #root}</setting>
+				<setting key="socketDataType_$T" type="String">java.util.LinkedHashMap</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-collectionBrowser-propextractor-collection" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">#root</setting>
+				<setting key="socketDataType_$T" type="String">java.util.List</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-state-holder-multiplexer-decider" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+					slotId="cockpitWidgetChildrenInvisible">
+				<setting key="single_expression" type="String" value="#root.isEmpty()"/>
+				<setting key="multiple_expression" type="String" value="!#root.isEmpty()"/>
+				<virtual-sockets>
+					<output id="single" type="java.util.Collection" visibility="external"/>
+					<output id="multiple" type="java.util.Collection" visibility="external"/>
+				</virtual-sockets>
+			</widget>
+
+			<widget id="pcmbackoffice-state-holder-multiplexer-saver" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+					slotId="cockpitWidgetChildrenInvisible">
+				<setting key="save_expression" type="String" value="#root != null ? (#root['storeInWidgetModel'] != null) : false"/>
+				<setting key="remove_expression" type="String" value="#root != null ? (#root['removeFromWidgetModel'] != null) : false"/>
+				<setting key="save_eval" type="String">#widgetModel['$_state'] = #root['storeInWidgetModel']</setting>
+				<setting key="remove_eval" type="String">(#widgetModel['$_state']?:{}).isEmpty() ? {} : T(org.apache.commons.collections4.CollectionUtils).removeAll(#widgetModel['$_state'], #root['removeFromWidgetModel'])</setting>
+				<virtual-sockets>
+					<output id="save" type="java.util.Collection" visibility="external"/>
+					<output id="remove" type="java.util.ArrayList" visibility="external"/>
+				</virtual-sockets>
+			</widget>
+
+			<widget id="pcmbackoffice-perspective-extractor"
+			        widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+			        template="false" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">#root.id + '-collectionBrowser-view'</setting>
+				<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-editorArea-quicklist-eraser" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+					template="false" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression" value="T(java.util.Collections).emptyList()"/>
+				<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+			</widget>
+
+			<widget id="pcmbackoffice-search-init-filter" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+			        template="false" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">#root.toString().equals('pcmbackoffice-collectionBrowser-view')</setting>
+				<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-search-init"
+			        widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+			        template="false" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">'Product'</setting>
+				<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+			</widget>
+
+			<widget id="pcmbackoffice-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+			        template="false" slotId="sidebar">
+				<setting key="widgetStyleClass" type="String" value="yw-pcmbackoffice-navibar"/>
+				<setting key="toolbarActions" type="String" value="pcmbackoffice-navibar-actions"/>
+				<setting key="viewMode" type="String" value="Vertical"/>
+				<virtual-sockets>
+					<input id="selected" type="java.lang.String" multiplicity="Collection"/>
+					<output id="output" type="java.lang.String"/>
+				</virtual-sockets>
+			</widget>
+
+			<widget id="pcmbackoffice-selection-filter" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+			        template="false" slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression">(#root instanceof T(java.util.Collection)) ? !#root.isEmpty() : #root != null</setting>
+				<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+			</widget>
+
+			<widget id="pcmbackoffice-contents" widgetDefinitionId="com.hybris.backoffice.viewswitcher"
+			        template="false" slotId="contents">
+
+				<widget id="pcmbackoffice-editorArea-view" widgetDefinitionId="com.hybris.cockpitng.flexiblelayout"
+				        template="false" slotId="views">
+					<widget id="pcmbackoffice-editorArea-borderlayout-quicklist"
+					        widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+					        template="false" slotId="sidebar">
+						<widget id="pcmbackoffice-editorArea-quicklist"
+						        widgetDefinitionId="com.hybris.cockpitng.quicklist"
+						        slotId="centerSlot" template="false">
+							<widget id="pcmbackoffice-editorArea-quicklist-conditionevaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+									slotId="cockpitWidgetChildrenInvisible" template="false">
+								<setting key="expression" type="String">#widgetModel['$_itemSelected_pcmbackoffice_editorArea_quicklist'] == null OR
+									#root.contains(#widgetModel['$_itemSelected_pcmbackoffice_editorArea_quicklist'])
+								</setting>
+								<setting key="socketDataType_$T" type="String">java.util.Collection</setting>
+								<virtual-sockets>
+									<input id="itemSelected_pcmbackoffice_editorArea_quicklist" type="java.lang.Object"/>
+								</virtual-sockets>
+							</widget>
+							<setting key="quickListConfigCtx">pcmbackoffice-quick-list</setting>
+							<setting key="actionSlotComponentId">pcm-quicklist-actions</setting>
+							<virtual-sockets>
+								<output id="itemsRemoved_pcmbackoffice-collectionBrowser-browser"
+								        type="java.lang.Object" multiplicity="List"/>
+							</virtual-sockets>
+						</widget>
+						<setting key="widgetStyleClass" type="String" value="yw-pcmbackoffice-light"/>
+						<setting key="northDisabled" type="Boolean" value="true"/>
+						<setting key="southDisabled" type="Boolean" value="true"/>
+						<setting key="eastDisabled" type="Boolean" value="true"/>
+						<setting key="westDisabled" type="Boolean" value="true"/>
+					</widget>
+					<widget id="pcmbackoffice-editorArea-area"
+					        widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+					        template="false" slotId="contents">
+						<widget id="pcmbackoffice-selectedreference-propertyextractor"
+						        widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+						        slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="expression" type="String">#root instanceof
+								T(com.hybris.cockpitng.data.TypeAwareSelectionContext) ? #root.selectedItem:#root
+							</setting>
+							<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+							<virtual-sockets/>
+						</widget>
+						<widget id="pcmbackoffice-objectcreated-propertyextractor"
+						        widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+						        slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="expression" type="String">#root instanceof
+								T(com.hybris.cockpitng.common.model.ObjectWithComponentContext) ?
+								#root.parameters._inputObject:#root
+							</setting>
+							<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+							<virtual-sockets/>
+						</widget>
+						<widget id="pcmbackoffice-navigationhistory"
+						        widgetDefinitionId="com.hybris.cockpitng.navigationhistory"
+						        slotId="toolbarLeft" template="false">
+							<setting key="defaultOutput" type="String" value="historyOutput"/>
+							<setting key="historyLength" type="Integer" value="10"/>
+							<setting key="proxyEnabled" type="Boolean" value="false"/>
+							<setting key="emptyHistoryOutputValueEval" type="String">#root instanceof
+								T(com.hybris.backoffice.widgets.viewswitcher.ViewsSwitchedData) and
+								#root.deselectedViews.size() > 0 ?
+								#root.deselectedViews[0]:'pcmbackoffice-collectionBrowser-view'
+							</setting>
+							<virtual-sockets>
+								<input id="historyInput" type="java.lang.Object"/>
+								<output id="historyOutput" type="java.lang.Object"/>
+							</virtual-sockets>
+						</widget>
+						<widget id="pcmbackoffice-editorarea-summaryview"
+						        widgetDefinitionId="com.hybris.cockpitng.summaryView" slotId="staticSectionSlot"
+						        template="false">
+							<setting key="summaryViewConfigCtx" type="String">pcmbackoffice-summary-view</setting>
+							<setting key="syncOutputSocket" type="String">syncObject</setting>
+							<virtual-sockets>
+								<output id="syncObject" type="de.hybris.platform.core.model.ItemModel"/>
+							</virtual-sockets>
+						</widget>
+						<widget id="pcmbackoffice-editorarea-deselect-filter"
+						        widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+						        slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="expression" type="String">#root instanceof
+								T(com.hybris.backoffice.widgets.viewswitcher.ViewsSwitchedData) and
+								#root.deselectedViews.contains('pcmbackoffice-editorArea-view')
+							</setting>
+							<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+							<virtual-sockets/>
+						</widget>
+						<setting key="widgetStyleAttribute" type="String"/>
+						<setting key="viewModeBtnVisible" type="Boolean" value="false"/>
+						<setting key="widgetStyleClass" type="String">yw-centered-panel-editor-area</setting>
+						<setting key="initViewMode" type="String" value="fluid"/>
+						<setting key="fluidViewCode" type="String" value="fluid"/>
+						<setting key="editorAreaConfigCtx" type="String" value="editor-area"/>
+						<setting key="bottomToolbar" type="Boolean" value="false"/>
+						<setting key="actionSlotComponentId" type="String" value="pcmbackoffice-editorareaactions"/>
+						<setting key="essentialsInOverviewTab" type="Boolean" value="false"/>
+						<setting key="redirectReferenceSelectedToParentWidgetSocket" type="String"
+						         value="referenceSelected"/>
+						<setting key="toolbarButtonsPosition" type="String" value="bottom"/>
+						<virtual-sockets>
+							<input id="toggleState" type="java.lang.String" visibility="default"/>
+							<output id="toggle" type="java.lang.String" visibility="default"/>
+							<output id="breakpoint" type="java.lang.String"/>
+							<output id="selectView" type="java.lang.String" visibility="default"/>
+							<output id="com.hybris.cockpitng.action.delete.success" type="java.lang.Object"/>
+							<output id="com.hybris.cockpitng.action.clone.success" type="java.lang.Object"/>
+							<output id="referenceSelected" type="java.lang.Object"/>
+						</virtual-sockets>
+					</widget>
+
+					<setting key="sidebarPosition" type="String" value="right"/>
+					<setting key="overlapOnHover" type="Boolean" value="false"/>
+					<setting key="sidebarCollapsible" type="Boolean" value="false"/>
+				</widget>
+
+				<setting key="widgetStyleClass" type="String" value="yw-pcmbackoffice-contents"/>
+				<setting key="selectEditorArea_eval" type="String">'pcmbackoffice-editorArea-view'</setting>
+				<virtual-sockets>
+					<input id="selectEditorArea" type="java.lang.Object"/>
+				</virtual-sockets>
+			</widget>
+
+			<setting key="perspectiveImageUrl" value="/cng/images/pcmbackoffice-perspective.svg" type="String"/>
+			<setting key="widgetStyleClass" type="String" value="yw-pcmbackoffice"/>
+			<setting key="sidebarPosition" type="String" value="left"/>
+			<setting key="sidebarCollapsed" type="Boolean" value="true"/>
+			<setting key="sidebarCollapsible" type="Boolean" value="true"/>
+			<setting key="overlapOnHover" type="Boolean" value="false"/>
+			<setting key="sidebarBreakpoint" type="String" value="xl"/>
+			<setting key="showSidebarHeader" type="Boolean" value="false"/>
+		</widget>
+	</widget-extension>
+
+	<widget-extension widgetId="systembarActionsLeft">
+		<virtual-sockets>
+			<input id="toggleState" type="java.lang.String"/>
+			<output id="breakpoint" type="java.lang.String"/>
+			<output id="toggle" type="java.lang.String"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="backofficeGlobalNotificationMultiplexer">
+		<setting key="pcmbackofficeOutput_expression" type="String">#root.parameters['triggerContext'] ==
+			'pcmbackoffice'
+		</setting>
+		<virtual-sockets>
+			<output id="pcmbackofficeOutput" type="java.lang.Object" visibility="external"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="collaborationCenter-taskEdit-editorarea-summaryview">
+		<setting key="summaryViewConfigCtx" type="String">pcmbackoffice-summary-view</setting>
+		<setting key="syncOutputSocket" type="String">syncObject</setting>
+		<virtual-sockets>
+			<output id="syncObject" type="de.hybris.platform.core.model.ItemModel"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="collaborationCenter-taskEdit-editorarea-summaryview" outputId="syncObject"
+					   targetWidgetId="synchronizationPopup" inputId="inputObject"/>
+
+	<!-- Clone Action Selection -->
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-eraser" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist-eraser" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="items"/>
+	<!-- /Clone Action Selection -->
+
+	<widget-connection sourceWidgetId="systembarActionsLeft" outputId="toggle"
+	                   targetWidgetId="pcmbackoffice" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="pcmbackoffice" outputId="sidebarState"
+	                   targetWidgetId="systembarActionsLeft" inputId="toggleState"/>
+	<widget-connection sourceWidgetId="systembarActionsLeft" outputId="breakpoint"
+	                   targetWidgetId="pcmbackoffice" inputId="responsiveBreakpoint"/>
+
+	<widget-connection sourceWidgetId="backofficeMainSlot" outputId="perspectiveSelected"
+	                   targetWidgetId="pcmbackoffice-perspective-extractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-perspective-extractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-search-init-filter" inputId="input"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-search-init-filter" outputId="true"
+	                   targetWidgetId="pcmbackoffice-search-init" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-toolbar" outputId="output"
+	                   targetWidgetId="pcmbackoffice-contents" inputId="selectViews"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-contents" outputId="selectedViews"
+	                   targetWidgetId="pcmbackoffice-toolbar" inputId="selected"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-toolbar" outputId="output"
+	                   targetWidgetId="pcmbackoffice-search-init-filter" inputId="input"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-selection-filter" outputId="true"
+	                   targetWidgetId="pcmbackoffice-contents" inputId="selectEditorArea"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="toggle"
+	                   targetWidgetId="pcmbackoffice-editorArea-view" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-view" outputId="sidebarState"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="toggleState"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="breakpoint"
+	                   targetWidgetId="pcmbackoffice-editorArea-view" inputId="responsiveBreakpoint"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="referenceSelected"
+	                   targetWidgetId="pcmbackoffice-selectedreference-propertyextractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-objectcreated-propertyextractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-selectedreference-propertyextractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-selectedreference-propertyextractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-selectedreference-propertyextractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-contents" outputId="viewsSwitched"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="emptyHistoryEvaluationTarget"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-navigationhistory" outputId="emptyHistoryBackButtonPressed"
+	                   targetWidgetId="pcmbackoffice-contents" inputId="selectViews"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-navigationhistory" outputId="emptyHistoryBackButtonPressed"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="resetHistory"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorarea-deselect-filter" outputId="true"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="reset"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-contents" outputId="viewsSwitched"
+	                   targetWidgetId="pcmbackoffice-editorarea-deselect-filter" inputId="input"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-navigationhistory" outputId="historyOutput"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="backofficeGlobalNotificationMultiplexer" outputId="pcmbackofficeOutput"
+	                   targetWidgetId="pcmbackoffice-contents" inputId="selectEditorArea"/>
+	<widget-connection sourceWidgetId="backofficeGlobalNotificationMultiplexer" outputId="pcmbackofficeOutput"
+	                   targetWidgetId="pcmbackoffice-objectcreated-propertyextractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorarea-summaryview" outputId="syncObject"
+	                   targetWidgetId="synchronizationPopup" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-selectedreference-propertyextractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-navigationhistory" outputId="historyOutput"
+	                   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="openItem"
+	                   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorarea-summaryview" outputId="focusAttribute"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="focus"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="openItem"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="openItem"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorarea-deselect-filter" outputId="true"
+					   targetWidgetId="pcmbackoffice-navigationhistory" inputId="resetHistory"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist"
+	                   outputId="itemsRemoved_pcmbackoffice-collectionBrowser-browser"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-browser" inputId="deselectItems"/>
+
+	<!-- Connection between quicklist and navigation history -->
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="openItem"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-conditionevaluator" inputId="itemSelected_pcmbackoffice_editorArea_quicklist"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-conditionevaluator" inputId="itemSelected_pcmbackoffice_editorArea_quicklist"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-conditionevaluator" inputId="itemSelected_pcmbackoffice_editorArea_quicklist"/>
+
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemoved"
+					   targetWidgetId="pcmbackoffice-navigationhistory" inputId="removeItem"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemoved"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-conditionevaluator" inputId="input"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist-conditionevaluator" outputId="true"
+					   targetWidgetId="pcmbackoffice-editorArea-area" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="selectedItemsToEdit"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" inputId="genericInput"/>
+
+</widgets>

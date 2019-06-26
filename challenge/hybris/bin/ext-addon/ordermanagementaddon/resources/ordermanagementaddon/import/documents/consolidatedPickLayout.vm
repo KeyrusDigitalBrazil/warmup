@@ -1,0 +1,152 @@
+##messageSource=classpath:/ordermanagementaddon/messages/document-consolidatedpicklabel_$lang.properties
+#set( $columns = 4 )
+<html>
+<head>
+    <style type='text/css'>@media screen, print {
+        table {
+            width: 96%;
+            margin: 25px 10px 0;
+            font-family: "Open Sans", sans-serif;
+            color: #151c22;
+        }
+
+        th {
+            padding: 5px 5px 5px 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        th.hd1 {
+            font-size: 19px;
+        }
+
+        th.hd2 {
+        }
+
+        td {
+            padding: 5px 0 5px 15px;
+            font-size: 15px;
+        }
+
+        div.consolidated-pick-slip-border {
+            border-top: 1px solid #e5e9ed;
+        }
+
+        td.headline {
+            font-size: 27px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+
+        td.table-header {
+            font-size: 19px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+
+        .sitelogo > img {
+            max-width: 250px;
+        }
+
+        body > table {
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }</style>
+</head>
+<body>
+<table>
+    <tr>
+        <td colspan="2" class="sitelogo">
+            ${ctx.cmsSlotContents.SiteLogo}
+        </td>
+        <td><!--company name data--></td>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}"
+               style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.TopContent}</a>
+        </td>
+    </tr>
+    <tr>
+        <table>
+            <tr>
+                <td colspan="3" class="headline">$!{ctx.messages.consignments}</td>
+                <td colspan="1" style="text-align:right;">
+                    <div><strong>$!{ctx.messages.date}</strong> $!{ctx.date}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4"><div class="consolidated-pick-slip-border"></div></td>
+            </tr>
+            #set($rowStart = 0)
+            #set($rowEnd = $ctx.getRowQuantity($columns))
+            #set($rowRange = [$rowStart..$rowEnd])
+
+            #foreach($i in $rowRange)
+            ## Calculate the range for N columns
+                #set($colStart = $i * $columns)
+                #set($colEnd = (($i + 1) * $columns) - 1)
+
+            ## If we have an amount of items that can't be divided in N columns, we stop at proper index.
+                #if($colEnd > ($ctx.consignmentList.size() - 1))
+                    #set($colEnd = ($ctx.consignmentList.size() - 1))
+                #end
+
+                #set($colRange = [$colStart..$colEnd])
+
+                <tr>
+                    #foreach($j in $colRange)
+                        <td colspan="1">$!{ctx.escapeHtml($ctx.consignmentList[$j].code)}</td>
+                    #end
+                </tr>
+            #end
+        </table>
+    <tr>
+        <table class='data'>
+            <tr>
+                <td colspan="6" class="headline">$!{ctx.messages.sectionHeader}</td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <div class="consolidated-pick-slip-border"></div>
+                </td>
+            </tr>
+            <tr>
+                <th class="hd2">$!{ctx.messages.productCode}</th>
+                <th class="hd2">$!{ctx.messages.productImage}</th>
+                <th class="hd2">$!{ctx.messages.productName}</th>
+                <th class="hd2">$!{ctx.messages.binCode}</th>
+                <th class="hd2">$!{ctx.messages.quantity}</th>
+                <th class="hd2">$!{ctx.messages.consignments}</th>
+            </tr>
+
+            #foreach($entry in $ctx.formEntries)
+                <tr>
+                    <td>$!{ctx.escapeHtml($entry.product.code)}</td>
+                    <td>$!{ctx.escapeHtml($entry.product.name)}</td>
+                    <td><img src="${ctx.mediaBaseUrl}$!{ctx.getProductImageURL($entry.product)}"/></td>
+                    <td>$!{ctx.escapeHtml($entry.bin)}</td>
+                    <td>$!{entry.quantity}</td>
+                    <td>
+                            #foreach($allocationEvent in $entry.allocationEvents)
+                                <div style="margin-top:3px;margin-left:5px;margin-bottom:3px;margin-right:5px;display:flex;align-items:flex-end;">$!{ctx.escapeHtml($allocationEvent.consignmentEntry.consignment.code)}
+                                ($!{allocationEvent.quantity})
+                                <div style="display:inline-block;width:17px;height:17px;border-width:1px;border-style:solid;border-color:black;text-align:right;margin-left:20px;"></div></div>
+                            #end
+                    </td>
+                </tr>
+            #end
+
+        </table>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}"
+               style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.BottomContent}</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

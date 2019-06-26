@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<!-- payment transaction start -->
+
+	<context type="PaymentTransaction" component="base" merge-by="type">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>paymentProvider+':'+requestId</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="PaymentTransactionEntry" component="base" merge-by="type">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>type+','+transactionStatus</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+
+	 <context merge-by="type" parent="auto" type="AbstractOrder" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="hmc.payment_and_delivery"
+				position="0">
+				<editorArea:section name="hmc.payment">
+					<editorArea:attribute qualifier="paymentTransactions" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="PaymentTransaction" type="AlipayPaymentTransaction" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.alipaypaymenttransaction.properties">
+				<editorArea:section name="backoffice.section.alipaypaymenttransaction.details">
+					<editorArea:attribute qualifier="requestId" />
+					<editorArea:attribute qualifier="order" />
+					<editorArea:attribute qualifier="paymentProvider" />
+					<editorArea:attribute qualifier="paymentUrl" />
+					<editorArea:attribute qualifier="alipayCode" />
+					<editorArea:attribute qualifier="payMethod" />
+					<editorArea:attribute qualifier="transactionInitiateDate" />
+
+
+				</editorArea:section>
+				<editorArea:section name="backoffice.section.alipaypaymenttransactionentry.details">
+					<editorArea:attribute qualifier="entries" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="PaymentTransactionEntry" type="AlipayPaymentTransactionEntry" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.alipaypaymenttransaction.properties">
+				<editorArea:section name="backoffice.section.alipaypaymenttransactionentry.basic">
+					<editorArea:attribute qualifier="requestId" />
+					<editorArea:attribute qualifier="code" />
+					<editorArea:attribute qualifier="amount" editor="com.hybris.cockpitng.editor.defaultbigdecimal">
+						<editorArea:editor-parameter>
+							<editorArea:name>numberFormat</editorArea:name>
+							<editorArea:value>###.00</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+					<editorArea:attribute qualifier="type" />
+					<editorArea:attribute qualifier="transactionStatus" />
+					<editorArea:attribute qualifier="transactionStatusDetails" />
+				</editorArea:section>
+				<editorArea:section name="backoffice.section.alipaypaymenttransactionentry.trade">
+					<editorArea:attribute qualifier="payerEmail" readonly="true" />
+					<editorArea:attribute qualifier="payerId" readonly="true"/>
+					<editorArea:attribute qualifier="adjustedAmount" readonly="true"/>
+					<editorArea:attribute qualifier="couponUsed" readonly="true"/>
+					<editorArea:attribute qualifier="locked" readonly="true"/>
+					<editorArea:attribute qualifier="sellerFee" readonly="true"/>
+					<editorArea:attribute qualifier="supplementaryStatus" readonly="true"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+
+	<!-- payment transaction end -->
+
+</config>

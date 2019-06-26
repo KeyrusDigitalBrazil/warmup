@@ -1,0 +1,38 @@
+$defaultCurrency=EUR
+$lang=en
+$passwordEncoding=md5
+$defaultPassword=welcome
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+
+###################################################################################
+# CPQ Test Users
+###################################################################################
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid);locname[lang=en];
+;ruleTestGroup1;;
+;ruleTestGroup2;;
+;asagentgroup;customergroup;
+
+INSERT_UPDATE Customer;description;uid[unique=true];originalUid;email;name;sessionCurrency(isocode)[default=$defaultCurrency];$setPassword;groups(uid);
+;CPQ Customer 01;cpq01;cpq01;cpq01@sap.com;cpq01;;;ruleTestGroup1,customergroup;
+;CPQ Customer 02;cpq02;cpq02;cpq02@sap.com;cpq02;;;ruleTestGroup2,customergroup;
+
+
+####################################################################################
+# Creating Employee for customer support mode
+####################################################################################
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid);locname[lang=$lang];description
+;cpqagentgroup;asagentgroup;"CPQ Assisted Service Agent Group";
+
+INSERT_UPDATE Employee;uid[unique=true];password[default=$defaultPassword];name;description;groups(uid)
+;cpqagent;;"Assisted Service Agent";"Assisted Service Agent for CPQ";cpqagentgroup
+
+
+###############################
+# B2C Customer
+###############################
+INSERT_UPDATE Customer;description;uid[unique=true];originalUid;name;title(code);sessionCurrency(isocode)[default='USD'];password[default=$defaultPassword];
+;Customer B2C;cpq01@sap.com;cpq01@sap.com;cpq01;dr;;;;;
+
+INSERT_UPDATE OrderCancelConfig;orderCancelAllowed;cancelAfterWarehouseAllowed;completeCancelAfterShippingStartedAllowed;partialCancelAllowed;partialOrderEntryCancelAllowed;queuedOrderWaitingTime;
+;true;true;true;true;true;100;

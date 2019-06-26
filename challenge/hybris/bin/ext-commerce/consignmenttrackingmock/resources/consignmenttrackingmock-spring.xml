@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+           
+    <context:annotation-config/> 
+
+	<util:map id="carrierAdaptors" key-type="java.lang.String">
+	    <entry key="MockCarrier" value-ref="mockCarrierAdaptor"/>
+	</util:map>
+	
+	<bean id="carrier" class="java.lang.String">
+		<constructor-arg value="MockCarrier" />
+	</bean>
+
+	<bean id="mockCarrierAdaptor" class="de.hybris.platform.consignmenttrackingmock.adaptors.impl.MockCarrierAdaptor">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="mockConsignmentTrackingService" ref="mockConsignmentTrackingService"/>
+	</bean>
+
+	<bean id="mockDataProvider" class="de.hybris.platform.consignmenttrackingmock.data.MockDataProvider">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+	<bean id="mockConsignmentTrackingService" class="de.hybris.platform.consignmenttrackingmock.service.impl.MockConsignmentTrackingService"/>
+	
+</beans>

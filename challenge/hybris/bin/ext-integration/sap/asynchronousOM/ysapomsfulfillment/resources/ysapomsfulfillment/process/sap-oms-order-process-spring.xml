@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+        
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<context:annotation-config/>
+	
+	<alias name="sapCheckOrderAction" alias="sapOmsCheckOrderAction" />
+	<bean id="sapCheckOrderAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapCheckOrderAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapCheckCustomerReplicationAction" alias="sapOmsCheckCustomerReplicationAction" />
+	<bean id="sapCheckCustomerReplicationAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapCheckCustomerReplicationAction"
+		parent="abstractAction">
+		<property name="sapGlobalConfigurationService" ref="sapCoreDefaultSAPGlobalConfigurationService"></property>
+	</bean> 
+
+	<alias name="sapSetConfirmationStatusAction" alias="sapOmsSetConfirmationStatusAction" />
+	<bean id="sapSetConfirmationStatusAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapSetConfirmationStatusAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapCheckCompletionStatusAction" alias="sapOmsCheckCompletionStatusAction"/>
+	<bean id="sapCheckCompletionStatusAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapCheckCompletionStatusAction"
+		parent="abstractAction">
+	</bean>
+
+	<alias name="sapCancelOrderAction" alias="sapOmsCancelOrderAction" />
+	<bean id="sapCancelOrderAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapCancelOrderAction"
+		parent="abstractAction"/>
+	
+	<alias name="sapSourceOrderAction" alias="sapOmsSourceOrderAction" />
+	<bean id="sapSourceOrderAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapSourceOrderAction" parent="abstractAction">
+		<property name="sourcingService" ref="sourcingService"/>
+		<property name="allocationService" ref="allocationService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+	<alias name="sapCheckOrderSendStatusAction" alias="sapOmsCheckOrderSendStatusAction"/>
+	<bean id="sapCheckOrderSendStatusAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapCheckOrderSendStatusAction"
+		  parent="abstractAction">
+	</bean>
+
+	<alias name="sapGeocodeShippingAddressAction" alias="sapOmsGeocodeShippingAddressAction" />
+	<bean id="sapGeocodeShippingAddressAction" class="de.hybris.platform.sap.ysapomsfulfillment.actions.order.SapGeocodeShippingAddressAction" parent="abstractAction">
+		<property name="geoWebServiceWrapper" ref="geoServiceWrapper"/>
+		<property name="addressConverter" ref="sapOmsDeliveryAddressGeocodeConverter"/>
+	</bean>
+
+	<alias name="sapDeliveryAddressGeocodeConverter" alias="sapOmsDeliveryAddressGeocodeConverter" />
+	<bean id="sapDeliveryAddressGeocodeConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.storelocator.data.AddressData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="sapOmsDeliveryAddressGeocodePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapDeliveryAddressGeocodePopulator" alias="sapOmsDeliveryAddressGeocodePopulator" />
+	<bean id="sapDeliveryAddressGeocodePopulator" class="de.hybris.platform.sap.ysapomsfulfillment.converters.SapDeliveryAddressGeocodePopulator" />
+
+</beans>

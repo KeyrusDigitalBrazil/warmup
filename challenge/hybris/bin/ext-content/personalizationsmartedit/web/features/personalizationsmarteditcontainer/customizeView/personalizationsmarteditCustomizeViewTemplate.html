@@ -1,0 +1,48 @@
+<div id="personalizationsmartedit-right-toolbar-item-template">
+    <div class="pe-customize-panel__filter-label-layout">
+        <label class="personalization-modal__label pe-customize-panel__filter-label"
+            data-translate="personalization.commons.filter.label"></label>
+        <div class="pe-customize-panel__filter-layout">
+            <page-filter-dropdown data-initial-value="ctrl.pageFilter"
+                data-on-select-callback="ctrl.pageFilerChange(value)"></page-filter-dropdown>
+            <has-multicatalog>
+                <catalog-filter-dropdown data-initial-value="ctrl.catalogFilter"
+                    data-on-select-callback="ctrl.catalogFilerChange(value)" />
+            </has-multicatalog>
+            <status-filter-dropdown data-initial-value="ctrl.statusFilter"
+                data-on-select-callback="ctrl.statusFilerChange(value)"></status-filter-dropdown>
+        </div>
+    </div>
+    <div data-ng-class="ctrl.customizationsList.length == 0 ? 'pe-customize-panel-list--empty':''">
+        <div class="pe-customize-panel__search-layout">
+            <div class="perso-search perso-search-panel perso-input-group">
+                <div class="perso-input-group__addon">
+                    <span class="hyicon hyicon-search perso-search__search-icon"></span>
+                </div>
+                <input type="text"
+                    class="perso-input-group__input ng-pristine ng-untouched ng-valid"
+                    placeholder="{{ 'personalization.toolbar.pagecustomizations.search.placeholder' | translate}}"
+                    data-ng-model="ctrl.nameFilter"
+                    data-ng-keyup="ctrl.nameInputKeypress($event)">
+                </input>
+                <div class="perso-input-group__addon">
+                    <span data-ng-show="ctrl.nameFilter"
+                        class="glyphicon glyphicon-remove-sign perso-search__reset-icon"
+                        data-ng-click="ctrl.nameFilter=''; ctrl.nameInputKeypress($event)">
+                    </span>
+                </div>
+            </div>
+            <div class="perso-search__results">
+                <span data-ng-bind="ctrl.pagination.totalCount"></span>
+                <span data-translate="personalization.toolbar.pagecustomizations.search.result.label"></span>
+            </div>
+        </div>
+    </div>
+    <div class="pe-customize-panel__wrapper"
+        personalization-infinite-scroll="ctrl.addMoreCustomizationItems()"
+        personalization-infinite-scroll-distance="2"
+        data-customizations-loaded="{{ctrl.customizationsList.length > 0}}">
+        <customizations-list data-customizations-list="ctrl.customizationsList"
+            data-request-processing="ctrl.moreCustomizationsRequestProcessing" />
+    </div>
+</div>

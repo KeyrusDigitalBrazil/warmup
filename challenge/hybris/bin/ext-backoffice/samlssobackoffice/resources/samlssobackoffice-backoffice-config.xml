@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+
+	<context type="SamlUserGroup" component="base" parent="GenericItem">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>samlUserGroup</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context component="explorer-tree" merge-by="module">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="hmc_treenode_system">
+				<explorer-tree:type-node code="SamlUserGroup" id="hmc_typenode_samlusergroup"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="SamlUserGroup" component="simple-search" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="samlUserGroup"/>
+			<simple-search:sort-field name="samlUserGroup" asc="true"/>
+		</simple-search:simple-search>
+	</context>
+
+	<context type="SamlUserGroup" component="advanced-search" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="samlUserGroup" selected="true"/>
+				<advanced-search:field name="userType" selected="true">
+					<advanced-search:editor-parameter>
+						<advanced-search:name>availableValuesProvider</advanced-search:name>
+						<advanced-search:value>subtypesSearchFacade</advanced-search:value>
+					</advanced-search:editor-parameter>
+					<advanced-search:editor-parameter>
+						<advanced-search:name>referenceSearchCondition_code</advanced-search:name>
+						<advanced-search:value>User</advanced-search:value>
+					</advanced-search:editor-parameter>
+				</advanced-search:field>
+				<advanced-search:field name="userGroups" selected="true"/>
+				<advanced-search:field name="enableBackofficeLogin"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="SamlUserGroup" component="listview" parent="GenericItem">
+		<list-view:list-view>
+			<list-view:column qualifier="samlUserGroup"/>
+			<list-view:column qualifier="userType"/>
+			<list-view:column qualifier="userGroups"/>
+			<list-view:column qualifier="enableBackofficeLogin"/>
+		</list-view:list-view>
+	</context>
+
+	<context type="SamlUserGroup" component="editor-area" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="">
+				<editorArea:section name="hmc.section.samlUserGroup">
+					<editorArea:attribute qualifier="samlUserGroup"/>
+					<editorArea:attribute qualifier="userType">
+						<editorArea:editor-parameter>
+							<editorArea:name>availableValuesProvider</editorArea:name>
+							<editorArea:value>subtypesSearchFacade</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>referenceSearchCondition_code</editorArea:name>
+							<editorArea:value>User</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+					<editorArea:attribute qualifier="userGroups"/>
+					<editorArea:attribute qualifier="enableBackofficeLogin"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="SamlUserGroup" component="create-wizard" parent="GenericItem">
+		<wz:flow id="SamlUserGroup" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="itemPrepare">
+				<wz:initialize property="newObject" type="ctx.TYPE_CODE"/>
+			</wz:prepare>
+			<wz:step id="step1" label="flow.allmanadatory">
+				<wz:content id="step1.content">
+					<wz:property-list root="newObject">
+						<wz:property qualifier="samlUserGroup"/>
+						<wz:property qualifier="userType">
+							<wz:editor-parameter>
+								<wz:name>availableValuesProvider</wz:name>
+								<wz:value>subtypesSearchFacade</wz:value>
+							</wz:editor-parameter>
+							<wz:editor-parameter>
+								<wz:name>referenceSearchCondition_code</wz:name>
+								<wz:value>User</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property qualifier="userGroups"/>
+						<wz:property qualifier="enableBackofficeLogin"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:done
+							visible="!#empty(newObject.samlUserGroup) and (newObject.userType != null) and (newObject.userGroups != null) and !newObject.userGroups.isEmpty()">
+						<wz:save property="newObject"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+</config>

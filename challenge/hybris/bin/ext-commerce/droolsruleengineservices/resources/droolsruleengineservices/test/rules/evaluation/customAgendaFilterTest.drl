@@ -1,0 +1,21 @@
+package de.hybris.platform.promotionengineservices.test
+
+import de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO;
+import java.util.Map;
+
+//test rule for making sure an agenda filter is triggered (used in CustomAgendaFilterSupportIT test)
+rule "customAgendaFilterTest"
+@ruleCode("customAgendaFilterTest.drl")
+@moduleName("rules-module-junit")
+dialect "mvel"
+	no-loop true
+    when
+    	// rule just adds some value to map
+    	// custom agenda filter should add another value as well
+    	$mapFact := Map()
+    	and
+	   	$result  := RuleEngineResultRAO()
+    then
+    	$mapFact.put("addedByRule", "some value");
+		update($mapFact);
+end

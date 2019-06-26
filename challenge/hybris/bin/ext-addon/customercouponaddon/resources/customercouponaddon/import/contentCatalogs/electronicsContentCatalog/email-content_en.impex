@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the CMS content for the Marketplace site emails
+#
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+
+$emailResource=jar:de.hybris.platform.customercouponaddon.constants.CustomercouponaddonConstants&/customercouponaddon/import/contentCatalogs/electronicsContentCatalog/emails
+
+# Language
+$lang=en
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;electronics_Email_Customer_Customer_Coupon_Subject;"Customer Coupon Email Body";$emailResource/email-customerCouponSubject.vm
+;electronics_Email_Customer_Customer_Coupon_Body;"Customer Coupon Email Subject";$emailResource/email-customerCouponBody.vm
+
+# Email Pages
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];fromEmail[lang=$lang];fromName[lang=$lang]
+;;CustomerCouponEmail;"customerservices@hybris.com";"Customer Services Team"

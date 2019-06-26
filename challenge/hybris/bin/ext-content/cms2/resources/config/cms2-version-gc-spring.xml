@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:int="http://www.springframework.org/schema/integration"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration
+		http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+
+	<!-- Business Process Definition -->
+	<bean id="cmsVersionGCProcessDefinitionResource"
+		  class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/processes/cms2-version-gc-process.xml"/>
+	</bean>
+
+	<!-- Business Process Actions -->
+	<alias name="defaultAbstractCMSVersionGCAction" alias="abstractCMSVersionGCAction" />
+	<bean id="defaultAbstractCMSVersionGCAction" class="de.hybris.platform.cms2.version.processengine.action.AbstractCMSVersionGCProcessAction" parent="abstractAction" abstract="true">
+		<property name="cmsVersionGCService" ref="cmsVersionGCService"/>
+		<property name="cmsVersionGCProcessPredicate" ref="cmsVersionGCProcessPredicate"/>
+	</bean>
+
+	<alias name="defaultCollectRelatedCMSVersionsGCProcessAction" alias="collectRelatedCMSVersionsGCProcessAction" />
+	<bean id="defaultCollectRelatedCMSVersionsGCProcessAction" class="de.hybris.platform.cms2.version.processengine.action.impl.CollectRelatedCMSVersionsGCProcessAction" parent="abstractCMSVersionGCAction"/>
+
+	<alias name="defaultCollectRetainableCMSVersionsGCProcessAction" alias="collectRetainableCMSVersionsGCProcessAction" />
+	<bean id="defaultCollectRetainableCMSVersionsGCProcessAction" class="de.hybris.platform.cms2.version.processengine.action.impl.CollectRetainableCMSVersionsGCProcessAction" parent="abstractCMSVersionGCAction"/>
+
+	<alias name="defaultRemoveCMSVersionsGCProcessAction" alias="removeCMSVersionsGCProcessAction" />
+	<bean id="defaultRemoveCMSVersionsGCProcessAction" class="de.hybris.platform.cms2.version.processengine.action.impl.RemoveCMSVersionsGCProcessAction" parent="abstractCMSVersionGCAction">
+		<property name="pageableDataFactory" ref="pageableDataFactory"/>
+	</bean>
+
+	<!-- Services -->
+	<alias name="defaultCmsVersionGCProcessService" alias="cmsVersionGCProcessService" />
+	<bean id="defaultCmsVersionGCProcessService" class="de.hybris.platform.cms2.version.processengine.service.impl.DefaultCMSVersionGCProcessService">
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- Predicates -->
+	<alias name="defaultCmsVersionGCProcessPredicate" alias="cmsVersionGCProcessPredicate" />
+	<bean id="defaultCmsVersionGCProcessPredicate" class="de.hybris.platform.cms2.version.processengine.predicate.CMSVersionGCProcessPredicate"/>
+
+	<!-- Spring Integration Config -->
+	<int:inbound-channel-adapter
+			id="cmsVersionGCProcessAdapter"
+			ref="cmsVersionGCProcessService"
+			method="createProcess"
+			channel="cmsVersionGCProcessChannel"
+			auto-startup="#{configurationService.configuration.getProperty('version.gc.enabled')}">
+		<int:poller cron="#{configurationService.configuration.getProperty('version.gc.cron')}" task-executor="cmsVersionGCProcessThreadPoolTaskExecutor"/>
+	</int:inbound-channel-adapter>
+
+	<bean id="cmsVersionGCProcessThreadPoolTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="threadFactory" ref="cmsVersionGCProcessThreadFactory" />
+	</bean>
+
+	<bean id="cmsVersionGCProcessThreadFactory" class="de.hybris.platform.core.TenantAwareThreadFactory">
+		<constructor-arg name="tenant" ref="tenantFactory"/>
+	</bean>
+
+	<int:service-activator
+			input-channel="cmsVersionGCProcessChannel"
+			ref="cmsVersionGCProcessService"
+			method="startProcess"/>
+</beans>

@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# OMS velocity template for printing label
+
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$lang=ja
+$picture=media(code, $contentCV);
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;shipping-label-template;"shipping-label-template";jar:/ordermanagementaddon/import/documents/shippingLayout.vm
+;return-shipping-label-template;"return-shipping-label-template";jar:/ordermanagementaddon/import/documents/returnShippingLayout.vm
+;pick-slip-template;"pick-slip-template";jar:/ordermanagementaddon/import/documents/pickLayout.vm
+;pack-template;"pack-template";jar:/ordermanagementaddon/import/documents/packLayout.vm
+;export-form-template;"export-form-template";jar:/ordermanagementaddon/import/documents/exportFormLayout.vm
+;return-form-template;"return-form-template";jar:/ordermanagementaddon/import/documents/returnFormLayout.vm
+
+# CMS Image Components
+INSERT_UPDATE CMSImageComponent;$contentCV[unique=true];uid[unique=true];$picture[lang=$lang]
+;;DocumentSiteLogoImage;HybrisLogo;
+
+# Content Slots
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;DocumentSiteLogoSlot;DocumentSiteLogoImage
+
+# Import config properties into impex macros for modulegen
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$emailResource=$config-emailResourceValue
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+ ;powertools_Email_Return_Label_Body;"Return Label Email Body";jar:/ordermanagementaddon/import/documents/email-returnLabelBody.vm
+ ;powertools_Email_Return_Label_Subject;"Return Label Email Subject";jar:/ordermanagementaddon/import/documents/email-returnLabelSubject.vm
+
+# Email Pages
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];fromEmail[lang=$lang];fromName[lang=$lang]
+ ;;ReturnLabelEmail;"customerservices@hybris.com";"Customer Services Team"

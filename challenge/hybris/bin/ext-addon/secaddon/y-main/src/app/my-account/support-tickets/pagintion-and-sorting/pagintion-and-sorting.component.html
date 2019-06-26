@@ -1,0 +1,31 @@
+<div class="sort-refine-bar" *ngIf="hasPagingData()">
+  <div class="row">
+    <div class="col-xs-12 col-sm-4 col-md-4">
+      <div class="form-group">
+        <label class="control-label ">
+          <ng-container i18n="@@text.account.supportTickets.list.sort">Sort by</ng-container>
+        </label>
+          <select name="sort" class="form-control"[ngModel]=" selectedSort" (ngModelChange)="sort($event)">
+            <option disabled="" >
+              <ng-container i18n="@@text.account.supportTickets.list.sort">Sort by</ng-container>
+             </option>
+            <option *ngFor="let sort of getSorts()" [value]="sort">
+              {{sort}}
+            </option>
+          </select>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-5 pagination-wrap">
+      <ul class="pagination" [class.disabled]="getTotalPages()<=1">
+        <li class="pagination-prev" [class.disabled]="getPageNumber()==1" (click)="previous()">
+          <span class="glyphicon glyphicon-chevron-left"></span></li>
+        <li *ngFor="let item of createRange(getTotalPages())" [class.active]="getPageNumber()==item">
+          <span (click)="goToPage(item)">{{item}}</span>
+        </li>
+        <li class="pagination-next" [class.disabled]="getPageNumber()>=(getTotalPages())" (click)="next()">
+          <span class="glyphicon glyphicon-chevron-right"></span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,48 @@
+$defaultCurrency=EUR
+$lang=en
+$catalog-id=testConfigureCatalog
+$catalog-version=Online
+$catalogVersion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+
+$storeClassification=cpqTestClassification
+$systemVersion=1.0
+$classCatalogVersion=catalogversion(catalog(id[default='$storeClassification']),version[default='1.0'])[unique=true,default='$storeClassification:1.0'];
+$classSystemVersion=systemVersion(catalog(id[default='$storeClassification']),version[default='1.0'])[unique=true,default='$storeClassification:1.0'];
+$unit=unit(code,$classSystemVersion);
+$attributevalues=attributeValues(code,$classSystemVersion)[unique=true];
+
+
+#################################################################################
+# Define Classification Class
+#################################################################################
+INSERT_UPDATE ClassificationClass;$classCatalogVersion;code[unique=true];name[lang=$lang];description[lang=$lang];
+;;CPQ_LT_TEST;CPQ_LT_TEST;Classification class for the long text for CPQ_LAPTOP;
+
+#################################################################################
+# Create Classification Attribute
+#################################################################################
+INSERT_UPDATE ClassificationAttribute;$classSystemVersion;code[unique=true];description[lang=$lang];
+;;CPQ_DISPLAY     ;Customized long text description for the display;
+;;CPQ_RAM         ;Customized long text description for the memory;
+
+#################################################################################
+# Define Classification Attribute Values
+#################################################################################
+INSERT_UPDATE ClassificationAttributeValue;$classSystemVersion;code[unique=true];name[lang=$lang];description[lang=$lang];
+;;CPQ_DISPLAY_15     ;15;		Customer defined new text for display 15;
+;;CPQ_RAM_32GB       ;32GB;		Customer defined new text for memory 32GB;
+
+#################################################################################
+# Define Classification Attribute Assignments
+#################################################################################
+INSERT_UPDATE ClassAttributeAssignment;classificationClass($classCatalogVersion,code)[unique=true,allownull=true];classificationAttribute(code,$classSystemVersion)[unique=true,forceWrite=true,allownull=true];position[unique=true];$unit;attributeType(code[default=string]);multiValued[default=false];range[default=false];localized[default=true];$classSystemVersion[unique=true,forceWrite=true];
+;CPQ_LT_TEST;CPQ_DISPLAY;0;;enum;false;false;true;;
+;CPQ_LT_TEST;CPQ_RAM;1;;enum;false;false;true;;
+
+#################################################################################
+# Assign cpq_laptop class to product
+#################################################################################
+$categoriesForAssignment=source(code, $classCatalogVersion)[unique=true]
+$productsForAssignment=target(code, $catalogVersion)[unique=true]
+INSERT_UPDATE CategoryProductRelation;$productsForAssignment;$categoriesForAssignment;
+;CPQ_LAPTOP;CPQ_LT_TEST;

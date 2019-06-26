@@ -1,0 +1,42 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=testContentCatalog
+$languages=en,de
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+
+# Content catalog for CMS contents
+INSERT_UPDATE ContentCatalog;id[unique=true]
+;$contentCatalog
+
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;languages(isoCode)
+;$contentCatalog;Staged;false;$languages
+;$contentCatalog;Online;true;$languages
+
+INSERT_UPDATE PromotionGroup;identifier[unique=true]
+;website1
+
+INSERT_UPDATE BaseStore	; uid[unique=true]	; catalogs(id)		; currencies(isocode)               ; net            ; taxGroup(code)            ; storelocatorDistanceUnit(code) ; defaultCurrency(isocode) ; languages(isocode)       ; defaultLanguage(isocode) ; deliveryCountries(isocode) ; solrFacetSearchConfiguration(name) ; submitOrderProcessCode ; paymentProvider ;checkoutFlowGroup
+                        ; testStore         ; $contentCatalog   ; $defaultCurrency                  ; false          ;                           ; km                             ; $defaultCurrency         ; $defaultLanguage         ; $defaultLanguage         ; $deliveryCountries         ;                                    ; order-process          ; Mockup          ;defaultCheckoutGroup
+
+INSERT_UPDATE CMSSite	; uid[unique=true] ; stores(uid)        ; defaultPromotionGroup(Identifier)	; channel(code)	 ; urlEncodingAttributes     ; defaultCatalog(id)			  ; contentCatalogs(id)
+                        ; testCmsSite      ; testStore          ; website1                          ; B2C            ; language                  ; $contentCatalog				  ; $contentCatalog
+
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name[lang=en];name[lang=de];description[lang=en];description[lang=de];priority;status(code);website(identifier);conditions
+;rule1;rule1;de-rule1;description1;de-description1;1;PUBLISHED;website1;{"definitionId":"cx_aware_promotion","parameters":{},"children":[]}
+;rule2;rule2;de-rule2;description2;;1;PUBLISHED;website1;
+;rule3;rule3;;description3;de-description3;1;MODIFIED;website1;{"definitionId":"cx_aware_promotion","parameters":{},"children":[]}
+;rule4;rule4;;description4;;1;ARCHIVED;website1;

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.b2bcommercefacades.search.data.BudgetSearchStateData" extends="de.hybris.platform.commercefacades.search.data.SearchStateData">
+		<property name="costCenterCode" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitNodeData">
+		<!--<description>POJO representation of search query pagination.</description>-->
+		<property name="id" type="String"/>
+		<property name="name" type="String"/>
+		<property name="parent" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="children" type="java.util.List&lt;B2BUnitNodeData>"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.UserData" extends="de.hybris.platform.commercefacades.user.data.CustomerData" deprecated="Since 6.1. Use {@link CustomerData} instead." >
+		<description>B2B specific user data bean.</description>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.user.data.AddressData">
+		<property name="editable" type="boolean"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData">
+		<property name="budget" type="java.math.BigDecimal"/>
+		<property name="unit" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="code" type="String"/>
+		<property name="name" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="active" type="boolean"/>
+		<property name="costCenters" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData>"/>
+		<property name="costCenterNames" type="java.util.List&lt;String>"/>
+		<property name="startDate" type="java.util.Date"/>
+		<property name="endDate" type="java.util.Date"/>
+		<property name="selected" type="boolean"/>
+		<property name="originalCode" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData">
+		<property name="unit" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="code" type="String"/>
+		<property name="originalCode" type="String"/>
+		<property name="name" type="String"/>
+		<property name="currency" type="de.hybris.platform.commercefacades.storesession.data.CurrencyData"/>
+		<property name="active" type="boolean"/>
+		<property name="b2bBudgetData" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData>"/>
+		<property name="selected" type="boolean"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.user.data.CustomerData" extends="de.hybris.platform.commercefacades.user.data.PrincipalData">
+		<property name="normalizedUid" type="String"/>
+		<property name="unit" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="email" type="String"/>
+		<property name="contactNumber" type="String"/>
+		<property name="active" type="boolean"/>
+		<property name="selected" type="boolean"/>
+		<property name="roles" type="java.util.Collection&lt;String>"/>
+		<property name="displayRoles" type="java.util.Collection&lt;String>"/>
+		<property name="permissionGroups" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData>"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData" extends="de.hybris.platform.commercefacades.user.data.CompanyData">
+		<property name="unit" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="active" type="boolean"/>
+		<property name="selected" type="boolean"/>
+		<property name="selectable" type="boolean"/>
+		<property name="reportingOrganization" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="budgets" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData>"/>
+		<property name="orders" type="java.util.Collection&lt;de.hybris.platform.commercefacades.order.data.AbstractOrderData>"/>
+		<property name="costCenters" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData>"/>
+		<property name="userGroups" type="java.util.Collection&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData>"/>
+		<property name="accountManagerGroups" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.UserGroupData>"/>
+		<property name="children" type="java.util.List&lt;de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData>"/>
+		<property name="administrators" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="customers" type="java.util.Collection&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="managers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.CustomerData>"/>
+		<property name="accountManagers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.PrincipalData>"/>
+		<property name="addresses" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.AddressData>"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BSelectionData">
+		<property name="id" type="String"/>
+		<property name="selected" type="boolean"/>
+		<property name="active" type="boolean"/>
+		<property name="roles" type="java.util.List&lt;String>"/>
+		<property name="displayRoles" type="java.util.List&lt;String>"/>
+		<property name="normalizedCode" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData" extends="de.hybris.platform.commercefacades.user.data.UserGroupData">
+		<property name="roles" type="java.util.List&lt;String>"/>
+		<property name="unit" type="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData"/>
+		<property name="selected" type="boolean"/>
+		<property name="normalizedId" type="String"/>
+		<property name="editable" type="boolean"/>
+	</bean>
+</beans>

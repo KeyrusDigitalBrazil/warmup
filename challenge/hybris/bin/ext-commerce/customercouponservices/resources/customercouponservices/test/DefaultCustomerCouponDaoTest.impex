@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+$primaryKieBase=primary-kie-base
+
+INSERT_UPDATE PromotionGroup;identifier[unique=true]
+;website1
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name[lang=en];description[lang=en];priority;status(code);website(identifier);startDate[default=01-01-2000,dateformat=dd-MM-yyyy];endDate[default=01-01-2099,dateformat=dd-MM-yyyy];
+;rule1;rule1;description1;1;PUBLISHED;website1
+;rule2;rule2;description2;1;PUBLISHED;website1
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;primary-kie-module;primary-kie-module;primary-kie-module;1.0.0;PROMOTION;true;0;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;$primaryKieBase;primary-kie-module;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsRule;uuid[unique=true];code;sourceRule(code);kieBase(name)[default=$primaryKieBase];ruleType(code)[default=PROMOTION];version[default=0];active[default=true]
+;drools_rule_1;drools_rule_1;rule1
+;drools_rule_2;drools_rule_2;rule2
+
+INSERT_UPDATE RuleBasedPromotion;code[unique=true];rule(uuid)
+;promotion1;drools_rule_1
+;promotion2;drools_rule_2
+
+INSERT_UPDATE CustomerCoupon;couponId(id)[unique=true];startDate[default=01-05-2017,dateformat=dd-MM-yyyy];endDate[default=01-05-2020,dateformat=dd-MM-yyyy];active[default=true]
+;customerCouponCode1
+
+INSERT_UPDATE CustomerCouponForPromotionSourceRule;customerCouponCode[unique=true];rule(code)[unique=true];promotion(code)
+;customerCouponCode1;rule1;promotion1
+;customerCouponCode2;rule2;promotion2
+
+INSERT_UPDATE CatForPromotionSourceRule;categoryCode[unique=true];rule(code)[unique=true];promotion(code)
+;576;rule1;promotion1
+
+INSERT_UPDATE ExcludedCatForRule;categoryCode[unique=true];rule(code)[unique=true]
+;576;rule1
+
+INSERT_UPDATE ProductForPromotionSourceRule;productCode[unique=true];rule(code)[unique=true];promotion(code)
+;111111;rule1;promotion1
+
+INSERT_UPDATE ExcludedProductForRule;productCode[unique=true];rule(code)[unique=true]
+;111111;rule1
+
+INSERT_UPDATE CustomerCoupon;couponId[unique=true];name[lang=en];active;assignable
+;tesinasm;Test in ASM;true;true
+;tesinasm2;Test in ASM 2;true;true
+
+INSERT_UPDATE Customer;uid[unique=true];customerCoupons(couponId)
+;testcustomerinasm;tesinasm
+

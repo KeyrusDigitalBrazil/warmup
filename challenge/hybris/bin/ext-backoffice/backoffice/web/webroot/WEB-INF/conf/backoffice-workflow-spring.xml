@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:cng="http://www.hybris.com/cockpitng/spring"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+    <context:annotation-config/>
+
+    <alias name="defaultWorkflowFacade" alias="workflowFacade"/>
+    <bean id="defaultWorkflowFacade" class="com.hybris.backoffice.workflow.impl.DefaultWorkflowFacade" parent="defaultCoreWorkflowFacade">
+        <property name="workflowActionService" ref="workflowActionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="workflowsTypeFacade" ref="workflowsTypeFacade"/>
+        <property name="objectFacade" ref="objectFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowSearchPageable" alias="workflowSearchPageable"/>
+    <bean name="defaultWorkflowSearchPageable" class="com.hybris.backoffice.workflow.impl.WorkflowSearchPageable"
+          scope="prototype">
+        <constructor-arg name="searchData">
+            <null/>
+        </constructor-arg>
+        <property name="workflowService" ref="newestWorkflowService"/>
+    </bean>
+
+	<alias name="defaultWorkflowDecisionMaker" alias="workflowDecisionMaker" />
+	<bean id="defaultWorkflowDecisionMaker" class="com.hybris.backoffice.workflow.impl.DefaultWorkflowDecisionMaker">
+		<property name="workflowProcessingService" ref="workflowProcessingService" />
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowEventPublisher" alias="workflowEventPublisher"/>
+    <bean id="defaultWorkflowEventPublisher" class="com.hybris.backoffice.workflow.impl.DefaultWorkflowEventPublisher">
+        <property name="eventPublisher" ref="eventPublisher"/>
+    </bean>
+
+    <alias name="defaultAbstractWorkflowsTabRenderer" alias="abstractWorkflowsTabRenderer"/>
+    <bean name="defaultAbstractWorkflowsTabRenderer" abstract="true">
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+    <alias name="defaultRunningWorkflowsTabRenderer" alias="runningWorkflowRenderer"/>
+    <bean id="defaultRunningWorkflowsTabRenderer" parent="abstractWorkflowsTabRenderer"
+          class="com.hybris.backoffice.widgets.workflows.renderer.DefaultRunningWorkflowsRenderer">
+        <property name="threeDotsRenderer" ref="workflowSidebarMenuContainerRenderer"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="uiDateRendererProvider" ref="uiDateRendererProvider"/>
+    </bean>
+
+    <alias name="dashboardRunningWorkflowsRenderer" alias="dashboardRunningWorkflowsRenderer"/>
+    <bean id="dashboardRunningWorkflowsRenderer" parent="defaultRunningWorkflowsTabRenderer"
+          class="com.hybris.backoffice.widgets.workflows.renderer.DashboardRunningWorkflowsRenderer" />
+
+	<alias name="defaultPlannedWorkflowsTabRenderer" alias="plannedWorkflowRenderer" />
+	<bean id="defaultPlannedWorkflowsTabRenderer" parent="abstractWorkflowsTabRenderer"
+		class="com.hybris.backoffice.widgets.workflows.renderer.DefaultPlannedWorkflowsRenderer">
+		<property name="dragAndDropStrategy" ref="collaborationViewDnD" />
+		<property name="threeDotsRenderer" ref="workflowSidebarMenuContainerRenderer" />
+		<property name="workflowStartActionExecutor" ref="workflowStartActionExecutor" />
+		<property name="objectFacade" ref="objectFacade" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowActionsRenderer" alias="workflowActionsRenderer"/>
+    <bean id="defaultWorkflowActionsRenderer"
+          class="com.hybris.backoffice.widgets.workflowactions.renderer.DefaultWorkflowActionsRenderer">
+        <property name="timeService" ref="timeService"/>
+        <property name="uiDateRendererProvider" ref="uiDateRendererProvider"/>
+        <property name="labelService" ref="labelService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="i18NService" ref="i18NService"/>
+    </bean>
+
+    <alias name="dashboardWorkflowActionsRenderer" alias="dashboardWorkflowActionsRenderer"/>
+    <bean id="dashboardWorkflowActionsRenderer" parent="defaultWorkflowActionsRenderer"
+          class="com.hybris.backoffice.widgets.workflowactions.renderer.DashboardWorkflowActionsRenderer" />
+
+    <alias name="defaultCollaborationViewDnD" alias="collaborationViewDnD"/>
+    <bean id="defaultCollaborationViewDnD" class="com.hybris.backoffice.cockpitng.dnd.DefaultDragAndDropStrategy"
+          init-method="initialize" parent="abstractDnDStrategy" lazy-init="true">
+        <property name="performSystemValidation" value="false"/>
+        <property name="handlerMap">
+            <map>
+                <entry key="Workflow" value-ref="itemToWorkflowDropHandler"/>
+                <entry key="com.hybris.backoffice.workflow.wizard.WorkflowsDropConsumer!"
+                       value-ref="itemToNewWorkflowDropHandler"/>
+            </map>
+        </property>
+    </bean>
+
+	<alias name="defaultItemToWorkflowDropHandler" alias="itemToWorkflowDropHandler" />
+	<bean id="defaultItemToWorkflowDropHandler" class="com.hybris.backoffice.cockpitng.dnd.handlers.ItemToWorkflowDropHandler">
+		<property name="workflowFacade" ref="defaultWorkflowFacade" />
+		<property name="workflowsTypeFacade" ref="workflowsTypeFacade" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultItemToNewWorkflowDropHandler" alias="itemToNewWorkflowDropHandler"/>
+    <bean id="defaultItemToNewWorkflowDropHandler"
+          class="com.hybris.backoffice.cockpitng.dnd.handlers.ItemToNewWorkflowDropHandler">
+        <property name="workflowsTypeFacade" ref="workflowsTypeFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowsTypeFacade" alias="workflowsTypeFacade"/>
+    <bean id="defaultWorkflowsTypeFacade" class="com.hybris.backoffice.workflow.impl.DefaultWorkflowsTypeFacade">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="backofficeTypeUtils" ref="backofficeTypeUtils"/>
+        <property name="permissionFacade" ref="permissionFacade"/>
+        <property name="attachmentTypeCodes">
+            <set value-type="java.lang.String">
+                <value>Product</value>
+                <value>Category</value>
+                <value>AuditReportData</value>
+            </set>
+        </property>
+    </bean>
+
+    <alias name="defaultCollaborationWorkflowWizardForm" alias="collaborationWorkflowWizardForm"/>
+    <bean id="defaultCollaborationWorkflowWizardForm"
+          class="com.hybris.backoffice.workflow.wizard.CollaborationWorkflowWizardForm" scope="prototype"/>
+
+	<alias name="defaultCollaborationWorkflowWizardHandler" alias="collaborationWorkflowWizardHandler" />
+	<bean id="defaultCollaborationWorkflowWizardHandler" class="com.hybris.backoffice.workflow.wizard.CollaborationWorkflowWizardHandler">
+		<property name="workflowFacade" ref="workflowFacade" />
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowTemplateReferenceSearchFacade" alias="workflowTemplateReferenceSearchFacade"/>
+    <bean id="defaultWorkflowTemplateReferenceSearchFacade"
+          class="com.hybris.backoffice.workflow.WorkflowTemplateReferenceSearchFacade">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowAssigneeReferenceSearchFacade" alias="workflowAssigneeReferenceSearchFacade"/>
+    <bean id="defaultWorkflowAssigneeReferenceSearchFacade"
+          class="com.hybris.backoffice.workflow.WorkflowAssigneeReferenceSearchFacade">
+        <property name="permissionManagementService" ref="permissionManagementService"/>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <alias name="defaultWorkflowAttachmentTypeReferenceSearchFacade"
+           alias="workflowAttachmentTypeReferenceSearchFacade"/>
+    <bean id="defaultWorkflowAttachmentTypeReferenceSearchFacade"
+          class="com.hybris.backoffice.workflow.WorkflowAttachmentTypeReferenceSearchFacade">
+        <property name="workflowsTypeFacade" ref="workflowsTypeFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowActionMenuContainerRenderer" alias="workflowActionMenuContainerRenderer"/>
+    <bean id="defaultWorkflowActionMenuContainerRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowActionMenuContainerRenderer">
+        <property name="actionRenderers">
+            <list>
+                <ref bean="workflowActionDecisionListSubMenuRenderer"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultOverviewWorkflowMenuContainerRenderer" alias="workflowOverviewMenuContainerRenderer"/>
+    <bean id="defaultOverviewWorkflowMenuContainerRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowMenuContainerRenderer">
+        <property name="actionRenderers">
+            <list>
+                <ref bean="workflowStartActionRenderer"/>
+                <ref bean="workflowDeleteActionRenderer"/>
+                <ref bean="workflowTerminateActionRenderer"/>
+                <ref bean="workflowShowFlowActionRenderer"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultSidebarWorkflowMenuContainerRenderer" alias="workflowSidebarMenuContainerRenderer"/>
+    <bean id="defaultSidebarWorkflowMenuContainerRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowMenuContainerRenderer">
+        <property name="actionRenderers">
+            <list>
+                <ref bean="workflowDeleteActionRenderer"/>
+                <ref bean="workflowTerminateActionRenderer"/>
+                <ref bean="workflowShowFlowActionRenderer"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultWorkflowStartActionRenderer" alias="workflowStartActionRenderer"/>
+    <bean id="defaultWorkflowStartActionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowStartActionRenderer">
+        <property name="actionPredicate" ref="startWorkflowPredicate"/>
+        <property name="workflowStartActionExecutor" ref="workflowStartActionExecutor"/>
+    </bean>
+
+    <alias name="defaultWorkflowShowFlowActionRenderer" alias="workflowShowFlowActionRenderer"/>
+    <bean id="defaultWorkflowShowFlowActionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowShowFlowActionRenderer"/>
+
+    <alias name="defaultWorkflowShowFlowViewRenderer" alias="workflowShowFlowViewRenderer"/>
+    <bean id="defaultWorkflowShowFlowViewRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowShowFlowViewRenderer"/>
+
+	<alias name="defaultWorkflowStartActionExecutor" alias="workflowStartActionExecutor" />
+	<bean id="defaultWorkflowStartActionExecutor" class="com.hybris.backoffice.workflow.renderer.actionexecutors.WorkflowStartActionExecutor">
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="workflowFacade" ref="workflowFacade" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowDeleteActionRenderer" alias="workflowDeleteActionRenderer"/>
+    <bean id="defaultWorkflowDeleteActionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowDeleteActionRenderer">
+        <property name="workflowDeleteActionExecutor" ref="workflowDeleteActionExecutor"/>
+        <property name="actionPredicate" ref="deleteWorkflowPredicate"/>
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+	<alias name="defaultWorkflowDeleteActionExecutor" alias="workflowDeleteActionExecutor" />
+	<bean id="defaultWorkflowDeleteActionExecutor" class="com.hybris.backoffice.workflow.renderer.actionexecutors.WorkflowDeleteActionExecutor">
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="workflowFacade" ref="workflowFacade" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowTerminateActionRenderer" alias="workflowTerminateActionRenderer"/>
+    <bean id="defaultWorkflowTerminateActionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowTerminateActionRenderer">
+        <property name="workflowTerminateActionExecutor" ref="workflowTerminateActionExecutor"/>
+        <property name="actionPredicate" ref="terminateWorkflowPredicate"/>
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+	<alias name="defaultWorkflowTerminateActionExecutor" alias="workflowTerminateActionExecutor" />
+	<bean id="defaultWorkflowTerminateActionExecutor" class="com.hybris.backoffice.workflow.renderer.actionexecutors.WorkflowTerminateActionExecutor">
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="workflowFacade" ref="workflowFacade" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultStartWorkflowPredicate" alias="startWorkflowPredicate"/>
+    <bean id="defaultStartWorkflowPredicate"
+          class="com.hybris.backoffice.workflow.renderer.predicates.StartWorkflowActionPredicate">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultDeleteWorkflowPredicate" alias="deleteWorkflowPredicate"/>
+    <bean id="defaultDeleteWorkflowPredicate"
+          class="com.hybris.backoffice.workflow.renderer.predicates.DeleteWorkflowActionPredicate">
+        <property name="workflowFacade" ref="workflowFacade"/>
+        <property name="permissionFacade" ref="permissionFacade"/>
+    </bean>
+
+    <alias name="defaultTerminateWorkflowPredicate" alias="terminateWorkflowPredicate"/>
+    <bean id="defaultTerminateWorkflowPredicate"
+          class="com.hybris.backoffice.workflow.renderer.predicates.TerminateWorkflowActionPredicate">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultDecisionWorkflowPredicate" alias="decisionWorkflowPredicate"/>
+    <bean id="defaultDecisionWorkflowPredicate"
+          class="com.hybris.backoffice.workflow.renderer.predicates.DecisionWorkflowActionPredicate"/>
+
+    <bean id="abstractWorkflowActionDecisionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.AbstractWorkflowActionDecisionRenderer" abstract="true">
+        <property name="labelService" ref="labelService"/>
+        <property name="workflowDecisionMaker" ref="workflowDecisionMaker"/>
+    </bean>
+
+    <alias name="defaultWorkflowActionDecisionListSubMenuRenderer" alias="workflowActionDecisionListSubMenuRenderer"/>
+    <bean id="defaultWorkflowActionDecisionListSubMenuRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowActionDecisionListSubMenuRenderer">
+        <property name="workflowActionDecisionMenuitemRenderer" ref="defaultWorkflowActionDecisionMenuitemRenderer"/>
+        <property name="predicate" ref="decisionWorkflowPredicate"/>
+    </bean>
+
+    <alias name="defaultWorkflowActionDecisionMenuitemRenderer" alias="workflowActionDecisionMenuitemRenderer"/>
+    <bean id="defaultWorkflowActionDecisionMenuitemRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowActionDecisionMenuitemRenderer"
+          parent="abstractWorkflowActionDecisionRenderer">
+        <property name="labelService" ref="labelService"/>
+        <property name="permissionFacade" ref="permissionFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowAttachmentMenuContainerRenderer" alias="workflowAttachmentMenuContainerRenderer"/>
+    <bean id="defaultWorkflowAttachmentMenuContainerRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowAttachmentMenuContainerRenderer">
+        <property name="actionRenderers">
+            <list>
+                <ref bean="workflowAttachmentDeleteActionRenderer"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultWorkflowAttachmentDeleteActionRenderer" alias="workflowAttachmentDeleteActionRenderer"/>
+    <bean id="defaultWorkflowAttachmentDeleteActionRenderer"
+          class="com.hybris.backoffice.workflow.renderer.WorkflowAttachmentDeleteActionRenderer">
+        <property name="workflowAttachmentDeleteActionExecutor" ref="workflowAttachmentDeleteActionExecutor"/>
+        <property name="actionPredicate" ref="workflowAttachmentDeletePredicate"/>
+    </bean>
+
+	<alias name="defaultWorkflowAttachmentDeleteActionExecutor" alias="workflowAttachmentDeleteActionExecutor" />
+	<bean id="defaultWorkflowAttachmentDeleteActionExecutor" class="com.hybris.backoffice.workflow.renderer.actionexecutors.WorkflowAttachmentDeleteActionExecutor">
+		<property name="objectFacade" ref="objectFacade" />
+		<property name="workflowEventPublisher" ref="workflowEventPublisher" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+    <alias name="defaultWorkflowAttachmentDeletePredicate" alias="workflowAttachmentDeletePredicate"/>
+    <bean id="defaultWorkflowAttachmentDeletePredicate"
+          class="com.hybris.backoffice.workflow.renderer.predicates.DeleteWorkflowAttachmentActionPredicate">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowDetailsSummaryAttachementsRenderer" alias="workflowDetailsSummaryAttachementsRenderer"/>
+    <bean id="defaultWorkflowDetailsSummaryAttachementsRenderer"
+          parent="abstractSummaryViewItemWithIconRenderer"
+          class="com.hybris.backoffice.widgets.workflowdetails.renderer.DefaultWorkflowDetailsSummaryAttachementsRenderer">
+    </bean>
+
+    <alias name="defaultWorkflowDetailsSummaryCurrentTasksRenderer" alias="workflowDetailsSummaryCurrentTasksRenderer"/>
+    <bean id="defaultWorkflowDetailsSummaryCurrentTasksRenderer"
+          parent="abstractSummaryViewItemWithIconRenderer"
+          class="com.hybris.backoffice.widgets.workflowdetails.renderer.DefaultWorkflowDetailsSummaryCurrentTasksRenderer">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowDetailsSummaryFlowRenderer" alias="workflowDetailsSummaryFlowRenderer"/>
+    <bean id="defaultWorkflowDetailsSummaryFlowRenderer"
+          parent="abstractSummaryViewItemWithIconRenderer"
+          class="com.hybris.backoffice.widgets.workflowdetails.renderer.DefaultWorkflowDetailsSummaryFlowRenderer">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowDetailsSummaryStatusRenderer" alias="workflowDetailsSummaryStatusRenderer"/>
+    <bean id="defaultWorkflowDetailsSummaryStatusRenderer"
+          parent="abstractSummaryViewItemWithIconRenderer"
+          class="com.hybris.backoffice.widgets.workflowdetails.renderer.DefaultWorkflowDetailsSummaryStatusRenderer">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowStartedTimeEditorRenderer" alias="workflowStartedTimeEditorRenderer"/>
+    <bean id="defaultWorkflowStartedTimeEditorRenderer"
+          class="com.hybris.backoffice.widgets.workflowdetails.renderer.DefaultWorkflowStartedTimeEditorRenderer">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowActionsForWorkflowAdvancedSearchInitializer"
+           alias="workflowActionsForWorkflowAdvancedSearchInitializer"/>
+    <bean id="defaultWorkflowActionsForWorkflowAdvancedSearchInitializer"
+          class="com.hybris.backoffice.widgets.searchadapters.workflows.WorkflowActionsForWorkflowAdvancedSearchInitializer"/>
+
+    <cng:list-extender bean="fixedBeanResolver" property="availableBeanNames">
+        <cng:add value-type="java.lang.String">
+            <value>typeFacade</value>
+        </cng:add>
+    </cng:list-extender>
+
+    <alias name="defaultWorkflowActivationService" alias="workflowTemplateActivationService"/>
+    <bean id="defaultWorkflowActivationService"
+          class="com.hybris.backoffice.workflow.impl.DefaultWorkflowTemplateActivationService">
+        <property name="scriptEvaluationService" ref="scriptEvaluationService"/>
+        <property name="localizationService" ref="localizationService"/>
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="workflowActivationSupportedTypes" ref="backofficeWorkflowTemplateActivationSupportedTypes"/>
+    </bean>
+
+    <alias name="defaultWorkflowItemModelFactory" alias="workflowItemModelFactory"/>
+    <bean name="defaultWorkflowItemModelFactory" class="com.hybris.backoffice.workflow.WorkflowItemModelFactory">
+        <property name="localeService" ref="cockpitLocaleService"/>
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+    <alias name="defaultWorkflowNetworkFactory" alias="workflowNetworkFactory"/>
+    <bean name="defaultWorkflowNetworkFactory" class="com.hybris.backoffice.workflow.WorkflowNetworkFactory">
+        <property name="workflowItemModelFactory" ref="workflowItemModelFactory"/>
+    </bean>
+
+    <alias name="defaultWorkflowItemFromModelExtractor" alias="workflowItemFromModelExtractor"/>
+    <bean name="defaultWorkflowItemFromModelExtractor" class="com.hybris.backoffice.workflow.WorkflowItemFromModelExtractor">
+        <property name="workflowItemModelFactory" ref="workflowItemModelFactory"/>
+    </bean>
+
+    <alias name="defaultWorkflowItemFromTemplateModelExtractor" alias="workflowItemFromTemplateModelExtractor"/>
+    <bean name="defaultWorkflowItemFromTemplateModelExtractor" class="com.hybris.backoffice.workflow.WorkflowItemFromTemplateModelExtractor">
+        <property name="workflowItemModelFactory" ref="workflowItemModelFactory"/>
+    </bean>
+
+    <alias name="defaultWorkflowModelPopulator" alias="workflowModelPopulator"/>
+    <bean name="defaultWorkflowModelPopulator" class="com.hybris.backoffice.workflow.WorkflowPopulator">
+        <property name="workflowItemExtractor" ref="workflowItemFromModelExtractor"/>
+        <property name="workflowNetworkFactory" ref="workflowNetworkFactory"/>
+    </bean>
+
+    <alias name="defaultWorkflowTemplateModelPopulator" alias="workflowTemplateModelPopulator"/>
+    <bean name="defaultWorkflowTemplateModelPopulator" class="com.hybris.backoffice.workflow.WorkflowPopulator">
+        <property name="workflowItemExtractor" ref="workflowItemFromTemplateModelExtractor"/>
+        <property name="workflowNetworkFactory" ref="workflowNetworkFactory"/>
+    </bean>
+
+    <alias name="defaultBackofficeWorkflowTemplateActivationSupportedTypes"
+           alias="backofficeWorkflowTemplateActivationSupportedTypes"/>
+    <util:set value-type="java.lang.String" id="defaultBackofficeWorkflowTemplateActivationSupportedTypes">
+        <value>Product</value>
+    </util:set>
+
+</beans>

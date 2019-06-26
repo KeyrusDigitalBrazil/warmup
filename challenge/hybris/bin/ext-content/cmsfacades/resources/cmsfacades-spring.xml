@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/util
+				http://www.springframework.org/schema/util/spring-util-4.0.xsd
+           	http://www.springframework.org/schema/context
+           	http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="de.hybris.platform.cmsfacades"
+			scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	<import resource="config/cmsfacades-structuretypes-spring.xml" />
+	<import resource="config/cmsfacades-predicate-spring.xml" />
+	<import resource="config/cmsfacades-attribute-predicate-spring.xml" />
+	<import resource="config/cmsfacades-validator-spring.xml" />
+	<import resource="config/cmsfacades-localization-spring.xml" />
+	<import resource="config/cmsfacades-component-items-spring.xml" />
+	<import resource="config/cmsfacades-page-spring.xml" />
+	<import resource="config/cmsfacades-page-validator-spring.xml" />
+	<import resource="config/cmsfacades-navigation-spring.xml" />
+	<import resource="config/cmsfacades-restriction-spring.xml" />
+	<import resource="config/cmsfacades-navigation-entry-spring.xml" />
+	<import resource="config/cmsfacades-products-spring.xml" />
+	<import resource="config/cmsfacades-uniqueidentifier-spring.xml" />
+	<import resource="config/cmsfacades-user-spring.xml" />
+	<import resource="config/cmsfacades-usergroup-spring.xml" />
+	<import resource="config/cmsfacades-synchronization-spring.xml" />
+	<import resource="config/cmsfacades-cmsitems-spring.xml" />
+	<import resource="config/cmsfacades-media-container-spring.xml" />
+	<import resource="config/cmsfacades-rendering-spring.xml" />
+	<import resource="config/cmsfacades-rendering-suppliers-spring.xml" />
+	<import resource="config/cmsfacades-rendering-validators-spring.xml" />
+	<import resource="config/cmsfacades-rendering-converters-spring.xml" />
+	<import resource="config/cmsfacades-version-spring.xml" />
+	
+
+	<!-- Common Helpers -->
+	
+	<bean id="locationHeaderResource" class="de.hybris.platform.cmsfacades.header.LocationHeaderResource" />
+	
+	<bean id="cmsSearchResultConverter" class="de.hybris.platform.cmsfacades.common.service.impl.DefaultSearchResultConverter" />
+	
+	<bean id="cmsProductCatalogItemModelFinder" class="de.hybris.platform.cmsfacades.common.service.impl.DefaultProductCatalogItemModelFinder">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+					 	
+	<!-- Common Populators and Converters -->
+	<bean id="composedTypeModelPopulator" class="de.hybris.platform.cmsfacades.common.populator.impl.ComposedTypeModelPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+
+
+	<!-- Prototype DTOs and ObjectFactory beans -->
+	<alias name="cmsComponentTypeData" alias="componentTypeData" />
+	<bean id="cmsComponentTypeData" class="de.hybris.platform.cmsfacades.data.ComponentTypeData" scope="prototype"/>
+	<bean id="componentTypeDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="componentTypeData" />
+	</bean>
+
+	<alias name="cmsComponentTypeAttributeData" alias="componentTypeAttributeData" />
+	<bean id="cmsComponentTypeAttributeData" class="de.hybris.platform.cmsfacades.data.ComponentTypeAttributeData" scope="prototype" />
+	<bean id="componentTypeAttributeDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="componentTypeAttributeData" />
+	</bean>
+	
+	<alias name="defaultItemData" alias="cmsItemData" />
+	<bean id="defaultItemData" class="de.hybris.platform.cmsfacades.data.ItemData" scope="prototype" />
+	<bean id="cmsItemDataDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="cmsItemData" />
+	</bean>
+
+	<alias name="defaultEncodedItemComposedKey" alias="encodedItemComposedKeyPrototype" />
+	<bean id="defaultEncodedItemComposedKey" class="de.hybris.platform.cmsfacades.uniqueidentifier.EncodedItemComposedKey" scope="prototype" />
+	<bean id="encodedItemComposedKeyFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="encodedItemComposedKeyPrototype" />
+	</bean>
+	
+	<alias name="defaultCMSVersionData" alias="cmsVersionData" />
+	<bean id="defaultCMSVersionData" class="de.hybris.platform.cmsfacades.data.CMSVersionData" scope="prototype"/>
+	<bean id="cmsVersionDataDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="cmsVersionData" />
+	</bean>
+
+	<!-- Facades -->
+
+	<alias name="defaultLanguageFacade" alias="languageFacade" />
+	<bean id="defaultLanguageFacade" class="de.hybris.platform.cmsfacades.languages.impl.DefaultLanguageFacade">
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+		<property name="commonI18NService" ref="commonI18NService" /> <!-- deprecated since 1808, not needed anymore -->
+	</bean>
+
+	<alias name="defaultCatalogVersionCentricLanguageFacade" alias="catalogVersionCentricLanguageFacade" />
+	<bean id="defaultCatalogVersionCentricLanguageFacade" class="de.hybris.platform.cmsfacades.languages.impl.DefaultCatalogVersionCentricLanguageFacade">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="languageConverter" ref="languageConverter" />
+	</bean>
+
+
+	<alias name="defaultMediaFacade" alias="mediaFacade" />
+	<bean id="defaultMediaFacade" class="de.hybris.platform.cmsfacades.media.impl.DefaultMediaFacade">
+		<property name="mediaService" ref="mediaService" />
+		<property name="modelService" ref="modelService" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="namedQueryService" ref="flexibleSearchNamedQueryService" />
+		<property name="namedQueryDataValidator" ref="namedQueryDataValidator" />
+		<property name="mediaModelConverter" ref="mediaModelConverter" />
+		<property name="mediaNamedQueryConverter" ref="mediaNamedQueryConverter" />
+		<property name="adminSiteService" ref="cmsAdminSiteService" />
+		<property name="createMediaPopulator" ref="createMediaPopulator" />
+		<property name="createMediaFilePopulator" ref="createMediaFilePopulator" />
+		<property name="createMediaValidator" ref="createMediaValidator" />
+		<property name="createMediaFileValidator" ref="createMediaFileValidator" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<!-- Synchronization Facade -->
+	<alias name="defaultSynchronizationFacade" alias="synchronizationFacade" />
+	<bean id="defaultSynchronizationFacade" class="de.hybris.platform.cmsfacades.synchronization.impl.DefaultSynchronizationFacade">
+		<property name="syncJobConverter" ref="syncJobConverter" />
+		<property name="syncItemJobToSyncJobDataPopulator" ref="cmsSyncItemJobToSyncJobDataPopulator" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="syncJobRequestCompositeValidator" ref="syncJobRequestCompositeValidator" />
+		<property name="basicSyncJobRequestCompositeValidator" ref="cmsBasicSyncJobRequestCompositeValidator" />
+		<property name="catalogSynchronizationCompositeValidator" ref="cmsCatalogSynchronizationCompositeValidator" />
+		<property name="cronJobService" ref="cronJobService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<!-- Synchronization Validators -->
+	<alias name="cmsCreateCatalogSynchronizationValidator" alias="createCatalogSynchronizationValidator" />
+	<bean id="cmsCreateCatalogSynchronizationValidator" class="de.hybris.platform.cmsfacades.synchronization.validator.CreateCatalogSynchronizationValidator" parent="cmsCatalogSynchronizationValidator">
+		<description>deprecated since 1811, please use cmsCatalogSynchronizationValidator instead</description>
+	</bean>
+
+	<alias name="catalogSynchronizationValidator" alias="cmsCatalogSynchronizationValidator" />
+	<bean id="catalogSynchronizationValidator" class="de.hybris.platform.cmsfacades.synchronization.validator.CatalogSynchronizationValidator">
+		<property name="userService" ref="userService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="catalogSynchronizationService" ref="catalogSynchronizationService" />
+	</bean>
+
+	<alias name="defaultSyncJobRequestCompositeValidator" alias="syncJobRequestCompositeValidator" />
+	<bean id="defaultSyncJobRequestCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="defaultSyncJobRequestValidator" />
+				<ref bean="syncJobRequestSourceValidator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="basicSyncJobRequestCompositeValidator" alias="cmsBasicSyncJobRequestCompositeValidator" />
+	<bean id="basicSyncJobRequestCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="defaultSyncJobRequestValidator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="cmsCreateCatalogSynchronizationCompositeValidator" alias="createCatalogSynchronizationCompositeValidator" />
+	<bean id="cmsCreateCatalogSynchronizationCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator" parent="cmsCatalogSynchronizationCompositeValidator">
+		<description>deprecated since 1811, please use cmsCatalogSynchronizationCompositeValidator instead</description>
+	</bean>
+
+	<alias name="catalogSynchronizationCompositeValidator" alias="cmsCatalogSynchronizationCompositeValidator" />
+	<bean id="catalogSynchronizationCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="defaultSyncJobRequestValidator" />
+				<ref bean="cmsCatalogSynchronizationValidator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPageContentSlotTypeRestrictionsFacade" alias="pageContentSlotTypeRestrictionsFacade" />
+	<bean id="defaultPageContentSlotTypeRestrictionsFacade"
+		class="de.hybris.platform.cmsfacades.pagescontentslotstyperestrictions.impl.DefaultPageContentSlotTypeRestrictionsFacade">
+		<property name="cmsAdminTypeRestrictionsService" ref="cmsAdminTypeRestrictionsService" />
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="catalogLevelService" ref="cmsCatalogLevelService" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler"/>
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<alias name="defaultPageContentSlotComponentFacade" alias="pageContentSlotComponentFacade" />
+	<bean id="defaultPageContentSlotComponentFacade" class="de.hybris.platform.cmsfacades.pagescontentslotscomponents.impl.DefaultPageContentSlotComponentFacade">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="adminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="adminComponentService" ref="cmsAdminComponentService" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="createPageContentSlotComponentCompositeValidator" ref="createPageContentSlotComponentCompositeValidator" />
+		<property name="updatePageContentSlotComponentValidator" ref="updatePageContentSlotComponentValidator" />
+		<property name="componentExistsInSlotValidator" ref="componentExistsInSlotValidator" />
+		<property name="transactionManager" ref="txManager" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler"/>
+	</bean>
+
+	<alias name="defaultPageContentSlotContainerFacade" alias="cmsPageContentSlotContainerFacade" />
+	<bean id="defaultPageContentSlotContainerFacade" class="de.hybris.platform.cmsfacades.pagescontentslotscontainers.impl.DefaultPageContentSlotContainerFacade">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="adminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="adminComponentService" ref="cmsAdminComponentService" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler"/>
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultCmsSiteFacade" alias="siteFacade" />
+	<bean id="defaultCmsSiteFacade" class="de.hybris.platform.cmsfacades.sites.impl.DefaultSiteFacade">
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsSiteModelConverter" ref="cmsSiteModelConverter" />
+		<property name="siteDataComparator" ref="siteDataComparator" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="userService" ref="userService" />
+		<property name="cmsContentCatalogLevelComparator" ref="cmsContentCatalogCatalogLevelComparator" />
+
+		<property name="readPermissionRequired" value="${cmsfacades.site.permission.canread}" />
+		<property name="writePermissionRequired" value="${cmsfacades.site.permission.canwrite}" />
+	</bean>
+
+	<alias name="defaultSiteDataComparator" alias="siteDataComparator" />
+	<bean id="defaultSiteDataComparator" class="de.hybris.platform.cmsfacades.sites.SiteDataUidComparator" />
+
+	<alias name="defaultCatalogVersionFacade" alias="catalogVersionFacade" />
+	<bean id="defaultCatalogVersionFacade" class="de.hybris.platform.cmsfacades.catalogversions.impl.DefaultCatalogVersionFacade">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="cmsCatalogVersionConverter" ref="cmsCatalogVersionConverter" />
+		<property name="pageDisplayConditionService" ref="cmsPageDisplayConditionService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<alias name="defaultContentCatalogLevelComparator" alias="cmsContentCatalogCatalogLevelComparator" />
+	<bean id="defaultContentCatalogLevelComparator" class="de.hybris.platform.cmsfacades.catalogversions.comparator.ContentCatalogLevelComparator">
+		<property name="cmsCatalogLevelService" ref="cmsCatalogLevelService" />
+	</bean>
+	
+	<alias name="defaultCmsCatalogModelToDataPopulator" alias="basicCmsCatalogModelToDataPopulator" />
+	<bean id="defaultCmsCatalogModelToDataPopulator" class="de.hybris.platform.cmsfacades.catalogs.populator.CatalogModelToDataPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+	
+	<alias name="defaultCmsPageDisplayConditionService" alias="cmsPageDisplayConditionService" />
+	<bean id="defaultCmsPageDisplayConditionService" class="de.hybris.platform.cmsfacades.catalogversions.service.impl.DefaultPageDisplayConditionService">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsItemSearchTypeBlacklistMap" ref="cmsItemSearchTypeBlacklistMap" />
+		<property name="cmsPageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry" />
+	</bean>
+	
+	<alias name="defaultCmsCatalogVersionPermissionService" alias="cmsCatalogVersionPermissionService" />
+	<bean id="defaultCmsCatalogVersionPermissionService" class="de.hybris.platform.cmsfacades.catalogversions.service.impl.DefaultCatalogVersionPermissionService">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<!-- Media converters & populators -->
+	
+	<alias name="defaultMediaModelConverter" alias="mediaModelConverter" />
+	<bean id="defaultMediaModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.MediaData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicMediaModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCmsBasicMediaModelPopulator" alias="basicMediaModelPopulator" />
+	<bean id="defaultCmsBasicMediaModelPopulator" class="de.hybris.platform.cmsfacades.media.populator.BasicMediaPopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultCreateMediaPopulator" alias="createMediaPopulator" />
+	<bean id="defaultCreateMediaPopulator" class="de.hybris.platform.cmsfacades.media.populator.CreateMediaPopulator">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+	
+	<alias name="defaultCreateMediaFilePopulator" alias="createMediaFilePopulator" />
+	<bean id="defaultCreateMediaFilePopulator" class="de.hybris.platform.cmsfacades.media.populator.CreateMediaFilePopulator">
+	</bean>
+
+
+	<!-- Site converters & populators -->
+	
+	<alias name="defaultSiteThumbnailResolver" alias="siteThumbnailResolver" />
+	<bean id="defaultSiteThumbnailResolver" class="de.hybris.platform.cmsfacades.resolvers.sites.impl.DefaultSiteThumbnailResolver">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+	</bean>
+
+	<alias name="defaultCmsSiteModelConverter" alias="cmsSiteModelConverter" />
+	<bean id="defaultCmsSiteModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.SiteData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSiteModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="cmsSiteModelPopulator" class="de.hybris.platform.cmsfacades.sites.populator.model.SiteModelPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+	</bean>
+
+	<alias name="defaultCatalogVersionConverter" alias="cmsCatalogVersionConverter" />
+	<bean id="defaultCatalogVersionConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CatalogVersionData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsCatalogVersionModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCatalogVersionModelPopulator" alias="cmsCatalogVersionModelPopulator" />
+	<bean id="defaultCatalogVersionModelPopulator" class="de.hybris.platform.cmsfacades.catalogversions.populator.CatalogVersionModelPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+	</bean>
+	
+	<alias name="defaultContentCatalogVersionModelPopulator" alias="cmsContentCatalogVersionModelPopulator" />
+	<bean id="defaultContentCatalogVersionModelPopulator" class="de.hybris.platform.cmsfacades.catalogversions.populator.ContentCatalogVersionModelPopulator">
+		<property name="siteThumbnailResolver" ref="siteThumbnailResolver" />
+		<property name="pageDisplayConditionService" ref="cmsPageDisplayConditionService" />
+	</bean>
+
+	<!-- Comparator -->
+	<alias name="pageNameComparator" alias="cmsPageComparator" />
+	<bean id="pageNameComparator" class="de.hybris.platform.cmsfacades.pages.comparator.PageNameComparator">
+		<description>deprecated since 6.6</description>
+	</bean>
+
+	<!-- Service Strategies -->
+	<alias name="defaultSyncJobConverter" alias="syncJobConverter" />
+	<bean id="defaultSyncJobConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.SyncJobData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="syncJobDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="syncJobDataPopulator" class="de.hybris.platform.cmsfacades.synchronization.populator.SyncJobDataPopulator" />
+
+	<alias name="syncItemJobToSyncJobDataPopulator" alias="cmsSyncItemJobToSyncJobDataPopulator" />
+	<bean id="syncItemJobToSyncJobDataPopulator" class="de.hybris.platform.cmsfacades.synchronization.populator.SyncItemJobToSyncJobDataPopulator" />
+
+	<!-- NamedQueries -->
+	
+	<bean depends-on="namedQueryMap" parent="mapMergeDirective">
+		<property name="key" value="namedQueryMediaSearchByCodeCatalogVersion" />
+		<property name="value" value="SELECT {pk} FROM {Media} WHERE LOWER({code}) LIKE LOWER(?code) AND {catalogVersion} = ?catalogVersion" />
+	</bean>
+	<bean depends-on="namedQueryMap" parent="mapMergeDirective">
+		<property name="key" value="namedQueryRestrictionSearchByName" />
+		<property name="value" value="SELECT {pk} FROM {AbstractRestriction} WHERE LOWER({name}) LIKE LOWER(?name) AND {catalogVersion} = ?catalogVersion AND {itemtype} = ?itemtype" />
+	</bean>
+	<bean depends-on="namedQueryMap" parent="mapMergeDirective">
+		<property name="key" value="namedQueryProductCategoryByText" />
+		<property name="value" value="SELECT {pk} FROM {Category} WHERE ( LOWER({name}) LIKE LOWER(?name) OR LOWER({description}) LIKE LOWER(?description) OR LOWER({code}) LIKE LOWER(?code)) AND {catalogVersion} = ?catalogVersion" />
+	</bean>
+	<bean depends-on="namedQueryMap" parent="mapMergeDirective">
+		<property name="key" value="namedQueryProductByText" />
+		<property name="value" value="SELECT {pk} FROM {Product} WHERE ( LOWER({name}) LIKE LOWER(?name) OR LOWER({description}) LIKE LOWER(?description) OR LOWER({code}) LIKE LOWER(?code)) AND {catalogVersion} = ?catalogVersion" />
+	</bean>
+
+	<alias name="abstractNamedQueryDataPopulator" alias="cmsAbstractNamedQueryDataPopulator" />
+	<bean id="abstractNamedQueryDataPopulator" class="de.hybris.platform.cmsfacades.common.populator.impl.AbstractNamedQueryDataPopulator" abstract="true">
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+	</bean>
+
+	<!-- Media Search -->
+
+	<bean id="basicNamedQueryDataPopulator" class="de.hybris.platform.cmsfacades.media.populator.BasicNamedQueryDataPopulator" />
+
+	<bean id="mediaSearchByCodeNamedQueryDataPopulator" parent="cmsAbstractNamedQueryDataPopulator" 
+		class="de.hybris.platform.cmsfacades.media.populator.MediaSearchByCodeNamedQueryDataPopulator">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<alias alias="mediaNamedQueryConverter" name="defaultMediaNamedQueryConverter" />
+	<bean id="defaultMediaNamedQueryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cms2.namedquery.NamedQuery" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicNamedQueryDataPopulator" />
+				<ref bean="mediaSearchByCodeNamedQueryDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Media Format -->
+	
+	<alias alias="cmsMediaFormatService" name="defaultCmsMediaFormatService" />
+	<bean id="defaultCmsMediaFormatService" class="de.hybris.platform.cmsfacades.media.service.impl.DefaultCMSMediaFormatService">
+		<property name="cmsComponentMediaFormats" ref="cmsComponentMediaFormats" />
+		<property name="cmsMediaFormatDao" ref="cmsMediaFormatDao" />
+	</bean>
+	
+	<alias alias="cmsComponentMediaFormats" name="defaultCmsComponentMediaFormats" />
+	<util:map id="defaultCmsComponentMediaFormats" key-type="java.lang.Class" />
+
+    <!-- PageContentSlot Facade, Converter and Populator -->
+	
+	<alias name="defaultPageContentSlotFacade" alias="pageContentSlotFacade" />
+	<bean id="defaultPageContentSlotFacade" class="de.hybris.platform.cmsfacades.pagescontentslots.impl.DefaultPageContentSlotFacade">
+		<property name="adminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="pageContentSlotConverterRegistry" ref="cmsPageContentSlotConverterRegistry" />
+		<property name="contentSlotDataConverter" ref="cmsContentSlotDataConverter" />
+	</bean>
+	
+	<alias name="defaultPageContentSlotConverterRegistry" alias="cmsPageContentSlotConverterRegistry" />
+	<bean name="defaultPageContentSlotConverterRegistry" class="de.hybris.platform.cmsfacades.pagescontentslots.service.impl.DefaultPageContentSlotConverterRegistry" />
+	
+	<bean id="cmsContentSlotDataConverter" class="de.hybris.platform.cmsfacades.pagescontentslots.converter.ContentSlotDataConverter" />
+	
+	<bean id="cmsContentSlotForPageModelPopulator" class="de.hybris.platform.cmsfacades.pagescontentslots.populator.ContentSlotForPageModelPopulator" />
+	<alias name="defaultContentSlotForPageModelConverter" alias="cmsContentSlotForPageModelConverter" />
+	<bean id="defaultContentSlotForPageModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.PageContentSlotData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsContentSlotForPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	<bean name="cmsContentSlotForPageModelConverterType" class="de.hybris.platform.cmsfacades.pagescontentslots.service.impl.DefaultPageContentSlotConverterType">
+		<property name="classType" value="de.hybris.platform.cms2.model.relations.ContentSlotForPageModel" />
+		<property name="converter" ref="cmsContentSlotForPageModelConverter" />
+	</bean>
+	
+	<bean id="cmsContentSlotForTemplateModelPopulator" class="de.hybris.platform.cmsfacades.pagescontentslots.populator.ContentSlotForTemplateModelPopulator" />
+	<alias name="defaultContentSlotForTemplateModelConverter" alias="cmsContentSlotForTemplateModelConverter" />
+	<bean id="defaultContentSlotForTemplateModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.PageContentSlotData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsContentSlotForTemplateModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	<bean name="cmsContentSlotForTemplateModelConverterType" class="de.hybris.platform.cmsfacades.pagescontentslots.service.impl.DefaultPageContentSlotConverterType">
+		<property name="classType" value="de.hybris.platform.cms2.model.relations.ContentSlotForTemplateModel" />
+		<property name="converter" ref="cmsContentSlotForTemplateModelConverter" />
+	</bean>
+
+	<bean id="cmsCompositePopulator" abstract="true"
+		  class="de.hybris.platform.cmsfacades.common.populator.impl.CompositePopulator">
+	</bean>
+
+</beans>

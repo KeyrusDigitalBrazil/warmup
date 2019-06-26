@@ -1,0 +1,57 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$addonExtensionName=b2bpunchoutaddon
+
+
+# *** FOOTER ***
+
+# footer component for PunchOut without links
+INSERT_UPDATE FooterNavigationComponent;$contentCV[unique=true];uid[unique=true];name;wrapAfter;showLanguageCurrency;&componentRef
+;;PunchOutFooterComponent;PunchOut Footer Component;3;true;PunchOutFooterComponent
+
+# CMS Footer Component
+UPDATE FooterNavigationComponent;$contentCV[unique=true];uid[unique=true];wrapAfter
+;;FooterNavigationComponent;2
+
+
+# *** CART COMPONENT ***
+# cart component for PunchOut
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;PunchOutCartComponent;PunchOut Cart Display Component;/WEB-INF/views/addons/b2bpunchoutaddon/responsive/pages/cart/cartDisplay.jsp;;PunchOutCartComponent
+
+
+# *** HEADER ***
+# header component for PunchOut
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;PunchOutSiteLogoComponent;PunchOut Site Logo Component;PunchOutSiteLogoComponent;"/"
+
+
+# *** CONTENT SLOTS ***
+# add PunchOut specific components to existing slots
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)[mode=append]
+;;FooterSlot;PunchOutFooterComponent
+;;SiteLogoSlot;PunchOutSiteLogoComponent
+;;TopContent-cartPage;PunchOutCartComponent
+
+
+# *** RESTRICTIONS ***
+
+# PunchOut CMS User Group Restrictions, so only PunchOut users can see PunchOut specific components
+INSERT_UPDATE CMSUserGroupRestriction;$contentCV[unique=true];uid[unique=true];&userGroupRestriction;name;userGroups(uid);includeSubgroups;components(&componentRef)
+;;PunchOutGroupRestriction;PunchOutGroupRestriction;PunchOut Group Restriction;PunchOut Organization;true;PunchOutFooterComponent,PunchOutSiteLogoComponent,PunchOutCartComponent
+
+# CMS Inverse Restriction, for elements replaced by PunchOut specific components 
+INSERT_UPDATE CMSInverseRestriction;$contentCV[unique=true];name;originalRestriction(&userGroupRestriction)[allownull=true];uid[unique=true];components(uid, $contentCV)
+;;PunchOutGroupInverseRestriction;PunchOutGroupRestriction;loggedInUser;FooterNavigationComponent,SiteLogoComponent,NextDayDeliveryBanner120,CartComponent,ImportSavedCartLink
+
+

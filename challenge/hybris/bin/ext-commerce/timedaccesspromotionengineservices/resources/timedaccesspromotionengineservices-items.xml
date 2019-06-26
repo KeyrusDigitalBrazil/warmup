@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	<itemtypes>
+	
+		<itemtype code="FlashBuyCoupon" autocreate="true" generate="true" extends="SingleCodeCoupon">
+			<description>Flash buy special coupon</description>
+			<attributes>
+				<attribute qualifier="rule" type="PromotionSourceRule">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="maxProductQuantityPerOrder" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="product" type="product">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="true" optional="true"/>
+				</attribute>
+				<attribute qualifier="originalMaxOrderQuantity" type="java.lang.Integer">
+					<persistence type="property"/>
+					<modifiers read="true" write="true" search="false" optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="FlashBuyCronJob" autocreate="true" generate="true" extends="CronJob">
+			<deployment table="FlashBuyCronJobs" typecode="9873"/>
+			<attributes>
+				<attribute qualifier="flashBuyCoupon" type="FlashBuyCoupon">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="true"/>
+				</attribute>			
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="Cart" autocreate="false" generate="false">
+			<description>Extending Cart type with additional attributes for import cart functionality</description>
+			<attributes>
+				<attribute autocreate="true" qualifier="processingFlashBuyOrder" type="boolean">
+					<description>set the status for the flashbuy</description>
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>	
+	</itemtypes>
+</items>

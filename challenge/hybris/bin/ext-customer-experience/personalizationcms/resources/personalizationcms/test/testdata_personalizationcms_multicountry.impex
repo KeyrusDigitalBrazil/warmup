@@ -1,0 +1,150 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append];
+;$regulargroup;customergroup;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;customer1@hybris.com;customergroup;;Miljenko Calhoun
+;cxcontextcustomer@hybris.com;customergroup;;Cxer Contexter
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;segment1;
+
+INSERT_UPDATE CxUserToSegment;segment(code)[unique=true];user(uid)[unique=true];affinity;
+;segment1;customer1@hybris.com;1;
+
+## multicountry ##
+$defaultCurrency=EUR
+$languages=en
+$defaultLanguage=en
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id),CatalogVersion.version[default=Online])
+
+$multiCatalog1=multiCatalog1
+$multiCV1=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog1]),CatalogVersion.version[default=Online])[default=$multiCatalog1:Online]
+$multiCatalog2=multiCatalog2
+$multiCV2=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog2]),CatalogVersion.version[default=Online])[default=$multiCatalog2:Online]
+$multiCatalog3a=multiCatalog3a
+$multiCV3a=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog3a]),CatalogVersion.version[default=Online])[default=$multiCatalog3a:Online]
+$multiCatalog3b=multiCatalog3b
+$multiCV3b=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog3b]),CatalogVersion.version[default=Online])[default=$multiCatalog3b:Online]
+
+$localSiteA=localSiteA
+$localSiteB=localSiteB
+$globalSite=globalSite
+
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=de];name[lang=en];superCatalog(id);
+;$multiCatalog1;$multiCatalog1;$multiCatalog1;
+;$multiCatalog2;$multiCatalog2;$multiCatalog2;multiCatalog1
+;$multiCatalog3a;$multiCatalog3a;$multiCatalog3a;multiCatalog2
+;$multiCatalog3b;$multiCatalog3b;$multiCatalog3b;multiCatalog2
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$multiCatalog1;Online;true;$defaultCurrency;$languages
+;$multiCatalog2;Online;true;$defaultCurrency;$languages
+;$multiCatalog3a;Online;true;$defaultCurrency;$languages
+;$multiCatalog3b;Online;true;$defaultCurrency;$languages
+
+
+#Cx Customizations
+INSERT_UPDATE CxCustomizationsGroup;code;$multiCV1[unique=true]
+;default;$multiCatalog1:Online;
+;default;$multiCatalog2:Online;
+;default;$multiCatalog3a:Online;
+;default;$multiCatalog3b:Online;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='default'];enabledStartDate[dateformat=dd.MM.yyyy];enabledEndDate[dateformat=dd.MM.yyyy];status(code)[default=ENABLED]
+;customization1;customization1;$multiCatalog1:Online;default:$multiCatalog1:Online;;;
+;customization2;customization2;$multiCatalog1:Online;default:$multiCatalog1:Online;;;DISABLED
+;customization3;customization3;$multiCatalog3a:Online;default:$multiCatalog3a:Online;;;
+;customization4;random name;$multiCatalog3a:Online;default:$multiCatalog3a:Online;;;
+;customization5;customization5;$multiCatalog3a:Online;default:$multiCatalog3a:Online;;;
+;customization6;customization6;$multiCatalog3a:Online;default:$multiCatalog3a:Online;;;DISABLED
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];enabled[default=true];customization(code,$contentCV)[unique=true];status(code)[default=ENABLED]
+;variation1;variation1;$multiCatalog1:Online;;customization1:$multiCatalog1:Online;
+;variation2;variation2;$multiCatalog1:Online;;customization2:$multiCatalog1:Online;
+;variation3;variation3;$multiCatalog3a:Online;;customization3:$multiCatalog3a:Online;
+;variation4;variation4;$multiCatalog3a:Online;;customization4:$multiCatalog3a:Online;
+;variation5;variation5;$multiCatalog3a:Online;;customization5:$multiCatalog3a:Online;
+;variation6;variation6;$multiCatalog3a:Online;;customization6:$multiCatalog3a:Online;
+
+INSERT_UPDATE CxCmsAction;code[unique=true];$contentCV[unique=true];componentId;variation(code,$contentCV)[unique=true];target;type(code);containerId;
+;cmsaction1;$multiCatalog1:Online;cxcomponent1;variation1:$multiCatalog1:Online;cxCmsActionPerformable;PLAIN;container1
+;cmsaction2;$multiCatalog1:Online;cxcomponent2;variation2:$multiCatalog1:Online;cxCmsActionPerformable;PLAIN;container2
+;cmsaction3;$multiCatalog1:Online;cxcomponent1;variation1:$multiCatalog1:Online;cxCmsActionPerformable;PLAIN;container1
+;cmsaction4;$multiCatalog1:Online;cxcomponent2;variation2:$multiCatalog1:Online;cxCmsActionPerformable;PLAIN;container2
+;cmsaction5;$multiCatalog3a:Online;cxcomponent3;variation3:$multiCatalog3a:Online;cxCmsActionPerformable;PLAIN;container3
+;cmsaction8;$multiCatalog3a:Online;cxcomponent4;variation4:$multiCatalog3a:Online;cxCmsActionPerformable;PLAIN;container4
+;cmsaction9;$multiCatalog3a:Online;cxcomponent5;variation5:$multiCatalog3a:Online;cxCmsActionPerformable;PLAIN;container5
+;cmsaction10;$multiCatalog3a:Online;cxcomponent6;variation6:$multiCatalog3a:Online;cxCmsActionPerformable;PLAIN;container1
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCV[unique=true];variation(code,$contentCV)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger1;$multiCatalog1:Online;variation1:$multiCatalog1:Online;segment1;
+;trigger1;$multiCatalog1:Online;variation2:$multiCatalog1:Online;segment1;
+;trigger1;$multiCatalog3a:Online;variation3:$multiCatalog3a:Online;segment1;
+;trigger1;$multiCatalog3a:Online;variation4:$multiCatalog3a:Online;segment1;
+;trigger1;$multiCatalog3a:Online;variation5:$multiCatalog3a:Online;segment1;
+;trigger1;$multiCatalog3a:Online;variation6:$multiCatalog3a:Online;segment1;
+
+
+#Page setup
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;active[default=true];&templateRef
+;$multiCatalog1:Online ;page1Template;Landing Page 1 Template;;page1Template
+;$multiCatalog2:Online ;page2Template;Landing Page 2 Template;;page2Template
+;$multiCatalog3a:Online;page3Template;Landing Page 3a Template;;page3Template
+;$multiCatalog3b:Online;page4Template;Landing Page 3b Template;;page4Template
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];&pageRef
+;$multiCatalog1:Online ;page1;page1;page1Template:$multiCatalog1:Online ;page1;;;;page1
+;$multiCatalog2:Online ;page2;page2;page2Template:$multiCatalog2:Online ;page2;;;;page2
+;$multiCatalog3a:Online;page3;page3;page3Template:$multiCatalog3a:Online;page3;;;;page3
+;$multiCatalog3b:Online;page4;page4;page4Template:$multiCatalog3b:Online;page4;;;;page4
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];sourceId;name;&containerRef
+;$multiCatalog1:Online ;container1;container1;container1;container1;
+;$multiCatalog1:Online ;container2;container2;container2;container2;
+;$multiCatalog2:Online ;container3;container3;container3;container3;
+;$multiCatalog2:Online ;container4;container4;container4;container4;
+;$multiCatalog3b:Online;container5;container5;container5;container5;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&containerRef);&slotRef
+;$multiCatalog1:Online ;contentSlot1;container1;contentSlot1
+;$multiCatalog1:Online ;contentSlot2;container1;contentSlot2
+;$multiCatalog2:Online ;contentSlot3;container2;contentSlot3
+;$multiCatalog2:Online ;contentSlot4;container3,container4;contentSlot4
+;$multiCatalog3b:Online;contentSlot5;container5;contentSlot5
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(&pageRef)[unique=true];contentSlot(&slotRef)[unique=true];
+;$multiCatalog1:Online ;contentSlotForPage11;1;page1;contentSlot1;
+;$multiCatalog1:Online ;contentSlotForPage22;2;page1;contentSlot2;
+;$multiCatalog3a:Online;contentSlotForPage31;1;page3;contentSlot1;
+;$multiCatalog3a:Online;contentSlotForPage32;2;page3;contentSlot2;
+;$multiCatalog3a:Online;contentSlotForPage33;3;page3;contentSlot3;
+;$multiCatalog3b:Online;contentSlotForPage44;4;page4;contentSlot5;
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(&templateRef)[unique=true];contentSlot(&slotRef)[unique=true];allowOverwrite
+;$multiCatalog2:Online ;page13TemplateSlot;1;page2Template;contentSlot3;true
+;$multiCatalog2:Online ;page14TemplateSlot;2;page2Template;contentSlot4;true
+;$multiCatalog3a:Online;page31TemplateSlot;1;page3Template;contentSlot1;true
+;$multiCatalog3a:Online;page32TemplateSlot;2;page3Template;contentSlot4;true
+
+INSERT_UPDATE CMSSite;uid[unique=true];contentCatalogs(id)
+;$localSiteA;$multiCatalog1,$multiCatalog2,$multiCatalog3a;
+;$localSiteB;$multiCatalog1,$multiCatalog2,$multiCatalog3b;
+;$globalSite;$multiCatalog1;

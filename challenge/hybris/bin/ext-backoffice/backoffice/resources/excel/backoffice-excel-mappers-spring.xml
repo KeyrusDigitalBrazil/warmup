@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="fromAttributeDescriptorsToExcelAttributesMapper"
+		  class="com.hybris.backoffice.excel.template.mapper.FromAttributeDescriptorsToExcelAttributesMapper">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="fromComposedTypeToAttributeDescriptorsMapper"
+		  class="com.hybris.backoffice.excel.template.mapper.FromComposedTypeToAttributeDescriptorsMapper">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean id="fromTypeCodeToAttributeDescriptorsMapper"
+		  class="com.hybris.backoffice.excel.template.mapper.FromTypeCodeToAttributeDescriptorsMapper">
+		<property name="typeService" ref="typeService"/>
+		<property name="mapper" ref="fromComposedTypeToAttributeDescriptorsMapper"/>
+	</bean>
+
+	<bean id="fromExcelResultToAttributeDescriptorsMapper"
+		  class="com.hybris.backoffice.excel.template.mapper.FromExcelResultToAttributeDescriptorsMapper">
+		<property name="excelSheetService" ref="excelSheetService"/>
+		<property name="mapper" ref="fromTypeCodeToAttributeDescriptorsMapper"/>
+	</bean>
+
+	<bean id="fromExcelResultToExcelAttributesMapper" class="com.hybris.backoffice.excel.template.mapper.ChainMapper">
+		<property name="mapper1" ref="fromExcelResultToAttributeDescriptorsMapper"/>
+		<property name="mapper2" ref="fromAttributeDescriptorsToExcelAttributesMapper"/>
+	</bean>
+
+</beans>

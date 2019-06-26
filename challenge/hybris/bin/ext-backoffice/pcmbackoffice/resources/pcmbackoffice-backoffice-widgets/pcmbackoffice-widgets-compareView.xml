@@ -1,0 +1,101 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="pcmbackoffice-contents">
+
+		<widget id="pcmbackoffice-compare-view" widgetDefinitionId="com.hybris.cockpitng.widgets.compare"
+				slotId="views">
+
+			<widget id="pcmbackoffice-compare-view-extract-item" slotId="cockpitWidgetChildrenInvisible"
+					widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor">
+				<setting key="expression" value="selectedItem"/>
+				<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+			</widget>
+			<widget id="pcmbackoffice-compare-view-extract-items" slotId="cockpitWidgetChildrenInvisible"
+					widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor">
+				<setting key="expression" value="availableItems"/>
+				<setting key="socketDataType_$T" type="String" value="java.util.Collection"/>
+			</widget>
+			<widget id="pcmbackoffice-advancedsearchgroup" widgetDefinitionId="com.hybris.cockpitng.backoffice.referenceadvancedsearchgroup"
+					slotId="cockpitWidgetChildrenInvisible" title="compareview.additems.title" template="true">
+				<instance-settings socketEventRoutingMode="LAST_USED">
+					<create onInit="false" reuseExisting="false">
+						<incoming-events>
+							<socket-event id="referenceSearchCtx"/>
+						</incoming-events>
+					</create>
+					<close>
+						<outgoing-events>
+							<socket-event id="selectedReferencesOutput"/>
+							<socket-event id="cancelOutput"/>
+						</outgoing-events>
+					</close>
+					<select onInit="false"/>
+				</instance-settings>
+				<setting key="/referenceCollectionBrowser/collectionBrowserConfigCtx" type="String">reference-collection-browser</setting>
+				<setting key="/referenceAdvancedSearch/displayInNonCollapsibleContainer" type="Boolean">true</setting>
+				<setting key="/referenceAdvancedSearch/disableSimpleSearch" type="Boolean">true</setting>
+				<setting key="/referenceAdvancedSearchEngine/defaultPageSize" type="Integer">50</setting>
+				<setting key="widgetStyleClass" type="String"></setting>
+				<setting key="widgetStyleAttribute" type="String"></setting>
+				<setting key="_width" type="String">70%</setting>
+				<setting key="_height" type="String">75%</setting>
+				<virtual-sockets/>
+			</widget>
+
+			<setting key="defaultTypeCode" value="Product"/>
+			<setting key="configCtx" value="pcmbackoffice-compare-view"/>
+		</widget>
+
+		<setting key="configCtx" type="String">pcmbackoffice-compare-view</setting>
+		<setting key="selectCompareView_eval" type="String">'pcmbackoffice-compare-view'</setting>
+		<virtual-sockets>
+			<input id="selectCompareView" type="java.lang.Object"/>
+		</virtual-sockets>
+
+	</widget-extension>
+
+	<widget-extension widgetId="pcmbackoffice-collectionBrowser-browser">
+		<virtual-sockets>
+			<output id="selectedItemsToCompare" type="de.hybris.platform.core.model.ItemModel" multiplicity="Collection"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<!-- CollectionBrowser <> CompareView -->
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="selectedItemsToCompare"
+					   targetWidgetId="pcmbackoffice-compare-view" inputId="setObjects"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="selectedItemsToCompare"
+					   targetWidgetId="pcmbackoffice-contents" inputId="selectCompareView"/>
+
+	<!-- CompareView:selectedItem <> PCM editor area -->
+	<widget-connection sourceWidgetId="pcmbackoffice-compare-view" outputId="selectedItem"
+					   targetWidgetId="pcmbackoffice-compare-view-extract-items" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-compare-view-extract-items" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-compare-view" outputId="selectedItem"
+					   targetWidgetId="pcmbackoffice-compare-view-extract-item" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-compare-view-extract-item" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-item-selection-proxy" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemoved"
+					   targetWidgetId="pcmbackoffice-compare-view" inputId="removeObjects"/>
+
+
+	<!-- CompareView:addItem -->
+	<widget-connection sourceWidgetId="pcmbackoffice-compare-view" outputId="addItemsRequest"
+					   targetWidgetId="pcmbackoffice-advancedsearchgroup" inputId="referenceSearchCtx"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-advancedsearchgroup" outputId="selectedReferencesOutput"
+					   targetWidgetId="pcmbackoffice-compare-view" inputId="addObjects"/>
+
+</widgets>

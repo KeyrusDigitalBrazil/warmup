@@ -1,0 +1,40 @@
+package de.hybris.platform.promotionengineservices.test
+
+import de.hybris.platform.ruleengineservices.rao.CartRAO;
+import de.hybris.platform.ruleengineservices.rao.OrderEntryRAO;
+import de.hybris.platform.ruleengineservices.rao.CategoryRAO;
+import de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO;
+import de.hybris.platform.ruleengineservices.rao.WebsiteGroupRAO;
+import de.hybris.platform.ruleengineservices.rrd.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import de.hybris.platform.ruleengineservices.rrd.RuleConfigurationRRD;
+import java.util.Map;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleOrderEntryPercentageDiscountAction;
+
+rule "percentageDiscountCameraAccessories"
+@ruleCode("percentageDiscountCameraAccessories.drl")
+@moduleName("promotions-module-junit")
+dialect "mvel"
+
+	salience 10
+	when
+		$result : RuleEngineResultRAO()
+		$config : RuleConfigurationRRD(ruleCode == "percentageDiscountCameraAccessories.drl")
+		$groupExecution := RuleGroupExecutionRRD(code == $config.ruleGroupCode)
+		$cart : CartRAO()
+		$entries : ArrayList(size > 0)
+  	              from collect(OrderEntryRAO(product.code == "HW1210-3411", quantity > 0))
+		eval($groupExecution.allowedToExecute($config))
+	then
+		Map variables = [
+		   "de.hybris.platform.ruleengineservices.rao.OrderEntryRAO": $entries,
+		   "de.hybris.platform.ruleengineservices.rao.CartRAO": $cart,
+		   "de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO": $result
+		];
+		ruleOrderEntryPercentageDiscountAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["value":new BigDecimal(19)]);
+		$groupExecution.trackRuleGroupExecution($config);
+end
+

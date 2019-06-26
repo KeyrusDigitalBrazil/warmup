@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:int-jmx="http://www.springframework.org/schema/integration/jmx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration/jmx http://www.springframework.org/schema/integration/jmx/spring-integration-jmx.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+           http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <alias alias="eventConfigurationDao" name="defaultEventConfigurationDao"/>
+    <bean id="defaultEventConfigurationDao" class="de.hybris.platform.apiregistryservices.dao.impl.DefaultEventConfigurationDao" parent="abstractItemDao"/>
+
+    <alias alias="destinationDao" name="defaultDestinationDao"/>
+    <bean id="defaultDestinationDao" class="de.hybris.platform.apiregistryservices.dao.impl.DefaultDestinationDao" parent="abstractItemDao"/>
+
+    <bean id="destinationService" class="de.hybris.platform.apiregistryservices.services.impl.DefaultDestinationService">
+        <property name="destinationDao" ref="destinationDao"/>
+    </bean>
+
+    <alias alias="eventDlqService" name="defaultEventDlqService"/>
+    <bean id="defaultEventDlqService" class="de.hybris.platform.apiregistryservices.services.impl.DefaultEventDlqService">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="credentialService" class="de.hybris.platform.apiregistryservices.services.impl.DefaultCredentialService">
+        <property name="modelService" ref="modelService"/>
+        <property name="taskService" ref="taskService"/>
+        <property name="credentialDao" ref="credentialDao"/>
+    </bean>
+
+    <bean id="removeOAuthClientTask" class="de.hybris.platform.apiregistryservices.task.RemoveOAuthClientTask">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultCredentialDao" alias="credentialDao" />
+    <bean id="defaultCredentialDao" class="de.hybris.platform.apiregistryservices.dao.impl.DefaultCredentialDao" parent="abstractItemDao"/>
+
+    <alias name="defaultApiRegistrationService" alias="apiRegistrationService"/>
+    <bean id="defaultApiRegistrationService" class="de.hybris.platform.apiregistryservices.services.impl.DefaultApiRegistrationService">
+        <property name="destinationService" ref="destinationService"/>
+        <property name="apiRegistrationStrategyMap" ref="apiRegistrationStrategyMap"/>
+    </bean>
+
+    <alias name="defaultApiRegistrationStrategyMap" alias="apiRegistrationStrategyMap"/>
+    <util:map id="defaultApiRegistrationStrategyMap" key-type="de.hybris.platform.apiregistryservices.enums.DestinationChannel"/>
+
+    <bean depends-on="additionalEventSenders" parent="listMergeDirective">
+        <property name="add" ref="exportEventSender"/>
+    </bean>
+
+    <bean id="exportEventSender" class="de.hybris.platform.apiregistryservices.event.impl.ExportEventSender">
+        <property name="channel" ref="eventSourceDataChannel" />
+        <property name="eventConfigurationDao" ref="eventConfigurationDao"/>
+    </bean>
+
+    <util:map id="eventRoutingMap">
+        <entry key="DEFAULT" value="defaultChannel" />
+    </util:map>
+
+    <bean id="eventSourceDataRouter" class="de.hybris.platform.apiregistryservices.router.EventSourceDataRouter">
+        <property name="eventRoutingMap" ref="eventRoutingMap"/>
+    </bean>
+
+    <int:router ref="eventSourceDataRouter" input-channel="eventSourceDataChannel" method="route" default-output-channel="defaultChannel"/>
+    <int:channel id="eventSourceDataChannel"/>
+
+    <int:logging-channel-adapter id="loggingChannel" log-full-message="true" level="INFO" />
+
+    <!-- default channel -->
+    <int:chain id="defaultChain" input-channel="defaultChannel" >
+        <int:service-activator method="handle" id="eventServiceActivator">
+            <bean class="de.hybris.platform.apiregistryservices.event.impl.EventServiceActivator">
+                <property name="eventEmitStrategy" ref="eventEmitStrategy" />
+            </bean>
+        </int:service-activator>
+    </int:chain>
+
+    <alias name="mockEventEmitStrategy" alias="eventEmitStrategy"/>
+    <bean id="mockEventEmitStrategy" class="de.hybris.platform.apiregistryservices.strategies.impl.MockEventEmitStrategy"/>
+
+    <int:poller default="true" fixed-delay="100"/>
+
+    <!-- error channel -->
+    <int:channel id="errorChannel"/>
+
+    <int:logging-channel-adapter id="errorLoggingChannel" log-full-message="true" level="ERROR" channel="errorChannel"/>
+
+    <bean id="removeExposedDestinationInterceptor" class="de.hybris.platform.apiregistryservices.interceptors.RemoveExposedDestinationInterceptor"
+          autowire="byName"/>
+
+    <bean id="removeExposedDestinationInterceptorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="removeExposedDestinationInterceptor"/>
+        <property name="typeCode" value="ExposedDestination"/>
+    </bean>
+
+    <alias name="apiCharonFactory" alias="clientFactory"/>
+    <bean id="apiCharonFactory" class="de.hybris.platform.apiregistryservices.factory.impl.CharonFactory"/>
+
+    <bean id="consumedDestinationRemoveInterceptor" class="de.hybris.platform.apiregistryservices.interceptors.ConsumedDestinationRemoveInterceptor" >
+        <property name="clientFactory" ref="clientFactory" />
+        <property name="eventService" ref="eventService"/>
+    </bean>
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="consumedDestinationRemoveInterceptor" />
+        <property name="typeCode" value="ConsumedDestination" />
+    </bean>
+
+    <bean id="consumedDestinationValidateInterceptor" class="de.hybris.platform.apiregistryservices.interceptors.ConsumedDestinationValidateInterceptor" >
+        <property name="modelService" ref="modelService"/>
+        <property name="clientFactory" ref="clientFactory" />
+        <property name="eventService" ref="eventService"/>
+    </bean>
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="consumedDestinationValidateInterceptor" />
+        <property name="typeCode" value="ConsumedDestination" />
+    </bean>
+
+    <bean id="consumedOAuthCredentialRemoveInterceptor" class="de.hybris.platform.apiregistryservices.interceptors.ConsumedOAuthCredentialRemoveInterceptor" >
+        <property name="clientFactory" ref="clientFactory" />
+        <property name="eventService" ref="eventService"/>
+    </bean>
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="consumedOAuthCredentialRemoveInterceptor" />
+        <property name="typeCode" value="ConsumedOAuthCredential" />
+    </bean>
+
+    <bean id="consumedOAuthCredentialValidateInterceptor" class="de.hybris.platform.apiregistryservices.interceptors.ConsumedOAuthCredentialValidateInterceptor" >
+        <property name="modelService" ref="modelService"/>
+        <property name="clientFactory" ref="clientFactory" />
+        <property name="eventService" ref="eventService"/>
+    </bean>
+
+    <bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="consumedOAuthCredentialValidateInterceptor" />
+        <property name="typeCode" value="ConsumedOAuthCredential" />
+    </bean>
+
+    <alias name="defaultApiRegistryClientService" alias="apiRegistryClientService"/>
+    <bean id="defaultApiRegistryClientService" class="de.hybris.platform.apiregistryservices.services.impl.DefaultApiRegistryClientService">
+        <property name="clientFactory" ref="clientFactory"/>
+        <property name="destinationService" ref="destinationService"/>
+        <property name="consumedDestinationLocatorStrategy" ref="consumedDestinationLocatorStrategy"/>
+        <property name="credentialsStrategyMap" ref="credentialsStrategyMap"/>
+    </bean>
+
+    <util:map id="credentialsStrategyMap" key-type="java.lang.Class">
+        <entry key="de.hybris.platform.apiregistryservices.model.ConsumedOAuthCredentialModel" value-ref="oAuthClientCredentialPopulatingStrategy"/>
+    </util:map>
+
+    <alias name="defaultOAuthClientCredentialPopulatingStrategy" alias="oAuthClientCredentialPopulatingStrategy"/>
+    <bean id="defaultOAuthClientCredentialPopulatingStrategy" class="de.hybris.platform.apiregistryservices.services.impl.OAuthClientCredentialPopulatingStrategy"/>
+
+   <alias name="defaultConsumedDestinationLocatorStrategy" alias="consumedDestinationLocatorStrategy"/>
+   <bean id="defaultConsumedDestinationLocatorStrategy" class="de.hybris.platform.apiregistryservices.strategies.impl.DefaultConsumedDestinationLocatorStrategy" >
+        <property name="destinationService" ref="destinationService"/>
+    </bean>
+
+    <bean id="apiregistryAfterInitEndEventListener"
+          class="de.hybris.platform.apiregistryservices.event.listeners.ApiregistryAfterInitEndEventListener"
+          parent="abstractEventListener">
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+    <bean id="apiregistryAfterInitStartEventListener"
+          class="de.hybris.platform.apiregistryservices.event.listeners.ApiregistryAfterInitStartEventListener"
+          parent="abstractEventListener">
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+
+    <bean id="eventExportEnabledEventListner" class="de.hybris.platform.apiregistryservices.event.listeners.EventExportEnabledEventListener"
+          parent="abstractEventListener">
+    </bean>
+    <bean id="eventExportDisabledEventListner" class="de.hybris.platform.apiregistryservices.event.listeners.EventExportDisabledEventListener"
+          parent="abstractEventListener">
+    </bean>
+
+    <bean id="siRegistrator" class="de.hybris.platform.apiregistryservices.jmx.SpringIntegrationQueueRegistrator">
+        <property name="jmxPath" value="springintegration=Queues"/>
+        <property name="beanInterface" value="de.hybris.platform.apiregistryservices.jmx.QueueInfoBean"/>
+        <property name="springIntegrationJmxService" ref="springIntegrationJmxService" />
+    </bean>
+
+    <bean id="springIntegrationJmxService" class="de.hybris.platform.apiregistryservices.jmx.service.impl.DefaultSpringIntegrationJmxService" >
+        <property name="mbeanRegisterUtility" ref="mbeanRegisterUtility"/>
+    </bean>
+
+    <bean id="dynamicProcessEventAction" class="de.hybris.platform.apiregistryservices.action.DynamicProcessEventAction">
+        <property name="eventService" ref="eventService"/>
+    </bean>
+
+    <bean id="invalidateCharonCacheEventListener"
+          class="de.hybris.platform.apiregistryservices.event.listeners.InvalidateCharonCacheEventListener"
+          parent="abstractEventListener">
+        <property name="clientFactory" ref="clientFactory"/>
+    </bean>
+</beans>

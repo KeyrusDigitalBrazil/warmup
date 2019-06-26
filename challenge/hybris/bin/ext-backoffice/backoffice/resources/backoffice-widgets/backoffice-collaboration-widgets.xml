@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <import resource="backoffice-collaboration-general-widgets.xml" />
+    <import resource="backoffice-collaboration-workflow-overview-widgets.xml" />
+    <import resource="backoffice-collaboration-workflow-details-widgets.xml"/>
+    <import resource="backoffice-collaboration-task-edit-widgets.xml" />
+
+    <widget-extension widgetId="backofficeGlobalNotificationMultiplexer">
+
+        <widget id="backofficeGlobalNotificationMultiplexer-workflowExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                slotId="cockpitWidgetChildrenInvisible" template="false">
+            <setting key="expression" type="String">
+                #root instanceof T(com.hybris.cockpitng.common.model.ObjectWithComponentContext) ? #root.getParameters().get("_inputObject").workflow : #root
+            </setting>
+            <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowModel</setting>
+        </widget>
+
+        <setting key="workflowDetailsOutput_expression" type="String">#root.parameters['triggerContext'] == 'workflowDetails'</setting>
+        <setting key="workflowEAOutput_expression" type="String">#root.parameters['triggerContext'] == 'workflowEA'</setting>
+        <setting key="workflowEAOutput_eval" type="String">
+            #root instanceof T(com.hybris.cockpitng.common.model.ObjectWithComponentContext) ? #root.getParameters().get("_inputObject").workflow : #root
+        </setting>
+        <virtual-sockets>
+            <output id="workflowDetailsOutput" type="com.hybris.cockpitng.common.model.ObjectWithComponentContext" visibility="default"/>
+            <output id="workflowEAOutput" type="de.hybris.platform.workflow.model.WorkflowModel" visibility="default"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-connection sourceWidgetId="backofficeGlobalNotificationMultiplexer" outputId="workflowDetailsOutput"
+                       targetWidgetId="backofficeGlobalNotificationMultiplexer-workflowExtractor" inputId="genericInput"/>
+
+</widgets>

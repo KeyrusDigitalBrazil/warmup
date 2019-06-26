@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- beans used for socket communication between widgets -->
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.CatalogVersionData">
+		<property name="catalogId" type="String" equals="true" />
+		<property name="version" type="String" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.NavigationContextData">
+		<property name="indexConfiguration" type="String" equals="true" />
+		<property name="indexType" type="String" equals="true" />
+		<property name="catalogVersion" type="de.hybris.platform.adaptivesearchbackoffice.data.CatalogVersionData"
+			equals="true" />
+		<property name="category" type="de.hybris.platform.adaptivesearchbackoffice.data.CategoryData" equals="true" />
+		<property name="currentSearchProfile" type="String" />
+		<property name="searchProfiles" type="java.util.List&lt;String>" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SearchContextData">
+		<property name="language" type="String" equals="true" />
+		<property name="currency" type="String" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData" />
+	
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SearchRequestData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData" />
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.PaginationRequestData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData">
+		<property name="activePage" type="int" />
+		<property name="pageSize" type="int" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.FacetRequestData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData">
+		<property name="indexProperty" type="String" />
+		<property name="open" type="boolean" />
+		<property name="facetVisibility" type="de.hybris.platform.adaptivesearch.data.AsFacetVisibility" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.FacetFiltersRequestData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData">
+		<property name="indexProperty" type="String" />
+		<property name="values" type="java.util.List&lt;String>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SortRequestData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData">
+		<property name="sort" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SearchResultData">
+		<property name="navigationContext" type="de.hybris.platform.adaptivesearchbackoffice.data.NavigationContextData" />
+		<property name="searchContext" type="de.hybris.platform.adaptivesearchbackoffice.data.SearchContextData" />
+		<property name="asSearchResult" type="de.hybris.platform.adaptivesearch.data.AsSearchResultData" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.CategoryData">
+		<property name="code" type="String" equals="true" />
+		<property name="path" type="java.util.List&lt;String>" equals="true" />
+	</bean>
+
+	<!-- beans used by the widgets -->
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.FacetStateData">
+		<property name="facetVisibility" type="de.hybris.platform.adaptivesearch.data.AsFacetVisibility" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SearchStateData">
+		<property name="searchQuery" type="de.hybris.platform.adaptivesearch.data.AsSearchQueryData" />
+		<property name="facetsState" type="java.util.Map&lt;String,de.hybris.platform.adaptivesearchbackoffice.data.FacetStateData>" />
+	</bean>
+
+	<!-- beans used by the editors -->
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractEditorData" abstract="true">
+		<property name="uid" type="String" equals="true" />
+		<property name="label" type="String" />
+		<property name="valid" type="boolean" />
+		<property name="open" type="boolean" />
+		<property name="fromSearchProfile" type="boolean" />
+		<property name="fromSearchConfiguration" type="boolean" />
+		<property name="override" type="boolean" />
+		<property name="overrideFromSearchProfile" type="boolean" />
+		<property name="inSearchResult" type="boolean" />
+		<property name="rankUpAllowed" type="boolean" />
+		<property name="rankDownAllowed" type="boolean" />
+		<property name="model" type="de.hybris.platform.core.model.ItemModel" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractFacetConfigurationEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractEditorData"
+		abstract="true">
+		<property name="indexProperty" type="String" equals="true" />
+		<property name="priority" type="Integer" equals="true" />
+		<property name="multiselect" type="boolean" equals="true" />
+		<property name="facetFiltersCount" type="Integer" equals="true" />
+		<property name="facetConfiguration" type="de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration" />
+		<property name="facet" type="de.hybris.platform.adaptivesearch.data.AsFacetData" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.PromotedFacetEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractFacetConfigurationEditorData" />
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.FacetEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractFacetConfigurationEditorData" />
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.ExcludedFacetEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractFacetConfigurationEditorData" />
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractBoostItemConfigurationEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractEditorData">
+		<property name="itemPk" type="de.hybris.platform.core.PK" equals="true" />
+		<property name="boostItemConfiguration" type="de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.PromotedItemEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractBoostItemConfigurationEditorData" />
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.ExcludedItemEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractBoostItemConfigurationEditorData" />
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractBoostRuleConfigurationEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractEditorData" />
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.BoostRuleEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractBoostRuleConfigurationEditorData">
+		<property name="indexProperty" type="String" equals="true" />
+		<property name="boostType" type="de.hybris.platform.adaptivesearch.enums.AsBoostType" equals="true" />
+		<property name="boostTypeSymbol" type="String" equals="true" />
+		<property name="boost" type="Float" equals="true" />
+		<property name="boostRuleConfiguration" type="de.hybris.platform.adaptivesearch.data.AbstractAsBoostRuleConfiguration" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSortConfigurationEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractEditorData">
+		<property name="code" type="String" equals="true" />
+		<property name="name" type="java.util.Map&lt;String,String>" equals="true" />
+		<property name="priority" type="Integer" equals="true" />
+		<property name="sortConfiguration" type="de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.PromotedSortEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSortConfigurationEditorData" />
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.SortEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSortConfigurationEditorData" />
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.ExcludedSortEditorData" extends="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSortConfigurationEditorData" />
+
+	<!-- beans used by facades -->
+
+	<bean class="de.hybris.platform.adaptivesearchbackoffice.data.AsCategoryData">
+		<property name="code" type="String" equals="true" />
+		<property name="name" type="String" equals="true" />
+		<property name="children" type="java.util.List&lt;de.hybris.platform.adaptivesearchbackoffice.data.AsCategoryData>"
+			equals="true" />
+	</bean>
+
+</beans>

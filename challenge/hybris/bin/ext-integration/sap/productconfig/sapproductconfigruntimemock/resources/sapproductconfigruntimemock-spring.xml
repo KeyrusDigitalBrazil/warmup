@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<alias name="sapProductConfigDefaultMockProviderFactory" alias="sapProductConfigMockProviderFactory" />
+	<bean id="sapProductConfigDefaultMockProviderFactory"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.impl.DefaultRuntimeProviderFactoryImpl">
+		<property name="configurationProvider" ref="sapProductConfigConfigurationProviderMock" />
+		<property name="pricingProvider" ref="sapProductConfigDefaultPricingProvider" />
+		<property name="analyticsProvider" ref="sapProductConfigDefaultAnalyticsProvider" />
+		<property name="productCsticAndValueParameterProvider"
+			ref="sapProductConfigDefaultProductCsticAndValueParameterProviderMock" />
+		<property name="pricingParameter" ref="sapProductConfigDefaultPricingParameters" />
+	</bean>
+	
+	<bean id="sapProductConfigRegisteredProviderFactoriesMockListMergeDirective"
+		depends-on="sapProductConfigRegisteredProviderFactories" parent="listMergeDirective">
+		<property name="add" value="sapProductConfigMockProviderFactory" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultRunTimeConfigMockFactory" alias="sapProductConfigRunTimeConfigMockFactory" />
+	<bean id="sapProductConfigDefaultRunTimeConfigMockFactory"
+		class="de.hybris.platform.sap.productconfig.runtime.mock.impl.RunTimeConfigMockFactory">
+	</bean>
+
+	<!-- uncomment if you want the mock implementation to be default -->
+	<!-- <alias name="sapProductConfigConfigurationProviderMock" alias="sapProductConfigConfigurationProvider" /> -->
+	<bean id="sapProductConfigConfigurationProviderMock"
+		class="de.hybris.platform.sap.productconfig.runtime.mock.provider.impl.ConfigurationProviderMockImpl">
+		<property name="configMockFactory" ref="sapProductConfigRunTimeConfigMockFactory" />
+	</bean>
+
+	<!-- uncomment if you want the mock implementation to be default -->
+	<!-- <alias alias="sapProductConfigProductCsticAndValueParameterProvider" name="sapProductConfigDefaultProductCsticAndValueParameterProviderMock" 
+		/> -->
+	<bean id="sapProductConfigDefaultProductCsticAndValueParameterProviderMock"
+		class="de.hybris.platform.sap.productconfig.runtime.mock.provider.impl.ProductCsticAndValueParameterProviderMockImpl">
+		<property name="configMockFactory" ref="sapProductConfigRunTimeConfigMockFactory" />
+	</bean>
+
+</beans>

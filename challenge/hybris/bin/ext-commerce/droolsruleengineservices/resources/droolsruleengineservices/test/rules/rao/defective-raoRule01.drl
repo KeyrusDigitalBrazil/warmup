@@ -1,0 +1,25 @@
+package de.hybris.platform.ruleengineservices.test
+
+import java.math.*;
+import de.hybris.platform.ruleengineservices.rao.*;
+
+salience 10;
+// cart with code ABC gets 10% discount
+rule "defective-raoRule01"
+@ruleCode("defective-raoRule01.drl")
+@moduleName("rules-module-junit")
+    when
+    	$cart:CartRAO(code == "ABC")
+    	$result:RuleEngineResultRAO()
+    	// check if rule discount is not applied already
+    	not $discount:DiscountRAO( firedRuleCode == "defective-raoRule01.drl" )
+    then
+    	// compile error due to missing variable declaration
+    	$discount = new DiscountRAO();
+    	$discount.setActionId("abc1234");
+    	$discount.setValue(BigDecimal.valueOf(10L));
+    	$result.getActions().add($discount);
+    	// above check only works if the discount is inserted as fact
+    	insert($discount);
+    	update($result);
+end

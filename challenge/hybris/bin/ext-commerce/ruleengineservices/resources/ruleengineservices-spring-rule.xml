@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Rule -->
+	<alias name="defaultRuleDao" alias="ruleDao" />
+	<bean id="defaultRuleDao" class="de.hybris.platform.ruleengineservices.rule.dao.impl.DefaultRuleDao" parent="abstractItemDao">
+		<property name="i18NService" ref="i18NService" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias name="defaultRuleGroupDao" alias="ruleGroupDao" />
+	<bean id="defaultRuleGroupDao" class="de.hybris.platform.ruleengineservices.rule.dao.impl.DefaultRuleGroupDao" parent="abstractItemDao"/>
+
+	<alias name="defaultRuleService" alias="ruleService" />
+	<bean id="defaultRuleService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleService">
+		<property name="ruleDao" ref="ruleDao" />
+		<property name="modelService" ref="modelService" />
+		<property name="sourceRuleCodeGenerator" ref="sourceRuleCodeGenerator" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="ruleTypeMappingStrategy" ref="ruleTypeMappingStrategy"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="ruleEngineContextFinderStrategy" ref="ruleEngineContextFinderStrategy"/>
+		<property name="moduleVersionResolver" ref="moduleVersionResolver"/>
+	</bean>
+
+	<bean id="sourceRuleCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.source_rule.code.name}"/>
+		<property name="digits" value="${keygen.source_rule.code.digits}"/>
+		<property name="start" value="${keygen.source_rule.code.start}"/>
+		<property name="type" value="${keygen.source_rule.code.type}"/>
+		<property name="template" value="${keygen.source_rule.code.template}"/>
+	</bean>
+
+	<alias name="defaultRuleMaintenanceService" alias="ruleMaintenanceService" />
+	<bean id="defaultRuleMaintenanceService" class="de.hybris.platform.ruleengineservices.maintenance.impl.DefaultRuleMaintenanceService">
+		<property name="modelService" ref="modelService" />
+		<property name="ruleEngineService" ref="platformRuleEngineService" />
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="ruleService" ref="ruleService"/>
+		<property name="ruleCompilationContextProvider" ref="ruleCompilationContextProvider"/>
+		<property name="rulesModuleResolver" ref="rulesModuleResolver"/>
+		<property name="rulesCompilationGuardedSuspension" ref="rulesCompilationGuardedSuspension"/>
+		<property name="engineRulesRepository" ref="engineRulesRepository"/>
+		<property name="eventService" ref="eventService"/>
+	</bean>
+
+	<alias name="defaultRulesCompilationGuardedSuspension" alias="rulesCompilationGuardedSuspension" />
+	<bean id="defaultRulesCompilationGuardedSuspension" class="de.hybris.platform.ruleengineservices.maintenance.impl.RulesCompilationGuardedSuspension">
+		<property name="eventService" ref="eventService"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultRuleImagePopulator" alias="ruleImagePopulator" />
+	<bean id="defaultRuleImagePopulator" class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleImagePopulator" />
+
+	<alias name="defaultRuleImageConverter" alias="ruleImageConverter" />
+	<bean id="defaultRuleImageConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.ImageData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleImagePopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<alias name="defaultRuleTypeMappingStrategy" alias="ruleTypeMappingStrategy" />
+	<bean id="defaultRuleTypeMappingStrategy" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleTypeMappingStrategy">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<!-- Rule Template interceptors -->
+	
+	<alias name="defaultSourceRuleTemplateValidateInterceptor" alias="sourceRuleTemplateValidateInterceptor" />
+	<bean id="defaultSourceRuleTemplateValidateInterceptor" class="de.hybris.platform.ruleengineservices.rule.interceptors.SourceRuleTemplateValidateInterceptor">
+		<property name="ruleConditionsService" ref="ruleConditionsService" />
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+		<property name="ruleActionsService" ref="ruleActionsService" />
+		<property name="ruleActionsRegistry" ref="ruleActionsRegistry" />
+		<property name="ruleService" ref="ruleService" />
+	</bean>
+
+	<bean id="sourceRuleTemplateValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sourceRuleTemplateValidateInterceptor" />
+		<property name="typeCode" value="SourceRuleTemplate" />
+	</bean>
+	
+	<!-- Rule interceptors -->
+
+	<alias name="defaultSourceRuleValidateInterceptor" alias="sourceRuleValidateInterceptor" />
+	<bean id="defaultSourceRuleValidateInterceptor" class="de.hybris.platform.ruleengineservices.rule.interceptors.SourceRuleValidateInterceptor">
+		<property name="ruleConditionsService" ref="ruleConditionsService" />
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+		<property name="ruleActionsService" ref="ruleActionsService" />
+		<property name="ruleActionsRegistry" ref="ruleActionsRegistry" />
+	</bean>
+
+	<bean id="sourceRuleValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sourceRuleValidateInterceptor" />
+		<property name="typeCode" value="SourceRule" />
+	</bean>
+
+	<alias name="defaultRulePrepareInterceptor" alias="rulePrepareInterceptor" />
+	<bean id="defaultRulePrepareInterceptor" class="de.hybris.platform.ruleengineservices.rule.interceptors.RulePrepareInterceptor" />
+
+	<bean id="rulePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="rulePrepareInterceptor" />
+		<property name="typeCode" value="AbstractRule" />
+	</bean>
+	
+	<alias name="defaultRuleVersioningPrepareInterceptor" alias="ruleVersioningPrepareInterceptor" />
+	<bean id="defaultRuleVersioningPrepareInterceptor" class="de.hybris.platform.ruleengineservices.rule.interceptors.RuleVersioningPrepareInterceptor">
+		<property name="historicalContentCreator" ref="sourceRuleHistoricalContentCreator"/>
+	</bean>
+
+	<bean id="ruleVersioningPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ruleVersioningPrepareInterceptor" />
+		<property name="typeCode" value="AbstractRule" />
+	</bean>
+	
+	<alias name="defaultSourceRuleHistoricalContentCreator" alias="sourceRuleHistoricalContentCreator" />
+	<bean id="defaultSourceRuleHistoricalContentCreator" class="de.hybris.platform.ruleengineservices.versioning.impl.SourceRuleModelHistoricalContentCreator">
+		<property name="ruleDao" ref="ruleDao"/>
+		<property name="historicalRuleContentProviders" ref="sourceRuleHistoricalRuleContentProviders"/>
+	</bean>
+	
+	<alias alias="sourceRuleHistoricalRuleContentProviders" name="defaultSourceRuleHistoricalRuleContentProviders"/>
+	<util:list id="defaultSourceRuleHistoricalRuleContentProviders"/>
+	
+	<bean depends-on="sourceRuleHistoricalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="defaultSourceRuleHistoricalRuleContentProvider"/>
+	</bean>
+	
+	<bean id="defaultSourceRuleHistoricalRuleContentProvider" class="de.hybris.platform.ruleengineservices.versioning.impl.DefaultSourceRuleHistoricalRuleContentProvider"/>
+	
+	<bean id="ruleEngineServicesHistoricalRuleContentProvider" class="de.hybris.platform.ruleengineservices.versioning.impl.RuleEngineServicesHistoricalRuleContentProvider"/>
+	
+	<bean depends-on="historicalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="ruleEngineServicesHistoricalRuleContentProvider"/>
+	</bean>
+
+	<alias name="defaultCampaignRuleValidateInterceptor" alias="campaignRuleValidateInterceptor" />
+	<bean id="defaultCampaignRuleValidateInterceptor" class="de.hybris.platform.ruleengineservices.rule.interceptors.CampaignRuleValidateInterceptor"/>
+
+	<bean id="campaignRulePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="campaignRuleValidateInterceptor" />
+		<property name="typeCode" value="Campaign" />
+	</bean>
+
+	<!-- Rule conditions -->
+
+	<alias name="defaultRuleConditionDefinitionConverter" alias="ruleConditionDefinitionConverter" />
+	<bean id="defaultRuleConditionDefinitionConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleConditionDefinitionData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleConditionDefinitionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionPopulator" alias="ruleConditionDefinitionPopulator" />
+	<bean id="defaultRuleConditionDefinitionPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleConditionDefinitionPopulator">
+		<property name="ruleConditionDefinitionCategoryConverter" ref="ruleConditionDefinitionCategoryConverter" />
+		<property name="ruleConditionDefinitionParameterConverter" ref="ruleConditionDefinitionParameterConverter" />
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionCategoryConverter" alias="ruleConditionDefinitionCategoryConverter" />
+	<bean id="defaultRuleConditionDefinitionCategoryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleConditionDefinitionCategoryData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleConditionDefinitionCategoryPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionCategoryPopulator" alias="ruleConditionDefinitionCategoryPopulator" />
+	<bean id="defaultRuleConditionDefinitionCategoryPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleConditionDefinitionCategoryPopulator">
+		<property name="imageConverter" ref="ruleImageConverter" />
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionParameterConverter" alias="ruleConditionDefinitionParameterConverter" />
+	<bean id="defaultRuleConditionDefinitionParameterConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleParameterDefinitionData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleConditionDefinitionParameterPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionParameterPopulator" alias="ruleConditionDefinitionParameterPopulator" />
+	<bean id="defaultRuleConditionDefinitionParameterPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleConditionDefinitionParameterPopulator">
+		<property name="ruleParameterValueConverter" ref="ruleParameterValueConverter" />
+	</bean>
+
+	<alias name="defaultRuleConditionDefinitionDao" alias="ruleConditionDefinitionDao" />
+	<bean id="defaultRuleConditionDefinitionDao" class="de.hybris.platform.ruleengineservices.rule.dao.impl.DefaultRuleConditionDefinitionDao" parent="abstractItemDao">
+		<property name="typeService" ref="typeService" />
+	</bean>
+	
+	<alias name="defaultRuleConditionDefinitionService" alias="ruleConditionDefinitionService" />
+	<bean id="defaultRuleConditionDefinitionService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleConditionDefinitionService">
+		<property name="ruleConditionDefinitionDao" ref="ruleConditionDefinitionDao" />
+	</bean>
+
+
+	<alias name="defaultSourceRuleInspector" alias="sourceRuleInspector" />
+	<bean id="defaultSourceRuleInspector" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultSourceRuleInspector">
+		<property name="ruleConditionsConverter" ref="ruleConditionsConverter" />
+		<property name="ruleActionsConverter" ref="ruleActionsConverter" />
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+		<property name="ruleActionsRegistry" ref="ruleActionsRegistry" />
+	</bean>
+
+    <!-- Rule actions -->
+
+	<alias name="defaultRuleActionDefinitionCategoryPopulator" alias="ruleActionDefinitionCategoryPopulator" />
+	<bean id="defaultRuleActionDefinitionCategoryPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleActionDefinitionCategoryPopulator">
+		<property name="imageConverter" ref="ruleImageConverter" />
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionCategoryConverter" alias="ruleActionDefinitionCategoryConverter" />
+	<bean id="defaultRuleActionDefinitionCategoryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleActionDefinitionCategoryData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleActionDefinitionCategoryPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionParameterPopulator" alias="ruleActionDefinitionParameterPopulator" />
+	<bean id="defaultRuleActionDefinitionParameterPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleActionDefinitionParameterPopulator">
+		<property name="ruleParameterValueConverter" ref="ruleParameterValueConverter" />
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionParameterConverter" alias="ruleActionDefinitionParameterConverter" />
+	<bean id="defaultRuleActionDefinitionParameterConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleParameterDefinitionData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleActionDefinitionParameterPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionPopulator" alias="ruleActionDefinitionPopulator" />
+	<bean id="defaultRuleActionDefinitionPopulator"
+		class="de.hybris.platform.ruleengineservices.rule.services.impl.converters.populators.RuleActionDefinitionPopulator">
+		<property name="ruleActionDefinitionCategoryConverter" ref="ruleActionDefinitionCategoryConverter" />
+		<property name="ruleActionDefinitionParameterConverter" ref="ruleActionDefinitionParameterConverter" />
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionConverter" alias="ruleActionDefinitionConverter" />
+	<bean id="defaultRuleActionDefinitionConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rule.data.RuleActionDefinitionData" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleActionDefinitionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionDao" alias="ruleActionDefinitionDao" />
+	<bean id="defaultRuleActionDefinitionDao" class="de.hybris.platform.ruleengineservices.rule.dao.impl.DefaultRuleActionDefinitionDao" parent="abstractItemDao">
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias name="defaultRuleActionDefinitionService" alias="ruleActionDefinitionService" />
+	<bean id="defaultRuleActionDefinitionService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleActionDefinitionService">
+		<property name="ruleActionDefinitionDao" ref="ruleActionDefinitionDao" />
+	</bean>
+	
+	 <!-- Rule conditions & actions services -->
+
+	<alias name="defaultRuleConditionsRegistry" alias="ruleConditionsRegistry" />
+	<bean id="defaultRuleConditionsRegistry" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleConditionsRegistry">
+		<property name="ruleConditionDefinitionService" ref="ruleConditionDefinitionService" />
+		<property name="ruleConditionDefinitionConverter" ref="ruleConditionDefinitionConverter" />
+	</bean>
+
+	<alias name="defaultRuleActionsRegistry" alias="ruleActionsRegistry" />
+	<bean id="defaultRuleActionsRegistry" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleActionsRegistry">
+		<property name="ruleActionDefinitionService" ref="ruleActionDefinitionService" />
+		<property name="ruleActionDefinitionConverter" ref="ruleActionDefinitionConverter" />
+	</bean>
+
+	<alias name="defaultRuleParameterUuidGenerator" alias="ruleParameterUuidGenerator" />
+	<bean id="defaultRuleParameterUuidGenerator" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterUuidGenerator" />
+
+	<alias name="defaultRuleParametersService" alias="ruleParametersService" />
+	<bean id="defaultRuleParametersService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleParametersService">
+		<property name="ruleParametersConverter" ref="ruleParametersConverter" />
+		<property name="ruleParameterUuidGenerator" ref="ruleParameterUuidGenerator" />
+	</bean>
+
+	<alias name="defaultRuleConditionsService" alias="ruleConditionsService" />
+	<bean id="defaultRuleConditionsService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleConditionsService">
+		<property name="ruleConditionsConverter" ref="ruleConditionsConverter" />
+		<property name="ruleConditionBreadcrumbsBuilder" ref="ruleConditionBreadcrumbsBuilder" />
+		<property name="ruleParametersService" ref="ruleParametersService" />
+	</bean>
+
+	<alias name="defaultRuleActionsService" alias="ruleActionsService" />
+	<bean id="defaultRuleActionsService" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleActionsService">
+		<property name="ruleActionsConverter" ref="ruleActionsConverter" />
+		<property name="ruleActionBreadcrumbsBuilder" ref="ruleActionBreadcrumbsBuilder" />
+		<property name="ruleParametersService" ref="ruleParametersService" />
+	</bean>
+	
+	<!-- Rule conditions & actions conversion -->
+
+	<alias name="defaultRuleParameterSupportedTypes" alias="ruleParameterSupportedTypes" />
+	<util:set id="defaultRuleParameterSupportedTypes" value-type="java.lang.String">
+		<value>java.lang.Boolean</value>
+		<value>java.lang.Character</value>
+		<value>java.lang.String</value>
+		<value>java.lang.Byte</value>
+		<value>java.lang.Short</value>
+		<value>java.lang.Integer</value>
+		<value>java.lang.Long</value>
+		<value>java.lang.Float</value>
+		<value>java.lang.Double</value>
+		<value>java.math.BigInteger</value>
+		<value>java.math.BigDecimal</value>
+		<value>java.util.Date</value>
+		<value>java.lang.Enum</value>
+		<value>java.util.List</value>
+		<value>java.util.Map</value>
+	</util:set>
+
+  	<util:map id="ruleParameterTypeFormatterMap" key-type="java.lang.String" value-type="java.lang.String">
+	   <entry key="ItemType\((.*)\)" value="java.lang.String" />
+	   <entry key="Map\((.+)\,\s*(.+)\)" value="Map(%s,%s)" />
+	   <entry key="List\((.+)\)" value="List(%s)" />
+	</util:map>
+
+    <alias name="defaultRuleParameterTypeFormatter" alias="ruleParameterTypeFormatter" />
+    <bean id="defaultRuleParameterTypeFormatter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterTypeFormatter">
+	    <property name="formats" ref="ruleParameterTypeFormatterMap" /> 
+    </bean>
+
+	<alias name="defaultRuleParameterValueConverter" alias="ruleParameterValueConverter" />
+	<bean id="defaultRuleParameterValueConverter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterValueConverter">
+		<property name="supportedTypes" ref="ruleParameterSupportedTypes" />
+		<property name="ruleParameterTypeFormatter" ref="ruleParameterTypeFormatter" />
+	</bean>
+
+	<bean id="abstractRuleConverter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.AbstractRuleConverter" abstract="true">
+		<property name="ruleParameterUuidGenerator" ref="defaultRuleParameterUuidGenerator"/>
+		<property name="ruleParameterValueConverter" ref="ruleParameterValueConverter"/>
+	</bean>
+
+	<alias name="defaultRuleParametersConverter" alias="ruleParametersConverter" />
+	<bean id="defaultRuleParametersConverter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParametersConverter" parent="abstractRuleConverter"/>
+
+	<alias name="defaultRuleConditionsConverter" alias="ruleConditionsConverter" />
+	<bean id="defaultRuleConditionsConverter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleConditionsConverter" parent="abstractRuleConverter">
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+	</bean>
+
+	<alias name="defaultRuleActionsConverter" alias="ruleActionsConverter" />
+	<bean id="defaultRuleActionsConverter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleActionsConverter" parent="abstractRuleConverter">
+		<property name="ruleActionsRegistry" ref="ruleActionsRegistry" />
+	</bean>
+
+	<alias name="defaultRuleParameterValueMapperStrategy" alias="ruleParameterValueMapperStrategy" />
+	<bean id="defaultRuleParameterValueMapperStrategy" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterValueMapperStrategy">
+		<property name="supportedTypes" ref="ruleParameterSupportedTypes" />
+	</bean>
+
+	<bean id="categoryRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.CategoryRuleParameterValueMapper">
+		<property name="categoryDao" ref="categoryDao" />
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogRuleParameterValueMapper" ref="catalogRuleParameterValueMapper"/>
+		<property name="delimiter" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogdelimiter')}"/>
+		<property name="catalogVersionName" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogversionname')}"/>
+	</bean>
+
+	<bean id="categoryRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="categoryRuleParameterValueMapper" />
+		<property name="normalizer" ref="categoryRuleParameterValueNormalizer"/>
+		<property name="type" value="ItemType(Category)" />
+	</bean>
+
+	<bean id="currencyRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.CurrencyRuleParameterValueMapper">
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<bean id="currencyRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="currencyRuleParameterValueMapper" />
+		<property name="type" value="ItemType(Currency)" />
+	</bean>
+
+	<bean id="customerRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.CustomerRuleParameterValueMapper">
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userIdentifierProvider" ref="userIdentifierProvider" />
+	</bean>
+
+	<bean id="userIdentifierProvider" class="de.hybris.platform.ruleengineservices.rule.identifiers.UserIdentifier">
+		<property name="usePk" value="#{configurationService.configuration.getProperty('ruleengineservices.target.customer.condition.use.pk')}" />
+	</bean>
+
+	<bean id="customerRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="customerRuleParameterValueMapper" />
+		<property name="type" value="ItemType(Customer)" />
+	</bean>
+
+	<bean id="languageRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.LanguageRuleParameterValueMapper">
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<bean id="languageRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="languageRuleParameterValueMapper" />
+		<property name="type" value="ItemType(Language)" />
+	</bean>
+
+	<bean id="productRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.ProductRuleParameterValueMapper">
+		<property name="productDao" ref="productDao" />
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogRuleParameterValueMapper" ref="catalogRuleParameterValueMapper"/>
+		<property name="delimiter" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogdelimiter')}"/>
+        <property name="catalogVersionName" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogversionname')}"/>
+	</bean>
+
+	<bean id="productRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="productRuleParameterValueMapper" />
+		<property name="normalizer" ref="productRuleParameterValueNormalizer"/>
+		<property name="type" value="ItemType(Product)" />
+	</bean>
+
+	<bean id="catalogVersionRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.CatalogVersionRuleParameterValueMapper">
+		<property name="catalogVersionDao" ref="catalogVersionDao" />
+		<property name="delimiter" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogdelimiter')}"/>
+	</bean>
+
+	<bean id="catalogVersionRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="catalogVersionRuleParameterValueMapper" />
+		<property name="type" value="ItemType(CatalogVersion)" />
+	</bean>
+
+	<bean id="catalogRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.CatalogRuleParameterValueMapper">
+		<property name="catalogService" ref="catalogService" />
+	</bean>
+
+	<bean id="catalogRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="catalogRuleParameterValueMapper" />
+		<property name="type" value="ItemType(Catalog)" />
+	</bean>
+
+	<bean id="userGroupRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.UserGroupRuleParameterValueMapper">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="userGroupRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="userGroupRuleParameterValueMapper" />
+		<property name="type" value="ItemType(UserGroup)" />
+	</bean>
+
+	<bean id="deliveryModeRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.DeliveryModeRuleParameterValueMapper">
+		<property name="deliveryModeService" ref="deliveryModeService" />
+	</bean>
+
+	<bean id="deliveryModeRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="deliveryModeRuleParameterValueMapper" />
+		<property name="type" value="ItemType(DeliveryMode)" />
+	</bean>
+	
+	<bean id="sourceRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.SourceRuleParameterValueMapper">
+		<property name="ruleService" ref="ruleService" />
+	</bean>
+
+	<bean id="sourceRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="sourceRuleParameterValueMapper" />
+		<property name="type" value="ItemType(AbstractRule)" />
+	</bean>
+	
+	<bean id="dynamicEnumRuleParameterValueMapper" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.mappers.DynamicEnumRuleParameterValueMapper" abstract="true">
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<bean id="groupTypeEnumRuleParameterValueMapper" parent="dynamicEnumRuleParameterValueMapper">
+		<constructor-arg name="enumerationCode" value="GroupType"/>
+	</bean>
+
+	<bean id="groupTypeEnumRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="groupTypeEnumRuleParameterValueMapper"/>
+		<property name="type" value="ItemType(GroupType)"/>
+	</bean>
+
+	<alias name="defaultRuleParameterValueNormalizerStrategy" alias="ruleParameterValueNormalizerStrategy" />
+	<bean id="defaultRuleParameterValueNormalizerStrategy" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterValueNormalizerStrategy"/>
+
+	<alias name="catalogVersionStripperValueNormalizer" alias="productRuleParameterValueNormalizer"/>
+	<alias name="catalogVersionStripperValueNormalizer" alias="categoryRuleParameterValueNormalizer"/>
+	<bean id="catalogVersionStripperValueNormalizer" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.CatalogVersionStripperRuleParameterValueNormalizer">
+		<property name="delimiter" value="#{configurationService.configuration.getProperty('ruleengineservices.mapper.value.catalogdelimiter')}"/>
+	</bean>
+	<!-- Rule messages -->
+
+	<alias name="defaultRuleMessageFormatStrategy" alias="ruleMessageFormatStrategy" />
+	<bean name="defaultRuleMessageFormatStrategy" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleMessageFormatStrategy">
+		<property name="l10NService" ref="l10nService" />
+		<property name="enumerationService" ref="enumerationService" />
+		<property name="ruleParameterValueNormalizerStrategy" ref="ruleParameterValueNormalizerStrategy" />
+	</bean>
+
+	<bean id="abstractRuleBreadcrumbsBuilder" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.AbstractRuleBreadcrumbsBuilder"
+		abstract="true">
+		<property name="ruleMessageFormatStrategy" ref="ruleMessageFormatStrategy" />
+		<property name="xssEncodeService" ref="xssEncodeService" />
+	</bean>
+
+	<alias name="defaultRuleConditionBreadcrumbsBuilder" alias="ruleConditionBreadcrumbsBuilder" />
+	<bean name="defaultRuleConditionBreadcrumbsBuilder" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleConditionBreadcrumbsBuilder"
+		parent="abstractRuleBreadcrumbsBuilder">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultRuleActionBreadcrumbsBuilder" alias="ruleActionBreadcrumbsBuilder" />
+	<bean name="defaultRuleActionBreadcrumbsBuilder" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleActionBreadcrumbsBuilder"
+		parent="abstractRuleBreadcrumbsBuilder">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+	
+	<!-- Rule parameters validation -->
+
+	<bean id="ruleRequiredParameterValidator" class="de.hybris.platform.ruleengineservices.definitions.validation.RuleRequiredParameterValidator">
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+	</bean>
+
+	<bean id="ruleContainerIdParameterValidator" class="de.hybris.platform.ruleengineservices.definitions.validation.RuleContainerIdParameterValidator">
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+	</bean>
+
+	<bean id="ruleContainersParameterValidator" class="de.hybris.platform.ruleengineservices.definitions.validation.RuleContainersParameterValidator">
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+	</bean>
+
+	<alias name="defaultRuleParameterFilterValueProvider" alias="ruleParameterFilterValueProvider"/>
+	<bean id="defaultRuleParameterFilterValueProvider" class="de.hybris.platform.ruleengineservices.rule.services.impl.DefaultRuleParameterFilterValueProvider">
+		<property name="parser">
+			<bean class="org.springframework.expression.spel.standard.SpelExpressionParser"/>
+		</property>
+	</bean>
+	
+</beans>

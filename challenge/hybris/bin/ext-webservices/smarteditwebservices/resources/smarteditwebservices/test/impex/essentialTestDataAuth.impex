@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=nimda
+$cmsManagerPassword=1234
+
+INSERT_UPDATE Employee;UID[unique=true];groups(uid)[mode=append];sessionLanguage(isocode);password[default=$defaultPassword];name
+;admin;cmsmanagergroup;en;;Admin
+INSERT_UPDATE Employee;UID[unique=true];groups(uid)[mode=append];sessionLanguage(isocode);password[default=$cmsManagerPassword];name
+;cmsmanager;cmsmanagergroup;en;;CmsManager
+INSERT_UPDATE Employee;UID[unique=true];sessionLanguage(isocode);password[default=$cmsManagerPassword];name
+;nobody;en;;Nobody
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;basecmsmanagergroup;employeegroup
+;cmsmanagergroup;employeegroup,basecmsmanagergroup
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true]	;resourceIds	;scope		;authorizedGrantTypes											;authorities			;clientSecret	;registeredRedirectUri
+;trusted_client			;hybris			;basic		;authorization_code,refresh_token,password,client_credentials	;ROLE_ADMINGROUP,ROLE_CMSMANAGERGROUP			;secret	;http://localhost:9001/authorizationserver/oauth2_callback;

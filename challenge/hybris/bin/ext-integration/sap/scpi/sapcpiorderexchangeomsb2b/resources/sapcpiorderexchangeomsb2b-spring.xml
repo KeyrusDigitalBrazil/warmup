@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <alias name="sapCpiOmsOrderB2BConversionService" alias="sapCpiOrderConversionService" />
+    <bean id="sapCpiOmsOrderB2BConversionService"  parent="sapCpiOmsOrderConversionService" >
+        <property name="sapOrderContributor" ref="sapOrderContributor" />
+        <property name="sapPartnerContributor" ref="sapPartnerContributor" />
+    </bean>
+
+    <!-- Default Beans -->
+    <bean id="sapcpiorderexchangeomsb2bSystemSetup" class="de.hybris.platform.sap.sapcpiorderexchangeomsb2b.setup.Sapcpiorderexchangeomsb2bSystemSetup">
+        <!-- constructor arg injection example -->
+        <constructor-arg ref="sapcpiorderexchangeomsb2bService"/>
+    </bean>
+
+    <bean id="sapcpiorderexchangeomsb2bService" class="de.hybris.platform.sap.sapcpiorderexchangeomsb2b.service.impl.DefaultSapcpiorderexchangeomsb2bService">
+        <!-- setter injection example -->
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+			
+</beans>

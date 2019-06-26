@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+
+	<context component="explorer-tree">
+		<explorer-tree:explorer-tree >
+			<explorer-tree:navigation-node id="YaaS Configuration">
+				<explorer-tree:type-node id="YaaSOrganisation" code="YaasOrganisation" />
+				<explorer-tree:type-node id="YaaSProject" code="YaasProject" />
+				<explorer-tree:type-node id="YaaSClientCredential" code="YaasClientCredential" />
+				<explorer-tree:type-node id="YaaSService" code="YaasService" />
+				<explorer-tree:type-node id="BaseSiteServiceMapping" code="BaseSiteServiceMapping" />
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="YaasOrganisation" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="identifier" />
+			<list-view:column qualifier="basePath" />
+			<list-view:column qualifier="yaasProjects" />
+		</list-view:list-view>
+	</context>
+
+	<context type="YaasProject" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="identifier" />
+			<list-view:column qualifier="baseSite" />
+			<list-view:column qualifier="yaasOrganisation" />
+			<list-view:column qualifier="yaasClientCredentials" />
+		</list-view:list-view>
+	</context>
+	<context type="YaasClientCredential" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="identifier" />
+			<list-view:column qualifier="yaasProject" />
+			<list-view:column qualifier="pubsubClient" />
+		</list-view:list-view>
+	</context>
+	<context type="BaseSiteServiceMapping" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="baseSite" />
+			<list-view:column qualifier="yaasService" />
+			<list-view:column qualifier="yaasClientCredential" />
+		</list-view:list-view>
+	</context>
+
+	<context type="YaasService" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="identifier" />
+			<list-view:column qualifier="serviceURL" />
+		</list-view:list-view>
+	</context>
+
+	<context type="BaseSiteServiceMapping" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>baseSite</y:label>
+			</y:labels>
+			<y:preview/>
+		</y:base>
+	</context>
+
+	<context type="YaasClientCredential" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>identifier</y:label>
+			</y:labels>
+			<y:preview/>
+		</y:base>
+	</context>
+
+	<context type="YaasProject" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>identifier</y:label>
+			</y:labels>
+			<y:preview/>
+		</y:base>
+	</context>
+
+	<context type="YaasOrganisation" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>identifier</y:label>
+			</y:labels>
+			<y:preview/>
+		</y:base>
+	</context>
+
+	<context type="YaasService" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>identifier</y:label>
+			</y:labels>
+			<y:preview/>
+		</y:base>
+	</context>
+
+	<context component="create-wizard" type="YaasOrganisation">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="YaasOrganisationWizard" title="create.yaasorganisation.title">
+		<wz:prepare id="yaasOrganisationPrepare">
+			 <wz:initialize property="newYaasOrganisation" type="YaasOrganisation"/>
+		</wz:prepare>
+		<wz:step id="step1" label="step1">
+			<wz:content id="step1.content">
+				<wz:property-list root="newYaasOrganisation">
+					<wz:property qualifier="identifier"/>
+					<wz:property qualifier="basePath"/>
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:done visible="!#empty(newYaasOrganisation.identifier) and newYaasOrganisation.basePath != null">
+					<wz:save property="newYaasOrganisation"/>
+				</wz:done>
+			</wz:navigation>
+		</wz:step>
+	</wz:flow>
+	</context>
+
+	<context component="create-wizard" type="YaasProject">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="YaasProjectWizard" title="create.yaasproject.title">
+		<wz:prepare id="yaasProjectPrepare">
+			 <wz:initialize property="newYaasProject" type="YaasProject"/>
+		</wz:prepare>
+		<wz:step id="step1" label="step1">
+			<wz:content id="step1.content">
+				<wz:property-list root="newYaasProject">
+					<wz:property qualifier="identifier"/>
+					<wz:property qualifier="baseSite"/>
+					<wz:property qualifier="yaasOrganisation"/>
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:done visible="!#empty(newYaasProject.identifier)">
+					<wz:save property="newYaasProject"/>
+				</wz:done>
+			</wz:navigation>
+		</wz:step>
+	</wz:flow>
+	</context>
+
+	 <context component="create-wizard" type="BaseSiteServiceMapping">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="BaseSiteServiceMappingWizard" title="create.basesiteservicemapping.title">
+		<wz:prepare id="baseSiteServiceMappingPrepare">
+			 <wz:initialize property="newBaseSiteServiceMapping" type="BaseSiteServiceMapping"/>
+		</wz:prepare>
+		<wz:step id="step1" label="step1">
+			<wz:content id="step1.content">
+				<wz:property-list root="newBaseSiteServiceMapping">
+					<wz:property qualifier="baseSite"/>
+					<wz:property qualifier="yaasService"/>
+					<wz:property qualifier="yaasClientCredential"/>
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:done visible="!#empty(newBaseSiteServiceMapping.baseSite) and newBaseSiteServiceMapping.yaasService != null and newBaseSiteServiceMapping.yaasClientCredential != null">
+					<wz:save property="newBaseSiteServiceMapping"/>
+				</wz:done>
+			</wz:navigation>
+		</wz:step>
+	</wz:flow>
+	</context> 
+
+	<context component="create-wizard" type="YaasClientCredential">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="YaasClientCredentialWizard" title="create.yaasclientcredential.title">
+		<wz:prepare id="yaasClientCredentialPrepare">
+			 <wz:initialize property="newYaasClientCredential" type="YaasClientCredential"/>
+		</wz:prepare>
+		<wz:step id="step1" label="step1">
+			<wz:content id="step1.content">
+				<wz:property-list root="newYaasClientCredential">
+					<wz:property qualifier="identifier"/>
+					<wz:property qualifier="clientId"/>
+					<wz:property qualifier="clientSecret"/>
+					<wz:property qualifier="oauthURL"/>
+					<wz:property qualifier="yaasProject"/>
+					<wz:property qualifier="pubsubClient" />
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:done visible="!#empty(newYaasClientCredential.identifier) and !#empty(newYaasClientCredential.clientId) and !#empty(newYaasClientCredential.clientSecret)">
+					<wz:save property="newYaasClientCredential"/>
+				</wz:done>
+			</wz:navigation>
+		</wz:step>
+	</wz:flow>
+	</context> 
+
+	 <context merge-by="type" parent="GenericItem" type="YaasClientCredential" component="editor-area">  	
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="field.yaasclientcredential.clientSecret.description">
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="clientSecret"
+					editor="de.hybris.platform.yaasconfigurationbackoffice.editor.masktext"/>
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="clientId"
+					editor="de.hybris.platform.yaasconfigurationbackoffice.editor.masktext"/>
+				</editorArea:section>
+				 <editorArea:section name="field.yaasclientcredential.otherattribute.description">
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="identifier"/>
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="oauthURL"/>
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="yaasProject"/>
+					<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="pubsubClient"/>
+				</editorArea:section>
+			  
+			  </editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context component="create-wizard" type="YaasService">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="YaasServiceWizard" title="create.yaasservice.title">
+		<wz:prepare id="yaasServicePrepare">
+			 <wz:initialize property="newYaasService" type="YaasService"/>
+		</wz:prepare>
+		<wz:step id="step1" label="step1">
+			<wz:content id="step1.content">
+				<wz:property-list root="newYaasService">
+					<wz:property qualifier="identifier"/>
+					<wz:property qualifier="serviceURL"/>
+					<wz:property qualifier="serviceScope"/>
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:done visible="!#empty(newYaasService.identifier)">
+					<wz:save property="newYaasService"/>
+				</wz:done>
+			</wz:navigation>
+		</wz:step>
+	</wz:flow>
+	</context>  
+</config>

@@ -1,0 +1,76 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$currencies=EUR
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+$catalogId=testContentCatalog
+$catalogId1=testContentCatalog1
+$catalogId2=testContentCatalog2
+$catalog-version=Online
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$catalogId]),CatalogVersion.version[default=Online])[default=$catalogId:Online]
+$contentCV1=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$catalogId1]),CatalogVersion.version[default=Online])[default=$catalogId1:Online]
+
+
+INSERT_UPDATE ContentCatalog;id[unique=true];defaultCatalog[default=true];
+                            ;$catalogId;;
+                            ;$catalogId1;;
+                            ;$catalogId2;;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true,default=$catalog-version];active[default=true];defaultCurrency(isocode)[default=$defaultCurrency];
+                            ;$catalogId;;;;
+                            ;$catalogId1;;;;
+                            ;$catalogId2;;;;
+
+
+INSERT_UPDATE BaseStore;uid[unique=true];currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode;catalogs(id);
+                       ;testStore1;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;;$catalogId;
+                       ;testStore2;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;;$catalogId1;
+                       ;testStore3;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;;$catalogId2;
+
+INSERT_UPDATE CMSSite;uid[unique=true];stores(uid);contentCatalogs(id);
+                     ;testSite1;testStore1;$catalogId;
+                     ;testSite2;testStore2;$catalogId1;
+                     ;testSite3;testStore3;$catalogId2;
+
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+                                   ;default;
+
+INSERT_UPDATE CxCustomization; code[unique = true]; name; $contentCV[unique = true]; group(code, $contentCV)[default = 'default']; enabledStartDate[dateformat = dd.MM.yyyy]; enabledEndDate[dateformat = dd.MM.yyyy]; status(code)[default = ENABLED]
+                             ; customization1 ; customization1 ; ; ; ; ;
+
+INSERT_UPDATE CxVariation; code[unique = true]; name; $contentCV[unique = true]; enabled[default = true]; customization(code, $contentCV)[unique = true]; status(code)[default = ENABLED]
+                         ; defaultVariation ; defaultVariation ; ; ; customization1 ;
+
+INSERT_UPDATE CxDefaultTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]; $contentCV[unique = true];
+                              ; defaultTrigger ; defaultVariation ;
+
+INSERT_UPDATE CxCmsAction; code[unique = true]; $contentCV[unique = true]; componentId; variation(code, $contentCV)[unique = true]; target; type(code); containerId;
+                         ; defaultAction ; ; cxcomponent1 ; defaultVariation ; cxCmsActionPerformable ; PLAIN ; container1
+
+
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV1[unique=true]
+                                   ;default;
+
+INSERT_UPDATE CxCustomization; code[unique = true]; name; $contentCV1[unique = true]; group(code, $contentCV1)[default = 'default']; enabledStartDate[dateformat = dd.MM.yyyy]; enabledEndDate[dateformat = dd.MM.yyyy]; status(code)[default = ENABLED]
+                             ; customization1 ; customization1 ; ; ; ; ;
+
+INSERT_UPDATE CxVariation; code[unique = true]; name; $contentCV1[unique = true]; enabled[default = true]; customization(code, $contentCV1)[unique = true]; status(code)[default = ENABLED]
+                         ; defaultVariation ; defaultVariation ; ; ; customization1 ;
+
+INSERT_UPDATE CxDefaultTrigger; code[unique = true]; variation(code, $contentCV1)[unique = true]; $contentCV1[unique = true];
+                              ; defaultTrigger ; defaultVariation ;
+
+INSERT_UPDATE CxCmsAction; code[unique = true]; $contentCV1[unique = true]; componentId; variation(code, $contentCV1)[unique = true]; target; type(code); containerId;
+                         ; defaultAction ; ; cxcomponent1 ; defaultVariation ; cxCmsActionPerformable ; PLAIN ; container1

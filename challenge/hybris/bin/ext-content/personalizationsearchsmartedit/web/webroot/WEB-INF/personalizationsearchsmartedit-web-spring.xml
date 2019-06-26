@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- 
+  WARNING: This is the Spring WEB configuration file. If you want to replace
+  items or managers you have to do this from the extensions core configuration 
+  file (personalizationsearchsmartedit/resources/personalizationsearchsmartedit-spring.xml)
+  -->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- spring security file -->
+	<import resource="config/security-spring.xml"/>
+
+	<!-- Scan for annotation configured controller -->
+	<import resource="classpath:personalizationsearchsmartedit-spring.xml"/>
+
+	<context:component-scan base-package="de.hybris.platform.personalizationsearchsmartedit"/>
+
+	<!-- activates annotation driven binding -->
+	<bean id="pathMatcher" class="org.springframework.util.AntPathMatcher"/>
+	<bean id="urlPathHelper" class="org.springframework.web.util.UrlPathHelper"/>
+
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		<property name="order" value="0"/>
+		<property name="pathMatcher" ref="pathMatcher"/>
+		<property name="urlPathHelper" ref="urlPathHelper"/>
+	</bean>
+
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="webBindingInitializer">
+			<bean class="org.springframework.web.bind.support.ConfigurableWebBindingInitializer">
+			</bean>
+		</property>
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+		<property name="scopes">
+			<map>
+				<entry key="tenant" value="de.hybris.platform.spring.TenantScope"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="smarteditAppPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter"/>
+				<ref bean="dynamicTenantActivationFilter"/>
+				<ref bean="sessionFilter"/>
+				<ref bean="springSecurityFilterChain" />
+				<ref bean="smarteditAppMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="smarteditAppMediaFilter" class="de.hybris.platform.servicelayer.web.WebAppMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+</beans>

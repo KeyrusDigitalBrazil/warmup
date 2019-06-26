@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<!-- Explorer Tree configuration -->
+  	<context component="explorer-tree" parent="auto" merge-by="module">
+     <n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree">
+        <n:navigation-node id="hmc.group.sapintegration.name" merge-mode="append">
+           <n:navigation-node id="cpq.productconfig">
+              <n:type-node id="hmc.cpq.productconfig.sourcerules" code="ProductConfigSourceRule" />
+              <n:type-node id="cpq.typenode.productconfig.modules" code="DroolsKIEModule" />
+           </n:navigation-node>
+        </n:navigation-node>
+     </n:explorer-tree>
+  	</context>
+  	
+  	<context type="ProductConfigSourceRule">
+  	   <context merge-by="type" parent="SourceRule" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field xmlns="http://www.hybris.com/cockpitng/config/advancedsearch" name="conditions" selected="true"/>
+            </advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		
+		<context component="listviewactions" merge-by="type" parent="AbstractSourceRule">
+	         <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	            <y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+		               <y:parameter>
+					  		<y:name>targetComponent</y:name>
+					  		<y:value>configurableFlow</y:value>
+					  	</y:parameter>
+	            </y:action>
+					<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.rulecompileallformoduleaction" property="selectedObjects"/>
+					<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.ruleundeployselectedfrommoduleaction" property="selectedObjects" />
+	            </y:group>
+	         </y:actions>
+    	</context>
+    	
+    	<context merge-by="type" parent="GenericItem" component="editorareaactions">
+	        <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	           <y:group qualifier="common">
+	           		<y:label>actiongroup.common</y:label>
+	           		<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.deletesourcerule" property="currentObject"/>
+					   <y:action action-id="de.hybris.platform.ruleenginebackoffice.action.rulearchiveaction" property="currentObject"/>
+					   <y:action action-id="de.hybris.platform.ruleenginebackoffice.action.rulecloneaction" property="currentObject"/>
+	              	<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.rulecompileformoduleaction" property="currentObject"/>
+	      			<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.ruleundeployfrommoduleaction" property="currentObject"/>          
+	  
+	           </y:group>
+	        </y:actions>
+    	</context>
+	 
+    	<context merge-by="type" parent="AbstractRule" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.abstractrule">
+				
+				   <editorArea:section name="section.productconfigsourcerule.basestores" position="2">
+				      <editorArea:panel name="baseStoresPanel">
+				        <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" 
+						                        qualifier="baseStores" />
+				      </editorArea:panel>
+				   </editorArea:section>
+				</editorArea:tab>
+				   
+				<editorArea:tab name="tab.configuration.conditionsandactions">
+					
+					<editorArea:customSection merge-mode="replace" name="sec.configuration.sourcerule.conditions" spring-bean="productconfigConditionsEditorSectionRenderer" />
+               <editorArea:customSection merge-mode="replace" name="sec.configuration.sourcerule.actions" spring-bean="productconfigActionsEditorSectionRenderer" />
+					
+				</editorArea:tab>
+				
+				<editorArea:tab name="hmc.administration"> 
+			      <editorArea:section name="section.productconfigsourcerule.message" >
+			         <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea"   
+			         									 qualifier="messageFired" />
+						<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" 
+						                            qualifier="messageSeverity" />
+						<editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" 
+						                            qualifier="messageForCstic" />			        
+					</editorArea:section>
+	         </editorArea:tab>
+				
+				
+			</editorArea:editorArea>
+			
+		</context>
+		
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="ProductConfigSourceRuleWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="sourceRulePrepare">
+					<wz:initialize property="newProductConfigSourceRule" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.productconfig.rule.label">
+					<wz:content id="step1.content">
+						<wz:property-list root="newProductConfigSourceRule">
+							<wz:property qualifier="code" type="java.lang.String" />
+							<wz:property qualifier="name" type="java.lang.String" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done visible="!#empty(newProductConfigSourceRule.code)">
+							<wz:save property="newProductConfigSourceRule"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+  	</context>
+
+</config>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="webservicecommons_buildcallbacks" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<target name="wsStaticDoc" description="Generates static html documentation for webservices. Needs running server.">
+	    <var name="docDir" value="${HYBRIS_TEMP_DIR}/swagger"/>
+
+		<for list="${extension.names}" param="extName" delimiter=";">
+			<sequential>
+				<if>
+					<and>
+						<isset property="ext.@{extName}.webmodule.available" />			
+						<equals arg1="${@{extName}.documentation.static.generate}" arg2="true" />
+				    </and>
+					<then>
+						<var name="jsonFile" value="${docDir}/@{extName}.json" />
+						<swaggerGetJson docdir="${docDir}" extname="@{extName}" destfile="${jsonFile}" />
+						<swaggerMavenPlugin swaggerInput="${jsonFile}" tempDir="${docDir}" outputdir="${HYBRIS_DATA_DIR}/doc/@{extName}"/>
+				    </then>
+				</if>
+			</sequential>
+		</for>
+		<delete dir="${docDir}" failonerror="false" />
+	</target>
+		
+	<macrodef name="swaggerGetJson">
+		<attribute name="docDir" />
+		<attribute name="extName" /> 
+		<attribute name="destFile" />
+		
+		<sequential>
+			<mkdir dir="@{docDir}"/>
+			<var name="webroot" value="${ext.@{extName}.extension.webmodule.webroot}"/>
+			<echo message="@{extName} -> http://localhost:${tomcat.http.port}${webroot}/api-docs"/>
+			<get src="http://localhost:${tomcat.http.port}${webroot}/api-docs" dest="@{destFile}"/>
+		</sequential>	
+	</macrodef>
+	
+	<macrodef name="swaggerMavenPlugin">
+		<attribute name="swaggerInput" />
+		<attribute name="tempDir" />
+		<attribute name="templateDir" default="${ext.webservicescommons.path}/resources/swagger" />
+		<attribute name="outputDir"  default="${HYBRIS_DATA_DIR}/doc/"/>
+		<sequential>
+			<echo message="transforming [@{swaggerInput}] to [@{outputDir}]"/>
+			<artifact:mvn pom="@{templateDir}/pom.xml" fork="true" failonerror="true" mavenVersion="3.2.5">
+				<arg value="io.github.swagger2markup:swagger2markup-maven-plugin:convertSwagger2markup" />
+				<arg value="org.asciidoctor:asciidoctor-maven-plugin:process-asciidoc" />
+				<arg value="-Dswagger.input=@{swaggerInput}" />
+				<arg value="-Ddoc.generated=@{tempDir}" />
+				<arg value="-Dasciidoctor.input.directory=@{templateDir}/asciidoc" />
+				<arg value="-Ddoc.output=@{outputDir}" />
+				<jvmarg line="${env.MAVEN_OPTS} ${env.JAVA_OPTS}" />
+			</artifact:mvn>	
+		</sequential>
+	</macrodef>
+	
+</project>

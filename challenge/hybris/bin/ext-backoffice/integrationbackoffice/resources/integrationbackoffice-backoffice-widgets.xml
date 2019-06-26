@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <widget-extension widgetId="backofficeMainSlot">
+        <widget id="integrationBackofficeToolPerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+                slotId="perspectives" title="integrationUITool.name" template="false"
+                access="integrationadministrator, integrationagent">
+            <widget id="integrationBackofficeExplorerTree"
+                    widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree"
+                    slotId="leftSlot" template="false">
+                <widget id="integrationTypeCodeExtractor"
+                        widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                        slotId="cockpitWidgetChildrenInvisible">
+                    <widget id="integrationTypeCodeRouter"
+                            widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+                            slotId="cockpitWidgetChildrenInvisible">
+                        <setting key="editMode_expression" type="String">#root eq 'Modeling'</setting>
+                        <setting key="inboundRequests_expression" type="String">#root eq 'InboundRequest'</setting>
+                        <setting key="outboundRequests_expression" type="String">#root eq 'OutboundRequest'</setting>
+                        <virtual-sockets>
+                            <output id="inboundRequests" type="java.lang.String" />
+                            <output id="outboundRequests" type="java.lang.String" />
+                            <output id="editMode" type="java.lang.String" />
+                        </virtual-sockets>
+                    </widget>
+                    <setting key="expression" type="String">#this instanceof T(com.hybris.cockpitng.tree.node.TypeNode)
+                        ? #this.code : #this.id
+                    </setting>
+                    <setting key="socketDataType_$T" type="String">java.lang.String</setting>
+                    <virtual-sockets/>
+                </widget>
+                <setting key="explorerTreeConfigCtx" type="String">integrationbackoffice-explorer-tree</setting>
+                <setting key="widgetStyleClass" type="String">integrationbackoffice-explorer-tree</setting>
+                <setting key="allowFilteringEntries" type="Boolean">true</setting>
+                <virtual-sockets/>
+            </widget>
+
+            <widget id="integrationBackofficeViewSwitcher" widgetDefinitionId="com.hybris.backoffice.viewswitcher"
+                    slotId="centerSlot" template="false">
+                <widget id="integrationBackofficeEditModeContainer"
+                        widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+                        slotId="views" template="false" title="Edit Mode">
+                    <widget id="integrationBackofficeModelingToolbar"
+                            widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+                            slotId="headerSlot" template="false">
+                        <widget id="integrationBackofficeModelingToolbarDropDown"
+                                widgetDefinitionId="de.hybris.platform.integrationbackoffice.widgets.IntegrationObjectSelector"
+                                slotId="toolbarBeforeSlot" template="false">
+                            <virtual-sockets/>
+                        </widget>
+                        <widget id="integrationBackofficeModelingToolbarButtonPanel"
+                                widgetDefinitionId="de.hybris.platform.integrationbackoffice.widgets.IntegrationObjectButtonPanel"
+                                slotId="toolbarAfterSlot" template="false">
+                            <virtual-sockets/>
+                        </widget>
+                        <widget id="createIntegrationObjectModal"
+                                widgetDefinitionId="de.hybris.platform.integrationbackoffice.widgets.CreateIntegrationObjectModal"
+                                slotId="cockpitWidgetChildrenInvisible" template="true"
+                                title="Create Integration Object">
+                            <instance-settings socketEventRoutingMode="LAST_USED">
+                                <create onInit="false" reuseExisting="true">
+                                    <all-incoming-events/>
+                                </create>
+                                <close>
+                                    <outgoing-events>
+                                        <socket-event id="createButtonClick"/>
+                                    </outgoing-events>
+                                </close>
+                                <select onInit="false">
+                                    <all-incoming-events/>
+                                </select>
+                            </instance-settings>
+                            <virtual-sockets/>
+                        </widget>
+                        <widget id="integrationBackofficeMetadataViewerModal"
+                                widgetDefinitionId="de.hybris.platform.integrationbackoffice.widgets.MetadataViewerModal"
+                                slotId="cockpitWidgetChildrenInvisible" template="true" title="Integration Object Metadata">
+                            <instance-settings socketEventRoutingMode="LAST_USED">
+                                <create onInit="false" reuseExisting="true">
+                                    <all-incoming-events/>
+                                </create>
+                                <close/>
+                                <select onInit="false">
+                                    <all-incoming-events/>
+                                </select>
+                            </instance-settings>
+                            <virtual-sockets/>
+                        </widget>
+                        <setting key="widgetStyleClass" type="String">y-toolbar yw-integrationbackoffice-toolbar</setting>
+                        <setting key="widgetStyleAttribute" type="String">background-color:white;</setting>
+                        <setting key="toolbarActions" type="String">integrationbackoffice-modeling-toolbar-actions</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <widget id="integrationBackofficeEditModeWidget"
+                            widgetDefinitionId="de.hybris.platform.integrationbackoffice.widgets.IntegrationObjectEditor"
+                            slotId="centerSlot" template="false">
+                        <virtual-sockets/>
+                    </widget>
+                    <setting key="northCollapsible" type="Boolean">false</setting>
+                    <setting key="northSplittable" type="Boolean">false</setting>
+                    <setting key="northHeight" type="String">60px</setting>
+                    <setting key="westDisabled" type="Boolean">true</setting>
+                    <setting key="northDisabled" type="Boolean">false</setting>
+                    <setting key="eastDisabled" type="Boolean">true</setting>
+                    <virtual-sockets/>
+                </widget>
+
+                <widget id="inboundMonitor"
+                        widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer"
+                        slotId="views" template="false" title="Inbound Monitoring">
+                    <widget id="inboundRequestSearchEngine"
+                            widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+                            slotId="cockpitWidgetChildrenInvisible" template="false">
+                        <virtual-sockets/>
+                    </widget>
+                    <widget id="inboundRequestSearchCondition" widgetDefinitionId="com.hybris.cockpitng.advancedsearch"
+                            slotId="top" template="false">
+                        <setting key="disableSubtypesCheckbox" type="Boolean">true</setting>
+                        <setting key="disableAdvancedSearchToolbar" type="Boolean">true</setting>
+                        <setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <widget id="inboundRequestSearchResult"
+                            widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+                            slotId="center" template="false">
+                        <setting key="socketDataType_$T" type="String">
+                            de.hybris.platform.inboundservices.model.InboundRequestModel
+                        </setting>
+                    </widget>
+                    <widget id="inboundRequestDetails"
+                            widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+                            slotId="bottom" template="false">
+                        <setting key="socketDataType_$T" type="String">
+                            de.hybris.platform.inboundservices.model.InboundRequestModel
+                        </setting>
+                        <setting key="toolbarDisabled" type="Boolean">true</setting>
+                    </widget>
+                    <setting key="topPanelCollapsed">true</setting>
+                </widget>
+                <widget id="outboundMonitor"
+                        widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer"
+                        slotId="views" template="false" title="Outbound Monitoring">
+                    <widget id="outboundRequestSearchEngine"
+                            widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+                            slotId="cockpitWidgetChildrenInvisible" template="false">
+                        <virtual-sockets/>
+                    </widget>.
+                    <widget id="outboundRequestSearchCondition" widgetDefinitionId="com.hybris.cockpitng.advancedsearch"
+                            slotId="top" template="false">
+                        <setting key="disableSubtypesCheckbox" type="Boolean">true</setting>
+                        <setting key="disableAdvancedSearchToolbar" type="Boolean">true</setting>
+                        <setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <widget id="outboundRequestSearchResult"
+                            widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+                            slotId="center" template="false">
+                        <setting key="socketDataType_$T" type="String">de.hybris.platform.outboundservices.model.OutboundRequestModel</setting>
+                    </widget>
+                    <widget id="outboundRequestDetails"
+                            widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+                            slotId="bottom" template="false">
+                        <setting key="socketDataType_$T" type="String">de.hybris.platform.outboundservices.model.OutboundRequestModel</setting>
+                        <setting key="toolbarDisabled" type="Boolean">true</setting>
+                    </widget>
+                    <setting key="topPanelCollapsed">true</setting>
+                </widget>
+
+                <setting key="defaultView" type="String">integrationBackofficeEditModeContainer</setting>
+                <setting key="initialView" type="String">integrationBackofficeEditModeContainer</setting>
+                <setting key="selectEditModeContainer_eval" type="String" value="'integrationBackofficeEditModeContainer'"/>
+                <setting key="selectInboundMonitor_eval" type="String" value="'inboundMonitor'"/>
+                <setting key="selectOutboundMonitor_eval" type="String" value="'outboundMonitor'" />
+                <setting key="widgetStyleClass" type="String"/>
+                <virtual-sockets>
+                    <input id="selectEditModeContainer" type="java.lang.Object"/>
+                    <input id="selectInboundMonitor" type="java.lang.Object" />
+                    <input id="selectOutboundMonitor" type="java.lang.Object" />
+                </virtual-sockets>
+            </widget>
+
+            <setting key="perspectiveImageUrl" value="cng/images/integrationbackoffice_perspective_icon.svg" type="String"/>
+            <setting key="eastDisabled" type="Boolean">true</setting>
+        </widget>
+    </widget-extension>
+
+    <!-- Modeling -->
+    <widget-connection sourceWidgetId="integrationBackofficeModelingToolbarButtonPanel" outputId="refreshButtonClick"
+                       targetWidgetId="integrationBackofficeModelingToolbarDropDown" inputId="receiveRefresh"/>
+    <widget-connection sourceWidgetId="integrationBackofficeModelingToolbarButtonPanel" outputId="refreshButtonClick"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="refreshEvent"/>
+
+    <widget-connection sourceWidgetId="integrationBackofficeModelingToolbarButtonPanel" outputId="saveButtonClick"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="saveEvent"/>
+
+    <widget-connection sourceWidgetId="integrationBackofficeModelingToolbarDropDown" outputId="comboBoxOnChange"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="integrationObject"/>
+
+    <widget-connection sourceWidgetId="integrationBackofficeModelingToolbarDropDown" outputId="comboBoxOnChange"
+                       targetWidgetId="integrationBackofficeModelingToolbarButtonPanel" inputId="integrationObject"/>
+
+    <widget-connection sourceWidgetId="STUB_integrationbackoffice.actions.deleteIntegrationObjectAction"
+                       outputId="requestDelete"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="receiveDelete"/>
+
+    <widget-connection sourceWidgetId="STUB_integrationbackoffice.actions.createIntegrationObjectAction"
+                       outputId="createIntegrationObjectPerform"
+                       targetWidgetId="createIntegrationObjectModal" inputId="createIntegrationObjectEvent"/>
+
+    <widget-connection sourceWidgetId="STUB_integrationbackoffice.actions.integrationObjectMetadataViewerAction"
+                       outputId="openMetadataModal"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="metadataModalEvent"/>
+
+    <widget-connection sourceWidgetId="createIntegrationObjectModal" outputId="createButtonClick"
+                       targetWidgetId="integrationBackofficeEditModeWidget" inputId="createIntegrationObjectEvent"/>
+
+    <widget-connection sourceWidgetId="integrationBackofficeEditModeWidget"
+                       outputId="openMetadataViewer"
+                       targetWidgetId="integrationBackofficeMetadataViewerModal" inputId="showModal"/>
+    <widget-connection sourceWidgetId="integrationBackofficeEditModeWidget" outputId="sendActionState"
+                       targetWidgetId="STUB_integrationbackoffice.actions.integrationObjectMetadataViewerAction" inputId="actionState"/>
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="editMode"
+                       targetWidgetId="integrationBackofficeViewSwitcher" inputId="selectEditModeContainer"/>
+
+    <!-- Monitoring -->
+    <widget-connection sourceWidgetId="integrationBackofficeExplorerTree" outputId="nodeSelected"
+                       targetWidgetId="integrationTypeCodeExtractor" inputId="genericInput"/>
+
+
+    <widget-connection sourceWidgetId="integrationTypeCodeExtractor" outputId="genericOutput"
+                       targetWidgetId="integrationTypeCodeRouter" inputId="element"/>
+
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="inboundRequests"
+                       targetWidgetId="integrationBackofficeViewSwitcher" inputId="selectInboundMonitor"/>
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="inboundRequests"
+                       targetWidgetId="inboundMonitor" inputId="activate"/>
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="inboundRequests"
+                       targetWidgetId="inboundRequestSearchCondition" inputId="type"/>
+
+    <widget-connection sourceWidgetId="inboundRequestSearchCondition" outputId="searchData"
+                       targetWidgetId="inboundRequestSearchEngine" inputId="searchData"/>
+    <widget-connection sourceWidgetId="inboundRequestSearchEngine" outputId="pageable"
+                       targetWidgetId="inboundRequestSearchResult" inputId="pageable"/>
+    <widget-connection sourceWidgetId="inboundRequestSearchResult" outputId="selectedItem"
+                       targetWidgetId="inboundRequestDetails" inputId="inputObject" />
+
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="outboundRequests"
+                       targetWidgetId="integrationBackofficeViewSwitcher" inputId="selectOutboundMonitor"/>
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="outboundRequests"
+                       targetWidgetId="outboundMonitor" inputId="activate"/>
+
+    <widget-connection sourceWidgetId="integrationTypeCodeRouter" outputId="outboundRequests"
+                       targetWidgetId="outboundRequestSearchCondition" inputId="type"/>
+
+    <widget-connection sourceWidgetId="outboundRequestSearchCondition" outputId="searchData"
+                       targetWidgetId="outboundRequestSearchEngine" inputId="searchData"/>
+    <widget-connection sourceWidgetId="outboundRequestSearchEngine" outputId="pageable"
+                       targetWidgetId="outboundRequestSearchResult" inputId="pageable" />
+    <widget-connection sourceWidgetId="outboundRequestSearchResult" outputId="selectedItem"
+                       targetWidgetId="outboundRequestDetails" inputId="inputObject" />
+</widgets>

@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=electronicsContentCatalog
+$contentCatalogName=Electronics Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+$siteResource=jar:de.hybris.platform.constants.PromotionEngineSamplesAddonConstants&/promotionenginesamplesaddon/import/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$lang=en
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+INSERT_UPDATE Media; mediaFormat(qualifier); code[unique = true]; @media[translator = de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite = true]; realfilename; altText; mime[default = 'image/jpeg']; $contentCV[unique = true]; folder(qualifier)[default = images];
+; mobile     ; Elec_Campaign_480x201_EN_01_480W.jpg   ; $siteResource/images/Elec_Campaign_480x201_EN_01_480W.jpg ; Elec_Campaign_480x201_EN_01_480W.jpg ; "Get 10% Off and start your photo journey" ;
+; tablet     ; Elec_Campaign_770x322_EN_01_770W.jpg   ; $siteResource/images/Elec_Campaign_770x322_EN_01_770W.jpg ; Elec_Campaign_770x322_EN_01_770W.jpg ; "Get 10% Off and start your photo journey" ;
+; desktop    ; Elec_Campaign_960x401_EN_01_960W.jpg   ; $siteResource/images/Elec_Campaign_960x401_EN_01_960W.jpg ; Elec_Campaign_960x401_EN_01_960W.jpg ; "Get 10% Off and start your photo journey" ;
+; widescreen ; Elec_Campaign_1400x602_EN_01_1400W.jpg ; $siteResource/images/Elec_Campaign_1400x602_EN_01_1400W.jpg ; Elec_Campaign_1400x602_EN_01_1400W.jpg ; "Get 10% Off and start your photo journey" ;
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-sony-campaign-spalsh-en;Elec_Campaign_480x201_EN_01_480W.jpg,Elec_Campaign_770x322_EN_01_770W.jpg,Elec_Campaign_960x401_EN_01_960W.jpg,Elec_Campaign_1400x602_EN_01_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer
+;;ElectronicsHomepageSonyCampaignSplashBannerComponent;electronics-sony-campaign-spalsh-en
+

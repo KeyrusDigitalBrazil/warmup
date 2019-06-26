@@ -1,0 +1,39 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# ImpEx for Promotions for Electronics Store
+#% impex.setLocale( Locale.GERMAN );
+
+$defaultPromoGrp=apparelUKPromoGrp
+$promotionsModule="promotions-module"
+$previewModule="promotions-preview-module"
+$ruleImportProcessor=processor=de.hybris.platform.ruleengineservices.impex.impl.ConditionalImportProcessor,condition=de.hybris.platform.ruleengineservices.impex.impl.RuleImportCondition
+
+############################# RULE GROUPS ##########################
+INSERT_UPDATE RuleGroup;code[unique=true]
+;productPromotionRuleGroup
+
+INSERT_UPDATE PromotionSourceRule[$ruleImportProcessor];&sourceRule;code[unique=true];priority;maxAllowedRuns;ruleGroup(code);conditions;actions;website(Identifier)[default=$defaultPromoGrp];excludeFromStorefrontDisplay[default=false];status(code)[unique=true,default=UNPUBLISHED]
+"#% afterEach: de.hybris.platform.core.Registry.getApplicationContext().getBean(""ruleEngineSystemSetup"").registerSourceRuleForDeployment(impex.getLastImportedItem(), new String[]{$promotionsModule});"
+;percentage_discount_on_winter_products;percentage_discount_on_winter_products;210;1;productPromotionRuleGroup;"[{""definitionId"":""y_qualifying_categories"",""parameters"":{""quantity"":{""uuid"":""ce4c88a9-1ec1-421b-b431-09c1983b476c"",""type"":""java.lang.Integer"",""value"":1},""categories_operator"":{""uuid"":""77a69eec-736b-4f7a-9c81-31bec7dc9c8a"",""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""value"":""CONTAINS_ANY""},""excluded_categories"":{""uuid"":""9d32fe48-1fe9-4209-a57a-5a722e9a1516"",""type"":""List(ItemType(Category))""},""categories"":{""uuid"":""af6b597d-7582-44f4-a834-fbe83b12b63b"",""type"":""List(ItemType(Category))"",""value"":[""skigear"",""450100""]},""excluded_products"":{""uuid"":""28a5c1a2-b5b8-4727-b362-d9efd22d0e70"",""type"":""List(ItemType(Product))""},""operator"":{""uuid"":""e7041a69-5911-479c-b7f1-072ccfeb3d5b"",""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""value"":""GREATER_THAN_OR_EQUAL""}},""children"":[]}]";"[{""definitionId"":""y_order_percentage_discount"",""parameters"":{""value"":{""uuid"":""73120101-d00e-464e-9053-729936a27da6"",""type"":""java.math.BigDecimal"",""value"":10}}}]";;true
+;percentage_discount_on_summer_products;percentage_discount_on_summer_products;220;1;productPromotionRuleGroup;"[{""definitionId"":""y_qualifying_categories"",""parameters"":{""quantity"":{""uuid"":""2dcd2f07-3af4-4310-ad66-f75e3e7f5e32"",""type"":""java.lang.Integer"",""value"":1},""categories_operator"":{""uuid"":""60365af2-eaff-45df-8624-702334cc31fd"",""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""value"":""CONTAINS_ANY""},""excluded_categories"":{""uuid"":""d2a59de6-322f-4c92-be53-5a9f22735d14"",""type"":""List(ItemType(Category))""},""categories"":{""uuid"":""15b437c3-07fb-4979-831d-eae1fdbe2b5e"",""type"":""List(ItemType(Category))"",""value"":[""sunglasses"",""tshirts""]},""excluded_products"":{""uuid"":""834dd037-26a1-44e0-baac-5f4ddc3889fa"",""type"":""List(ItemType(Product))""},""operator"":{""uuid"":""9b9e24b1-0a8d-4edb-9b73-2bab037064a0"",""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""value"":""GREATER_THAN_OR_EQUAL""}},""children"":[]}]";"[{""definitionId"":""y_order_percentage_discount"",""parameters"":{""value"":{""uuid"":""cfaaf3ef-c2e2-491a-b353-e472fd9b3913"",""type"":""java.math.BigDecimal"",""value"":10}}}]";;true
+
+INSERT_UPDATE Campaign[disable.interceptor.types=validate];code[unique=true];enabled;sourceRules[translator=de.hybris.platform.ruleengineservices.impex.impl.CampaignSourceRulesTranslator,mode=append];startDate[dateformat=dd.MM.yyyy HH:mm];endDate[dateformat=dd.MM.yyyy HH:mm];
+"#%
+int year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+int nextYear = year + 1; 
+String line1 = ""enjoy_winter_campaign;false;percentage_discount_on_winter_products;01.11."" + year + "" 00:01;30.04."" + nextYear + "" 23:59;\n"";
+String line2 = ""enjoy_summer_campaign;false;percentage_discount_on_summer_products;01.05."" + nextYear + "" 00:01;31.10."" + nextYear + "" 23:59\n;"";
+reader = new de.hybris.platform.util.CSVReader(line1+line2);
+reader.setMaxBufferLines(100000);
+impex.includeExternalData(reader);
+";
+

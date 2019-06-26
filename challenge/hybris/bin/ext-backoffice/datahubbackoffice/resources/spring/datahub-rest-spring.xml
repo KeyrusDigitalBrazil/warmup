@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="restClientDad" class="com.hybris.datahub.client.AbstractJerseyRestClient" abstract="true">
+		<constructor-arg ref="developerClientConfiguration" />
+		<property name="serverContextService" ref="dataHubServerContext" />
+		<property name="adminClientConfiguration" ref="adminConfiguration" />
+		<property name="developerClientConfiguration" ref="developerConfiguration" />
+		<property name="userContext" ref="userContext" />
+	</bean>
+
+	<alias name="adminClientConfiguration" alias="adminConfiguration" />
+	<bean id="adminClientConfiguration" class="com.hybris.datahub.client.ClientConfiguration">
+		<property name="contentType" value="application/json" />
+		<property name="providerClasses">
+			<set>
+				<value type="java.lang.Class">com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider</value>
+			</set>
+		</property>
+		<property name="securityCredentialsInfo" ref="adminSecurityCredentialsInfo" />
+	</bean>
+
+	<alias name="developerClientConfiguration" alias="developerConfiguration" />
+	<bean id="developerClientConfiguration" class="com.hybris.datahub.client.ClientConfiguration">
+		<property name="contentType" value="application/json" />
+		<property name="providerClasses">
+			<set>
+				<value type="java.lang.Class">com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider</value>
+			</set>
+		</property>
+		<property name="securityCredentialsInfo" ref="developerSecurityCredentialsInfo" />
+	</bean>
+
+	<bean id="canonicalItemClassClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicCanonicalItemClassClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="csvImportClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicCsvImportClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataFeedClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicDataFeedClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataItemClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicDataItemClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataPoolClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicDataPoolClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="poolActionClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicPoolActionClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="publicationClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicPublicationClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="rawFragmentClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicRawFragmentClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="rawItemClassClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicRawItemClassClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="targetSystemClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicTargetSystemClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="itemClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicDataItemClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="dataHubStatusClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicDataHubStatusClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+
+	<bean id="statusCountClient" class="de.hybris.platform.datahubbackoffice.datahub.rest.DynamicStatusCountClient"
+		  parent="restClientDad" scope="session">
+		<aop:scoped-proxy />
+	</bean>
+</beans>

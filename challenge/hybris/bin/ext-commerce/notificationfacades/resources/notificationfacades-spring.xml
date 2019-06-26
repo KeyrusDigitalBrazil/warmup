@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+          
+    
+    <bean id="notificationPreferencePopulator" class="de.hybris.platform.notificationfacades.populators.NotificationPreferencePopulator">
+		<property name="smsNotificationChannelStrategy" ref="smsNotificationChannelStrategy"/>
+    </bean>
+     
+    <alias name="defaultNotificationPreferenceConverter" alias="notificationPreferenceConverter"/> 
+	<bean id="defaultNotificationPreferenceConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.notificationfacades.data.NotificationPreferenceData"/>
+		<property name="populators">
+			<list>
+				<ref bean="notificationPreferencePopulator"/>
+			</list>
+		</property>
+	</bean>
+    
+    <bean id="notificationPreferencesPopulator" class="de.hybris.platform.notificationfacades.populators.NotificationPreferencesPopulator">		
+    </bean>    
+    
+    <alias name="defaultNotificationPreferencesConverter" alias="notificationPreferencesConverter"/> 
+	<bean id="defaultNotificationPreferencesConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.notificationfacades.data.NotificationPreferenceDataList"/>
+		<property name="populators">
+			<list>
+				<ref bean="notificationPreferencesPopulator"/>
+			</list>
+		</property>
+	</bean>
+   
+    <bean id="notificationPreferenceEntryPopulator" class="de.hybris.platform.notificationfacades.populators.NotificationPreferenceEntryPopulator">		
+    	<property name="configurationService" ref="configurationService"/>
+    </bean>
+    
+    <alias name="defaultNotificationPreferenceEntryConverter" alias="notificationPreferenceEntryConverter"/> 
+	<bean id="defaultNotificationPreferenceEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.notificationfacades.data.NotificationPreferenceData"/>
+		<property name="populators">
+			<list>
+				<ref bean="notificationPreferenceEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultNotificationPreferenceFacade" alias="notificationPreferenceFacade"/>
+	<bean id="defaultNotificationPreferenceFacade" class="de.hybris.platform.notificationfacades.facades.impl.DefaultNotificationPreferenceFacade">
+		<property name="notificationPreferenceConverter" ref="notificationPreferenceConverter"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="notificationService" ref="notificationService"/>
+		<property name="notificationPreferencesConverter" ref="notificationPreferencesConverter"/>
+		<property name="notificationPreferenceEntryConverter" ref="notificationPreferenceEntryConverter"/>
+	</bean>
+	
+	<alias name="defaultSiteMessageFacade" alias="siteMessageFacade"/>
+	<bean id="defaultSiteMessageFacade" class="de.hybris.platform.notificationfacades.facades.impl.DefaultSiteMessageFacade">
+		<property name="userService" ref="userService"/>
+		<property name="siteMessageService" ref="siteMessageService"/>
+		<property name="siteMessageSearchPageDataConverter" ref="siteMessageSearchPageDataConverter"/>
+	</bean>
+	
+	<bean id="siteMessagePopulator" class="de.hybris.platform.notificationfacades.populators.SiteMessagePopulator">		
+		<property name="siteMessageUrlResolvers" ref="siteMessageUrlResolversMap"/>
+    </bean>
+    
+    <alias name="defaultSiteMessageConverter" alias="siteMessageConverter"/> 
+	<bean id="defaultSiteMessageConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.notificationfacades.data.SiteMessageData"/>
+		<property name="populators">
+			<list>
+				<ref bean="siteMessagePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="siteMessageSearchPageDataPopulator" class="de.hybris.platform.notificationfacades.populators.SiteMessageSearchPageDataPopulator">	
+		<property name="siteMessageConverter" ref="siteMessageConverter"/>
+    </bean>
+    
+    <alias name="siteMessageSearchPageDataConverter" alias="siteMessageSearchPageDataConverter"/> 
+	<bean id="siteMessageSearchPageDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.core.servicelayer.data.SearchPageData"/>
+		<property name="populators">
+			<list>
+				<ref bean="siteMessageSearchPageDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<util:map id="siteMessageUrlResolversMap" key-type="de.hybris.platform.notificationservices.enums.NotificationType"
+			value-type="de.hybris.platform.notificationfacades.url.SiteMessageUrlResolver">
+	</util:map>
+	
+</beans>

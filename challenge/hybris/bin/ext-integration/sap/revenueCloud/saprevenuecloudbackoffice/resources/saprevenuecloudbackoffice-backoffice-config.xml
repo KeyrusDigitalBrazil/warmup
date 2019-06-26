@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+ <context merge-by="module" parent="auto" component="explorer-tree">
+    <explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+        <explorer-tree:navigation-node id="backoffice.group.saprevenuecloud.name">
+            <explorer-tree:type-node code="SAPRevenueCloudConfiguration" id="SAPRevenueCloudConfiguration"/>
+            <explorer-tree:type-node code="SAPMarketToCatalogMapping" id="SAPMarketToCatalogMapping"/>
+            <explorer-tree:type-node code="UsageUnit" id="UsageUnit"/>
+            <explorer-tree:type-node code="BillingEvent" id="BillingEvent"/>
+        </explorer-tree:navigation-node>
+    </explorer-tree:explorer-tree>
+    </context>
+    
+     <context merge-by="type" parent="GenericItem" type="SAPRevenueCloudConfiguration" component="listview">
+    <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+        <list-view:column qualifier="name"/>
+    </list-view:list-view>
+    </context>
+    
+    <context type="SAPRevenueCloudConfiguration" component="advanced-search" merge-by="type" parent="GenericItem">
+    <advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch" xmlns="http://www.hybris.com/cockpitng/config/advancedsearch">
+       <field-list>
+           <field name="name"  selected="true" operator="startsWith" />
+	 </field-list>
+	 </advanced-search:advanced-search>
+	</context>
+	
+	    <context merge-by="type" parent="GenericItem" type="Product" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab  name="backoffice.tab.common">
+                <editorArea:section name="backoffice.section.saprevenuecloud.subscription">
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="subscriptionCode"/>
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="contractTerms"/>
+                    <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="subscriptionType"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+	
+	  <context merge-by="type" parent="GenericItem" type="SAPRevenueCloudConfiguration" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:essentials xmlns="http://www.hybris.com/cockpitng/component/editorArea">
+                <essentialSection name="backoffice.essential">
+                    <attribute qualifier="name"/>
+                </essentialSection>
+            </editorArea:essentials>
+            <editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.saprevenuecloud.configuration">
+                <section name="backoffice.section.saprevenuecloud.config">
+                    <attribute qualifier="marketToCatalogMappings"/>
+                </section>
+                <section name="backoffice.section.saprevenuecloud.customer">
+                    <attribute qualifier="replicateCustomer"/>
+                    <attribute qualifier="defaultCountryCode"/>
+                </section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    
+    
+    
+    <context merge-by="type" parent="GenericItem" type="SAPMarketToCatalogMapping" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab xmlns="http://www.hybris.com/cockpitng/component/editorArea" name="backoffice.tab.saprevenuecloud.market2catalog">
+                <section name="backoffice.section.saprevenuecloud.market2catalog.map">
+                    <attribute qualifier="marketId"/>
+                    <attribute qualifier="catalog"/>
+                </section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    
+     <context type="SAPRevenueCloudConfiguration" component="base" merge-by="type" parent="GenericItem">
+    <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+        <y:labels>
+            <y:label>name</y:label>
+        </y:labels>
+    </y:base>
+    </context>
+    
+    <context type="SAPRevenueCloudConfiguration" component="create-wizard">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"  id="saprcWizard" title="create.saprc.title">
+	
+	 <wz:prepare id="saprcPrepare" >
+	 	<wz:initialize property="newSAPRC" type="SAPRevenueCloudConfiguration" />
+	 </wz:prepare>
+	 
+	 <wz:step id="step1" label="create.saprc.config.label" sublabel="create.saprc.config.sublabel">>
+	 	<wz:content id="step1.content">
+	 		<wz:property-list root="newSAPRC">
+	 			<wz:property qualifier="name" />
+	 			<wz:property qualifier="marketToCatalogMappings" />
+	 			<wz:property qualifier="replicateCustomer" />
+	 			<wz:property qualifier="defaultCountryCode" />
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step1.navigation" >
+	 	<wz:cancel />
+	 	<wz:done visible="!#empty(newSAPRC.name)" >
+	 		<wz:save property="newSAPRC" />
+	 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	 
+	</wz:flow>
+	</context>
+	
+	<context type="SAPMarketToCatalogMapping" component="create-wizard">
+	<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"  id="saprcMappingWizard" title="create.saprcMapping.title">
+	
+	 <wz:prepare id="saprcMappingPrepare" >
+	 	<wz:initialize property="newSAPRCMapping" type="SAPMarketToCatalogMapping" />
+	 </wz:prepare>
+	 
+	 <wz:step id="step1" label="create.saprc.mapping.label" sublabel="create.saprc.mapping.sublabel">>
+	 	<wz:content id="step1.content">
+	 		<wz:property-list root="newSAPRCMapping">
+	 			<wz:property qualifier="marketId" />
+	 			<wz:property qualifier="catalog" />
+	 		</wz:property-list>
+	 	</wz:content>
+	 	<wz:navigation id="step1.navigation" >
+	 	<wz:cancel />
+	 	<wz:done visible="!#empty(newSAPRCMapping.marketId) AND newSAPRCMapping.catalog != null"  >
+	 		<wz:save property="newSAPRCMapping" />
+	 	</wz:done>
+	 	</wz:navigation>
+	 </wz:step>
+	 
+	</wz:flow>
+	</context>
+	 
+	 
+
+</config>

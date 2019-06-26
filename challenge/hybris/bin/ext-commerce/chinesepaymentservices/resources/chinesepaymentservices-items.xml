@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+	<enumtypes>
+        <enumtype code="ServiceType" autocreate="true" generate="true" dynamic="true">
+        	<value code="Payorder"></value>
+        </enumtype>
+    </enumtypes>
+
+	<itemtypes>
+		<itemtype code="StockLevelReservationHistoryEntry" generate="true"
+			extends="GenericItem" autocreate="true">
+			<deployment table="StockReserveHistoryEntry"
+				typecode="9863" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="orderCode"
+					autocreate="true">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute generate="true" autocreate="true" qualifier="warehouse"
+					type="Warehouse">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+				<attribute generate="true" autocreate="true" type="Product"
+					qualifier="product">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+				<attribute generate="true" autocreate="true" type="java.lang.Integer"
+					qualifier="quantity">
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="ChinesePaymentInfo" extends="PaymentInfo"
+			generate="true" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="orderCode"
+					autocreate="true" generate="true">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute generate="true" autocreate="true" qualifier="serviceType"
+					type="ServiceType">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+				</attribute>
+				<attribute generate="true" autocreate="true" type="java.lang.String"
+					qualifier="paymentProvider">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="true"
+						optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<description>additional attributes.</description>
+			<attributes>
+				<attribute qualifier="chinesePaymentInfo" type="ChinesePaymentInfo">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

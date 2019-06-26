@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultAuditReportDataService" alias="auditReportDataService" />
+	<bean id="defaultAuditReportDataService" class="de.hybris.platform.auditreport.service.impl.DefaultAuditReportDataService">
+		<property name="auditViewService" ref="auditViewService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="reportViewConverterStrategies" ref="reportViewConverterStrategies" />
+		<property name="reportFolderName" value="auditreports" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultReportViewConverterStrategies" alias="reportViewConverterStrategies" />
+	<util:list id="defaultReportViewConverterStrategies">
+		<ref bean="reportViewConverterStrategy" />
+	</util:list>
+
+	<alias name="defaultJsonReportViewConverterStrategy" alias="jsonReportViewConverterStrategy" />
+	<bean id="defaultJsonReportViewConverterStrategy" class="de.hybris.platform.auditreport.service.impl.JsonReportViewConverterStrategy" />
+
+	<alias name="defaultReportViewConverterStrategy" alias="reportViewConverterStrategy" />
+	<bean id="defaultReportViewConverterStrategy" class="de.hybris.platform.auditreport.service.impl.DefaultReportViewConverterStrategy">
+		<property name="textConverterStrategy" ref="jsonReportViewConverterStrategy" />
+		<property name="rendererService" ref="rendererService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="sessionService" ref="sessionService"/>
+		<property name="customDirectives">
+			<list>
+				<bean class="de.hybris.platform.auditreport.service.impl.velocity.JSONEncodingInputStreamDirective"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCreateAuditReportJobPerformable" alias="createAuditReportJobPerformable" />
+	<bean id="defaultCreateAuditReportJobPerformable" class="de.hybris.platform.auditreport.service.impl.CreateAuditReportJobPerformable" parent="abstractJobPerformable">
+		<property name="auditReportDataService" ref="auditReportDataService" />
+		<property name="userService" ref="userService" />
+		<property name="workflowTemplateName" value="ProcessAuditReport" />
+		<property name="workflowProcessingService" ref="workflowProcessingService" />
+		<property name="workflowService" ref="newestWorkflowService" />
+		<property name="workflowTemplateService" ref="workflowTemplateService" />
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultAuditServicesCustomerCleanupHook" alias="auditServicesCustomerCleanupHook" />
+	<bean id="defaultAuditServicesCustomerCleanupHook" class="de.hybris.platform.auditreport.retention.impl.AuditServicesCustomerCleanupHook">
+		<property name="auditReportDataService" ref="auditReportDataService" />
+	</bean>
+	
+	<bean id="auditReportServicesCustomerCleanupHookMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective">
+        <property name="add" ref="auditServicesCustomerCleanupHook"/>
+	</bean>
+
+</beans>

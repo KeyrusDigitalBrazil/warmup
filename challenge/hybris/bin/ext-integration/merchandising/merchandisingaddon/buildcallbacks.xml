@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><project name="merchandisingaddon_buildcallbacks">
+	
+	<patternset id="extension.merchandisingaddon.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+    <patternset id="extension.merchandisingaddon.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+    <patternset id="extension.merchandisingaddon.production.filter">
+        <patternset refid="extension.production.filter"/>
+        <exclude name="build/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+	<!-- 
+		Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+	
+		 ${ear.path}: 			path to ear
+	 -->
+	<macrodef name="merchandisingaddon_before_ear">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+			
+		</sequential>
+	</macrodef>
+
+	<macrodef name="merchandisingaddon_before_clean">
+		<sequential>
+			<if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+				<then>
+					<delete dir="${ext.merchandisingaddon.path}${file.separator}jsTarget"/>
+					<delete file="${ext.merchandisingaddon.path}${file.separator}acceleratoraddon${file.separator}web${file.separator}webroot${file.separator}_ui${file.separator}responsive${file.separator}common${file.separator}js${file.separator}merchandisingaddon.js"/>
+					<removeNodeModulesSymlink path="${ext.merchandisingaddon.path}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="merchandisingaddon_before_build">
+		<sequential>
+			<copy failonerror="false" file="${ext.merchandisingaddon.path}${file.separator}gitignore" overwrite="true" tofile="${ext.merchandisingaddon.path}${file.separator}.gitignore"/>
+			<if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+				<then>
+					<gruntBuild path="${ext.merchandisingaddon.path}" phase="default"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="merchandisingaddon_before_yunit">
+		<sequential>
+			<if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+				<then>
+					<gruntBuild path="${ext.merchandisingaddon.path}" phase="test_only"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

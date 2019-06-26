@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+    <alias name="defaultNavigationEntryTypesFacade" alias="navigationEntryTypesFacade"/>
+    <bean id="defaultNavigationEntryTypesFacade"
+          class="de.hybris.platform.cmsfacades.navigationentrytypes.impl.DefaultNavigationEntryTypesFacade">
+        <description>deprecated since 1811</description>
+        <property name="navigationEntryConverterRegistry" ref="cmsNavigationEntryConverterRegistry"/>
+    </bean>
+
+    <alias name="defaultNavigationEntryService" alias="cmsNavigationEntryService"/>
+    <bean id="defaultNavigationEntryService"
+          class="de.hybris.platform.cmsfacades.navigations.service.impl.DefaultNavigationEntryService">
+        <description>deprecated since 1811</description>
+        <property name="navigationService" ref="cmsNavigationService"/>
+        <property name="navigationEntryConverterRegistry" ref="cmsNavigationEntryConverterRegistry"/>
+    </bean>
+
+    <!-- Registry -->
+    <alias name="defaultNavigationEntryConverterRegistry" alias="cmsNavigationEntryConverterRegistry"/>
+    <bean id="defaultNavigationEntryConverterRegistry"
+          class="de.hybris.platform.cmsfacades.navigations.service.impl.DefaultNavigationEntryConverterRegistry">
+        <description>deprecated since 1811</description>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+
+    <!-- NavigationEntryItemModelConverter NavigationEntryData to ItemModel - Converter Functions-->
+
+    <alias name="defaultNavigationEntryCmsComponentItemModelConversionFunction"
+           alias="cmsNavigationEntryCmsComponentItemModelConversionFunction"/>
+    <bean id="defaultNavigationEntryCmsComponentItemModelConversionFunction"
+          class="de.hybris.platform.cmsfacades.navigations.service.functions.DefaultNavigationEntryCmsComponentItemModelConversionFunction">
+        <description>deprecated since 1811</description>
+        <property name="componentAdminService" ref="cmsAdminComponentService"/>
+    </bean>
+
+    <alias name="defaultNavigationEntryCmsPageItemModelConversionFunction"
+           alias="cmsNavigationEntryCmsPageItemModelConversionFunction"/>
+    <bean id="defaultNavigationEntryCmsPageItemModelConversionFunction"
+          class="de.hybris.platform.cmsfacades.navigations.service.functions.DefaultNavigationEntryCmsPageItemModelConversionFunction">
+        <description>deprecated since 1811</description>
+        <property name="cmsAdminPageService" ref="cmsAdminPageService"/>
+    </bean>
+
+    <alias name="defaultNavigationEntryMediaModelConversionFunction" alias="cmsNavigationEntryMediaModelConversionFunction"/>
+    <bean id="defaultNavigationEntryMediaModelConversionFunction"
+          class="de.hybris.platform.cmsfacades.navigations.service.functions.DefaultNavigationEntryMediaModelConversionFunction">
+        <description>deprecated since 1811</description>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="cmsAdminSiteService" ref="cmsAdminSiteService"/>
+    </bean>
+
+    <!-- NavigationEntryItemModelConverter ItemModel to UID- Converter Functions-->
+
+    <alias name="defaultNavigationEntryCmsItemModelIdConversionFunction"
+           alias="cmsNavigationEntryCmsItemModelIdConversionFunction"/>
+    <bean id="defaultNavigationEntryCmsItemModelIdConversionFunction"
+          class="de.hybris.platform.cmsfacades.navigations.service.functions.DefaultNavigationEntryCmsItemModelIdConversionFunction">
+        <description>deprecated since 1811</description>
+    </bean>
+
+    <alias name="defaultNavigationEntryMediaModelIdConversionFunction" alias="cmsNavigationEntryMediaModelIdConversionFunction"/>
+    <bean id="defaultNavigationEntryMediaModelIdConversionFunction"
+          class="de.hybris.platform.cmsfacades.navigations.service.functions.DefaultNavigationEntryMediaModelIdConversionFunction">
+        <description>deprecated since 1811</description>
+    </bean>
+
+
+    <!-- NavigationEntryItemModelConverter Converter beans -->
+
+    <bean class="de.hybris.platform.cmsfacades.navigations.service.converters.DefaultNavigationEntryItemModelConverter"
+          p:itemType="AbstractCMSComponent"
+          p:converter-ref="cmsNavigationEntryCmsComponentItemModelConversionFunction"
+          p:uniqueIdentifierConverter-ref="cmsNavigationEntryCmsItemModelIdConversionFunction">
+        <description>deprecated since 1811</description>
+    </bean>
+
+    <bean class="de.hybris.platform.cmsfacades.navigations.service.converters.DefaultNavigationEntryItemModelConverter"
+          p:itemType="AbstractPage"
+          p:converter-ref="cmsNavigationEntryCmsPageItemModelConversionFunction"
+          p:uniqueIdentifierConverter-ref="cmsNavigationEntryCmsItemModelIdConversionFunction">
+        <description>deprecated since 1811</description>
+    </bean>
+
+    <bean class="de.hybris.platform.cmsfacades.navigations.service.converters.DefaultNavigationEntryItemModelConverter"
+          p:itemType="Media"
+          p:converter-ref="cmsNavigationEntryMediaModelConversionFunction"
+          p:uniqueIdentifierConverter-ref="cmsNavigationEntryMediaModelIdConversionFunction">
+        <description>deprecated since 1811</description>
+    </bean>
+
+
+</beans>

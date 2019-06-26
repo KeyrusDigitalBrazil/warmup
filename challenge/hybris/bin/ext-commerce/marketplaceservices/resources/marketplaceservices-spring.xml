@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/integration
+		   http://www.springframework.org/schema/integration/spring-integration.xsd
+		   http://www.springframework.org/schema/integration/file
+		   http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		   http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean class="de.hybris.platform.marketplaceservices.setup.MarketplaceservicesSystemSetup" parent="abstractCoreSystemSetup" />
+
+	<!-- ***************************** business beans definition ******************************* -->
+	<alias name="defaultVendorDao" alias="vendorDao" />
+	<bean id="defaultVendorDao" class="de.hybris.platform.marketplaceservices.vendor.daos.impl.DefaultVendorDao" >
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+	
+	<alias name="defaultMarketplaceProductDao" alias="marketplaceProductDao" />
+	<bean id="defaultMarketplaceProductDao" class="de.hybris.platform.marketplaceservices.dao.impl.DefaultMarketplaceProductDao" >
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultCustomerVendorReviewDao" alias="customerVendorReviewDao" />
+	<bean id="defaultCustomerVendorReviewDao" class="de.hybris.platform.marketplaceservices.vendor.daos.impl.DefaultCustomerVendorReviewDao">
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCustomerVendorReviewService" alias="customerVendorReviewService" />
+	<bean id="defaultCustomerVendorReviewService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultCustomerVendorReviewService">
+		<property name="customerVendorReviewDao" ref="customerVendorReviewDao" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultVendorRatingCalculationJob" alias="vendorRatingCalculationJob" />
+	<bean id="defaultVendorRatingCalculationJob" class="de.hybris.platform.marketplaceservices.cronjob.VendorRatingCalculationJob"
+		parent="abstractJobPerformable">
+		<property name="vendorService" ref="vendorService" />
+		<property name="customerVendorReviewService" ref="customerVendorReviewService" />
+	</bean>
+
+	<alias name="defaultVendorActivationStrategy" alias="vendorActivationStrategy" />
+	<bean id="defaultVendorActivationStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorActivationStrategy">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultVendorDeactivationStrategy" alias="vendorDeactivationStrategy" />
+	<bean id="defaultVendorDeactivationStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorDeactivationStrategy">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultIndexedVendorsLookupStrategy" alias="indexedVendorsLookupStrategy"/>
+	<bean id="defaultIndexedVendorsLookupStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultIndexedVendorsLookupStrategy">
+		<property name="vendorDao" ref="vendorDao"/>
+	</bean>
+
+	<alias name="defaultVendorService" alias="vendorService" />
+	<bean id="defaultVendorService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultVendorService">
+		<property name="vendorDao" ref="vendorDao" />
+		<property name="userDao" ref="userDao"/>
+		<property name="vendorActivationStrategy" ref="vendorActivationStrategy" />
+		<property name="vendorDeactivationStrategy" ref="vendorDeactivationStrategy" />
+		<property name="vendorCreationStrategy" ref="vendorCreationStrategy" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="indexedVendorsLookupStrategy" ref="indexedVendorsLookupStrategy"/>
+	</bean>
+
+	<alias name="defaultVendorUserService" alias="vendorUserService" />
+	<bean id="defaultVendorUserService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultVendorUserService">
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias name="defaultMarketplaceProductService" alias="marketplaceProductService" />
+	<bean id="defaultMarketplaceProductService" class="de.hybris.platform.marketplaceservices.product.impl.DefaultMarketplaceProductService">
+		<property name="marketplaceProductDao" ref="marketplaceProductDao" />
+	</bean>
+
+	<bean id="venderUserDefaultGroupInterceptor" class="de.hybris.platform.marketplaceservices.interceptor.VendorUserInitDefaultsInterceptor">
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="venderUserDefaultGroupInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="venderUserDefaultGroupInterceptor" />
+		<property name="typeCode" value="VendorUser" />
+	</bean>
+
+	<alias name="defaultVendorCreationStrategy" alias="vendorCreationStrategy" />
+	<bean id="defaultVendorCreationStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorCreationStrategy">
+		<property name="configurationService" ref="configurationService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="vendorCmsStrategy" ref="vendorCmsStrategy" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+		<property name="vendorPromotionRuleEngineContextService" ref="vendorPromotionRuleEngineContextService" />
+	</bean>
+
+	<alias name="marketplaceCarouselSyncConfig" alias="syncConfig" />
+	<bean id="marketplaceCarouselSyncConfig" class="de.hybris.platform.catalog.synchronization.SyncConfig">
+		<property name="createSavedValues" value="FALSE" />
+		<property name="logToDatabase" value="FALSE" />
+		<property name="logToFile" value="TRUE" />
+		<property name="logLevelDatabase" value="WARNING" />
+		<property name="logLevelFile" value="INFO" />
+		<property name="forceUpdate" value="FALSE" />
+		<property name="errorMode" value="IGNORE" />
+		<property name="synchronous" value="TRUE" />
+		<property name="fullSync" value="TRUE" />
+	</bean>
+
+	<alias name="defaultVendorCmsService" alias="vendorCmsService" />
+	<bean id="defaultVendorCmsService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultVendorCMSService">
+		<property name="cmsPageTemplateDao" ref="cmsPageTemplateDao" />
+		<property name="cmsRestrictionDao" ref="cmsRestrictionDao" />
+		<property name="cmsPageDao" ref="cmsPageDao" />
+		<property name="cmsContentSlotDao" ref="cmsContentSlotDao" />
+		<property name="cmsComponentDao" ref="cmsComponentDao" />
+		<property name="modelService" ref="modelService" />
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="catalogTypeService" ref="catalogTypeService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="platformSynchronizationStatusService" ref="synchronizationStatusService" />
+		<property name="catalogSynchronizationService" ref="catalogSynchronizationService" />
+		<property name="syncConfig" ref="syncConfig" />
+	</bean>
+
+	<alias name="defaultVendorCmsStrategy" alias="vendorCmsStrategy" />
+	<bean id="defaultVendorCmsStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorCMSStrategy">
+		<property name="modelService" ref="modelService" />
+		<property name="vendorCmsService" ref="vendorCmsService" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="vendorCMSPageService" ref="vendorCMSPageService"/>
+	</bean>
+
+	<alias alias="activateBaseSiteInSessionStrategy" name="marketplaceActivateBaseSiteInSessionStrategy" />
+	<bean id="marketplaceActivateBaseSiteInSessionStrategy" class="de.hybris.platform.marketplaceservices.catalog.impl.MarketplaceActivateBaseSiteInSessionStrategy">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="vendorService" ref="vendorService" />
+	</bean>
+
+	<alias alias="cmsSiteService" name="marketplaceCMSSiteService" />
+	<bean id="marketplaceCMSSiteService" class="de.hybris.platform.marketplaceservices.catalog.impl.MarketplaceCMSSiteService"
+		parent="defaultCMSSiteService">
+		<property name="vendorService" ref="vendorService" />
+	</bean>
+
+	<alias alias="commerceSearchSolrQueryPopulator" name="marketplaceSearchSolrQueryPopulator" />
+	<bean id="marketplaceSearchSolrQueryPopulator" class="de.hybris.platform.marketplaceservices.catalog.impl.MarketplaceSearchSolrQueryPopulator"
+		parent="defaultCommerceSearchSolrQueryPopulator">
+		<property name="vendorService" ref="vendorService" />
+	</bean>
+
+	<alias name="extendedCmsSupportedPages" alias="cmsSupportedPages" />
+	<util:set id="extendedCmsSupportedPages">
+		<value type="java.lang.Class">de.hybris.platform.marketplaceservices.model.VendorPageModel</value>
+		<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.ContentPageModel</value>
+		<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.ProductPageModel</value>
+		<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.CategoryPageModel</value>
+	</util:set>
+
+	<bean id="vendorCMSPageService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultVendorCMSPageService"
+		parent="defaultCMSPageService">
+		<property name="marketplaceCMSDataFactory" ref="marketplaceCMSDataFactory" />
+	</bean>
+
+	<bean id="cmsVendorRestrictionEvaluator" class="de.hybris.platform.marketplaceservices.evaluator.impl.CMSVendorRestrictionEvaluator" />
+
+	<bean id="cmsVendorRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping">
+		<property name="restrictionTypeCode" value="CMSVendorRestriction" />
+		<property name="restrictionEvaluator" ref="cmsVendorRestrictionEvaluator" />
+	</bean>
+
+	<alias name="marketplaceCMSDataFactory" alias="cmsDataFactory" />
+	<bean id="marketplaceCMSDataFactory" class="de.hybris.platform.marketplaceservices.data.impl.MarketplaceCMSDataFactoryImpl"
+		parent="defaultCMSDataFactory" />
+
+	<bean id="productVendorValueProvider" class="de.hybris.platform.marketplaceservices.solr.provider.ProductVendorValueProvider">
+		<property name="vendorService" ref="vendorService" />
+		<property name="fieldNameProvider" ref="solrFieldNameProvider" />
+	</bean>
+
+	<bean id="productVendorValueResolver" class="de.hybris.platform.marketplaceservices.solr.resolver.ProductVendorValueResolver" parent="abstractValueResolver">
+		<property name="vendorService" ref="vendorService" />
+		<property name="fieldNameProvider" ref="solrFieldNameProvider" />
+	</bean>
+
+	<bean id="productVendorFacetDisplayNameProvider" class="de.hybris.platform.marketplaceservices.solr.provider.ProductVendorFacetDisplayNameProvider">
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="vendorService" ref="vendorService" />
+	</bean>
+
+	<alias name="marketplaceCategorySource" alias="abstractCategorySource" />
+	<bean id="marketplaceCategorySource" class="de.hybris.platform.marketplaceservices.catalog.impl.MarketplaceCategorySource"
+		parent="defaultCategorySource" />
+
+	<alias name="defaultVendorOrderTotalPriceCalculationStrategy" alias="vendorOrderTotalPriceCalculationStrategy" />
+	<bean id="defaultVendorOrderTotalPriceCalculationStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorOrderTotalPriceCalculationStrategy" />
+
+	<bean id="marketplaceSessionInitializationListener" class="de.hybris.platform.marketplaceservices.catalog.impl.MarketplaceSessionInitializationListener">
+		<property name="vendorService" ref="vendorService" />
+	</bean>
+
+	<bean id="marketplaceSessionInitializationListenerDefinition" parent="solrListenerDefinition">
+		<property name="listener" ref="marketplaceSessionInitializationListener" />
+		<property name="priority" value="1300" />
+	</bean>
+
+	<bean id="vendorUrlResolver" class="de.hybris.platform.marketplaceservices.url.impl.VendorUrlResolver">
+		<property name="threadContextService" ref="threadContextService" />
+		<property name="pattern" value="/v/{vendor-code}" />
+	</bean>
+
+	<bean id="vendorCategoryUrlResolver" parent="defaultCategoryModelUrlResolver">
+		<property name="pattern" value="/c/{category-code}" />
+	</bean>
+	<bean id="consignmentPrepareInterceptor" class="de.hybris.platform.marketplaceservices.interceptor.ConsignmentPrepareInterceptor">
+		<property name="vendorOrderTotalPriceCalculationStrategy" ref="vendorOrderTotalPriceCalculationStrategy" />
+	</bean>
+
+	<bean id="consignmentPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="consignmentPrepareInterceptor" />
+		<property name="typeCode" value="Consignment" />
+	</bean>
+
+	<alias name="defaultVendorOrderExportThreadFactory" alias="vendorOrderExportThreadFactory" />
+	<bean id="defaultVendorOrderExportThreadFactory" class="de.hybris.platform.core.TenantAwareThreadFactory" >
+		<constructor-arg name="tenant" ref="tenantFactory"/>
+	</bean>
+
+	<alias name="defaultVendorOrderExportJob" alias="vendorOrderExportJob" />
+	<bean id="defaultVendorOrderExportJob" class="de.hybris.platform.marketplaceservices.cronjob.VendorOrderExportJob"
+		parent="abstractJobPerformable">
+		<property name="vendorDao" ref="vendorDao" />
+		<property name="vendorOrderExportStrategy" ref="vendorOrderExportStrategy" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+				<property name="corePoolSize" value="${marketplaceservices.exportvendoroder.pool.coreSize}" />
+				<property name="maxPoolSize" value="${marketplaceservices.exportvendoroder.pool.maxSize}" />
+				<property name="queueCapacity" value="${marketplaceservices.exportvendoroder.pool.queueCapacity}" />
+				<property name="threadFactory" ref="vendorOrderExportThreadFactory" />
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultVendorOrderExportStrategy" alias="vendorOrderExportStrategy" />
+	<bean id="defaultVendorOrderExportStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorOrderExportStrategy">
+		<property name="exportDataBaseDirectory" ref="exportDataBaseDirectory" />
+		<property name="vendorDao" ref="vendorDao" />
+	</bean>
+
+	<alias name="defaultMarketplaceCartEntryDao" alias="cartEntryDao" />
+	<bean id="defaultMarketplaceCartEntryDao" class="de.hybris.platform.marketplaceservices.dao.impl.DefaultMarketplaceCartEntryDao"
+		parent="defaultCartEntryDao" />
+
+	<bean id="marketplaceCartValidationHook" class="de.hybris.platform.marketplaceservices.strategies.hooks.MarketplaceCartValidationHook">
+		<property name="modelService" ref="modelService" />
+		<property name="cartEntryDao" ref="cartEntryDao" />
+	</bean>
+	<bean id="marketplaceCartValidationHooksListMergeDirective" depends-on="cartValidationHooks" parent="listMergeDirective">
+		<property name="add" ref="marketplaceCartValidationHook" />
+	</bean>
+
+	<alias name="defaultMarketplaceCMSComponentDao" alias="cmsComponentDao"/>
+	<bean id="defaultMarketplaceCMSComponentDao" class="de.hybris.platform.marketplaceservices.dao.impl.DefaultMarketplaceCMSComponentDao" parent="defaultCMSComponentDao"/>
+	
+	<bean class="de.hybris.platform.cms2.services.impl.DefaultSortQueryData" 
+			p:typeClass="de.hybris.platform.marketplaceservices.dao.impl.DefaultMarketplaceCMSComponentDao"
+			p:sortCode="name"
+			p:query="ORDER BY LOWER({name}) ASC, {pk}"
+			p:default="false" />
+			
+	<bean class="de.hybris.platform.cms2.services.impl.DefaultSortQueryData" 
+			p:typeClass="de.hybris.platform.marketplaceservices.dao.impl.DefaultMarketplaceCMSComponentDao"
+			p:sortCode="modifiedtime"
+			p:query="ORDER BY {modifiedtime} DESC, {pk}"
+			p:default="true" />
+	
+	<alias name="defaultAutoApproveProductStrategy" alias="autoApproveProductStrategy" />
+	<bean id="defaultAutoApproveProductStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultAutoApproveProductStrategy">
+		<property name="validationCoverageCalculationStrategy" ref="validationCoverageCalculationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultVendorPromotionRuleEngineContextService" alias="vendorPromotionRuleEngineContextService" />
+	<bean id="defaultVendorPromotionRuleEngineContextService" class="de.hybris.platform.marketplaceservices.vendor.impl.DefaultVendorPromotionRuleEngineContextService">
+		<property name="ruleEngineContextDao" ref="ruleEngineContextDao" />
+	</bean>
+	
+	<alias name="defaultVendorOriginalEntryGroupDisplayStrategy" alias="vendorOriginalEntryGroupDisplayStrategy" />
+	<bean id="defaultVendorOriginalEntryGroupDisplayStrategy" class="de.hybris.platform.marketplaceservices.strategies.impl.DefaultVendorOriginalEntryGroupDisplayStrategy">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	
+	<bean id="customerVendorReviewsCleanupHook" class="de.hybris.platform.marketplaceservices.retention.hook.CustomerVendorReviewsCleanupHook">
+		<property name="modelService" ref="modelService"/>
+		<property name="customerVendorReviewDao" ref="customerVendorReviewDao"/>
+	</bean>
+	
+	<bean id="customerVendorReviewsCleanupHookListMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective" >
+        <property name="add" ref="customerVendorReviewsCleanupHook" />
+    </bean>
+	
+</beans>

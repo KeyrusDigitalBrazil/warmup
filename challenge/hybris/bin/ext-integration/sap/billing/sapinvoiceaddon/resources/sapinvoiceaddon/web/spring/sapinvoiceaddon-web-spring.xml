@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+       
+    <context:component-scan base-package="de.hybris.platform.sap.sapinvoiceaddon.controllers"
+		scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />    
+
+
+	<bean id="invoiceDetailsMyCompanyBreadcrumbBuilder" class="de.hybris.platform.sap.sapinvoiceaddon.breadcrumb.impl.InvoiceDetailsMyCompanyBreadcrumbBuilder">
+		<property name="messageSource" ref="storefrontMessageSource" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultSapinvoiceaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="sapinvoiceaddon"/>
+	</bean>
+
+	<bean id="defaultSapinvoiceaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultSapinvoiceaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getSapinvoiceaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultSapinvoiceaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="SapinvoiceaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getSapinvoiceaddonBeforeViewHandler"/>
+	</bean>
+	
+	
+	
+	
+	<!-- =========================================================== -->
+	<!-- ============ Invoice Switch UI Components Aspect ========== -->
+	<!-- =========================================================== -->
+
+    <alias alias="sapInvoiceSwitchUIComponentsAspect" name="sapInvoiceViewSwitchUIComponentsAspect"/>
+	<bean id="sapInvoiceViewSwitchUIComponentsAspect" class="de.hybris.platform.sap.sapinvoiceaddon.aspect.SapInvoiceViewSwitchUIComponentsAspect">
+	</bean>	
+	
+	
+	<!-- =========================================== -->
+	<!-- ============ accountStatus responsive version ========== -->
+	<!-- =========================================== -->
+	<aop:config proxy-target-class="true">		
+		<aop:pointcut id="accountStatusResponsivePointcut"  expression="execution(String *..AccountSummaryPageController.accountStatus(int,String,..))
+		                                                      and @annotation(org.springframework.web.bind.annotation.RequestMapping)  
+		                                                      and @annotation(de.hybris.platform.acceleratorstorefrontcommons.annotations.RequireHardLogIn)
+				                                              and @target(org.springframework.stereotype.Controller)" />
+		<aop:aspect ref="sapInvoiceSwitchUIComponentsAspect">
+			<aop:around pointcut-ref="accountStatusResponsivePointcut" method="switchInvoicePage" />
+		</aop:aspect>					
+	</aop:config>
+	
+</beans>

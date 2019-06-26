@@ -1,0 +1,48 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# ImpEx for Promotions for Electronics Store
+#% impex.setLocale( Locale.GERMAN );
+
+############################# RULE GROUPS ##########################
+INSERT_UPDATE RuleGroup;code[unique=true]
+;productPromotionRuleGroup
+;emptyPromotionRuleGroup
+
+############################# PROMOTION RULES ##########################
+INSERT_UPDATE SourceRule;code[unique=true];priority;maxAllowedRuns;ruleGroup(code);conditions;actions;
+;product_fixed_price_test;100;1;productPromotionRuleGroup;"[{""definitionId"":""y_group"",""parameters"":{""operator"":{""uuid"":""45a8d810-6e6f-4149-80ae-696164c1870a"",""type"":""Enum(de.hybris.platform.ruleengineservices.definitions.conditions.RuleGroupOperator)"",""value"":""OR""}},""children"":[{""definitionId"":""y_qualifying_products"",""parameters"":{""products_operator"":{""uuid"":""d7a81748-69ec-4d7d-9234-357da720ba3a"",""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""value"":""CONTAINS_ANY""},""quantity"":{""uuid"":""31aa64d3-f5dc-4746-92ec-6b55dc13c733"",""type"":""java.lang.Integer"",""value"":1},""operator"":{""uuid"":""34cf09db-877c-486d-8f9f-86ceb1fae48f"",""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""uuid"":""b40ee63a-1229-4012-a6ab-549003863819"",""type"":""List(ItemType(Product))""}},""children"":[]},{""definitionId"":""y_qualifying_categories"",""parameters"":{""quantity"":{""uuid"":""aa032a4d-8d1e-44ba-8d91-0e194b2814d1"",""type"":""java.lang.Integer"",""value"":1},""categories_operator"":{""uuid"":""fc339392-817f-4bba-9125-adcc7b353e73"",""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""value"":""CONTAINS_ALL""},""excluded_categories"":{""uuid"":""ee9f977b-cea1-4bbe-8d27-6d8abb382d62"",""type"":""List(ItemType(Category))""},""excluded_products"":{""uuid"":""bf7e4277-0dca-4e31-8b5c-67629c466e01"",""type"":""List(ItemType(Product))""},""categories"":{""uuid"":""da55c42b-b985-44b8-9a13-e60a6a36dbcb"",""type"":""List(ItemType(Category))"",""value"":[""576"",""brand_10""]},""operator"":{""uuid"":""0d8e0b50-62ae-4d0e-9ef9-d1479aece520"",""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""value"":""GREATER_THAN_OR_EQUAL""}},""children"":[]}]}]";"[{""definitionId"":""y_order_entry_fixed_price"",""parameters"":{""value"":{""uuid"":""b2d3412a-6916-4f53-b98e-26401cc307b6"",""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""value"":{""USD"":60}}}}]";
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;promotions-module-junit;hybris-rules;promotions-junit;1.0.0;DEFAULT;true;0;
+;preview-promotions-module-junit;hybris-rules;preview-promotions-junit;1.0.0;DEFAULT;true;0;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;promotions-base-junit;promotions-module-junit;EQUALITY;STREAM
+;preview-promotions-base-junit;preview-promotions-module-junit;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)
+;promotions-session-junit;promotions-base-junit;STATEFUL
+;preview-promotions-session-junit;preview-promotions-base-junit;STATEFUL
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit;
+;promotions-junit-context;promotions-session-junit;200;
+;preview-promotions-junit-context;preview-promotions-session-junit;200;
+
+UPDATE DroolsKIEModule;name[unique=true];defaultKIEBase(name)
+;promotions-module-junit;promotions-base-junit
+;preview-promotions-module-junit;preview-promotions-base-junit
+
+UPDATE DroolsKIEBase;name[unique=true];defaultKIESession(name)
+;promotions-base-junit;promotions-session-junit
+;preview-promotions-base-junit;preview-promotions-session-junit
+
+

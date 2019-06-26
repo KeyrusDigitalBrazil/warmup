@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2018 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+
+	<enumtypes>
+		<enumtype code="ServiceClient" autocreate="true" generate="true">
+			<description>This enum determines the service client type</description>
+			<value code="TICKETSERVICECLIENT" />
+			<value code="CUSTOMERMAPPINGCLIENT" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+
+
+
+
+
+		<relation code="ServiceCecMappingRelation" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement qualifier="CecService" type="CecService"
+				cardinality="one">
+				<modifiers unique="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="CecServiceMappings" type="AbstractCecServiceMapping"
+				cardinality="many" collectiontype="set" />
+		</relation>
+
+
+
+
+		<relation code="CecTechnicalUserSiteMapping" localized="false"
+			generate="true" autocreate="true">
+			<sourceElement type="CecTechnicalUser" qualifier="CecTechnicalUser"
+				cardinality="one" />
+			<targetElement qualifier="CecServiceMappings" type="AbstractCecServiceMapping"
+				cardinality="many" collectiontype="set" />
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+
+
+		<itemtype code="CecService" extends="GenericItem" autocreate="true"
+			generate="true">
+			<deployment table="CecService" typecode="9341" />
+			<attributes>
+				<attribute qualifier="identifier" type="ServiceClient">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="serviceURL" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+
+				<attribute qualifier="additionalConfigurations" type="String2StringMapType">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CecTechnicalUser" extends="GenericItem"
+			autocreate="true" generate="true">
+			<deployment table="CecTechnicalUser" typecode="9342" />
+			<attributes>
+				<attribute qualifier="tenantName" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="technicalUser" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="true" />
+				</attribute>
+				<attribute qualifier="password" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+
+				<attribute qualifier="oauthURL" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractCecServiceMapping" extends="GenericItem"
+			autocreate="true" generate="true">
+			<deployment table="AbstractServicesMapping" typecode="9343" />
+		</itemtype>
+
+		<itemtype code="BaseSiteCecServiceMapping" extends="AbstractCecServiceMapping"
+
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="baseSite" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" unique="true" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="adaptivesearchwebservices_buildcallbacks">
+
+	<macrodef name="adaptivesearchwebservices_before_build">
+		<sequential>
+            <!-- defines native file extension used by the nature of the extension -->
+			<property name="ext.adaptivesearchwebservices.native.file.extension" value="groovy" />
+            <!-- defines source folder for groovy files -->
+			<property name="ext.adaptivesearchwebservices.additional.src.dir" value="groovysrc" />
+            <!-- defines test source folder for groovy tests -->
+			<property name="ext.adaptivesearchwebservices.additional.testsrc.dir" value="groovytestsrc" />
+            <!-- defines web source folder for groovy files -->
+			<property name="ext.adaptivesearchwebservices.additional.websrc.dir" value="web/groovysrc" />
+            <!-- defines web test source folder for groovy tets -->
+			<property name="ext.adaptivesearchwebservices.additional.webtestsrc.dir" value="web/groovytestsrc" />
+			<outofdate>
+				<sourcefiles>
+					<fileset dir="${ext.adaptivesearchwebservices.path}">
+						<include name="${ext.adaptivesearchwebservices.additional.src.dir}/**" />
+						<include name="${ext.adaptivesearchwebservices.additional.websrc.dir}/**" />
+					</fileset>
+				</sourcefiles>
+				<targetfiles path="${HYBRIS_TEMP_DIR}/touch/adaptivesearchwebservices_srctouch" />
+				<sequential>
+					<touch mkdirs="true">
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.src.dir}" />
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.websrc.dir}" />
+					</touch>
+				</sequential>
+			</outofdate>
+			<outofdate>
+				<sourcefiles>
+					<fileset dir="${ext.adaptivesearchwebservices.path}">
+						<include name="${ext.adaptivesearchwebservices.additional.testsrc.dir}/**" />
+						<include name="${ext.adaptivesearchwebservices.additional.webtestsrc.dir}/**" />
+					</fileset>
+				</sourcefiles>
+				<targetfiles path="${HYBRIS_TEMP_DIR}/touch/adaptivesearchwebservices_testsrctouch" />
+				<sequential>
+					<touch mkdirs="true">
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.src.dir}" />
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.websrc.dir}" />
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.testsrc.dir}" />
+						<fileset dir="${ext.adaptivesearchwebservices.path}/${ext.adaptivesearchwebservices.additional.webtestsrc.dir}" />
+					</touch>
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="adaptivesearchwebservices_after_compile_core">
+		<sequential>
+			<groovynature_compile_core extname="adaptivesearchwebservices" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="adaptivesearchwebservices_after_compile_web">
+		<sequential>
+			<groovynature_compile_web extname="adaptivesearchwebservices" />
+		</sequential>
+	</macrodef>
+
+</project>

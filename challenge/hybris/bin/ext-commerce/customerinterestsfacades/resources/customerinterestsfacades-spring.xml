@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	
+	<alias name="defaultProductInterestConverter" alias="productInterestConverter"/>
+	<bean id="defaultProductInterestConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerinterestsfacades.data.ProductInterestData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productInterestPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultProductInterestReverseConverter" alias="productInterestReverseConverter"/>
+	<bean id="defaultProductInterestReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerinterestsservices.model.ProductInterestModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="productInterestReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="productInterestPopulator" class="de.hybris.platform.customerinterestsfacades.productinterest.populators.ProductInterestPopulator">
+		<property name="productConverter" ref="productConverter"/>
+		<property name="productPriceAndStockConverter" ref="productPriceAndStockConverter"/>
+		<property name="notificationPreferenceFacade" ref="notificationPreferenceFacade"/>
+	</bean>
+	
+	<alias name="defaultProductPriceAndStockConverter" alias="productPriceAndStockConverter"/>
+	<bean id="defaultProductPriceAndStockConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ProductData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productPricePopulator"/>
+				<ref bean="productStockPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="productInterestReversePopulator" class="de.hybris.platform.customerinterestsfacades.productinterest.populators.ProductInterestReversePopulator">
+		<property name="productService" ref="productService"/>
+    	<property name="userService" ref="userService"/>
+    	<property name="baseStoreService" ref="baseStoreService"/>
+    	<property name="baseSiteService" ref="baseSiteService"/>
+    	<property name="commonI18NService" ref="commonI18NService"/>	
+	</bean>
+		
+	<bean id="productInterestFacade" class="de.hybris.platform.customerinterestsfacades.productinterest.impl.DefaultProductInterestFacade">
+    	<property name="productInterestService" ref="productInterestService"/>
+    	<property name="productInterestConverter" ref="productInterestConverter"/>
+    	<property name="productInterestReverseConverter" ref="productInterestReverseConverter"/>
+    	<property name="productService" ref="productService"/>
+    	<property name="userService" ref="userService"/>
+    	<property name="baseStoreService" ref="baseStoreService"/>
+    	<property name="baseSiteService" ref="baseSiteService"/>
+    	<property name="productInterestRelationConverter" ref="productInterestRelationConverter"/>
+		<property name="productInterestEntryConverter" ref="productInterestEntryConverter"/>
+		<property name="productInterestsSortStrategies" ref="productInterestsSortStrategies"/>
+    </bean>
+
+	<alias name="defaultExtendedFutureStockFacade" alias="futureStockFacade"/>
+	<bean id="defaultExtendedFutureStockFacade" class="de.hybris.platform.customerinterestsfacades.futurestock.impl.DefaultExtendedFutureStockFacade" parent="defaultFutureStockFacade"/>
+
+	<bean id="productInterestEntryPopulator" class="de.hybris.platform.customerinterestsfacades.productinterest.populators.ProductInterestEntryPopulator"/>
+    
+    <alias name="defaultProductInterestEntryConverter" alias="productInterestEntryConverter"/>
+	<bean id="defaultProductInterestEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerinterestsfacades.data.ProductInterestEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productInterestEntryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="productInterestRelationPopulator" class="de.hybris.platform.customerinterestsfacades.productinterest.populators.ProductInterestRelationPopulator">
+		<property name="productConverter" ref="productConverter"/>
+		<property name="futureStockFacade" ref="futureStockFacade"/>
+		<property name="productPriceAndStockConverter" ref="productPriceAndStockConverter"/>
+	</bean>
+	
+	<alias name="defaultProductInterestRelationConverter" alias="productInterestRelationConverter"/>
+	<bean id="defaultProductInterestRelationConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customerinterestsfacades.data.ProductInterestRelationData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productInterestRelationPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="sortByProductNameStragety" class="de.hybris.platform.customerinterestsfacades.strategies.impl.SortByProductNameStrategy"/>
+	
+	<util:map id="productInterestsSortStrategies" key-type="java.lang.String" value-type="de.hybris.platform.customerinterestsfacades.strategies.CollectionSortStrategy" >
+        <entry key="name" value-ref="sortByProductNameStragety"/>
+    </util:map>
+    
+</beans>

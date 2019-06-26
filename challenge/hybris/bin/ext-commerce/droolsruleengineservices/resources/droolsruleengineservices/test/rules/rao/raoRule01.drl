@@ -1,0 +1,34 @@
+package de.hybris.platform.ruleengineservices.test
+
+import java.math.*;
+import de.hybris.platform.ruleengineservices.rao.*;
+import de.hybris.platform.ruleengineservices.rrd.*;
+import de.hybris.platform.ruleengineservices.rule.evaluation.*;
+import java.util.Map;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleOrderFixedDiscountAction;
+
+salience 50;
+// cart with code ABC gets $10 discount
+rule "raoRule01"
+@ruleCode("raoRule01.drl")
+@moduleName("rules-module-junit")
+dialect "mvel"
+
+    when
+    	$config : RuleConfigurationRRD(ruleCode == "raoRule01.drl")
+        $groupExecution := RuleGroupExecutionRRD(code == $config.ruleGroupCode)    
+    	$cart:CartRAO(code == "ABC")
+    	$result:RuleEngineResultRAO()
+    	// check if rule discount is not applied already
+    	not $discount:DiscountRAO( firedRuleCode == "raoRule01.drl" )
+    	eval($groupExecution.allowedToExecute($config))
+    then
+    	Map variables = [
+    		"de.hybris.platform.ruleengineservices.rao.CartRAO" : $cart,
+      		"de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO" : $result
+   		];
+		ruleOrderFixedDiscountAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["value":["USD":new BigDecimal(10)]]);
+		$groupExecution.trackRuleGroupExecution($config);
+end

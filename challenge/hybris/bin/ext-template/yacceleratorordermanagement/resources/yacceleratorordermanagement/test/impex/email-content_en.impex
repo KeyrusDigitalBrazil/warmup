@@ -1,0 +1,38 @@
+#
+# Import the CMS content for the Electronics site emails
+#
+
+$contentCatalog=contentCatalog_online
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+# Import config properties into impex macros for modulegen
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$emailResource=$config-emailResourceValue
+$picture=media(code, $contentCV);
+
+# Language
+$lang=en
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;return-shipping-label-template;"return-shipping-label-template";jar:/yacceleratorordermanagement/test/impex/returnShippingLayout.vm
+;return-form-template;"return-form-template";jar:/yacceleratorordermanagement/test/impex/returnFormLayout.vm
+
+# Content Slots
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;DocumentSiteLogoSlot;;
+
+
+# Import config properties into impex macros for modulegen
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$emailResource=$config-emailResourceValue
+
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+ ;electronics_Email_Return_Label_Body;"Return Label Email Body";jar:/yacceleratorordermanagement/test/impex/email-returnLabelBody.vm
+ ;electronics_Email_Return_Label_Subject;"Return Label Email Subject";jar:/yacceleratorordermanagement/test/impex/email-returnLabelSubject.vm
+
+# Email Pages
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];fromEmail[lang=$lang];fromName[lang=$lang]
+ ;;ReturnLabelEmail;"customerservices@hybris.com";"Customer Services Team"

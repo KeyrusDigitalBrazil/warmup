@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean id="cxCmsActionAffectedObjectKeyAttributeHandler" class="de.hybris.platform.personalizationcms.dynamic.CxCmsActionAffectedObjectKeyAttributeHandler"/>
+
+    <bean id="cxCMSDynamicAttributeService" class="de.hybris.platform.personalizationcms.service.CxCMSDynamicAttributeService">
+        <property name="sessionService" ref="sessionService"/>
+    </bean>
+
+    <alias name="cxCmsRecalculationService" alias="cxRecalculationService"/>
+    <bean id="cxCmsRecalculationService" class="de.hybris.platform.personalizationcms.service.CxCmsRecalculationService" parent="defaultCxRecalculationService">
+        <property name="cmsPreviewService" ref="cmsPreviewService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="cxSegmentTriggerDao" ref="cxSegmentTriggerDao"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+    </bean>
+
+    <bean id="cxCmsActionPerformable" class="de.hybris.platform.personalizationcms.action.CxCmsActionPerformable"/>
+
+    <bean id="cxCmsActionTargetProvider" parent="actionTargetProvider">
+        <property name="supportedClass" value="de.hybris.platform.personalizationcms.model.CxCmsActionModel"/>
+        <property name="target" value="cxCmsActionPerformable"/>
+    </bean>
+
+    <bean id="cxCmsComponentContainerStrategy" class="de.hybris.platform.personalizationcms.strategy.DefaultCxCmsContainerStrategy">
+        <property name="userService" ref="userService"/>
+        <property name="cxService" ref="cxService"/>
+        <property name="cmsComponentService" ref="cmsComponentService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+    </bean>
+
+    <bean depends-on="cmsComponentContainerStrategies" parent="mapMergeDirective">
+        <property name="key" value="CxCmsComponentContainer"/>
+        <property name="value" ref="cxCmsComponentContainerStrategy"/>
+    </bean>
+
+    <bean id="cxCustomizationPageIdDaoStrategy" class="de.hybris.platform.personalizationcms.customization.dao.impl.CxCustomizationPageIdDaoStrategy" parent="abstractCxDaoStrategy">
+        <property name="catalogService" ref="catalogService"/>
+    </bean>
+
+    <bean id="cxCustomizationPageIdNameDaoStrategy" class="de.hybris.platform.personalizationcms.customization.dao.impl.CxCustomizationPageIdDaoStrategy" parent="abstractCxDaoStrategy">
+        <property name="nameRequired" value="true"/>
+        <property name="catalogService" ref="catalogService"/>
+    </bean>
+    <bean id="CxCustomizationDaoCatalogParamStrategy" class="de.hybris.platform.personalizationcms.customization.dao.impl.CxCustomizationDaoCatalogParamStrategy"/>
+
+    <bean id="cxCmsActionTypeDao" class="de.hybris.platform.personalizationcms.action.dao.impl.CxCmsActionTypeDao" parent="baseCxDao">
+        <property name="catalogDao" ref="catalogDao"/>
+    </bean>
+
+    <bean id="cxActionRemoveInterceptor"
+          class="de.hybris.platform.personalizationcms.action.interceptor.CxActionRemoveInterceptor">
+        <property name="modelService" ref="modelService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+    </bean>
+
+    <bean id="cxActionRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxActionRemoveInterceptor"/>
+        <property name="typeCode" value="CxCmsAction"/>
+    </bean>
+
+    <alias name="cmsCxConfigurationLookupStrategy" alias="cxConfigurationLookupStrategy"/>
+    <bean id="cmsCxConfigurationLookupStrategy" class="de.hybris.platform.personalizationcms.strategy.CmsCxConfigurationLookupStrategy" parent="defaultCxConfigurationLookupStrategy"/>
+
+    <!--  Synchronization -->
+    <alias name="defaultCxCmsComponentContainerModelVisitor" alias="cxCmsComponentContainerModelVisitor"/>
+    <bean id="defaultCxCmsComponentContainerModelVisitor" class="de.hybris.platform.personalizationcms.synchronization.itemsvisitors.impl.CxCmsComponentContainerModelVisitor"/>
+
+    <bean depends-on="cmsVisitors" parent="mapMergeDirective">
+        <property name="key" value="CxCmsComponentContainer"/>
+        <property name="value" ref="cxCmsComponentContainerModelVisitor"/>
+    </bean>
+
+    <!-- Components and page cloning -->
+    <alias name="defaultCxCmsComponentContainerDefaultComponentPredicate" alias="cxCmsComponentContainerDefaultComponentPredicate"/>
+    <bean id="defaultCxCmsComponentContainerDefaultComponentPredicate" class="de.hybris.platform.personalizationcms.cloning.CxCmsComponentContainerDefaultComponentPredicate"/>
+
+    <bean id="addPersonalizationCmsModelCloningContextPartOfPredicates" depends-on="cmsModelCloningContextPartOfPredicates" parent="listMergeDirective">
+        <property name="add" ref="cxCmsComponentContainerDefaultComponentPredicate"/>
+    </bean>
+
+    <alias name="defaultCxCmsComponentContainerSourceIdPredicate" alias="cxCmsComponentContainerSourceIdPredicate"/>
+    <bean id="defaultCxCmsComponentContainerSourceIdPredicate" class="de.hybris.platform.personalizationcms.cloning.CxCmsComponentContainerSourceIdPredicate">
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+
+    <bean id="addPersonalizationCmsModelCloningContextPresetValuePredicates" depends-on="cmsModelCloningContextPresetValuePredicates" parent="listMergeDirective">
+        <property name="add" ref="cxCmsComponentContainerSourceIdPredicate"/>
+    </bean>
+
+    <!-- Strategies to retrieve the catalogs to use for personalization -->
+    <alias name="cxCmsCatalogService" alias="cxCatalogService"/>
+    <bean id="cxCmsCatalogService" class="de.hybris.platform.personalizationcms.service.CxCmsCatalogService" parent="defaultCxCatalogService">
+        <property name="sessionService" ref="sessionService"/>
+    </bean>
+
+    <bean id="cxLeafClosestAncestorsCatalogsLookupStrategy" class="de.hybris.platform.personalizationcms.strategy.LeavesOrClosestAncestorsCatalogLookupStrategy">
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="maxRecursions" value="5"/>
+    </bean>
+
+    <bean id="cxLeafCatalogsLookupStrategy" class="de.hybris.platform.personalizationcms.strategy.LeavesOrClosestAncestorsCatalogLookupStrategy">
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="maxRecursions" value="0"/>
+    </bean>
+
+    <!-- overwrite allCatalogsLookupStrategy from personalizationservices  -->
+    <bean id="cxAllCatalogsLookupStrategy" class="de.hybris.platform.personalizationcms.strategy.AllCatalogsHierarchyLookupStrategy">
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+    </bean>
+
+
+    <!-- system setup and update -->
+    <bean name="personalizationcmsSystemSetup" class="de.hybris.platform.personalizationcms.setup.PersonalizationcmsSystemSetup">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="configurationService" ref="configurationService"/>
+    </bean>
+</beans>

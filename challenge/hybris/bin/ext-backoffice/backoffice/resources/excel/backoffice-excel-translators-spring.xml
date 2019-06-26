@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultExcelTranslatorRegistry" alias="excelTranslatorRegistry"/>
+	<bean id="defaultExcelTranslatorRegistry" class="com.hybris.backoffice.excel.translators.ExcelTranslatorRegistry">
+		<property name="translators" ref="excelTranslators"/>
+	</bean>
+
+	<alias name="defaultExcelTranslators" alias="excelTranslators"/>
+	<util:list id="defaultExcelTranslators" value-type="com.hybris.backoffice.excel.translators.ExcelValueTranslator">
+		<ref bean="excelEurope1PricesTypeTranslator"/>
+		<ref bean="excelCatalogVersionTypeTranslator"/>
+		<ref bean="excelBaseProductTypeTranslator"/>
+		<ref bean="excelProductSupercategoriesTypeTranslator"/>
+		<ref bean="excelEnumTypeTranslator"/>
+		<ref bean="excelJavaTypeTranslator"/>
+		<ref bean="excelMediaImportTranslator"/>
+		<ref bean="excelMediaCollectionImportTranslator"/>
+		<ref bean="excelGenericReferenceTranslator"/>
+	</util:list>
+
+	<alias name="defaultExcelJavaTypeTranslator" alias="excelJavaTypeTranslator"/>
+	<bean id="defaultExcelJavaTypeTranslator" class="com.hybris.backoffice.excel.translators.ExcelJavaTypeTranslator">
+		<property name="order" value="0"/>
+		<property name="validators" ref="excelJavaTypeValidators"/>
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+		<property name="excelUniqueFilter" ref="uniqueCheckingFilter"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter" />
+	</bean>
+
+	<alias name="defaultAbstractExcelMediaImportTranslator" alias="abstractExcelMediaImportTranslator"/>
+	<bean id="defaultAbstractExcelMediaImportTranslator"
+		  class="com.hybris.backoffice.excel.translators.AbstractExcelMediaImportTranslator" abstract="true">
+		<property name="typeService" ref="typeService"/>
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+		<property name="mediaCodeGenerator" ref="mediaCodeGenerator"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter" />
+	</bean>
+
+	<alias name="defaultExcelMediaImportTranslator" alias="excelMediaImportTranslator"/>
+	<bean id="defaultExcelMediaImportTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelMediaImportTranslator"
+		  parent="abstractExcelMediaImportTranslator">
+		<property name="validators" ref="excelMediaImportValidators"/>
+	</bean>
+
+	<alias name="defaultExcelMediaCollectionImportTranslator" alias="excelMediaCollectionImportTranslator"/>
+	<bean id="defaultExcelMediaCollectionImportTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelMediaCollectionImportTranslator"
+		  parent="abstractExcelMediaImportTranslator">
+		<property name="validators" ref="excelMediaCollectionImportValidators"/>
+	</bean>
+
+	<alias name="defaultExcelMediaUrlTranslator" alias="excelMediaUrlTranslator" />
+	<bean id="defaultExcelMediaUrlTranslator" class="com.hybris.backoffice.excel.translators.ExcelMediaUrlTranslator" parent="abstractExcelMediaImportTranslator">
+		<property name="order" value="-1" />
+	</bean>
+
+	<alias name="defaultExcelMediaCollectionUrlTranslator" alias="excelMediaCollectionUrlTranslator" />
+	<bean id="defaultExcelMediaCollectionUrlTranslator" class="com.hybris.backoffice.excel.translators.ExcelMediaCollectionUrlTranslator" parent="abstractExcelMediaImportTranslator">
+		<property name="order" value="-1" />
+	</bean>
+
+	<alias name="defaultExcelEnumTypeTranslator" alias="excelEnumTypeTranslator"/>
+	<bean id="defaultExcelEnumTypeTranslator" class="com.hybris.backoffice.excel.translators.ExcelEnumTypeTranslator">
+		<property name="excelUniqueFilter" ref="uniqueCheckingFilter"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter" />
+		<property name="order" value="1000"/>
+		<property name="validators" ref="excelEnumValidators"/>
+	</bean>
+
+	<alias name="defaultAbstractCatalogVersionAwareTranslator" alias="abstractCatalogVersionAwareTranslator"/>
+	<bean name="defaultAbstractCatalogVersionAwareTranslator"
+		  class="com.hybris.backoffice.excel.translators.AbstractCatalogVersionAwareTranslator" abstract="true">
+		<property name="catalogTypeService" ref="catalogTypeService"/>
+		<property name="validators" ref="excelCatalogVersionValidators"/>
+	</bean>
+
+	<alias name="defaultExcelCatalogVersionTypeTranslator" alias="excelCatalogVersionTypeTranslator"/>
+	<bean id="defaultExcelCatalogVersionTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelCatalogVersionTypeTranslator"
+		  parent="abstractCatalogVersionAwareTranslator">
+		<property name="excelUniqueFilter" ref="uniqueCheckingFilter"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter" />
+		<property name="typeService" ref="typeService"/>
+		<property name="order" value="2000"/>
+	</bean>
+
+	<alias name="defaultExcelBaseProductTypeTranslator" alias="excelBaseProductTypeTranslator"/>
+	<bean id="defaultExcelBaseProductTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelBaseProductTypeTranslator"
+		  parent="abstractCatalogVersionAwareTranslator">
+		<property name="order" value="3000"/>
+		<property name="excelUniqueFilter" ref="uniqueCheckingFilter"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter" />
+		<property name="validators" ref="excelBaseProductValidators"/>
+	</bean>
+
+	<alias name="defaultExcelProductSupercategoriesTypeTranslator" alias="excelProductSupercategoriesTypeTranslator"/>
+	<bean id="defaultExcelProductSupercategoriesTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelProductSupercategoriesTypeTranslator"
+		  parent="abstractCatalogVersionAwareTranslator">
+		<property name="typeService" ref="typeService"/>
+		<property name="order" value="4000"/>
+		<property name="validators" ref="excelSupercategoriesValidators"/>
+	</bean>
+
+	<alias name="defaultExcelEurope1PricesTypeTranslator" alias="excelEurope1PricesTypeTranslator"/>
+	<bean id="defaultExcelEurope1PricesTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.ExcelEurope1PricesTypeTranslator">
+		<property name="order" value="5000"/>
+		<property name="validators" ref="excelEurope1PricesValidators"/>
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultRequiredAttributesFactory" alias="requiredAttributesFactory" />
+	<bean id="defaultRequiredAttributesFactory" class="com.hybris.backoffice.excel.translators.generic.factory.DefaultRequiredAttributesFactory">
+		<property name="typeService" ref="typeService" />
+		<property name="uniqueFilter" ref="uniqueCheckingFilter"/>
+		<property name="mandatoryFilter" ref="mandatoryCheckingFilter"/>
+		<property name="filter">
+			<bean class="com.hybris.backoffice.excel.template.filter.AndFilter">
+				<property name="filters">
+					<list>
+						<ref bean="skippingPkFilter" />
+						<ref bean="skippingItemTypeFilter" />
+						<ref bean="uniqueCheckingFilter" />
+						<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+							<property name="excelFilter" ref="valueCheckingFilter" />
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultReferenceFormatFactory" alias="referenceFormatFactory" />
+	<bean id="defaultReferenceFormatFactory" class="com.hybris.backoffice.excel.translators.generic.factory.DefaultReferenceFormatFactory"/>
+
+	<alias name="defaultExportDataFactory" alias="exportDataFactory" />
+	<bean id="defaultExportDataFactory" class="com.hybris.backoffice.excel.translators.generic.factory.DefaultExportDataFactory" >
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultReferenceImportImpexFactoryStrategy" alias="referenceImportImpexFactoryStrategy" />
+	<bean id="defaultReferenceImportImpexFactoryStrategy" class="com.hybris.backoffice.excel.translators.generic.factory.ReferenceImportImpexFactoryStrategy"/>
+
+	<alias name="defaultImportImpexFactoryStrategy" alias="importImpexFactoryStrategy"/>
+	<util:list id="defaultImportImpexFactoryStrategy"
+			   value-type="com.hybris.backoffice.excel.translators.generic.factory.ImportImpexFactoryStrategy">
+		<ref bean="referenceImportImpexFactoryStrategy"/>
+	</util:list>
+
+	<alias name="defaultImportImpexFactory" alias="importImpexFactory" />
+	<bean id="defaultImportImpexFactory" class="com.hybris.backoffice.excel.translators.generic.factory.DefaultImportImpexFactory">
+		<property name="strategies" ref="importImpexFactoryStrategy" />
+	</bean>
+
+	<alias name="defaultExcelGenericReferenceTranslator" alias="excelGenericReferenceTranslator" />
+	<bean id="defaultExcelGenericReferenceTranslator" class="com.hybris.backoffice.excel.translators.generic.ExcelGenericReferenceTranslator" >
+		<property name="requiredAttributesFactory" ref="requiredAttributesFactory" />
+		<property name="referenceFormatFactory" ref="referenceFormatFactory" />
+		<property name="exportDataFactory" ref="exportDataFactory" />
+		<property name="importImpexFactory" ref="importImpexFactory" />
+		<property name="validators" ref="excelGenericReferenceValidators" />
+		<property name="typeService" ref="typeService" />
+		<property name="excludedFields">
+			<util:list>
+			</util:list>
+		</property>
+	</bean>
+	<!--END - Translators based on AttributeDescriptorModel-->
+
+	<!--START - Translators based on ClassAttributeAssignmentModel-->
+	<alias name="defaultExcelClassificationAttributeTranslatorRegistry"
+		   alias="excelClassificationAttributeTranslatorRegistry"/>
+	<bean id="defaultExcelClassificationAttributeTranslatorRegistry"
+		  class="com.hybris.backoffice.excel.translators.ExcelAttributeTranslatorRegistry">
+		<property name="translators" ref="excelClassificationAttributeTranslators"/>
+	</bean>
+
+	<alias name="defaultClassificationExcelAttributeTranslators" alias="excelClassificationAttributeTranslators"/>
+	<util:list id="defaultClassificationExcelAttributeTranslators"
+			   value-type="com.hybris.backoffice.excel.translators.ExcelAttributeTranslator">
+		<ref bean="excelClassificationEnumTypeTranslator"/>
+		<ref bean="excelClassificationJavaTypeTranslator"/>
+		<ref bean="excelClassificationReferenceTranslator"/>
+	</util:list>
+
+	<alias name="defaultAbstractClassificationAttributeTranslator" alias="abstractClassificationAttributeTranslator"/>
+	<bean id="defaultAbstractClassificationAttributeTranslator"
+		  class="com.hybris.backoffice.excel.translators.classification.AbstractClassificationAttributeTranslator"
+		  abstract="true">
+		<property name="classificationService" ref="classificationService"/>
+		<property name="classificationSystemService" ref="classificationSystemService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="excelParserSplitter" ref="unitExcelParserSplitter"/>
+		<property name="classificationAttributeHeaderValueCreator" ref="classificationAttributeHeaderValueCreator"/>
+	</bean>
+
+	<alias name="defaultExcelClassificationEnumTypeTranslator" alias="excelClassificationEnumTypeTranslator"/>
+	<bean id="defaultExcelClassificationEnumTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.classification.ExcelClassificationEnumTypeTranslator"
+		  parent="abstractClassificationAttributeTranslator">
+	</bean>
+
+	<alias name="defaultExcelClassificationJavaTypeTranslator" alias="excelClassificationJavaTypeTranslator"/>
+	<bean id="defaultExcelClassificationJavaTypeTranslator"
+		  class="com.hybris.backoffice.excel.translators.classification.ExcelClassificationJavaTypeTranslator"
+		  parent="abstractClassificationAttributeTranslator">
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultExcelClassificationReferenceTranslator" alias="excelClassificationReferenceTranslator"/>
+	<bean id="defaultExcelClassificationReferenceTranslator"
+		  class="com.hybris.backoffice.excel.translators.classification.ExcelClassificationReferenceTranslator"
+		  parent="abstractClassificationAttributeTranslator">
+		<property name="exportDataFactory" ref="exportDataFactory"/>
+		<property name="referenceFormatFactory" ref="referenceFormatFactory"/>
+		<property name="requiredAttributesFactory" ref="requiredAttributesFactory"/>
+		<property name="headerValueCreator" ref="classificationAttributeHeaderValueCreator"/>
+		<property name="filter">
+			<bean class="com.hybris.backoffice.excel.template.filter.AndFilter">
+				<property name="filters">
+					<list>
+						<ref bean="skippingPkFilter" />
+						<ref bean="uniqueCheckingFilter" />
+						<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+							<property name="excelFilter" ref="valueCheckingFilter" />
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	<!--END - Translators based on ClassAttributeAssignmentModel-->
+
+</beans>

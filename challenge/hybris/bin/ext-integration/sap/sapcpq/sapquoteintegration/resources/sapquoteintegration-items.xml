@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- [y] hybris Platform Copyright (c) 2018 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype code="SAPCpiOutboundQuoteCommentList"
+			elementtype="SAPCpiOutboundQuoteComment" type="list"
+			autocreate="true" generate="false" />
+		<collectiontype code="ExternalDiscountCollection"
+			elementtype="java.lang.String" type="list" autocreate="true"
+			generate="false" />
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="QuoteAction" autocreate="false"
+			generate="false" dynamic="true">
+			<value code="DOWNLOAD_PROPOSAL_DOCUMENT" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+
+		<relation code="SAPCpiOutboundQuote2SAPCpiOutboundQuoteItem"
+			localized="false">
+			<sourceElement type="SAPCpiOutboundQuote"
+				qualifier="sapCpiOutboundQuote" cardinality="one" />
+			<targetElement type="SAPCpiOutboundQuoteItem"
+				qualifier="sapCpiOutboundQuoteItems" cardinality="many"
+				collectiontype="set">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation
+			code="SAPCpiOutboundQuote2SAPCpiOutboundQuoteCustomer"
+			localized="false">
+			<sourceElement type="SAPCpiOutboundQuote"
+				qualifier="sapCpiOutboundQuote" cardinality="one" />
+			<targetElement type="SAPCpiOutboundQuoteCustomer"
+				qualifier="sapCpiOutboundQuoteCustomers" cardinality="many"
+				collectiontype="set">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation
+			code="SAPCpiOutboundQuote2SAPCpiOutboundQuoteComment"
+			localized="false">
+			<sourceElement type="SAPCpiOutboundQuote"
+				qualifier="sapCpiOutboundQuote" cardinality="one" />
+			<targetElement type="SAPCpiOutboundQuoteComment"
+				qualifier="sapCpiOutboundQuoteComments" cardinality="many"
+				collectiontype="list">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation
+			code="SAPCpiOutboundQuoteItem2SAPCpiOutboundQuoteComment"
+			localized="false">
+			<sourceElement type="SAPCpiOutboundQuoteItem"
+				qualifier="sapCpiOutboundQuoteItem" cardinality="one" />
+			<targetElement type="SAPCpiOutboundQuoteComment"
+				qualifier="sapCpiOutboundQuoteItemComments" cardinality="many"
+				collectiontype="list">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+
+	<itemtypes>
+
+		<itemtype code="SAPCpiOutboundQuote"
+			jaloclass="com.sap.hybris.sapquoteintegration.jalo.SAPCpiOutboundQuote"
+			extends="GenericItem">
+
+			<deployment table="SAPCpiOutboundQuote" typecode="9358" />
+
+			<attributes>
+
+				<attribute qualifier="quoteId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="version" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="name" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="description" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="creationDate"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="currencyIsoCode"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="baseStoreUid"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="quoteStatus" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="externalQuoteId"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="promotionSummary"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="responseStatus"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="responseMessage"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="salesOrganization"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="distributionChannel"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="divison" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="pricingProcedure"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="SAPCpiOutboundQuoteItem"
+			jaloclass="com.sap.hybris.sapquoteintegration.jalo.SAPCpiOutboundQuoteItem"
+			extends="GenericItem">
+
+			<deployment table="SAPCpiOutboundQuoteItem"
+				typecode="9359" />
+
+			<attributes>
+
+				<attribute qualifier="quoteId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="entryNumber" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="productCode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="quantity" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="currencyIsoCode"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="unit" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="productName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="price" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="SAPCpiOutboundQuoteCustomer"
+			jaloclass="com.sap.hybris.sapquoteintegration.jalo.SAPCpiOutboundQuoteCustomer"
+			extends="GenericItem">
+
+			<deployment table="SAPCpiQuoteCustomer" typecode="9360" />
+			<attributes>
+
+				<attribute qualifier="quoteId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="customerRoleCode"
+					type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="customerId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="firstName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="lastName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="b2bUnitName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="line1" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="line2" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="city" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="phoneNumber" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="fax" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="email" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="country" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="postalcode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="SAPCpiOutboundQuoteComment"
+			jaloclass="com.sap.hybris.sapquoteintegration.jalo.SAPCpiOutboundQuoteComment"
+			extends="GenericItem">
+
+			<deployment table="SAPCpiQuoteComment" typecode="9361" />
+
+			<attributes>
+
+				<attribute qualifier="quoteId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="commentId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="entryNumber" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="text" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="userName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="email" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="b2bUnitName" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SAPCpiOutboundQuoteStatus"
+			jaloclass="com.sap.hybris.sapquoteintegration.jalo.SAPCpiOutboundQuoteStatus"
+			extends="GenericItem">
+
+			<deployment table="SAPCpiQuoteStatus" typecode="9362" />
+
+			<attributes>
+				<attribute qualifier="quoteId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers unique="true" />
+				</attribute>
+
+				<attribute qualifier="externalQuoteId"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="orderId" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="status" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="headerComments"
+					type="SAPCpiOutboundQuoteCommentList">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="itemComments"
+					type="SAPCpiOutboundQuoteCommentList">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="responseStatus"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="responseMessage"
+					type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="Quote" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.String"
+					qualifier="externalQuoteId">
+					<description>Unique identifier of Quote in the Integrated System, eg. Callidus CPQ</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="externalQuoteDocument">
+					<description>Quote Document eg. in PDF Base64 form</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="externalComments">
+					<description>External header level comments in XML formal to be parsed in pre-persist-hook</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="orderCode">
+					<description>Unique identifier of Order Created for particular Quote</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute type="Media" qualifier="proposalDocument">
+					<description>Externally generated Proposal PDF Document</description>
+					<modifiers read="true" write="true" search="false"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="ExternalDiscountCollection"
+					qualifier="externalGlobalDiscounts">
+					<description>Header level discounts collection</description>
+					<modifiers read="true" write="true" search="false"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute autocreate="true" qualifier="headerDiscount"
+					type="java.lang.Double" generate="true">
+					<persistence type="property">
+						<columntype>
+							<value>java.math.BigDecimal</value>
+						</columntype>
+					</persistence>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="salesOrganization">
+					<description>Sales Organization</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="distributionChannel">
+					<description>Distribution Channel</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="division">
+					<description>Division</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractOrderEntry" autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute type="java.lang.String"
+					qualifier="entryDiscountInternal">
+					<description>Field to hold discount value and populate discount value during cart calculations</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="QuoteEntry" autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute autocreate="true" qualifier="entryDiscount"
+					type="java.lang.Double" generate="true">
+					<persistence type="property">
+						<columntype>
+							<value>java.math.BigDecimal</value>
+						</columntype>
+					</persistence>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<defaultvalue>Double.valueOf(0.0d)</defaultvalue>
+				</attribute>
+
+				<attribute type="java.lang.String"
+					qualifier="externalQuoteEntryId">
+					<description>Unique identifier of QuoteEntry in the External Integrated System, eg. Callidus CPQ</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="rank">
+					<description>Unique rank of QuoteEntry in the External Integrated System, eg. Callidus CPQ</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String"
+					qualifier="itemId">
+					<description>Unique identifier of Product. Used to map this Quote Entry to a specific product in Commerce</description>
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="QuoteProcess" autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="orderCode">
+					<persistence type="property" />
+					<description>Order code of created order from Quote</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="Comment" autocreate="false" generate="false">
+			<attributes>
+				<attribute type="java.lang.String"
+					qualifier="commentAuthorEmail">
+					<persistence type="property" />
+					<modifiers read="true" write="true" search="false"
+						optional="true" />
+					<description>Temporary placeholder to map Author of comments</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SAPConfiguration" autocreate="false"
+			generate="false">
+			<attributes>
+			<!-- quoteType holds value for processing type code in backend c4c system, 
+					for e.g: ZAGR, AG etc. -->
+				<attribute qualifier="quoteDiscountConditionCode" type="java.lang.String">
+					<description>quote processingType code in back end c4c system</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="quoteEntryDiscountConditionCode" type="java.lang.String">
+					<description>quote processingType code in back end c4c system</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

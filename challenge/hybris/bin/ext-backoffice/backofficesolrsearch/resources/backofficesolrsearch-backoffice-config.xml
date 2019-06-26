@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+    <context merge-by="type" type="SolrIndexedProperty" component="editor-area">
+        <editorArea:editorArea  xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab name="hmc.tab.configuration.indexedproperty.facet" position="3">
+                <editorArea:section name="hmc.sec.configuration.indexedproperty.facet">
+                    <editorArea:attribute qualifier="backofficeDisplayName"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context component="explorer-tree" merge-by="module">
+        <explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+            <explorer-tree:navigation-node id="hmc_treenode_system">
+                <explorer-tree:navigation-node id="hmc.solrfacetsearch">
+                    <explorer-tree:navigation-node id="hmc_treenode_solr_backoffice">
+                        <explorer-tree:type-node code="BackofficeIndexedTypeToSolrFacetSearchConfig"
+                                                 id="hmc_typenode_BackofficeIndexedTypeToSolrFacetSearchConfig"/>
+                    </explorer-tree:navigation-node>
+                </explorer-tree:navigation-node>
+            </explorer-tree:navigation-node>
+        </explorer-tree:explorer-tree>
+    </context>
+
+    <context merge-by="source" component="notification-area" source="advancedSearchEngine">
+        <na:notification-area xmlns:na="http://www.hybris.com/cockpitng/config/notifications">
+            <na:notifications eventType="General" level="FAILURE">
+                <na:message>could.not.search.msg</na:message>
+            </na:notifications>
+        </na:notification-area>
+    </context>
+
+    <context merge-by="source" parent="advancedSearchEngine" component="notification-area" source=".*-advancedsearchengine(-.*)?">
+        <na:notification-area xmlns:na="http://www.hybris.com/cockpitng/config/notifications"/>
+    </context>
+
+</config>

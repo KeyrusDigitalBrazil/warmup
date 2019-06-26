@@ -1,0 +1,35 @@
+package de.hybris.platform.ruleengineservices.test
+
+import de.hybris.platform.ruleengineservices.rao.CartRAO;
+import de.hybris.platform.ruleengineservices.rao.OrderEntryRAO;
+import de.hybris.platform.ruleengineservices.rao.DiscountRAO
+import de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO;
+import de.hybris.platform.ruleengineservices.rrd.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Map;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleOrderEntryFixedDiscountAction;
+
+rule "availableQuantity_entryAbsoluteDiscount"
+@ruleCode("availableQuantity_entryAbsoluteDiscount.drl")
+@moduleName("rules-module-junit")
+dialect "mvel"
+
+salience 20
+	when
+        $entries : ArrayList(size > 0) from collect( OrderEntryRAO(product.getCode()=="1422222", quantity > 0) )
+        $config : RuleConfigurationRRD(ruleCode == "availableQuantity_entryAbsoluteDiscount.drl")
+		$groupExecution := RuleGroupExecutionRRD(code == $config.ruleGroupCode)
+		$result : RuleEngineResultRAO()
+		not $discount:DiscountRAO( firedRuleCode == "orderEntryAbsolutDiscount" )
+		eval($groupExecution.allowedToExecute($config))
+	then
+		Map variables = [
+      		"de.hybris.platform.ruleengineservices.rao.OrderEntryRAO" : $entries,
+      		"de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO" : $result
+   		];
+		ruleOrderEntryFixedDiscountAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["value":["USD":new BigDecimal(10)]]);
+		$groupExecution.trackRuleGroupExecution($config);
+end

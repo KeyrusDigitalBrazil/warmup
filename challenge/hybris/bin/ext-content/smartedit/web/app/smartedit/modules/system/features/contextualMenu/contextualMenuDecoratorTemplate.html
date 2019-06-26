@@ -1,0 +1,57 @@
+<div class="cmsx-ctx-wrapper1">
+    <div class="cmsx-ctx-wrapper2">
+        <div class="decorative-top-border decorative-border"
+            data-ng-if="ctrl.showContextualMenuBorders()"></div>
+        <div class="decorative-right-border decorative-border"
+            data-ng-if="ctrl.showContextualMenuBorders()"></div>
+        <div class="decorative-bottom-border decorative-border"
+            data-ng-if="ctrl.showContextualMenuBorders()"></div>
+        <div class="decorative-left-border decorative-border"
+            data-ng-if="ctrl.showContextualMenuBorders()"></div>
+        <div class="contextualMenuOverlay"
+            data-ng-show="ctrl.showOverlay() || ctrl.status.isopen">
+            <div data-ng-repeat="item in ctrl.getItems().leftMenuItems"
+                id="{{ item.key }}"
+                class="btn btn-primary cmsx-ctx-btns">
+                <contextual-menu-item data-mode="small"
+                    class="se-contextual--menu-item"
+                    data-ng-click="ctrl.triggerMenuItemAction(item, $event)"
+                    y-popup-overlay="ctrl.itemTemplateOverlayWrapper"
+                    y-popup-overlay-trigger="{{ctrl.shouldShowTemplate(item)}}"
+                    y-popup-overlay-on-show="ctrl.onShowItemPopup(item)"
+                    y-popup-overlay-on-hide="ctrl.onHideItemPopup(false)"
+                    data-index="$index"
+                    data-component-attributes="ctrl.componentAttributes"
+                    data-slot-attributes="ctrl.slotAttributes"
+                    data-item-config="item"
+                    data-component-id="{{ctrl.smarteditComponentId}}"
+                    data-component-uuid="{{ctrl.componentAttributes.smarteditComponentUuid}}"
+                    data-component-type="{{ctrl.smarteditComponentType}}"
+                    data-slot-id="{{ctrl.smarteditSlotId}}"
+                    data-slot-uuid="{{ctrl.smarteditSlotUuid}}"
+                    data-container-id="{{ctrl.smarteditContainerId}}"
+                    data-container-type="{{ctrl.smarteditContainerType}}">
+                </contextual-menu-item>
+            </div>
+            <div data-ng-if="ctrl.getItems().moreMenuItems.length > 0"
+                class="cmsx-ctx-more">
+                <div class="btn-group yCmsCtxMenu">
+                    <a type="button"
+                        class="cmsx-ctx-more-btn pull-right"
+                        data-ng-click="ctrl.moreMenuIsOpen = !ctrl.moreMenuIsOpen"
+                        y-popup-overlay="ctrl.moreMenuPopupConfig"
+                        y-popup-overlay-trigger="{{ctrl.moreMenuIsOpen}}"
+                        y-popup-overlay-on-show="ctrl.onShowMoreMenuPopup()"
+                        y-popup-overlay-on-hide="ctrl.onHideMoreMenuPopup()">
+                        <span title="{{ctrl.moreButton.i18nKey | translate}}"
+                            class="{{ctrl.moreButton.displayClass}}"></span>
+                    </a>
+                </div>
+            </div>
+            <div class="contextualmenuBackground"></div>
+        </div>
+        <div class="yWrapperData">
+            <div data-ng-transclude></div>
+        </div>
+    </div>
+</div>

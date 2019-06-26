@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="y2ysync_buildcallbacks">
+
+    <!--
+        Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+
+         ${ear.path}: 			path to ear
+     -->
+    <macrodef name="y2ysync_before_ear">
+        <sequential>
+
+            <!-- you can do anything before the EAR file is being packed -->
+
+        </sequential>
+    </macrodef>
+
+    <macrodef name="y2ysync_before_clean" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+        <sequential>
+            <if>
+                <available file="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml"/>
+                <then>
+                    <artifact:mvn pom="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml" fork="true"
+                                  failonerror="true" mavenVersion="3.2.5">
+                        <arg value="clean"/>
+                    </artifact:mvn>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="y2ysync_before_build" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+        <sequential>
+            <if>
+                 <available file="${ext.y2ysync.path}/../../../pom.xml"/>
+                 <then>
+                     <artifact:pom id="y2ysyncpom" file="${ext.y2ysync.path}/../../../pom.xml"/>
+                     <replace file="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml" token="1.0.0-REPLACED_BY_Y2YSYNC_BUILD"
+                              value="${y2ysyncpom.version}"/>
+            </then>
+         </if>
+         </sequential>
+     </macrodef>
+
+
+     <macrodef name="y2ysync_after_build" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+         <sequential>
+             <if>
+                 <available file="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml"/>
+                 <then>
+                     <artifact:mvn pom="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml" fork="true"
+                                   failonerror="true" mavenVersion="3.2.5">
+                         <arg value="compile"/>
+                     </artifact:mvn>
+                 </then>
+             </if>
+         </sequential>
+     </macrodef>
+
+     <macrodef name="y2ysync_after_dist_copy" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+         <sequential>
+            <if>
+                 <available file="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml"/>
+                 <then>
+                     <artifact:mvn pom="${ext.y2ysync.path}/../y2ysync-datahub-ext/pom.xml" fork="true" failonerror="true"
+                           mavenVersion="3.2.5">
+                     	<arg value="package"/>
+                     	<arg value="-DskipTests"/>
+                     </artifact:mvn>
+		     <mkdir dir="${destination.folder}/../y2ysync-temp"/>
+		     <copy todir="${destination.folder}/../y2ysync-temp/hybris/bin/ext-integration/datahub/extensions/y2ysync-datahub-ext"
+                     	preservelastmodified="true">
+                     	<fileset dir="${ext.y2ysync.path}/../y2ysync-datahub-ext/target">
+                     		<include name="y2ysync-datahub-ext*.jar"/>
+                     	</fileset>
+                     </copy>
+		     <zip destfile="${HYBRIS_TEMP_DIR}/dists/y2ysync-datahub-ext.zip" basedir="${destination.folder}/../y2ysync-temp" includes="hybris/**/y2ysync-datahub-ext*.jar"/>
+		     <delete dir="${destination.folder}/../y2ysync-temp" failonerror="false"/>
+                     <artifact:pom id="y2ysyncpom" file="${ext.y2ysync.path}/../../../pom.xml"/>
+                     <artifact:pom id="y2ysync-datahub-ext-zip-pom" groupId="de.hybris.platform" artifactId="y2ysync-datahub-ext-zip" version="${y2ysyncpom.version}"/>
+                     <artifact:writepom pomRefId="y2ysync-datahub-ext-zip-pom" file="${HYBRIS_TEMP_DIR}/dists/y2ysync-datahub-ext-zip-pom.xml" />
+                     <replace file="${HYBRIS_TEMP_DIR}/dists/y2ysync-datahub-ext-zip-pom.xml" token="&lt;name&gt;Maven Default Project&lt;/name&gt;" value="&lt;packaging&gt;zip&lt;/packaging&gt;"/>
+                     <if>
+                     	<istrue value="${dist.development.dist}"/>
+                     	<then>
+                     		<!--copy todir="${destination.develop.folder}/../hybris/bin/ext-integration/datahub/extensions/y2ysync-datahub-ext"
+                     			preservelastmodified="true">
+                     			<fileset dir="${ext.y2ysync.path}/../y2ysync-datahub-ext/target">
+                     				<include name="y2ysync-datahub-ext*.jar"/>
+                     			</fileset>
+                     		</copy-->
+                     	</then>
+                     </if>
+                 </then>
+            </if>
+         </sequential>
+     </macrodef>
+
+ </project>

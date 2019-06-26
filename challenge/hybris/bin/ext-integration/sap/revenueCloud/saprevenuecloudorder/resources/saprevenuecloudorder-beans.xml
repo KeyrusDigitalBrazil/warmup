@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+		<bean class="de.hybris.platform.commercefacades.product.data.ProductData">
+		<property name="subscriptionCode" type="java.lang.String" />
+	</bean>
+
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionData">
+		<property name="version" type="String" />
+		<property name="documentNumber" type="String"/>
+		<property name="ratePlanId" type="String"/>
+	    <property name="extendedPeriod" type="String"/>
+	    <property name="pricePlan" type="de.hybris.platform.subscriptionfacades.data.SubscriptionPricePlanData" />
+	    <property name="status" type="de.hybris.platform.subscriptionservices.enums.SubscriptionStatus"/> 
+	    <property name="validTillDate" type="String"/> 
+	    <property name="unlimited" type="Boolean" />
+	    <property name="currentUsages" type="java.util.List&lt;de.hybris.platform.subscriptionfacades.data.UsageChargeData>"/>
+	</bean>
+
+	<!-- Revenue CLoud Subscription Order -->
+
+	<!-- SapCpiOrder -->
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.SubscriptionOrder">
+		<property name="owner" type="String" />
+		<property name="market" type="de.hybris.platform.sap.saprevenuecloudorder.data.Market" />
+    	<property name="paymentData" type="de.hybris.platform.sap.saprevenuecloudorder.data.PaymentData" />
+		<property name="description" type="String" />
+		<property name="customer" type="de.hybris.platform.sap.saprevenuecloudorder.data.Customer" />
+		<property name="orderItems" type="java.util.List&lt;de.hybris.platform.sap.saprevenuecloudorder.data.OrderItem>" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.Market">
+		<property name="marketId" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.PaymentData">
+		<property name="paymentMethod" type="String" />
+		<property name="paymentCardToken" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.Customer">
+		<property name="id" type="String" />
+		<property name="customerNumber" type="String" />
+		<property name="name" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.OrderItem">
+		<property name="itemType" type="String" />
+		<property name="product" type="de.hybris.platform.sap.saprevenuecloudorder.data.Product" />
+		<property name="quantity" type="de.hybris.platform.sap.saprevenuecloudorder.data.Quantity" />
+		<property name="price" type="de.hybris.platform.sap.saprevenuecloudorder.data.Price" />
+		<property name="aspectsData" type="de.hybris.platform.sap.saprevenuecloudorder.data.AspectsData" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.Product">
+		<property name="id" type="String" />
+		<property name="code" type="String" />
+		<property name="version" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.Quantity">
+		<property name="value" type="String" />
+		<property name="unit" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.Price">
+		<property name="aspectData" type="de.hybris.platform.sap.saprevenuecloudorder.data.AspectData" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.AspectData">
+		<property name="subscriptionItemPrice" type="de.hybris.platform.sap.saprevenuecloudorder.data.SubscriptionItemPrice"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.AspectsData">
+		<property name="subscriptionItem" type="de.hybris.platform.sap.saprevenuecloudorder.data.SubscriptionItem" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.SubscriptionItemPrice">
+		<property name="priceObjectId" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.SubscriptionItem">
+		<property name="validFrom" type="String" />
+		<property name="validTo" type="String" />
+		<property name="numberOfWaiverPeriods" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.CancelSubscription">
+		<property name="metaData" type="de.hybris.platform.sap.saprevenuecloudorder.data.MetaData" />
+		<property name="requestedCancellationDate" type="String" />
+		<property name="cancellationReason" type="String" />
+	</bean>		
+	
+	<bean class="de.hybris.platform.sap.saprevenuecloudorder.data.MetaData">
+		<property name="version" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.PerUnitUsageChargeData" extends="UsageChargeData">
+		<property name="blockSize" type="Integer"/>
+		<property name="includedQty" type="Integer"/>
+		<property name="minBlocks" type="Integer"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.UsageChargeEntryData" extends="ChargeEntryData">
+		<property name="fixedPrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.subscriptionfacades.data.PerUnitUsageChargeEntryData" extends="UsageChargeEntryData"/>
+		
+	<bean class="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingData">
+		<property name="subscriptionBillDate" type="java.util.Date"/>
+		<property name="subscriptionId" type="String"/>
+		<property name="items" type="String"/>
+		<property name="price" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="charges" type="java.util.List&lt;de.hybris.platform.subscriptionfacades.data.UsageChargeData>"/>
+		<property name="billingCycle" type="de.hybris.platform.subscriptionfacades.data.BillingCycleTypeData"/>
+		<property name="productCode" type="String"/>
+		<property name="productUrl" type="String"/>
+	</bean>
+	
+	 <bean class="de.hybris.platform.subscriptionfacades.data.UsageChargeData">
+	 	<property name="fromDate" type="java.util.Date"/>
+		<property name="toDate" type="java.util.Date"/>
+		<property name="netAmount" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="usage" type="Integer"/>
+	 </bean>
+
+	
+</beans>

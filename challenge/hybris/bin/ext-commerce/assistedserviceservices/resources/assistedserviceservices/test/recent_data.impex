@@ -1,0 +1,52 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Language
+$lang=en
+
+$yCurrency=Y
+$productCatalog=productCatalog
+$catalog-id=testCatalog
+$catalog-version=Online
+$onlineProduct=catalogVersion(catalog(id[$catalog-id]),version[$catalog-version])[unique=true,default='$catalog-id:$catalog-version']
+$storeUid=testStore
+$siteUid=testSite
+
+# Currencies
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=$lang];active;conversion;digits;symbol
+;Y;"Yenes";true;1.5;4;"Y"
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;JP;Japan;true;;;;;;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$catalog-id;$catalog-id;true;;;;;;
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode;paymentProvider;pickupInStoreMode(code)
+;$storeUid;$catalog-id;Y;false;;Y;en;en;JP;;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid);channel(code)
+;$siteUid;$storeUid;B2C
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;loginDisabled;deactivationDate[dateformat=dd.MM.yyyy HH:mm:ss]
+;user1;user1@test.net;First Test User;;
+;user2;user2@test.net;Second Test User;;
+;user5;user2@test.net;Second Test User;;
+;user6;user2@test.net;Second Test User;;
+;user7;user2@test.net;Second Test User;;
+;user3;user3@test.net;Third Test User;true;
+;user4;user4@test.net;Fouth Test User;;11.11.2010 00:00:00
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups[ignorenull=false,default= ];locname[lang=en];description
+;asagentgroup;;"Common Assisted Service Agent Group";
+
+INSERT_UPDATE Employee;uid[unique=true];password[default=$defaultPassword];name;description;groups[ignorenull=false,default= ]
+;asagent;;"Assisted Service Agent";"Assisted Service Agent";

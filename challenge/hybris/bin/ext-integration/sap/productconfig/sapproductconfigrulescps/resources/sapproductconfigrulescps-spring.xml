@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="sapProductConfigRuleCPSDataSystemSetup" class="de.hybris.platform.sap.productconfig.rules.cps.setup.ProductConfigRulesCPSSetup"
+		parent="sapProductConfigRuleDataSystemSetup">
+	</bean>
+
+	<alias name="sapProductConfigDefaultDisplayPromoMessageAction" alias="sapProductConfigDisplayPromoMessageAction" />
+	<bean id="sapProductConfigDefaultDisplayPromoMessageAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigDisplayPromoMessageRAOAction" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultDisplayPromoMessageRAOAction" alias="sapProductConfigDisplayPromoMessageRAOAction" />
+	<bean id="sapProductConfigDefaultDisplayPromoMessageRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.cps.rule.evaluation.impl.DisplayPromoMessageRAOAction" />
+
+	<alias name="sapProductConfigDefaultDisplayPromoOpportunityMessageAction" alias="sapProductConfigDisplayPromoOpportunityMessageAction" />
+	<bean id="sapProductConfigDefaultDisplayPromoOpportunityMessageAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigDisplayPromoOpportunityMessageRAOAction" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultDisplayPromoOpportunityMessageRAOAction" alias="sapProductConfigDisplayPromoOpportunityMessageRAOAction" />
+	<bean id="sapProductConfigDefaultDisplayPromoOpportunityMessageRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.cps.rule.evaluation.impl.DisplayPromoOpportunityMessageRAOAction" />
+
+	<alias name="sapProductConfigDefaultPercentageDiscountForOptionAction" alias="sapProductConfigPercentageDiscountForOptionAction" />
+	<bean id="sapProductConfigDefaultPercentageDiscountForOptionAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigPercentageDiscountForOptionRAOAction" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPercentageDiscountForOptionRAOAction" alias="sapProductConfigPercentageDiscountForOptionRAOAction" />
+	<bean id="sapProductConfigDefaultPercentageDiscountForOptionRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.cps.rule.evaluation.impl.PercentageDiscountForOptionRAOAction" />
+
+	<bean id="sapProductConfigRulePromoMessageActionStrategiesMapping" depends-on="productConfigActionStrategiesMapping" parent="mapMergeDirective">
+		<property name="key" value="sapProductConfigDefaultDisplayPromoMessageRAOAction" />
+		<property name="value" ref="sapProductConfigDisplayPromoMessageActionStrategy" />
+	</bean>
+
+	<bean id="sapProductConfigRulePromoOpportunityMessageActionStrategiesMapping" depends-on="productConfigActionStrategiesMapping"
+		parent="mapMergeDirective">
+		<property name="key" value="sapProductConfigDefaultDisplayPromoOpportunityMessageRAOAction" />
+		<property name="value" ref="sapProductConfigDisplayPromoMessageActionStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultDisplayPromoMessageActionStrategy" alias="sapProductConfigDisplayPromoMessageActionStrategy" />
+	<bean id="sapProductConfigDefaultDisplayPromoMessageActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.cps.action.strategy.impl.DisplayPromoMessageRuleActionStrategyImpl">
+		<property name="messageValueMapper" ref="sapProductConfigMessageRuleParameterValueMapper" />
+	</bean>
+
+	<bean id="sapProductConfigRulePercentageDiscountForOptionActionStrategiesMapping" depends-on="productConfigActionStrategiesMapping"
+		parent="mapMergeDirective">
+		<property name="key" value="sapProductConfigDefaultPercentageDiscountForOptionRAOAction" />
+		<property name="value" ref="sapProductConfigPercentageDiscountForOptionActionStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPercentageDiscountForOptionActionStrategy" alias="sapProductConfigPercentageDiscountForOptionActionStrategy" />
+	<bean id="sapProductConfigDefaultPercentageDiscountForOptionActionStrategy" parent="sapProductConfigDefaultDisplayPromoMessageActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.cps.action.strategy.impl.PercentageDiscountForOptionRuleActionStrategyImpl">
+		<property name="rulesResultHandler" ref="sapProductConfigRulesCharacteristicValueRulesResultHandler" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRulesCPSPrepareInterceptor" alias="sapProductConfigRulesCPSPrepareInterceptor" />
+	<bean id="sapProductConfigDefaultRulesCPSPrepareInterceptor" class="de.hybris.platform.sap.productconfig.rules.cps.interceptor.ProductConfigRulesCPSPrepareInterceptor">
+		<property name="ruleDao" ref="ruleDao" />
+	</bean>
+	<bean id="sapProductConfigRulesCPSPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapProductConfigRulesCPSPrepareInterceptor" />
+		<property name="typeCode" value="AbstractRuleEngineRule" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRulesCharacteristicValueRulesResultHandler" alias="sapProductConfigRulesCharacteristicValueRulesResultHandler" />
+	<bean id="sapProductConfigDefaultRulesCharacteristicValueRulesResultHandler" class="de.hybris.platform.sap.productconfig.rules.cps.handler.impl.CharacteristicValueRulesResultHandlerImpl">
+		<property name="modelService" ref="modelService" />
+		<property name="persistenceService" ref="sapProductConfigProductConfigurationPersistenceService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSRulesResultUtil" alias="sapProductConfigRulesResultUtil" />
+	<bean id="sapProductConfigDefaultCPSRulesResultUtil" class="de.hybris.platform.sap.productconfig.rules.cps.service.impl.ProductConfigRulesResultUtilCPSImpl">
+		<property name="rulesResultHandler" ref="sapProductConfigRulesCharacteristicValueRulesResultHandler" />
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleCPSIrProcessor" alias="sapProductConfigRuleCPSIrProcessor" />
+	<bean id="sapProductConfigDefaultRuleCPSIrProcessor" class="de.hybris.platform.sap.productconfig.rules.cps.compiler.processors.ProductConfigRuleCPSIrProcessor">
+	</bean>
+
+	<bean id="sapProductConfigRuleCPSIrProcessorDefinition" parent="ruleIrProcessorDefinition">
+		<property name="ruleIrProcessor" ref="sapProductConfigRuleCPSIrProcessor" />
+	</bean>
+
+	<alias name="sapProductConfigRulesCPSConfigurationDependencyHandler" alias="sapProductConfigConfigurationDependencyHandler" />
+	<bean id="sapProductConfigRulesCPSConfigurationDependencyHandler" class="de.hybris.platform.sap.productconfig.rules.cps.handler.impl.ConfigurationDependencyHandlerRulesCPSImpl">
+		<property name="rulesResultHandler" ref="sapProductConfigRulesCharacteristicValueRulesResultHandler" />
+	</bean>
+
+</beans>

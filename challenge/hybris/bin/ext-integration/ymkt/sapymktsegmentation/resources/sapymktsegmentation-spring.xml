@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="initiativeServiceAbstract" abstract="true">
+		<property name="ODataService" ref="ODataService_CUAN_INITIATIVE_SRV" />
+		<property name="userContextService" ref="userContextService" />
+		<property name="campaignCategoryId" value="#{configurationService.configuration.getProperty('sapymktsegmentation.campaign_category_id')}" />
+		<property name="campaignOrderBy" value="#{configurationService.configuration.getProperty('sapymktsegmentation.campaign_order_by')}" />
+	</bean>
+
+	<alias name="initiativeServiceB2C" alias="initiativeService" />
+	<bean id="initiativeServiceB2C" class="com.hybris.ymkt.segmentation.services.InitiativeService" parent="initiativeServiceAbstract" />
+
+	<!-- Campaign Restriction description field handler -->
+	<bean id="campaignRestrictionDescriptionHandler" class="com.hybris.ymkt.segmentation.handlers.CampaignRestrictionDescriptionHandler" />
+</beans>

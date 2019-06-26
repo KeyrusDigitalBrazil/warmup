@@ -1,0 +1,74 @@
+$defaultCurrency=EUR
+$lang=EN
+$catalog-id=testConfigureCatalog
+$catalog-version=Online
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$testCategory-id=CPQConfigurableCategory
+$testSubCategory-id=CPQConfigurableSubCategory
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$approved=approvalstatus(code)[default='approved']
+
+$storeClassification=cpqTestClassification
+$systemVersion=1.0;;;;;;;;;
+$classCatalogVersion=catalogversion(catalog(id[default='$storeClassification']),version[default='1.0'])[unique=true,default='$storeClassification:1.0'];
+$classSystemVersion=systemVersion(catalog(id[default='$storeClassification']),version[default='1.0'])[unique=true,default='$storeClassification:1.0'];
+$unit=unit(code,$classSystemVersion);
+$attributevalues=attributeValues(code,$classSystemVersion)[unique=true];
+
+# Classification for product variants
+$variantsClassification=$storeClassification
+$variantsClassificationVersion=1.0
+$classCatalogVersionVariants=catalogversion(catalog(id[default='$variantsClassification']),version[default='$variantsClassificationVersion'])[unique=true,default='$variantsClassification:$variantsClassificationVersion'];
+$classSystemVersionVariants=systemVersion(catalog(id[default='$variantsClassification']),version[default='$variantsClassificationVersion'])[unique=true,default='$variantsClassification:$variantsClassificationVersion'];
+$unitVariants=unit(code,$classSystemVersionVariants);
+
+#################################################################################
+# DEFINE Classifications for CONF_PIPE variants
+#################################################################################
+INSERT_UPDATE ClassificationClass;$classCatalogVersionVariants;code[unique=true];allowedPrincipals(uid)[default='customergroup'];name[lang=$lang];description[lang=$lang];
+;;CONF_CPIPE;;ONF_CPIPE;Class Pipe;
+
+INSERT_UPDATE ClassificationAttributeValue; code[unique=true]; name[lang=$lang]; $classSystemVersionVariants;
+;CPQ_PIPE_INNER_15;15;
+;CPQ_PIPE_INNER_20;20;
+;CPQ_PIPE_INNER_25;25;
+;CPQ_PIPE_OUTER_30;30;
+;CPQ_PIPE_OUTER_40;40;
+;CPQ_PIPE_TYPE_PL;Plastic;
+;CPQ_PIPE_TYPE_ST;Steel;
+
+# Insert Classification Attributes
+$valuesForAssignment=defaultAttributeValues(code, $classSystemVersion)
+INSERT_UPDATE ClassificationAttribute;$classSystemVersionVariants;code[unique=true];name[lang=$lang];$valuesForAssignment;
+;;CPQ_PIPE_OUTER; Outer Diameter in cm;CPQ_PIPE_OUTER_30, CPQ_PIPE_OUTER_40;
+;;CPQ_PIPE_INNER; Inner Diameter in cm;CPQ_PIPE_INNER_15, CPQ_PIPE_INNER_20, CPQ_PIPE_INNER_25;
+;;CPQ_PIPE_TYPE; Type of Pipe;CPQ_PIPE_TYPE_PL, CPQ_PIPE_TYPE_ST;
+
+INSERT_UPDATE ClassAttributeAssignment;classificationClass(catalogVersion(catalog(id),version),code)[unique=true,allownull=true];	classificationAttribute(code,systemVersion(catalog(id),version))[unique=true,forceWrite=true,allownull=true];	position[unique=true];$unitVariants;attributeType(code[default=string]);multiValued;range;localized;		systemVersion(catalog(id),version)[unique=true,forceWrite=true];
+;$variantsClassification:$variantsClassificationVersion:CONF_CPIPE;																				CPQ_PIPE_OUTER:$variantsClassification:$variantsClassificationVersion;								0;;											enum;											false;		false;false;			$variantsClassification:$variantsClassificationVersion;
+;$variantsClassification:$variantsClassificationVersion:CONF_CPIPE;																				CPQ_PIPE_INNER:$variantsClassification:$variantsClassificationVersion;								1;;											enum;											false;		false;false;			$variantsClassification:$variantsClassificationVersion;
+;$variantsClassification:$variantsClassificationVersion:CONF_CPIPE;																				CPQ_PIPE_TYPE:$variantsClassification:$variantsClassificationVersion;								2;;											enum;											false;		false;false;			$variantsClassification:$variantsClassificationVersion;
+
+$clAttrModifiersVariants=system='$variantsClassification',version='$variantsClassificationVersion',translator=de.hybris.platform.catalog.jalo.classification.impex.ClassificationAttributeTranslator;
+$featurePipeOut=@CPQ_PIPE_OUTER[$clAttrModifiersVariants];
+$featurePipeIn=@CPQ_PIPE_INNER[$clAttrModifiersVariants];
+$featurePipeType=@CPQ_PIPE_TYPE[$clAttrModifiersVariants];   
+ 
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=en];description[lang=en];summary[lang=en];$prices;$approved;
+;CONF_PIPE;$testCategory-id;SAP;;;ERPVariantProduct;PCE;;CONF_PIPE;This is an example for a configurable Pipe;SAP simple product;1 PCE = 49 EUR N;
+
+# PartiallyConfigurable/Changeable product variants
+INSERT_UPDATE ERPVariantProduct;code[unique=true];changeable[default=false];baseproduct(code,$catalogversion);$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=$lang];description[lang=$lang];summary[lang=$lang];	$featurePipeOut;	$featurePipeIn;	$featurePipeType;	$prices;$approved;
+;CONF_PIPE-30-15-ST;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Steel Pipe 30/15;        Steel Pipe 30/15;     Steel Pipe 30/15;		CPQ_PIPE_OUTER_30;	CPQ_PIPE_INNER_15;	CPQ_PIPE_TYPE_ST;                       1 PCE = 67.76 USD N;;;
+;CONF_PIPE-30-25-ST;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Steel Pipe 30/25;        Steel Pipe 30/25;     Steel Pipe 30/25;		CPQ_PIPE_OUTER_30;	CPQ_PIPE_INNER_25;	CPQ_PIPE_TYPE_ST;                       1 PCE = 71.25 USD N;;;
+;CONF_PIPE-40-15-ST;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Steel Pipe 40/15;        Steel Pipe 40/15;     Steel Pipe 40/15;		CPQ_PIPE_OUTER_40;	CPQ_PIPE_INNER_15;	CPQ_PIPE_TYPE_ST;                       1 PCE = 75.12 USD N;;;
+;CONF_PIPE-30-15-PL;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Plastic Pipe 30/15;      Plastic Pipe 30/15;   Plastic Pipe 30/15;	CPQ_PIPE_OUTER_30;	CPQ_PIPE_INNER_15;	CPQ_PIPE_TYPE_PL;                       1 PCE = 42.89 USD N;;;
+;CONF_PIPE-30-20-PL;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Plastic Pipe 30/20;      Plastic Pipe 30/20;   Plastic Pipe 30/20;	CPQ_PIPE_OUTER_30;	CPQ_PIPE_INNER_20;	CPQ_PIPE_TYPE_PL;                       1 PCE = 46.81 USD N;;;
+
+INSERT_UPDATE StockLevel;productCode[unique=true];warehouse(code)[unique=true,default=default];available;inStockStatus(code);maxPreOrder[default=1];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;CONF_PIPE-30-15-ST;pw_warehouse_s;222;notSpecified;
+;CONF_PIPE-30-25-ST;pw_warehouse_s;222;notSpecified;
+;CONF_PIPE-40-15-ST;pw_warehouse_s;222;notSpecified;
+;CONF_PIPE-30-15-PL;pw_warehouse_s;222;notSpecified;
+;CONF_PIPE-30-20-PL;pw_warehouse_s;222;notSpecified;									

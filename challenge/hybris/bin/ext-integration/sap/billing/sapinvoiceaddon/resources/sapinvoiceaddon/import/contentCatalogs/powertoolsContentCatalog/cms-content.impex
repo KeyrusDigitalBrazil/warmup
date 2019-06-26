@@ -1,0 +1,34 @@
+#
+# Import the CMS content for invoice details page
+# the user of this addon should change the value of "$contentCatalog" accordingly
+#
+
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$addonExtensionName=sapinvoiceaddon
+
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountSummaryUnitDetailsListComponent;Account Summary Unit Details List Component;/WEB-INF/views/addons/sapinvoiceaddon/responsive/pages/account/accountSummaryUnitDetailsList.jsp;;AccountSummaryUnitDetailsListComponent
+;;AccountInvoiceDetailsHeadlineComponent;Account Invoice Details Headline Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceDetailHeadline.jsp;;AccountInvoiceDetailsHeadlineComponent
+;;AccountInvoiceDetailsInfoComponent;Invoice Details Information Page;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceDetailOverview.jsp;;AccountInvoiceDetailsInfoComponent
+;;AccountInvoiceDetailShippingInfoComponent;Invoice Shipping Information Page;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceShippingInfo.jsp;;AccountInvoiceDetailShippingInfoComponent
+;;AccountInvoiceDetailItemsComponent;Invoice Items Details Page;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceDetailItems.jsp;;AccountInvoiceDetailItemsComponent
+;;AccountInvoiceDetailOrderTotalsComponent;Invoice Items Details Page;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceDetailOrderTotals.jsp;;AccountInvoiceDetailOrderTotalsComponent
+;;AccountInvoiceOtherInformationComponent;Invoice Items Details Page;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/accountInvoiceOtherInformation.jsp;;AccountInvoiceOtherInformationComponent
+
+
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)
+;;invoice;Invoice Details Page;CompanyPageTemplate;invoice
+
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;BodyContent-invoicedetail;Body Content Slot for MyCompany Invoice Details;true;AccountInvoiceDetailsHeadlineComponent,AccountInvoiceDetailsInfoComponent,AccountInvoiceDetailShippingInfoComponent,AccountInvoiceDetailItemsComponent,AccountInvoiceOtherInformationComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='invoice'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-invoicedetail;BodyContent;;BodyContent-invoicedetail;;;
+
+

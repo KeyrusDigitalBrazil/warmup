@@ -1,0 +1,21 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online'])[unique=true,default='hwcatalog:Online'];
+
+INSERT_UPDATE PromotionGroup;Identifier[unique=true];
+;pgProductThresholdPriceDiscountPromotionTest1;
+
+INSERT PromotionPriceRow;&id;Currency(isocode);price;
+;pprProductThresholdPriceDiscountPromotionTest1;EUR;100;
+;pprProductThresholdPriceDiscountPromotionTest2;EUR;50;
+
+INSERT_UPDATE ProductThresholdPriceDiscountPromotion;code[unique=true];enabled;products(code,$catalogVersion);productThresholdPrice(&id);productPriceDiscount(&id);PromotionGroup(Identifier);priority;
+;ProductThresholdPriceDiscountPromotion;true;HW1210-3411,HW2310-1001;pprProductThresholdPriceDiscountPromotionTest1;pprProductThresholdPriceDiscountPromotionTest2;pgProductThresholdPriceDiscountPromotionTest1;1000;

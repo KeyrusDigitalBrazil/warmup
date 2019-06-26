@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+
+INSERT_UPDATE CxConfig; code[unique = true]; anonymousUserActions; anonymousUserMinRequestNumber; anonymousUserMinTime; anonymousUserIgnoreOtherActions[default = false]; ignoreRecalcForAnonymous[default = false];
+; testConfig        ;RECALCULATE,ASYNC_PROCESS ; 2 ; 0 ;false; false
+; testConfig1        ;LOAD                   ; 2 ; 0 ; false ; true
+; testConfig2        ;LOAD                   ; 2 ; 0 ; true ; false
+; testConfig3        ;LOAD                   ; 0 ; 6000;
+; testConfig4        ;LOAD                    ; 0 ; 6000;
+; testConfig5        ;LOAD                    ; -1 ; 0;
+; testConfig6        ;LOAD                    ; 0 ; -1 ;
+; testConfig7        ; ; 0 ; 6000; true
+
+#default ConfigurableUrlVoter configuration
+INSERT_UPDATE CxUrlVoterConfig; cxConfig(code)[unique = true]; code[unique = true]; urlRegexp; actions; userType(code)
+; testConfig  ; default  ; .*          ; LOAD                 ; ANONYMOUS
+; testConfig  ; checkout ; .*/checkout ; ASYNC_PROCESS        ;
+; testConfig1 ; default  ; .*          ; LOAD                 ;
+; testConfig2 ; default  ; .*          ; LOAD                 ;
+
+#default PeriodicVoter configuration
+INSERT_UPDATE CxPeriodicVoterConfig; cxConfig(code)[unique = true]; code[unique = true]; userMinTime; actions; userType(code); userMinRequestNumber
+; testConfig4  ; periodic  ; 0 ; LOAD                 ; ALL ; 0

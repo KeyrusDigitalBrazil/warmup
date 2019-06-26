@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop    http://www.springframework.org/schema/aop/spring-aop.xsd
+           				   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+               			   http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+               			   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config />
+	
+	<context:component-scan base-package="de.hybris.platform.assistedservicestorefront.controllers"/>
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultAssistedservicestorefrontJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="assistedservicestorefront"/>
+	</bean>
+
+	<bean id="defaultAssistedservicestorefrontBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultAssistedservicestorefrontJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getAssistedservicestorefrontBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultAssistedservicestorefrontBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="AssistedservicestorefrontBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getAssistedservicestorefrontBeforeViewHandler"/>
+	</bean>
+	
+	<bean id="AssistedservicestorefrontFilterListMergeDirective" depends-on="defaultStorefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+		<property name="add" ref="assistedServiceFilter"/>
+	</bean>
+	
+	<bean id="assistedServiceComponentRenderer" 
+	class="de.hybris.platform.assistedservicestorefront.component.renderer.AssistedServiceComponentRenderer" parent="addOnJspIncludeCMSComponentRenderer">
+         <property name="typeService" ref="typeService"/>
+         <property name="uiExperienceService" ref="defaultUiExperienceService"/>
+         <property name="cmsComponentService" ref="cmsComponentService"/>
+         <property name="modelService" ref="modelService"/>
+         <property name="assistedServiceFacade" ref="assistedServiceFacade"/>
+     </bean>
+     
+     <bean id="assistedServiceComponentRendererMapping" parent="addonCmsComponentRendererMapping" >
+      	 <property name="typeCode" value="AssistedServiceComponent" />
+         <property name="renderer" ref="assistedServiceComponentRenderer" />
+	</bean>
+	
+	<bean id="assistedServiceFilter" class="de.hybris.platform.assistedservicestorefront.filter.AssistedServiceFilter" >
+		<property name="assistedServicePathRestrictionEvaluator" ref="assistedServicePathRestrictionEvaluator"/>
+		<property name="assistedServiceFacade" ref="assistedServiceFacade"/>
+		<property name="assistedServiceAgentLoginStrategy" ref="assistedServiceAgentLoginStrategy"/>
+	</bean>
+			
+	<bean id="assistedServiceAgentLoginStrategy" class="de.hybris.platform.assistedservicestorefront.security.impl.AssistedServiceAgentLoginStrategy" >
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+		<property name="guidCookieStrategy" ref="guidCookieStrategy" />
+		<property name="sessionFixationStrategy" ref="fixation" />
+	</bean>
+	<bean id="assistedServiceAgentLogoutStrategy" class="de.hybris.platform.assistedservicestorefront.security.impl.AssistedServiceAgentLogoutStrategy" >
+		<property name="sessionFixationStrategy" ref="fixation" />
+	</bean>	
+	
+	<aop:aspectj-autoproxy />
+ 	<bean class="de.hybris.platform.assistedservicestorefront.aspect.ChannelDecisionAspect"/>
+ 	
+ 	<bean id="subscriptionFacadeWrapper" class="de.hybris.platform.assistedservicestorefront.util.SubscriptionFacadeReflectionWrapper"/>
+	
+ 	<bean id="assistedServiceAddOnValueProvider" class="de.hybris.platform.addonsupport.valueprovider.impl.DefaultAddOnValueProvider">
+ 		<property name="suppliers">
+ 			<map key-type="java.lang.String" value-type="java.util.function.Supplier">
+ 				<entry key="agentLoggedIn" value-ref="agentLoggedInSupplier" />
+ 			</map>
+ 		</property>
+ 	</bean>
+ 	
+ 	<bean id="agentLoggedInSupplier" class="de.hybris.platform.assistedservicestorefront.valueprovider.AgentLoggedInSupplier">
+ 		<property name="assistedServiceFacade" ref="assistedServiceFacade" />
+ 	</bean>
+ 	
+ 	<bean depends-on="addOnValueProviderMap" parent="mapMergeDirective">
+		<property name="key" value="assistedservicestorefront" />
+		<property name="value" ref="assistedServiceAddOnValueProvider" />
+	</bean>
+
+	<bean id="assistedServiceAgentAuthoritiesManager" class="de.hybris.platform.assistedservicestorefront.security.impl.DefaultAssistedServiceAgentAuthoritiesManager">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+		<property name="assistedServiceService" ref="assistedServiceService"/>
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="headingFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/heading" />
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerProfileFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/profile" />
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerColorsFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/favoriteColors" />
+	</bean>
+	
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="generalActivityFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/generalActivity" />		
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="ticketsFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/tickets" />
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="reviewFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/reviews" />
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerSummaryFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/summary" />
+	</bean>
+	
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerCartFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/cartData" />
+	</bean>
+
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerSavedCartFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/savedCart" />
+	</bean>
+
+	<!-- Store locations -->
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="storeLocationsFragment" />
+		<property name="value" value="addon:/assistedservicestorefront/fragments/customer360/storeLocations" />
+	</bean>
+	<!-- Store locations ends -->
+
+</beans>

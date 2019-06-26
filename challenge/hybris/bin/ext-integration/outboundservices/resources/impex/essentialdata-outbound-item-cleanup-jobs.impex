@@ -1,0 +1,19 @@
+INSERT_UPDATE AfterRetentionCleanupRule ; code[unique=true]              ; retirementItemType(code) ; itemFilterExpression    ; actionReference           ; retentionTimeSeconds  ; retirementDateAttribute(enclosingType(code),qualifier)
+                                        ; outboundRequestCleanupRule      ; OutboundRequest           ;                         ; basicRemoveCleanupAction  ; 604800                ; OutboundRequest:creationtime
+                                        ; outboundRequestMediaCleanupRule ; OutboundRequestMedia      ;                         ; basicRemoveCleanupAction  ; 604800                ; OutboundRequestMedia:creationtime
+
+
+INSERT_UPDATE RetentionJob  ; code[unique=true]               ; retentionRule(code)                ; batchSize
+                            ; outboundRequestCleanupJob        ; outboundRequestCleanupRule          ; 100
+                            ; outboundRequestMediaCleanupJob   ; outboundRequestMediaCleanupRule     ; 100
+
+
+INSERT_UPDATE CronJob   ; code[unique=true]                  ; job(code)                        ; sessionLanguage(isoCode)[default=en]
+                        ; outboundRequestCleanupCronJob       ; outboundRequestCleanupJob         ;
+                        ; outboundRequestMediaCleanupCronJob  ; outboundRequestMediaCleanupJob    ;
+
+
+# CronJob Triggers set to run every day at midnight
+INSERT_UPDATE Trigger ; cronJob(code)[unique=true]            ; cronExpression
+                      ; outboundRequestCleanupCronJob          ; 0 0 0 * * ?
+                      ; outboundRequestMediaCleanupCronJob     ; 0 0 0 * * ?

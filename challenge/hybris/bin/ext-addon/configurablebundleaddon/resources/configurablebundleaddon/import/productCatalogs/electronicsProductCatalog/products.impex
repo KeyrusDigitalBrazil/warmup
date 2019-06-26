@@ -1,0 +1,183 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$approved=approvalstatus(code)[default='approved']
+$syncJobCode=sync $productCatalog:Staged->Online
+$ruleType=ruleType(code)[default='ANY']
+
+
+INSERT_UPDATE Product;code[unique=true];unit(code)[default='pieces'];$catalogVersion;$approved
+;1382080
+;2053226
+;832382
+;898520
+;493683
+;784343
+;832386
+;847942
+;278688
+;805693
+;824267
+;3965240
+;29925
+;932577
+;266685
+;289540
+;107701
+;266899
+;346944
+;450848
+;482105
+;514518
+;594471
+;899387
+;1232590
+;1298094
+;443175
+;872912
+;1366001
+;1366053
+;4205436
+;4852405
+;1641905
+;4205431
+;2934302
+
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code)[default='approved'];$catalogVersion
+;Status_PHOTO
+
+# Add BundleTemplate and BundleTemplateStatus as rootTypes to the synchronization
+UPDATE CatalogVersionSyncJob;code[unique=true];roottypes(code)[mode=append];
+;$syncJobCode;BundleTemplate,BundleTemplateStatus;
+
+### Photography Starter and Photography Professional packages
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_PHOTO'];version[default=1.0][unique=true];$catalogVersion
+;PhotoStarterPackage
+;StarterDSLRComponent;PhotoStarterPackage
+;StarterLensComponent;PhotoStarterPackage
+;StarterAccessoryComponent;PhotoStarterPackage
+
+;PhotoProfessionalPackage
+;CameraComponent;PhotoProfessionalPackage
+;PowerSupplyComponent;PhotoProfessionalPackage
+;ProDSLRComponent;CameraComponent
+;ProLensComponent;CameraComponent
+;ChargerComponent;PowerSupplyComponent
+;BatteryComponent;PowerSupplyComponent
+;IncludedLensComponent;ProLensComponent
+;AdditionalLensComponent;ProLensComponent
+
+# Set the child templates again to make sure that the sequence of child templates is correct
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;PhotoStarterPackage;;StarterDSLRComponent,StarterLensComponent,StarterAccessoryComponent
+
+;PhotoProfessionalPackage;;CameraComponent,PowerSupplyComponent
+;CameraComponent;;ProDSLRComponent,ProLensComponent
+;ProLensComponent;;IncludedLensComponent,AdditionalLensComponent
+;PowerSupplyComponent;;ChargerComponent,BatteryComponent
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;StarterDSLRComponent;1382080,2934302
+;StarterLensComponent;832382,898520,493683
+;StarterAccessoryComponent;29925,932577,266685,289540,107701,266899,346944,450848,482105,514518,594471,899387,1232590,1298094,443175,872912,1366001,1366053,4205436,4852405,1641905,4205431
+
+;ProDSLRComponent;1382080,2934302
+;IncludedLensComponent;832382,898520
+;AdditionalLensComponent;493683,784343,832386
+;ChargerComponent;847942,278688
+;BatteryComponent;805693,824267,3965240
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter;$catalogVersion
+;StarterDSLRComponent_Pick1to2;1;2;true
+;StarterLensComponent_Pick1to2;1;2
+
+;AdditionalLensComponent_Pick0to1;0;1
+;ChargerComponent_Pick0to1;0;1
+;BatteryComponent_Pick0to1;0;1
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];starter;n[default=1];$catalogVersion
+;ProDSLRComponent_Pick1;true
+;IncludedLensComponent_Pick1
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;StarterDSLRComponent;StarterDSLRComponent_Pick1to2
+;StarterLensComponent;StarterLensComponent_Pick1to2
+
+;AdditionalLensComponent;AdditionalLensComponent_Pick0to1
+;ChargerComponent;ChargerComponent_Pick0to1
+;BatteryComponent;BatteryComponent_Pick0to1
+;ProDSLRComponent;ProDSLRComponent_Pick1
+;IncludedLensComponent;IncludedLensComponent_Pick1
+
+INSERT_UPDATE ChangeProductPriceBundleRule;id[unique=true];$catalogVersion;bundleTemplate(id,version[default=1.0],$catalogVersion);conditionalProducts(code,$catalogVersion);targetProducts(code,$catalogVersion);name;$ruleType;price;currency(isocode)[default=USD, unique=true]
+;IncludedLensComponentPriceRule;;IncludedLensComponent;2934302;832382;;;456.88;
+
+# Add Disable rules
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogVersion;bundleTemplate(id,version[default=1.0],$catalogVersion);conditionalProducts(code,$catalogVersion);targetProducts(code,$catalogVersion);$ruleType
+;DisableProductRule_PhotoStarterPackage_1;;StarterLensComponent;1382080;832382;
+;DisableProductRule_PhotoStarterPackage_2;;StarterDSLRComponent;832382;1382080;
+
+
+### Personalized Photography Starter Package - configurable (complex) products
+# Add configurable product to bundle
+
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_PHOTO'];version[default=1.0][unique=true];$catalogVersion
+;PhotoStarterPackageEngraving
+;StarterDSLRComponentEngraving;PhotoStarterPackageEngraving
+;StarterLensComponentEngraving;PhotoStarterPackageEngraving
+;StarterAccessoryComponentEngraving;PhotoStarterPackageEngraving
+
+# Set the child templates again to make sure that the sequence of child templates is correct
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;PhotoStarterPackageEngraving;;StarterDSLRComponentEngraving,StarterLensComponentEngraving,StarterAccessoryComponentEngraving
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;StarterDSLRComponentEngraving;1978440_red,1978440_blue,1978440_green,1934793
+;StarterLensComponentEngraving;832382,898520,493683
+;StarterAccessoryComponentEngraving;29925,932577,266685,289540,107701,266899,346944,450848,482105,514518,594471,899387,1232590,1298094,443175,872912,1366001,1366053,4205436,4852405,1641905,4205431
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter;$catalogVersion
+;StarterDSLRComponent_Pick1to2Engraving;1;2;true
+;StarterLensComponent_Pick1to2Engraving;1;2
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;StarterDSLRComponentEngraving;StarterDSLRComponent_Pick1to2Engraving
+;StarterLensComponentEngraving;StarterLensComponent_Pick1to2Engraving
+
+
+### Photo On The Go Package - required/dependent components
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_PHOTO'];version[default=1.0][unique=true];$catalogVersion
+;PhotoOTGPackage
+;PhotoOTGCameraComponent;PhotoOTGPackage
+;PhotoOTGBatteryComponent;PhotoOTGPackage
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;PhotoOTGPackage;;PhotoOTGCameraComponent,PhotoOTGBatteryComponent
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;PhotoOTGCameraComponent;1934793
+;PhotoOTGBatteryComponent;805693
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter[default=false];$catalogVersion
+;PhotoOTGCamera_Starter;0;1000;true
+;BatteryComponent_Pick1to2;1;2
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;PhotoOTGCameraComponent;PhotoOTGCamera_Starter
+;PhotoOTGBatteryComponent;BatteryComponent_Pick1to2
+
+# Set required component
+UPDATE BundleTemplate;id[unique=true];requiredBundleTemplates(id, version[default=1.0], $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;PhotoOTGBatteryComponent;PhotoOTGCameraComponent

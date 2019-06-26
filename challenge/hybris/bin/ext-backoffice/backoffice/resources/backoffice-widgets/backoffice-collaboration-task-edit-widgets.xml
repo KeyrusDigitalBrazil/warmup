@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <widget-extension widgetId="collaborationViewSwitcher">
+
+        <widget id="collaborationCenter-taskEdit-view" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+                title="collaboration.workflow.task.details" slotId="views" template="false">
+
+            <widget id="collaborationCenter-taskEdit-selectFirstAttachment" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                    template="false" slotId="cockpitWidgetChildrenInvisible">
+                <setting key="expression" type="String">#root.isEmpty() ? null : #root.iterator().next()</setting>
+                <setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+            </widget>
+
+            <widget id="collaborationCenter-taskEdit-editorArea" widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+                    slotId="centerSlot" template="false">
+                <widget id="collaborationCenter-taskEdit-itemComments" widgetDefinitionId="com.hybris.backoffice.cockpitng.widgets.itemcomments" slotId="toolbarInner" template="false">
+                    <widget id="collaborationCenter-taskEdit-itemComments-cast" widgetDefinitionId="com.hybris.cockpitng.widgets.common.simplecast" slotId="cockpitWidgetChildrenInvisible" template="false">
+                        <setting key="socketDataType_$T" type="String">de.hybris.platform.core.model.ItemModel</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <virtual-sockets/>
+                </widget>
+                <widget id="collaborationCenter-taskEdit-editorarea-summaryview"
+                        widgetDefinitionId="com.hybris.cockpitng.summaryView" slotId="staticSectionSlot">
+                </widget>
+                <setting key="toolbarDisabled" type="Boolean">true</setting>
+                <setting key="widgetStyleClass" type="String">yw-colaboration-center-task-editor-area yw-centered-panel-editor-area</setting>
+                <setting key="toolbarButtonsPosition" type="String">bottom</setting>
+                <setting key="actionSlotComponentId" type="String"/>
+            </widget>
+
+            <widget id="collaborationCenter-taskEdit-sidebar" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+                    slotId="rightSlot" template="false">
+                <widget id="collaborationCenter-taskEdit-attachmentsExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                        slotId="cockpitWidgetChildrenInvisible" template="false">
+                    <setting key="expression" type="String">#root.attachmentItems.?[#this != null]</setting>
+                    <setting key="socketDataType_$T" type="String">java.util.List</setting>
+                </widget>
+                <widget id="collaborationCenter-taskEdit-attachmentsMappings" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                        slotId="cockpitWidgetChildrenInvisible" template="false">
+                    <setting key="expression" type="String">#widgetModel['$_task'].attachments.^[#this.item == #root]</setting>
+                    <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowItemAttachmentModel</setting>
+                    <virtual-sockets>
+                        <input id="task" type="de.hybris.platform.workflow.model.AbstractWorkflowActionModel"/>
+                    </virtual-sockets>
+                </widget>
+
+                <widget id="collaborationCenter-taskEdit-quickList" widgetDefinitionId="com.hybris.cockpitng.quicklist"
+                        slotId="centerSlot" template="false">
+                    <setting key="widgetStyleClass" type="String">yw-collaboration-center-task-quicklist</setting>
+                    <setting key="quickListConfigCtx">taskEdit-quickList</setting>
+                    <setting key="showInfo" type="Boolean">false</setting>
+                    <setting key="quickListRenderer" type="String">readonlyQuickListItemRenderer</setting>
+                </widget>
+
+                <widget id="collaborationCenter-taskEdit-decision" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+                        slotId="bottomSlot" template="false">
+                    <setting key="widgetStyleClass" type="String">yw-collaboration-center-task-quicklist-toolbar</setting>
+                    <setting key="toolbarActions" type="String">taskEdit-quickList-toolbar-actions</setting>
+                    <virtual-sockets>
+                        <input id="selectedAction" type="de.hybris.platform.workflow.model.WorkflowActionModel" />
+                        <output id="selectedAction" type="de.hybris.platform.workflow.model.WorkflowActionModel" />
+                        <output id="com.hybris.cockpitng.action.workflowactiondecisionaction.success" type="java.lang.Object" visibility="external"/>
+                    </virtual-sockets>
+                </widget>
+
+                <setting key="northDisabled" type="Boolean" value="true"/>
+                <setting key="westDisabled" type="Boolean" value="true"/>
+                <setting key="eastDisabled" type="Boolean" value="true"/>
+                <setting key="southDisabled" type="Boolean" value="false"/>
+                <setting key="southCollapsible" type="Boolean" value="false"/>
+                <setting key="southSplittable" type="Boolean" value="false"/>
+                <setting key="widgetMold" type="String" value="light"/>
+                <setting key="widgetStyleClass" type="String">yw-collaboration-center-task-sidebar</setting>
+            </widget>
+
+            <setting key="northDisabled" type="Boolean" value="true"/>
+            <setting key="southDisabled" type="Boolean" value="true"/>
+            <setting key="westDisabled" type="Boolean" value="true"/>
+            <setting key="eastDisabled" type="Boolean" value="false"/>
+            <setting key="eastCollapsible" type="Boolean" value="false"/>
+            <setting key="eastSplittable" type="Boolean" value="false"/>
+            <setting key="eastWidth" type="String" value="350px"/>
+            <setting key="widgetMold" type="String" value="light"/>
+            <setting key="widgetStyleClass" type="String">yw-collaboration-center-task-layout</setting>
+            <virtual-sockets/>
+        </widget>
+
+        <setting key="selectTaskEdit_eval" type="String" value="'collaborationCenter-taskEdit-view'"/>
+        <virtual-sockets>
+            <input id="selectTaskEdit" type="java.lang.Object"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-extension widgetId="collaborationCenter-sidebar-header-actions-multiplexer">
+		<setting key="taskEditActions_expression" type="String">#root.contains('collaborationCenter-taskEdit-view')</setting>
+		<setting key="taskEditActions_eval" type="String">'taskEdit-quickList-header-actions'</setting>
+
+        <virtual-sockets>
+            <output id="taskEditActions" type="java.lang.String" visibility="external"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-extension widgetId="collaborationCenter-sidebar-header-three-dots-multiplexer">
+		<setting key="taskEditActions_expression" type="String">#root.contains('collaborationCenter-taskEdit-view')</setting>
+		<setting key="taskEditActions_eval" type="String">'collaborationCenter-quickList-threedots-actions'</setting>
+        <virtual-sockets>
+            <output id="taskEditActions" type="java.lang.String" visibility="external"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-extension widgetId="collaborationCenter-sidebar-header">
+        <virtual-sockets>
+            <input id="selectedAction" type="de.hybris.platform.workflow.model.WorkflowActionModel" />
+            <output id="selectedAction" type="de.hybris.platform.workflow.model.WorkflowActionModel" />
+        </virtual-sockets>
+    </widget-extension>
+
+	<widget-extension widgetId="collaborationCenter-center-toolbar">
+		<widget id="collaborationCenter-taskEdit-center-toolbar-type" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+				slotId="cockpitWidgetChildrenInvisible" template="false">
+			<setting key="expression" type="String">#root != null ? @typeFacade.getType(#root) : null</setting>
+			<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+		</widget>
+
+		<virtual-sockets>
+			<input id="selectedItem" type="java.lang.Object" />
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="collaborationCenter-center-toolbar-actions-multiplexer">
+		<setting key="taskEditActions_expression" type="String">#root.contains('collaborationCenter-taskEdit-view')</setting>
+		<setting key="taskEditActions_eval" type="String">'taskEdit-item-toolbar-actions'</setting>
+
+		<virtual-sockets>
+			<output id="taskEditActions" type="java.lang.String" visibility="external"/>
+		</virtual-sockets>
+	</widget-extension>
+
+    <widget-extension widgetId="collaborationNavigationHistory">
+        <widget id="collaborationCenter-taskEdit-history-init" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                slotId="cockpitWidgetChildrenInvisible" template="false">
+            <setting key="expression" type="String">'collaboration.label'</setting>
+            <setting key="socketDataType_$T" type="String">java.lang.String</setting>
+        </widget>
+
+        <setting key="taskAttachmentSelected_output">selectTaskAttachment</setting>
+        <virtual-sockets>
+            <input id="taskAttachmentSelected" type="java.lang.Object" visibility="external" />
+            <output id="selectTaskAttachment" type="java.lang.Object" visibility="external" />
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-extension widgetId="collaborationCenter-sidebar-header-three-dots">
+        <widget id="collaborationCenter-sidebar-header-type-extractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                slotId="cockpitWidgetChildrenInvisible">
+            <setting key="expression" type="String" value="#root != null and #root instanceof T(java.util.List) ? @backofficeTypeUtils.findClosestSuperType(#root) : null"/>
+            <setting key="socketDataType_$T" type="String">java.lang.String</setting>
+        </widget>
+    </widget-extension>
+
+    <!-- Show Task Edit View -->
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="toggleSidebar" />
+
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectTaskAttachment"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="toggleSidebar" />
+
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectTaskEdit" />
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationNavigationHistory" inputId="selectTaskEdit" />
+
+    <!-- Display current action in sidebar header -->
+    <widget-connection sourceWidgetId="collaborationCenter-sidebar-header-actions-multiplexer" outputId="taskEditActions"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="toolbarActions" />
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedAction" />
+
+    <!-- Side bar header actions inside 3 dots menu -->
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-sidebar-header-type-extractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaborationCenter-sidebar-header-type-extractor" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-sidebar-header-three-dots" inputId="type" />
+
+    <widget-connection sourceWidgetId="collaborationCenter-sidebar-header-three-dots-multiplexer" outputId="taskEditActions"
+                       targetWidgetId="collaborationCenter-sidebar-header-three-dots" inputId="toolbarActions"/>
+    <widget-connection sourceWidgetId="collaborationCenter-sidebar-header-three-dots-multiplexer" outputId="noActions"
+                       targetWidgetId="collaborationCenter-sidebar-header-three-dots" inputId="type"/>
+
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-sidebar-header-three-dots" inputId="items" />
+
+    <!-- Decision action of the current task in sidebar footer toolbar -->
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-decision" outputId="com.hybris.cockpitng.action.workflowactiondecisionaction.success"
+                       targetWidgetId="collaborationCenter-taskEdit-history-init" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-history-init" outputId="genericOutput"
+                       targetWidgetId="collaborationNavigationHistory" inputId="workflowOverviewSelected" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-decision" inputId="selectedAction" />
+
+	<!-- Display correct actions with correct context in center toolbar -->
+	<widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+					   targetWidgetId="collaborationCenter-center-toolbar" inputId="selectedItem" />
+	<widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+					   targetWidgetId="collaborationCenter-center-toolbar" inputId="selectedItem" />
+	<widget-connection sourceWidgetId="collaborationCenter-center-toolbar-actions-multiplexer" outputId="taskEditActions"
+					   targetWidgetId="collaborationCenter-center-toolbar" inputId="toolbarActions" />
+	<widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+					   targetWidgetId="collaborationCenter-taskEdit-toolbar-type" inputId="genericInput" />
+	<widget-connection sourceWidgetId="collaborationCenter-taskEdit-toolbar-type" outputId="genericOutput"
+					   targetWidgetId="collaborationCenter-center-toolbar" inputId="type" />
+
+    <!-- Quick list initialization -->
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="workflowOverview-tasks-collectionbrowser" outputId="selectedItem"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-quickList" inputId="items" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" inputId="genericInput" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-quickList" inputId="selectItem" />
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="workflowDetails-summaryView" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="task" />
+    <widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsExtractor" inputId="genericInput" />
+
+    <!-- Editor area & Summary view -->
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-editorArea" inputId="inputObject" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-editorarea-summaryview" inputId="inputObject"/>
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-editorarea-summaryview" outputId="focusAttribute"
+                       targetWidgetId="collaborationCenter-taskEdit-editorArea" inputId="focus"/>
+
+    <!-- Quick list interactions -->
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+                       targetWidgetId="collaborationCenter-taskEdit-editorArea" inputId="inputObject" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+                       targetWidgetId="collaborationCenter-taskEdit-editorarea-summaryview" inputId="inputObject"/>
+
+    <!-- Navigation history -->
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+                       targetWidgetId="collaborationNavigationHistory" inputId="taskAttachmentSelected" />
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+                       targetWidgetId="collaborationNavigationHistory" inputId="taskAttachmentSelected"/>
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectTaskAttachment"
+                       targetWidgetId="collaborationCenter-taskEdit-editorArea" inputId="inputObject"/>
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectTaskAttachment"
+                       targetWidgetId="collaborationCenter-taskEdit-quickList" inputId="selectItem"/>
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectTaskAttachment"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectTaskAttachment"
+                       targetWidgetId="collaborationCenter-taskEdit-editorarea-summaryview" inputId="inputObject"/>
+
+    <!-- Item comments -->
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-selectFirstAttachment" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-quickList" outputId="openItem"
+                       targetWidgetId="collaborationCenter-taskEdit-attachmentsMappings" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-attachmentsMappings" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-taskEdit-itemComments-cast" inputId="input"/>
+    <widget-connection sourceWidgetId="collaborationCenter-taskEdit-itemComments-cast" outputId="output"
+                       targetWidgetId="collaborationCenter-taskEdit-itemComments" inputId="inputItem"/>
+
+</widgets>

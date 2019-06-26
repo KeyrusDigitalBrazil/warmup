@@ -1,0 +1,30 @@
+#************* Added Subscription Order related attributes to Order Integration Object***********
+INSERT_UPDATE IntegrationObjectItemAttribute ; integrationObjectItem(integrationObject(code), code)[unique = true] ; attributeName[unique = true] ; attributeDescriptor(enclosingType(code), qualifier) ; returnIntegrationObjectItem(integrationObject(code), code) ; unique[default = false] 
+                                             ; OutboundOMMOrderOMSOrder:SAPCpiOutboundOrderItem                    ; pricePlanId                  ; SAPCpiOutboundOrderItem:pricePlanId                 ;                                                            ;                         
+                                             ; OutboundOMMOrderOMSOrder:SAPCpiOutboundOrderItem                    ; subscriptionValidFrom        ; SAPCpiOutboundOrderItem:subscriptionValidFrom       ;                                                            ;                         
+                                             ; OutboundOMMOrderOMSOrder:SAPCpiOutboundPartnerRole                  ; email                        ; SAPCpiOutboundPartnerRole:email                     ;                                                            ;                         
+                                             ; OutboundOMMOrderOMSOrder:SAPCpiOutboundPartnerRole                  ; revenueCloudCustomerId       ; SAPCpiOutboundPartnerRole:revenueCloudCustomerId    ;                                                            ;                         
+                                             ; OutboundOMMOrderOMSOrder:SAPCpiOutboundOrder                        ; revenueCloudOrderId          ; SAPCpiOutboundOrder:revenueCloudOrderId             ;                                                            ;                         
+                                             
+                                             
+                                             
+#**********************************#         
+#************  Endpoints  *********#         
+#**********************************#         
+                                             
+                                             
+INSERT_UPDATE Endpoint ; id[unique = true]             ; name                          ; version[unique = true] ; specUrl                                                                                                                                                                     
+                       ; scpiRevenuecloudOutboundOrder ; scpiRevenuecloudOutboundOrder ; unknown                ; "https://c1501-iflmap.hcisb.int.sap.hana.ondemand.com/gw/odata/SAP/REPLICATE-SUBSCRIPTION-ORDER-FROM-SAP-COMMERCE-CLOUD-TO-SAP-HYBRIS-REVENUE-CLOUD;v=1/scpiOutboundOrders" 
+                       
+                       
+INSERT_UPDATE DestinationTarget ; id[unique=true] 
+                                ; TestDestination 
+                                
+                                
+#**********************************************#
+#************  Consumed Destinations  *********#
+#**********************************************#
+                                
+INSERT_UPDATE ConsumedDestination ; id[unique = true]                ; url                                                                                                                                                                         ; endpoint(id,version)                  ; credential(id)      ; destinationTarget(id)[default=TestDestination] 
+                                  ; scpiRevenuecloudOrderDestination ; "https://c1501-iflmap.hcisb.int.sap.hana.ondemand.com/gw/odata/SAP/REPLICATE-SUBSCRIPTION-ORDER-FROM-SAP-COMMERCE-CLOUD-TO-SAP-HYBRIS-REVENUE-CLOUD;v=1/scpiOutboundOrders" ; scpiRevenuecloudOutboundOrder:unknown ; scpiOauthCredential ;                                                
+                                  

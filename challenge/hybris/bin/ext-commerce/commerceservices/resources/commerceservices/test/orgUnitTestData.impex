@@ -1,0 +1,111 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$defaultPassword=12341234
+
+$currencies=EUR,USD
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0;
+$testCategory1-id=testCategory1;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$catalog-id;$catalog-id;true;;;;;;
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode
+;testStore1;$catalog-id;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+;testStore2;$catalog-id;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;customergroup;;
+
+# Create a customer with quotes and assign it to one of the units
+
+INSERT_UPDATE Customer;originalUid[unique=true];uid[unique=true];title(code);name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password
+;customer1;customer1;;quote customer 1;quote customer 1;en;EUR;customergroup;$defaultPassword
+;customer2;customer2;;quote customer 2;quote customer 2;en;EUR;customergroup;$defaultPassword
+
+INSERT_UPDATE Quote;code[unique=true];version[unique=true];currency(isocode);user(uid);date[dateformat=dd.MM.yyyy HH:mm:ss];state(code);net;calculated;site(uid);store(uid);
+;testQuote1;1;EUR;customer1;25.04.2010 00:00:00;BUYER_DRAFT;false;false;;testStore1;
+;testQuote1;2;EUR;customer1;26.04.2010 00:00:00;BUYER_SUBMITTED;false;false;;testStore1;
+;testQuote1;3;EUR;customer1;27.04.2010 00:00:00;SELLER_REQUEST;false;false;;testStore1;
+;testQuote1;4;EUR;customer1;28.04.2010 00:00:00;SELLER_DRAFT;false;false;;testStore1;
+;testQuote1;5;EUR;customer1;29.04.2010 00:00:00;SELLERAPPROVER_PENDING;false;false;;testStore1;
+;testQuote1;6;EUR;customer1;30.04.2010 00:00:00;SELLERAPPROVER_APPROVED;false;false;;testStore1;
+;testQuote1;7;EUR;customer1;01.05.2010 00:00:00;BUYER_OFFER;false;false;;testStore1;
+;testQuote2;1;EUR;customer1;25.04.2010 00:00:00;BUYER_DRAFT;false;false;;testStore1;
+;testQuote2;2;EUR;customer1;26.04.2010 00:00:00;BUYER_SUBMITTED;false;false;;testStore1;
+;testQuote2;3;EUR;customer1;27.04.2010 00:00:00;SELLER_REQUEST;false;false;;testStore1;
+;testQuote3;1;EUR;customer1;25.04.2010 00:00:00;BUYER_DRAFT;false;false;;testStore2;
+;testQuote3;2;EUR;customer1;26.04.2010 00:00:00;BUYER_SUBMITTED;false;false;;testStore2;
+;testQuote3;3;EUR;customer1;27.04.2010 00:00:00;SELLER_REQUEST;false;false;;testStore2;
+;testQuote3;4;EUR;customer1;28.04.2010 00:00:00;SELLER_DRAFT;false;false;;testStore2;
+;testQuote4;1;EUR;customer2;25.04.2010 00:00:00;BUYER_DRAFT;false;false;;testStore1;
+;testQuote4;2;EUR;customer2;26.04.2010 00:00:00;BUYER_SUBMITTED;false;false;;testStore1;
+;testQuote4;3;EUR;customer2;27.04.2010 00:00:00;SELLER_REQUEST;false;false;;testStore1;
+
+# Create some more roles and assign user rights
+
+INSERT_UPDATE UserGroup;uid[unique=true];locname[lang=en];
+;orgadmingroup;Organization Admin;
+;orgmanagergroup;Organization Manager;
+;orgapprovergroup;Organization Approver;
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;orgadmingroup;orgemployeegroup;
+;orgmanagergroup;orgemployeegroup;
+;orgapprovergroup;orgemployeegroup;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;orgadmingroup;;;;;;;;
+;;;;OrgUnit;+;+;+;-;-
+;;;;Employee;+;+;+;-;-
+
+UserGroup;orgmanagergroup;;;;;;;;
+;;;;OrgUnit;+;+;-;-;-
+;;;;Employee;+;+;-;-;-
+;;;;OrgUnit.groups;+;-;-;-;-;
+$END_USERRIGHTS;;;;;;;;;
+
+# Create units and employees
+
+INSERT_UPDATE OrgUnit;uid[unique=true];name;locName[lang=en];description;groups(uid);active[allownull=true];supplier[allownull=true]
+;rootUnit;Root Unit;Root Unit;Root Unit;;TRUE;TRUE
+;northAmerica;North America;North America;Unit for North America;rootUnit;TRUE;TRUE
+;usa;USA;USA;Unit for the USA;northAmerica;TRUE;TRUE
+;canada;Canada;Canada;Unit for Canada;northAmerica;FALSE;TRUE
+;montreal;Montreal;Montreal;Unit for Montreal;canada;FALSE;TRUE
+;california;California;California;Unit for California;usa;TRUE;TRUE
+;new york;New York;New York;Unit for New York;;TRUE;TRUE
+;africa;Africa;Africa;Africa;rootUnit;TRUE;TRUE
+;nigeria;Nigeria;Nigeria;Nigeria;africa;TRUE;TRUE
+
+INSERT_UPDATE Employee;uid[unique=true,allownull=true];password[default=$defaultPassword];name;groups(uid);
+;unassignedEmployee;;Unassigned Employee;;
+;northAmericaEmployee;;North America Employee;northAmerica,orgemployeegroup;
+;usaEmployee;;USA Employee;usa,orgemployeegroup;
+;canadaEmployee;;Canada Employee;canada,orgemployeegroup;
+;canadaAdmin;;Canada Admin;canada,orgadmingroup,orgmanagergroup;
+;globalAdmin;;Global Admin;rootUnit,orgadmingroup;
+;usaAdmin;;USA Admin;usaadmingroup;
+;usaManager;;USA Manager;orgmanagergroup;
+
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid);locname[lang=en];
+;usaadmingroup;orgadmingroup;USA Admin Group;
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;customer1;northAmerica;
+;customer2;usa;

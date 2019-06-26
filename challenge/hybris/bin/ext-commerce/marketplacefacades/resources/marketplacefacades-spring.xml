@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="defaultVendorFacade" alias="vendorFacade" />
+	<bean id="defaultVendorFacade"
+		class="de.hybris.platform.marketplacefacades.vendor.impl.DefaultVendorFacade">
+		<property name="vendorService" ref="vendorService" />
+		<property name="vendorConverter" ref="vendorConverter" />
+	</bean>
+
+	<alias name="defaultCustomerVendorReviewFacade" alias="customerVendorReviewFacade" />
+	<bean id="defaultCustomerVendorReviewFacade"
+		class="de.hybris.platform.marketplacefacades.vendor.impl.DefaultCustomerVendorReviewFacade">
+		<property name="customerVendorReviewService" ref="customerVendorReviewService" />
+		<property name="userService" ref="userService" />
+		<property name="consignmentTrackingService" ref="consignmentTrackingService" />
+		<property name="customerVendorReviewConverter" ref="customerVendorReviewConverter"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="customerVendorReviewReverseConverter" ref="customerVendorReviewReverseConverter"/>
+	</bean>
+
+	<alias name="defaultVendorConverter" alias="vendorConverter" />
+	<bean id="defaultVendorConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.marketplacefacades.vendor.data.VendorData" />
+		<property name="populators">
+			<list>
+				<ref bean="vendorPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultVendorPopulator" alias="vendorPopulator"/>
+	<bean id="defaultVendorPopulator" class="de.hybris.platform.marketplacefacades.vendor.converters.populator.VendorPopulator">
+		<property name="mediaContainerConverter" ref="responsiveMediaContainerConverter"/>
+		<property name="vendorUrlResolver" ref="vendorUrlResolver"/>
+	</bean>
+	
+	<bean id="productVendorPopulator" class="de.hybris.platform.marketplacefacades.product.converters.populator.VendorProductPopulator">
+		<property name="vendorService" ref="vendorService"/>
+		<property name="vendorConverter" ref="vendorConverter" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productConverter" />
+		<property name="add" ref="productVendorPopulator" />
+	</bean>
+	
+	<bean id="searchResultVendorProductPopulator" class="de.hybris.platform.marketplacefacades.product.converters.populator.SearchResultVendorProductPopulator">
+		<property name="vendorService" ref="vendorService"/>
+		<property name="vendorConverter" ref="vendorConverter" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="commerceSearchResultProductConverter" />
+		<property name="add" ref="searchResultVendorProductPopulator" />
+	</bean>
+	
+	<alias name="defaultProductVendorCategorySearchPageConverter" alias="productVendorCategorySearchPageConverter"/>
+	<bean id="defaultProductVendorCategorySearchPageConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.search.facetdata.ProductCategorySearchPageData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productVendorCategorySearchPagePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultProductVendorCategorySearchPagePopulator" alias="productVendorCategorySearchPagePopulator"/>
+	<bean id="defaultProductVendorCategorySearchPagePopulator" class="de.hybris.platform.marketplacefacades.search.converters.populators.VendorProductCategorySearchPagePopulator" parent="defaultProductCategorySearchPagePopulator">
+		<property name="facetConverter" ref="vendorFacetConverter"/>
+	</bean>
+	
+	<bean id="vendorSolrSearchStateConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.search.data.SearchStateData"/>
+		<property name="populators">
+			<list>
+				<ref bean="vendorSolrSearchStatePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="vendorSolrSearchStatePopulator" class="de.hybris.platform.marketplacefacades.search.converters.populators.VendorSolrSearchStatePopulator" parent="defaultSolrSearchStatePopulator">
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="vendorCategoryUrlResolver" ref="vendorCategoryUrlResolver"/>
+	</bean>
+	
+	<bean id="vendorFacetConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.search.facetdata.FacetData"/>
+		<property name="populators">
+			<list>
+				<ref bean="vendorFacetPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="vendorFacetPopulator"
+			class="de.hybris.platform.marketplacefacades.search.converters.populators.VendorProductsPageFacetPopulator" parent="defaultFacetPopulator">
+		<property name="facetValueConverter" ref="vendorFacetValueConverter"/>
+	</bean>
+
+	<bean id="vendorFacetValueConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commerceservices.search.facetdata.FacetValueData"/>
+		<property name="populators">
+			<list>
+				<ref bean="vendorFacetValuePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="vendorFacetValuePopulator"
+			class="de.hybris.platform.marketplacefacades.search.converters.populators.VendorProductPageFacetValuePopulator" parent="defaultFacetValuePopulator">
+		<property name="searchStateConverter" ref="vendorSolrSearchStateConverter"/>
+	</bean>
+	
+	<bean id="vendorCategoryFacetConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.marketplacefacades.vendor.data.VendorData"/>
+		<property name="populators">
+			<list>
+				<ref bean="vendorCategoryFacetPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultVendorCategoryFacetPopulator" alias="vendorCategoryFacetPopulator"/>
+	<bean id="defaultVendorCategoryFacetPopulator" class="de.hybris.platform.marketplacefacades.search.converters.populators.VendorCategoryFacetPopulator"/>
+	
+	<alias name="defaultVendorProductSearchFacade" alias="vendorProductSearchFacade"/>
+	<bean id="defaultVendorProductSearchFacade" class="de.hybris.platform.marketplacefacades.impl.DefaultVendorProductSearchFacade" parent="defaultSolrProductSearchFacade">
+		<property name="productCategorySearchPageConverter" ref="productVendorCategorySearchPageConverter"/>
+		<property name="vendorCategoryFacetConverter" ref="vendorCategoryFacetConverter"/>
+		<property name="vendorFacade" ref="vendorFacade"/>
+		<property name="categoryConverter" ref="categoryConverter"/>
+		<property name="marketplaceProductService" ref="marketplaceProductService"/>
+	</bean>
+	
+	<bean id="consignmentReviewablePopulator" class="de.hybris.platform.marketplacefacades.consignment.converters.populators.ConsignmentReviewablePopulator">
+		<property name="customerVendorReviewFacade" ref="customerVendorReviewFacade"/>
+	</bean>
+	
+	<bean id="consignmentVendorPopulator" class="de.hybris.platform.marketplacefacades.consignment.converters.populators.ConsignmentVendorPopulator">
+		<property name="vendorConverter" ref="vendorConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomerVendorReviewPopulator" alias="customerVendorReviewPopulator"/>
+	<bean id="defaultCustomerVendorReviewPopulator" class="de.hybris.platform.marketplacefacades.vendor.converters.populator.CustomerVendorReviewPopulator">
+		<property name="customerConverter" ref="customerConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomerVendorReviewConverter" alias="customerVendorReviewConverter"/>
+	<bean id="defaultCustomerVendorReviewConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.product.data.VendorReviewData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerVendorReviewPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCustomerVendorReviewReversePopulator" alias="customerVendorReviewReversePopulator"/>
+	<bean id="defaultCustomerVendorReviewReversePopulator" class="de.hybris.platform.marketplacefacades.vendor.converters.populator.CustomerVendorReviewReversePopulator"/>	
+	
+	<alias name="defaultCustomerVendorReviewReverseConverter" alias="customerVendorReviewReverseConverter"/>
+	<bean id="defaultCustomerVendorReviewReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.marketplaceservices.model.CustomerVendorReviewModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerVendorReviewReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="consignmentConverter" />
+		<property name="add" ref="consignmentReviewablePopulator" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="consignmentConverter" />
+		<property name="add" ref="consignmentVendorPopulator" />
+	</bean>
+	
+	<alias name="defaultVendorGroupOrderEntryPopulator" alias="groupVendorOrderEntryPopulator"/>
+    <bean id="defaultVendorGroupOrderEntryPopulator"
+          class="de.hybris.platform.marketplacefacades.cart.converters.populator.GroupVendorOrderEntryPopulator">
+          <property name="vendorOriginalEntryGroupDisplayStrategy" ref="vendorOriginalEntryGroupDisplayStrategy" />
+    </bean>
+    
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter" />
+		<property name="add" ref="groupVendorOrderEntryPopulator" />
+	</bean>
+
+</beans>

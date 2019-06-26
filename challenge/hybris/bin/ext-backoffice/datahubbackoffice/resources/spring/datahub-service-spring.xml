@@ -1,0 +1,54 @@
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="dataHubSelectionHandler"
+		  class="de.hybris.platform.datahubbackoffice.service.datahub.impl.DataHubServerChangePropagator">
+		<property name="services">
+			<set>
+				<ref bean="dataHubServerContext" />
+				<ref bean="canonicalTypeService" />
+			</set>
+		</property>
+	</bean>
+
+	<bean id="dataHubServerContext"
+		  class="de.hybris.platform.datahubbackoffice.service.datahub.impl.DataHubServerContextServiceImpl" scope="session">
+		<aop:scoped-proxy />
+		<property name="nameService" ref="dataHubNameService" />
+	</bean>
+
+	<bean id="userContext" class="de.hybris.platform.datahubbackoffice.service.datahub.impl.UserContextImpl" scope="session">
+		<aop:scoped-proxy />
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="canonicalTypeService" class="de.hybris.platform.datahubbackoffice.dataaccess.metadata.impl.CachingTypeService"
+		  scope="session">
+		<aop:scoped-proxy />
+		<property name="delegate">
+			<bean class="de.hybris.platform.datahubbackoffice.dataaccess.metadata.impl.UniqueTypeService">
+				<constructor-arg>
+					<bean class="de.hybris.platform.datahubbackoffice.dataaccess.metadata.impl.CanonicalTypeService">
+						<property name="client" ref="canonicalItemClassClient" />
+						<property name="dataHubServerContextService" ref="dataHubServerContext" />
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="customersupportbackoffice_buildcallbacks">
+	<property name="customersupportbackofficeWebFragmentSrc" value="${ext.customersupportbackoffice.path}/resources/web-fragment.xml"/>
+	<property name="customersupportbackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_customersupportbackoffice.jar"/>
+
+	<macrodef name="customersupportbackoffice_after_clean">
+		<sequential>
+			<customersupportbackoffice_remove_web_fragment/>
+			<delete file="${ext.customersupportbackoffice.path}/resources-lang/touch_impexgen" failonerror="false"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="customersupportbackoffice_before_build">
+		<sequential>
+			<register_sass_extension extensionname="customersupportbackoffice"/>
+			<register_sass_extension extensionname="customersupportbackoffice" resources="resources" destination=""/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="customersupportbackoffice_after_build">
+		<sequential>
+			<customersupportbackoffice_remove_web_fragment/>
+			<customersupportbackoffice_create_web_fragment/>
+			
+			<impexGenerate extname="customersupportbackoffice"/>
+			<delete file="${ext.customersupportbackoffice.path}/resources-lang/touch_impexgen" failonerror="false"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="customersupportbackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${customersupportbackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${customersupportbackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="customersupportbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${customersupportbackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${customersupportbackofficeWebFragmentDestJar}">
+							<metainf file="${customersupportbackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+    <patternset id="extension.customersupportbackoffice.binary.filter">
+        <patternset refid="extension.filter" />
+        <exclude name=".project" />
+        <exclude name=".classpath_binary" />
+
+        <!-- excluded doc files -->
+        <exclude name="doc/install.xml" />
+        <exclude name="doc/resources/*.mdl" />
+
+        <!-- exclude src folders -->
+        <exclude name="web/src/**" />
+        <exclude name="src/**" />
+        <exclude name="hmc/src/**" />
+
+        <!-- exclude backoffice folders -->
+
+        <exclude name="backoffice/classes/**" />
+        <exclude name="backoffice/resources/**/*.xml" />
+        <exclude name="backoffice/resources/**/*.css" />
+        <exclude name="backoffice/resources/**/*.zul" />
+        <exclude name="backoffice/src/**" />
+        <exclude name="backoffice/testsrc/**" />
+
+
+        <!-- exculde root classes folder -->
+        <exclude name="classes/**" />
+    </patternset>
+</project>

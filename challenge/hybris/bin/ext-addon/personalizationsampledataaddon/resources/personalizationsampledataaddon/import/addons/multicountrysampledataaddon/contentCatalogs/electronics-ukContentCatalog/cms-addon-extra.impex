@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang=en
+$contentCatalog=electronics-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$defaultPassword=12341234
+$siteUid=electronics-uk
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;MayDay;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name;&userref;
+;maycustomer@hybris.com;customergroup;;May Day Customer;maycustomer@hybris.com;
+
+INSERT_UPDATE CxUserToSegment;segment(code)[unique=true];user(uid)[unique=true];baseSite(uid)[unique=true,default=$siteUid];affinity[default=1];
+;MayDay;maycustomer@hybris.com;;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxCustomizationsGroupExists(line, 1, impex, 1);"
+;electronicsUKCustomizationGroup;;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='electronicsUKCustomizationGroup'];status(code)[default=ENABLED]
+;UKSale;UK Sale;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];customization(code,$contentCV)[unique=true];enabled[default=true];status(code)[default=ENABLED]
+;MayDaySale;May Day Sale;;UKSale;
+
+INSERT_UPDATE CxCmsAction;$contentCV[unique=true];code[unique=true];variation(code,$contentCV)[unique=true];type(code)[default='PLAIN'];target[default='cxCmsActionPerformable'];containerId;componentId;componentCatalog[default=$contentCatalog];
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxActionExists(line, 2, impex, 0);"
+;;mayDaySaleAction;MayDaySale;;;Section1SlotHomepageCxContainer;mayDaySaleElectronicsUKHomepageSplashBannerComponent
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];variation(code,$contentCV)[unique=true];$contentCV[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger1;MayDaySale;;MayDay;
+
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(principal.uid)[mode=append];readPrincipals(principal.uid)[mode=append]
+;$contentCatalog;Staged;electronics-uk-cxmanagergroup;electronics-uk-cxusergroup;
+;$contentCatalog;Online;cxmanager;electronics-uk-cxmanagergroup,electronics-uk-cxusergroup;

@@ -1,0 +1,34 @@
+<!--<div class="row-fluid alert-overlay">-->
+<div class="alert-overlay"
+    data-ng-if="$ctrl.getAlerts().length > 0">
+    <div uib-alert
+        id="{{ 'system-alert-' + $index }}"
+        data-ng-repeat="alert in $ctrl.getAlerts()"
+        data-ng-class="['alert-' + (alert.type || 'info'), {'alert-item--closeable': alert.closeable}]"
+        class="alert-item"
+        data-close="alert.hide()">
+        <div class="alert-item--icon">
+            <span class="alert-item--icon-span hyicon"
+                data-ng-class="$ctrl.getIconType(alert.type)"></span>
+        </div>
+        <div class="alert-item--content">
+            <span id="{{ 'close-alert-' + $index }}"
+                data-ng-if="alert.message">
+                {{ alert.message | translate:alert.messagePlaceholders }}
+            </span>
+            <div data-ng-if="alert.controller"
+                data-ng-controller="alert.controller as $alertInjectedCtrl">
+                <div data-ng-if="alert.template"
+                    data-compile-html="alert.template"></div>
+                <div data-ng-if="alert.templateUrl"
+                    data-ng-include="alert.templateUrl"></div>
+            </div>
+            <div data-ng-if="!alert.controller">
+                <div data-ng-if="alert.template"
+                    data-compile-html="alert.template"></div>
+                <div data-ng-if="alert.templateUrl"
+                    data-ng-include="alert.templateUrl"></div>
+            </div>
+        </div>
+    </div>
+</div>

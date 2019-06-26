@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+           
+	<bean id="backInStockNotificationEmailContext" class="de.hybris.platform.stocknotificationfacades.process.email.context.BackInStockNotificationEmailContext" parent="abstractEmailContext" scope="prototype" >
+		<property name="productInterestConverter" ref="productInterestConverter"/>
+		<property name="productConverter" ref="productConverter"/>
+		<property name="commerceProductReferenceService" ref="commerceProductReferenceService"/>
+	</bean>
+	
+	<alias name="defaultStockNotificationFacade" alias="stockNotificationFacade"/>
+	<bean id="defaultStockNotificationFacade" class="de.hybris.platform.stocknotificationfacades.impl.DefaultStockNotificationFacade">
+		<property name="productInterestService" ref="productInterestService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+	    <property name="baseSiteService" ref="baseSiteService"/>
+		<property name="userService" ref="userService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+	
+	<bean id="stockNotificationSiteMessageUrlResolver" class="de.hybris.platform.stocknotificationfacades.url.impl.StockNotificationSiteMessageUrlResolver">
+		<property name="productModelUrlResolver" ref="productModelUrlResolver"/>
+	</bean>
+	<bean depends-on="siteMessageUrlResolversMap" parent="mapMergeDirective">
+		<property name="key" value="BACK_IN_STOCK"/>
+		<property name="value" ref="stockNotificationSiteMessageUrlResolver"/>
+	</bean>
+	
+</beans>

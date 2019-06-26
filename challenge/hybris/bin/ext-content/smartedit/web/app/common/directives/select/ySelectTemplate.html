@@ -1,0 +1,38 @@
+<ui-select id="{{ySelect.id}}-selector"
+    data-ng-model="ySelect.model"
+    style="width:100%"
+    theme="<%= theme %>"
+    search-enabled="ySelect.searchEnabled"
+    data-ng-change="ySelect.internalOnChange()"
+    reset-search-input="ySelect.resetSearchInput"
+    on-remove="ySelect.internalOnRemove($item, $model)"
+    on-select="ySelect.internalOnSelect($item, $model)"
+    data-ng-init="ySelect.internalInit($select)"
+    data-ng-keyup="ySelect.internalKeyup($event, $select.search)"
+    data-ng-class="{'se-generic-editor-dropdown__paged':ySelect.requiresPaginatedStyling(), 'has-error': ySelect.hasError(), 'has-warning': ySelect.hasWarning() }"
+    class="se-generic-editor-dropdown"
+    ng-disabled="ySelect.isReadOnly">
+    <ui-select-match placeholder="{{ySelect.placeholder || 'se.genericeditor.sedropdown.placeholder' | translate}}"
+        class="se-generic-editor-dropdown__match2">
+        <span data-ng-if="ySelect.hasControls()"
+            class="input-group-addon glyphicon glyphicon-search ySESearchIcon__navigation"></span>
+        <item-printer id="{{ySelect.id}}-selected"
+            data-model="$select.selected"
+            data-template-url="ySelect.itemTemplate"
+            class="y-select-item-printer"
+            data-ng-class="{'se-generic-editor-dropdown__item-printer':ySelect.hasControls()}"> </item-printer>
+        <span data-ng-if="ySelect.hasControls()"
+            class="input-group-addon glyphicon glyphicon-remove-sign ySESearchIcon__navigation"
+            data-ng-click="ySelect.clear($select, $event)"></span>
+    </ui-select-match>
+    <ui-select-choices id="{{ySelect.id}}-list"
+        "<%= filtering %>"
+        position="down"
+        ui-disable-choice="ySelect.disableChoice(item)">
+        <div data-ng-include="ySelect.itemTemplate"></div>
+    </ui-select-choices>
+    <ui-select-no-choice data-ng-if="ySelect.noResultLabel"
+        class="y-select-no-result-label">
+        {{ySelect.noResultLabel | translate}}
+    </ui-select-no-choice>
+</ui-select>

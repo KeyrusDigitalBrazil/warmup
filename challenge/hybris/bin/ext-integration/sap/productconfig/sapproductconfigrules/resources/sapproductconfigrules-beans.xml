@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+
+	<enum class="de.hybris.platform.ruleengineservices.rao.ProcessStep">
+		<value>CREATE_DEFAULT_CONFIGURATION</value>
+		<value>RETRIEVE_CONFIGURATION</value>
+	</enum>
+
+
+	<bean class="de.hybris.platform.ruleengineservices.rao.OrderEntryRAO" >
+		<property name="productConfiguration" type="de.hybris.platform.sap.productconfig.rules.rao.ProductConfigRAO" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.ProductConfigRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractActionedRAO"
+		template="resources/beanTemplate/productConfigRao-allTemplate.vm">
+		<property name="productCode" type="java.lang.String" />
+		<!-- only configId is unique -->
+		<property name="configId" type="java.lang.String" />
+		<property name="inCart" type="java.lang.Boolean" />
+		<property name="cstics" type="java.util.List&lt;de.hybris.platform.sap.productconfig.rules.rao.CsticRAO>" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.CsticRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractActionedRAO"
+		template="resources/beanTemplate/productConfigRao-allTemplate.vm">
+		<!-- CsticName + ConfigId is unique -->
+		<property name="csticName" type="java.lang.String" />
+		<property name="configId" type="java.lang.String" />
+		<property name="assignedValues" type="java.util.List&lt;de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO>" />
+		<property name="assignableValues" type="java.util.List&lt;de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO>" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractActionedRAO"
+		template="resources/beanTemplate/productConfigRao-allTemplate.vm">
+		<!-- ValueName + CsticName + ConfigId is unique -->
+		<property name="csticValueName" type="java.lang.String" />
+		<property name="csticName" type="java.lang.String" />
+		<property name="configId" type="java.lang.String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.action.SetCsticValueRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+		<property name="valueNameToSet" type="de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.action.RemoveAssignableValueRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+		<property name="valueNameToRemoveFromAssignable" type="de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.action.HideCsticRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.action.DisplayCsticReadonlyRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.action.ProductConfigDisplayMessageRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+		<property name="valueNameForMessage" type="de.hybris.platform.sap.productconfig.rules.rao.CsticValueRAO" />
+		<property name="message" type="java.lang.String" />
+		<property name="messageSeverity" type="de.hybris.platform.sap.productconfig.rules.enums.ProductConfigRuleMessageSeverity" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.ProductConfigProcessStepRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractRuleActionRAO"
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+		<property name="processStep" type="de.hybris.platform.ruleengineservices.rao.ProcessStep" />
+	</bean>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.model.ProductConfigProcessStepModel" 
+		template="resources/beanTemplate/productConfigRao-onlyToStringTemplate.vm">
+		<property name="processStep" type="de.hybris.platform.ruleengineservices.rao.ProcessStep" />
+	</bean>
+	
+	<enum class="de.hybris.platform.sap.productconfig.runtime.interf.model.ProductConfigMessageSource">
+		<value>RULE</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.sap.productconfig.runtime.interf.model.ProductConfigMessageSourceSubType">
+		<value>DISPLAY_MESSAGE</value>
+	</enum>
+	
+	<bean class="de.hybris.platform.sap.productconfig.rules.rao.BaseStoreRAO" extends="de.hybris.platform.ruleengineservices.rao.AbstractActionedRAO"
+		template="resources/beanTemplate/productConfigRao-allTemplate.vm">
+		<property name="uid" type="java.lang.String" />
+	</bean>
+
+</beans>

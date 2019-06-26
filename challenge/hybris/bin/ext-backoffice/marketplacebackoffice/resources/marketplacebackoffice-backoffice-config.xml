@@ -1,0 +1,1282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+	xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+	xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+	xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+	xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+	xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms"
+	xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+	xmlns:n="http://www.hybris.com/cockpitng/config/explorertree"
+	xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+	xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+	<context component="perspective-view-switcher" principal="merchantvendormanagerrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="merchantvendormanagerrole">
+				<vs:view id="Marketplace-Perspective" />
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-chooser" principal="vendoradministratorrole">
+		<y:perspective-chooser xmlns:y="http://www.hybris.com/cockpitng/config/perspectiveChooser">
+			<y:defaultPerspective name="Marketplace-Vendor-User-Perspective"/>
+		</y:perspective-chooser>
+	</context>
+
+	<context component="perspective-view-switcher" principal="vendoradministratorrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="vendoradministratorrole">
+				<vs:view id="Marketplace-Vendor-User-Perspective" />
+				<vs:view id="marketplace-warehouse-perspective" />
+				<vs:view id="Marketplace-Vendor-Contentmanagement-Perspective" />
+				<vs:view id="pcmbackoffice" />
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" principal="vendorcontentmanagerrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="vendorcontentmanagerrole">
+				<vs:view id="Marketplace-Vendor-Contentmanagement-Perspective" />
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" principal="vendorwarehousestaffrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="vendorwarehousestaffrole">
+				<vs:view id="marketplace-warehouse-perspective"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="mpvu-explorer-tree" module="marketplacebackoffice">
+		<n:explorer-tree title="vendor_user">
+			<n:navigation-node id="marketplacebackoffice.treenode.user">
+				<n:type-node id="marketplacebackoffice.typenode.vendoruser.all" code="VendorUser" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+
+	<context component="mpvc-explorer-tree" module="marketplacebackoffice">
+		<n:explorer-tree title="productcarousel">
+			<n:navigation-node id="marketplacebackoffice.treenode.wcms">
+				<n:type-node id="marketplacebackoffice.typenode.productcarousel.all" code="ProductCarouselComponent" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+
+	<context component="mp-explorer-tree" module="marketplacebackoffice">
+		<n:explorer-tree title="market_place">
+			<n:navigation-node id="marketplacebackoffice.treenode.vendor">
+				<n:type-node id="marketplacebackoffice.typenode.vendor.all" code="Vendor" />
+			</n:navigation-node>
+			<n:navigation-node id="marketplacebackoffice.treenode.user">
+				<n:type-node id="marketplacebackoffice.typenode.vendoruser.all" code="VendorUser" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+
+	<context component="mpw-explorer-tree" module="marketplacebackoffice" principal="vendorwarehousestaffrole,vendoradministratorrole">
+		<n:explorer-tree title="warehouse">
+			<n:navigation-node id="marketplacebackoffice.treenode.order">
+				<n:type-node id="marketplacebackoffice.typenode.order.all" code="Consignment" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+
+	<context component="mp-listview" type="Vendor" module="marketplacebackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="code" label="marketplace.backoffice.vendors.code.label"/>
+			<list-view:column qualifier="name" label="marketplace.backoffice.vendors.name.label" />
+			<list-view:column qualifier="active" label="marketplace.backoffice.vendors.active.label" />
+		</list-view:list-view>
+	</context>
+
+	<context component="mp-listview" type="VendorUser" module="marketplacebackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="uid" label="marketplace.backoffice.vendorusers.code.label"/>
+			<list-view:column qualifier="name" label="marketplace.backoffice.vendorusers.name.label" />
+			<list-view:column qualifier="vendor" label="marketplace.backoffice.vendorusers.vendor.label"/>
+			<list-view:column qualifier="groups" label="marketplace.backoffice.vendorusers.group.label" />
+		</list-view:list-view>
+	</context>
+
+	<context component="mpvc-listview" type="ProductCarouselComponent" module="marketplacebackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="vendorCarouselCode" label="marketplace.backoffice.productcarousel.uid.label" />
+			<list-view:column qualifier="name" label="marketplace.backoffice.productcarousel.name.label" />
+		</list-view:list-view>
+	</context>
+
+	<context component="mpvu-listview" type="VendorUser" module="marketplacebackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="uid" label="marketplace.backoffice.vendorusers.code.label"/>
+			<list-view:column qualifier="name" label="marketplace.backoffice.vendorusers.name.label" />
+			<list-view:column qualifier="loginDisabled" label="marketplace.backoffice.vendorusers.loginDisabled.label" />
+		</list-view:list-view>
+	</context>
+
+
+	<context component="mp-advanced-search" type="Vendor" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="code" />
+				<advanced-search:field name="name" />
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context component="mp-advanced-search" type="VendorUser" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="uid" />
+				<advanced-search:field name="name" />
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context component="mpvu-advanced-search" type="VendorUser" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="uid" />
+				<advanced-search:field name="name" />
+				<advanced-search:field name="loginDisabled" />
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context component="mpvc-advanced-search" type="ProductCarouselComponent" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="uid" />
+				<advanced-search:field name="name" />
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context component="advanced-search" type="CustomerVendorReview" module="customersupportbackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="vendor" />
+				<advanced-search:field name="approvalStatus" />
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context component="mp-editor-area" type="Vendor" merge-by="type" parent="auto">
+		<editorArea:editorArea>
+			<editorArea:tab name="tab.vendor.summary">
+				<editorArea:section name="section.vendor.essential">
+                	<editorArea:attribute qualifier="code" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="section.vendor.properties">
+                	<editorArea:attribute qualifier="warehouses" />
+                	<editorArea:attribute qualifier="catalog" />
+                	<editorArea:attribute qualifier="categories" />
+                	<editorArea:attribute qualifier="userGroups" />
+                	<editorArea:attribute qualifier="active" readonly="true"/>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="tab.vendor.employee">
+				<editorArea:section name="section.vendor.user.essential">
+                	<editorArea:attribute qualifier="code" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="section.vendor.user.properties">
+                	<editorArea:attribute qualifier="vendorUsers" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="tab.vendor.logo">
+				<editorArea:section name="section.vendor.user.essential">
+                	<editorArea:attribute qualifier="code" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="section.vendor.user.properties">
+                	<editorArea:attribute qualifier="logo" label="vendor.logo.mediaContainer.label" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context component="mp-editor-area" type="VendorUser" merge-by="type" parent="Employee">
+		<editorArea:editorArea>
+			<editorArea:tab name="tab.vendor.user.general">
+				<editorArea:section name="section.vendor.essential">
+                	<editorArea:attribute qualifier="uid" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="section.vendor.properties">
+                	<editorArea:attribute qualifier="vendor" />
+                	<editorArea:attribute qualifier="groups" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.password">
+				<editorArea:section name="section.vendor.essential">
+                	<editorArea:attribute qualifier="uid" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="hmc.password">
+                    <editorArea:customPanel name="userPasswordPanelRenderer" spring-bean="userPasswordPanelRenderer"/>
+                    <editorArea:panel name="">
+						<editorArea:attribute qualifier="passwordQuestion" description="hmc.text.passwordQuestion.description"/>
+						<editorArea:attribute qualifier="lastLogin" description="hmc.text.lastLogin.description"/>
+						<editorArea:attribute qualifier="loginDisabled" label="hmc.text.password.logindisabled" readonly="true"/>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context component="mpvu-editor-area" type="VendorUser" merge-by="type" parent="Employee">
+		<editorArea:editorArea>
+			<editorArea:tab name="tab.vendor.user.general">
+				<editorArea:section name="section.vendor.essential">
+                	<editorArea:attribute qualifier="uid" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="section.vendor.properties">
+					<editorArea:attribute qualifier="vendor" readonly="true" />
+                	<editorArea:attribute qualifier="groups" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.password">
+				<editorArea:section name="section.vendor.essential">
+                	<editorArea:attribute qualifier="uid" />
+                	<editorArea:attribute qualifier="name" />
+				</editorArea:section>
+				<editorArea:section name="hmc.password">
+                    <editorArea:customPanel name="userPasswordPanelRenderer" spring-bean="userPasswordPanelRenderer"/>
+                    <editorArea:panel name="">
+						<editorArea:attribute qualifier="passwordQuestion" description="hmc.text.passwordQuestion.description"/>
+						<editorArea:attribute qualifier="lastLogin" description="hmc.text.lastLogin.description"/>
+						<editorArea:attribute qualifier="loginDisabled" label="hmc.text.password.logindisabled" readonly="true"/>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context component="mpvc-editor-area" type="ProductCarouselComponent" merge-by="module">
+		<editorArea:editorArea>
+			<editorArea:tab name="tab.vendor.user.general">
+				<editorArea:customSection name="section.vendor.essential" spring-bean="productCarouselComponentEssentialSectionRenderer"/>
+				<editorArea:section name="section.carousel.products">
+                	<editorArea:attribute qualifier="products"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="Vendor" component="base">
+        <y:base>
+            <y:labels>
+                <y:label>name</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+
+    <context type="Warehouse" component="base">
+        <y:base>
+            <y:labels>
+                <y:label>name</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+
+ 	<context component="create-wizard" type="Vendor">
+		<wz:flow id="vendorWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="vendPrepare">
+				<wz:initialize property="newVendor" type="ctx.TYPE_CODE"/>
+				<wz:assign property="useCustomPageOnVendorCreate" value="true"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendor.essential.label" sublabel="marketplace.create.vendor.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newVendor">
+	                    <wz:property qualifier="code"/>
+						<wz:property qualifier="name"/>
+					</wz:property-list>
+					<wz:property qualifier="useCustomPageOnVendorCreate" type="java.lang.Boolean" editor="com.hybris.cockpitng.editor.defaultboolean">
+						<wz:editor-parameter>
+                            <wz:name>showOptionalField</wz:name>
+                            <wz:value>false</wz:value>
+                        </wz:editor-parameter>
+                        <wz:editor-parameter>
+							<wz:name>trueLabel</wz:name>
+							<wz:value>customTrueLabel</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>falseLabel</wz:name>
+							<wz:value>customFalseLabel</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newVendor.code)"/>
+                    <wz:custom visible="!#empty(newVendor.code)" handler="createVendorWizardHandler" label="label.marketplace.vendor.create.done"/>
+				</wz:navigation>
+			</wz:step>
+            <wz:step id="step2" label="marketplace.create.vendor.optional.label" sublabel="marketplace.create.vendor.optional.sublabel">
+                <wz:content id="step2.content">
+                    <wz:property qualifier="newVendor.categories"/>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+					<wz:custom handler="createVendorWizardHandler" label="label.marketplace.vendor.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+	<context component="create-wizard" type="VendorUser" parent="Employee" principal="merchantvendormanagerrole" >
+		<wz:flow id="vendorUserWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="vendPrepare">
+				<wz:initialize property="newVendorUser"	type="ctx.TYPE_CODE"/>
+				<wz:assign property="newVendorUser.uid" value="ctx.code"/>
+				<wz:assign property="newVendorUser.vendor" value="ctx.parentObject"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendoruser.step1.label" sublabel="marketplace.create.vendoruser.step1.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newVendorUser">
+                        <wz:property qualifier="uid" />
+						<wz:property qualifier="name" />
+						<wz:property qualifier="description" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newVendorUser.uid)"/>
+				</wz:navigation>
+			</wz:step>
+            <wz:step id="step2" label="marketplace.create.vendoruser.step2.label" sublabel="marketplace.create.vendoruser.step2.sublabel">
+                <wz:content id="step2.content">
+                    <wz:property-list root="newVendorUser">
+                        <wz:property qualifier="vendor" />
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+                    <wz:custom visible="newVendorUser.vendor != null" handler="vendorUserUserGroupWizardHandler" label="label.marketplace.vendor.user.create.next"
+						default-target="step3">
+					</wz:custom>
+                </wz:navigation>
+            </wz:step>
+             <wz:step id="step3" label="marketplace.create.vendoruser.step3.label" sublabel="marketplace.create.vendoruser.step3.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property-list root="newVendorUser">
+                        <wz:property qualifier="groups"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+                   	<wz:done>
+						<wz:save property="newVendorUser" />
+					</wz:done>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context component="create-wizard" type="VendorUser" parent="Employee" principal="vendoradministratorrole">
+		<wz:flow id="vendorUserWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="vendPrepare">
+				<wz:initialize property="newVendorUser"	type="ctx.TYPE_CODE"/>
+				<wz:assign property="newVendorUser.uid" value="ctx.code"/>
+				<wz:assign property="newVendorUser.vendor" value="ctx.parentObject"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendoruser.step1.label" sublabel="marketplace.create.vendoruser.step1.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newVendorUser">
+                        <wz:property qualifier="uid" />
+						<wz:property qualifier="name" />
+						<wz:property qualifier="description" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newVendorUser.uid)"/>
+				</wz:navigation>
+			</wz:step>
+             <wz:step id="step2" label="marketplace.create.vendoruser.step3.label" sublabel="marketplace.create.vendoruser.step3.sublabel">
+                <wz:content id="step2.content">
+                    <wz:property-list root="newVendorUser">
+                        <wz:property qualifier="groups"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+					<wz:custom handler="createVendorUesrWizardHandler" label="label.marketplace.vendor.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+   <context component="mpeditorareaactions" type="VendorUser">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.activateVendorUser" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.deactivateVendorUser" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+	<context component="mpvueditorareaactions" type="VendorUser">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.activateVendorUser" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.deactivateVendorUser" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mpvceditorareaactions" type="ProductCarouselComponent">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.syncCarousel" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mplistviewactions" type="VendorUser">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mpvulistviewactions" type="VendorUser">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mpvulistviewactions" type="VendorUser">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mpeditorareaactions" type="Vendor">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.activateVendor" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.deactivateVendor" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+    <context component="mplistviewactions" type="Vendor">
+        <y:actions>
+            <y:group qualifier="common">
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+
+    <!-- vendor warehouse backoffice -->
+
+
+    <context component="mpw-listview" type="Consignment" module="marketplacebackoffice">
+		<list-view:list-view>
+			<list-view:column qualifier="code"/>
+			<list-view:column qualifier="creationtime"/>
+			<list-view:column qualifier="order.user" label="marketplacebackoffice.order.customer"/>
+			<list-view:column qualifier="totalPrice"/>
+			<list-view:column qualifier="status"/>
+		</list-view:list-view>
+	</context>
+
+    <context merge-by="type" parent="GenericItem" type="ConsignmentEntry" component="marketplacereferenceListViewConsignmentEntries">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="orderEntry.product.vendorSku" label="marketplacebackoffice.consignmentEntry.orderEntry.product.code" />
+            <list-view:column qualifier="orderEntry.product.name" label="marketplacebackoffice.consignmentEntry.orderEntry.product.name" />
+            <list-view:column qualifier="orderEntry.totalPrice" label="marketplacebackoffice.consignmentEntry.orderEntry.totalPrice"/>
+            <list-view:column qualifier="quantity" label="marketplacebackoffice.consignmentEntry.orderEntry.quantity"/>
+        </list-view:list-view>
+    </context>
+
+    <context merge-by="module" parent="GenericItem" type="Consignment" component="mpw-editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab>
+            	<editorArea:section name="marketplacebackoffice.consignment.essential">
+            		<editorArea:panel>
+            			<editorArea:attribute qualifier="code"  readonly="true" label="marketplacebackoffice.consignment.code"/>
+            			<editorArea:attribute qualifier="status"  readonly="true"/>
+            			<editorArea:attribute qualifier="totalPrice" readonly="true">
+            				<editorArea:editor-parameter>
+							    <editorArea:name>numberFormat</editorArea:name>
+							    <editorArea:value>###.00</editorArea:value>
+							</editorArea:editor-parameter>
+            			</editorArea:attribute>
+            			<editorArea:attribute qualifier="creationtime"  readonly="true"/>
+            		</editorArea:panel>
+                	<editorArea:customPanel name="marketplacebackoffice.renderer" spring-bean="marketplaceNestedAttributePanelRenderer">
+                		<editorArea:attribute qualifier="order.user.uid"  readonly="true" label="marketplacebackoffice.order.customer.id"/>
+                		<editorArea:attribute qualifier="order.user.name"  readonly="true" label="marketplacebackoffice.order.customer.name"/>
+                		<editorArea:attribute qualifier="order.code" readonly="true" label="marketplacebackoffice.order.code"/>
+                		<editorArea:attribute qualifier="order.currency" readonly="true" />
+                	</editorArea:customPanel>
+				</editorArea:section>
+                <editorArea:section name="marketplacebackoffice.consignment.logistic">
+                	<editorArea:attribute qualifier="carrierDetails" />
+                	<editorArea:attribute qualifier="trackingID" />
+                	<editorArea:attribute qualifier="shippingAddress" />
+				</editorArea:section>
+                <editorArea:section name="marketplacebackoffice.consignment.typenode.product.all">
+                    <editorArea:panel>
+	                    <editorArea:attribute editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" qualifier="consignmentEntries" readonly="true" label="marketplacebackoffice.section.entries">
+	                        <editorArea:editor-parameter>
+	                            <editorArea:name>listConfigContext</editorArea:name>
+	                            <editorArea:value>marketplacereferenceListViewConsignmentEntries</editorArea:value>
+	                        </editorArea:editor-parameter>
+	                        <editorArea:editor-parameter>
+	                            <editorArea:name>disableDisplayingDetails</editorArea:name>
+	                            <editorArea:value>true</editorArea:value>
+	                        </editorArea:editor-parameter>
+	                        <editorArea:editor-parameter>
+	                            <editorArea:name>disableRemoveReference</editorArea:name>
+	                            <editorArea:value>true</editorArea:value>
+	                        </editorArea:editor-parameter>
+	                    </editorArea:attribute>
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context type="Consignment" component="mpw-advanced-search" merge-by="module" parent="GenericItem" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+                <advanced-search:field name="status" selected="false" />
+                <advanced-search:field name="creationtime" selected="false"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+
+    <context component="create-wizard" type="StockLevel" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="stockLevelWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="stockLevelPrepare">
+				<wz:initialize property="saveStockLevelForm" template-bean="stockLevelForm"/>
+            </wz:prepare>
+             <wz:step id="stockLevelStep" label="marketplace.create.stocklevel.label">
+                <wz:content id="stockLevelStep.content">
+                    <wz:property-list root="saveStockLevelForm">
+                        <wz:property qualifier="available" type="java.lang.Integer" editor="com.hybris.cockpitng.editor.defaultinteger"/>
+                        <wz:property qualifier="product" type="Reference(Product)" editor="com.hybris.cockpitng.editor.defaultreferenceeditor">
+                        	<wz:editor-parameter>
+								<wz:name>advancedSearch/advancedSearchConfigCtxCode</wz:name>
+								<wz:value>stocklevel-reference-product-search</wz:value>
+							</wz:editor-parameter>
+                        </wz:property>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="stockLevelStep.navigation">
+					<wz:cancel/>
+					<wz:custom visible="saveStockLevelForm.available >= 0 and saveStockLevelForm.product != null" handler="createStockLevelWizardHandler" label="label.marketplace.stocklevel.create.done"/>
+				</wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context component="stocklevel-reference-product-search" type="Product" module="marketplacebackoffice">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="name" selected="true"/>
+				<advanced-search:field name="vendorSku" selected="true"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+    <context component="collection-browser" type="VendorUser" principal="vendoradministratorrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="ProductCarouselComponent" principal="vendorcontentmanagerrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="ProductCarouselComponent" principal="vendoradministratorrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="Order" principal="vendorwarehousestaffrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="Order" principal="vendoradministratorrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="Consignment" principal="vendorwarehousestaffrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="Consignment" principal="vendoradministratorrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+<!--
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~ The following sections are used by PCM
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  -->
+    <context component="collection-browser" type="Product" principal="vendorproductmanagerrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="collection-browser" type="Product" principal="vendoradministratorrole">
+  		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+    		<cb:available-molds>
+      			<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+      			<cb:mold spring-bean="gridViewCollectionBrowserMoldStrategy"/>
+    		</cb:available-molds>
+  		</cb:collection-browser>
+	</context>
+
+    <context component="perspective-view-switcher" principal="vendorproductmanagerrole">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="vendorproductmanagerrole">
+				<vs:view id="pcmbackoffice" />
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+    <context component="create-wizard" type="media" parent="abstractMedia"  principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="mediaWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="mediaPrepare">
+				<wz:initialize property="newMedia"	type="ctx.TYPE_CODE"/>
+            </wz:prepare>
+             <wz:step id="step1" label="marketplace.create.media.step1.label" sublabel="marketplace.create.media.step1.sublabel">
+                <wz:content id="step1.content">
+                    <wz:property-list root="newMedia">
+                        <wz:property qualifier="code"/>
+                        <wz:property qualifier="description"/>
+                    </wz:property-list>
+                </wz:content>
+                 <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+                   	<wz:custom handler="createMediaWizardHandler" label="label.marketplace.media.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context merge-by="module" parent="AbstractMedia" type="Media" component="editor-area" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="code" readonly="true"/>
+					<editorArea:attribute qualifier="catalogVersion" readonly="true"/>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="hmc.media.section.general">
+                    <editorArea:customPanel name="mediaSection" spring-bean="mediaItemUploadRenderer">
+						<editorArea:render-parameter>
+							<editorArea:name>dataModelProperty</editorArea:name>
+							<editorArea:value>currentObject</editorArea:value>
+						</editorArea:render-parameter>
+					</editorArea:customPanel>
+				</editorArea:section>
+				<editorArea:section name="hmc.properties">
+					<editorArea:attribute qualifier="mediaFormat" />
+					<editorArea:attribute qualifier="mediaContainer" />
+					<editorArea:attribute qualifier="mime" readonly="true"/>
+					<editorArea:attribute qualifier="realFileName" readonly="true"/>
+					<editorArea:attribute qualifier="folder"
+						editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.defaultreferenceeditor,{moveMediaToFolderEditor})" readonly="true"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+
+    <context component="create-wizard" type="MediaContainer" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="mediaContainerWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="mediaContainerPrepare">
+				<wz:initialize property="newMediaContainer"	type="ctx.TYPE_CODE"/>
+            </wz:prepare>
+             <wz:step id="step1" label="marketplace.create.mediaContainer.step1.label" sublabel="marketplace.create.mediaContainer.step1.sublabel">
+                <wz:content id="step1.content">
+                    <wz:property-list root="newMediaContainer">
+                        <wz:property qualifier="qualifier"/>
+                        <wz:property qualifier="name"/>
+                    </wz:property-list>
+                </wz:content>
+                 <wz:navigation id="step2.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+                   	<wz:custom handler="createMediaContainerWizardHandler" label="label.marketplace.mediaContainer.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+	<context merge-by="module" parent="GenericItem" type="MediaContainer" component="editor-area">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="qualifier" />
+					<editorArea:attribute qualifier="catalogVersion" readonly="true"/>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+			<editorArea:tab name="hmc.tab.mediacontainer.commons">
+				<editorArea:section name="hmc.tab.mediacontainer.properties">
+					<editorArea:attribute qualifier="name" />
+					<editorArea:attribute qualifier="medias" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="Product" merge-by="type" parent="GenericItem" component="editor-area">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="code" readonly="true"/>
+					<editorArea:attribute qualifier="name" />
+					<editorArea:attribute qualifier="catalogVersion" readonly="true"/>
+					<editorArea:attribute qualifier="approvalStatus" />
+					<editorArea:attribute qualifier="vendorSku" label="label.product.vendorsku.name"/>
+                    <editorArea:attribute qualifier="saleable">
+                    	<editorArea:editor-parameter>
+							<editorArea:name>showOptionalField</editorArea:name>
+							<editorArea:value>false</editorArea:value>
+						</editorArea:editor-parameter>
+	                    <editorArea:editor-parameter>
+							<editorArea:name>trueLabel</editorArea:name>
+							<editorArea:value>customTrueLabel</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>falseLabel</editorArea:name>
+							<editorArea:value>customFalseLabel</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="Product" merge-by="type" parent="GenericItem" component="editor-area" principal="backofficeproductmanagergroup">
+		<editorArea:editorArea name="">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="code" readonly="true" />
+					<editorArea:attribute qualifier="name" />
+					<editorArea:attribute qualifier="catalogVersion" readonly="true" />
+					<editorArea:attribute qualifier="approvalStatus" />
+					<editorArea:attribute qualifier="vendorSku" label="label.product.vendorsku.name" />
+					<editorArea:attribute qualifier="saleable">
+						<editorArea:editor-parameter>
+							<editorArea:name>showOptionalField</editorArea:name>
+							<editorArea:value>false</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>trueLabel</editorArea:name>
+							<editorArea:value>customTrueLabel</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>falseLabel</editorArea:name>
+							<editorArea:value>customFalseLabel</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="module" parent="GenericItem" type="Product" component="editor-area" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<editorArea:editorArea name="" logic-handler="productSaleableEditorAreaLogicHandler">
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="code" readonly="true"/>
+					<editorArea:attribute qualifier="name" />
+					<editorArea:attribute qualifier="catalogVersion" readonly="true"/>
+					<editorArea:attribute qualifier="approvalStatus" readonly="true"/>
+					<editorArea:attribute qualifier="vendorSku" label="label.product.vendorsku.name" readonly="true"/>
+                    <editorArea:attribute qualifier="saleable" readonly="true">
+                    	<editorArea:editor-parameter>
+							<editorArea:name>showOptionalField</editorArea:name>
+							<editorArea:value>false</editorArea:value>
+						</editorArea:editor-parameter>
+	                    <editorArea:editor-parameter>
+							<editorArea:name>trueLabel</editorArea:name>
+							<editorArea:value>customTrueLabel</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>falseLabel</editorArea:name>
+							<editorArea:value>customFalseLabel</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+			<editorArea:tab name="hmc.tab.product.properties">
+				<editorArea:section name="hmc.section.catalog_and_validity">
+					<editorArea:attribute qualifier="onlineDate" />
+					<editorArea:attribute qualifier="offlineDate" />
+				</editorArea:section>
+				<editorArea:section name="hmc.product.descriptions">
+                    <editorArea:attribute editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)"
+						qualifier="description" />
+					<editorArea:attribute qualifier="unit" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:customTab name="hmc.tab.attribute" spring-bean="classificationTabEditorAreaRenderer">
+				<editorArea:section name="hmc.section.product.untypedfeatures">
+                    <editorArea:attribute qualifier="untypedFeatures" description="hmc.text.product.untypedfeatures"/>
+				</editorArea:section>
+			</editorArea:customTab>
+			<editorArea:tab name="hmc.tab.product.categorysystem">
+				<editorArea:section name="hmc.section.product.productincategory">
+					<editorArea:attribute qualifier="supercategories" />
+					<editorArea:attribute qualifier="classificationClasses" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.product.prices">
+                <editorArea:section name="hmc.section.product.pricesdiscounts">
+                    <editorArea:panel colspan="2" name="panel.europe1Prices" rowspan="2">
+                        <editorArea:attribute qualifier="europe1Prices" description="hmc.text.product.pg"
+                            editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+                            <editorArea:editor-parameter>
+                                <editorArea:name>listConfigContext</editorArea:name>
+                                <editorArea:value>europe1PricesListView</editorArea:value>
+                            </editorArea:editor-parameter>
+                            <editorArea:editor-parameter>
+                                <editorArea:name>configurableFlowConfigCtx</editorArea:name>
+                                <editorArea:value>create-wizard-no-save</editorArea:value>
+                            </editorArea:editor-parameter>
+                        </editorArea:attribute>
+                    </editorArea:panel>
+					<editorArea:attribute qualifier="minOrderQuantity" />
+					<editorArea:attribute qualifier="maxOrderQuantity" />
+					<editorArea:attribute qualifier="priceQuantity" />
+					<editorArea:attribute qualifier="Europe1PriceFactory_PPG" description="hmc.text.product.pg" />
+				</editorArea:section>
+				<editorArea:section name="hmc.section.product.discounts" columns="2">
+					<editorArea:attribute qualifier="Europe1PriceFactory_PDG" description="hmc.text.product.dg"/>
+					<editorArea:attribute qualifier="Europe1PriceFactory_PTG" description="hmc.text.product.dg"/>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.product.multimedia">
+				<editorArea:section name="hmc.section.product.pictures">
+					<editorArea:attribute qualifier="picture" />
+					<editorArea:attribute qualifier="thumbnail" />
+				</editorArea:section>
+				<editorArea:section name="hmc.section.product.additionalmedias">
+					<editorArea:attribute qualifier="data_sheet" />
+					<editorArea:attribute qualifier="detail" />
+					<editorArea:attribute qualifier="logo" />
+					<editorArea:attribute qualifier="normal" />
+					<editorArea:attribute qualifier="others" />
+					<editorArea:attribute qualifier="thumbnails" />
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.product.variants">
+                <editorArea:section name="hmc.section.product.variants" description="hmc.text.variants">
+                    <editorArea:attribute qualifier="variantType"/>
+                    <editorArea:attribute qualifier="variants" description="hmc.attribute.product.variants.disabled.hint">
+                        <editorArea:editor-parameter>
+                            <editorArea:name>configurableFlowConfigCtx</editorArea:name>
+                            <editorArea:value>create-wizard-no-save</editorArea:value>
+                        </editorArea:editor-parameter>
+                    </editorArea:attribute>
+           		</editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.product.extendedattributes">
+				<editorArea:section name="hmc.section.product.ids">
+					<editorArea:attribute qualifier="ean" />
+					<editorArea:attribute qualifier="manufacturerAID" />
+					<editorArea:attribute qualifier="manufacturerName" />
+					<editorArea:attribute qualifier="deliveryTime" />
+					<editorArea:attribute qualifier="contentUnit" />
+					<editorArea:attribute qualifier="numberContentUnits" />
+				</editorArea:section>
+				<editorArea:section name="hmc.section.product.remarks">
+					<editorArea:attribute qualifier="remarks" />
+				</editorArea:section>
+				<editorArea:section name="hmc.section.product.keywords">
+                    <editorArea:attribute qualifier="keywords" description="hmc.text.product.keywords"/>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.tab.product.stock" position="35">
+                <editorArea:section name="hmc.tab.product.stockfinder"/>
+					<editorArea:section name="hmc.section.warehouse.stocklevels">
+						<editorArea:attribute editor="de.hybris.platform.commerceservices.backoffice.editor.stocklevelfindereditor" qualifier="stockLevels" label="hmc.text.product.usesearchtogetstocklevels">
+							<editorArea:editor-parameter>
+								<editorArea:name>stockLevelSearchField</editorArea:name>
+								<editorArea:value>product</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+            </editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+    <context type="Product" component="create-wizard" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="productWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="productPrepare">
+				<wz:initialize property="newProduct" type="ctx.TYPE_CODE"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendor.product.step1.label" sublabel="marketplace.create.vendor.product.step1.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="vendorSku" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newProduct.vendorSku)"/>
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="marketplace.create.vendor.product.step2.label" sublabel="marketplace.create.vendor.product.step2.sublabel">
+                <wz:content id="step2.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="name"/>
+                        <wz:property editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)"
+							qualifier="description" type="java.lang.String" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel />
+                    <wz:next />
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+             <wz:step id="step3" label="marketplace.create.vendor.product.step3.label" sublabel="marketplace.create.vendor.product.step3.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property-list root="newProduct">
+                        <wz:property qualifier="supercategories"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+					<wz:custom handler="createVendorProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+   	</context>
+
+   	<context type="VariantProduct" component="create-wizard" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="variantProductWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="variantProductPrepare">
+				<wz:initialize property="newProduct" type="ctx.TYPE_CODE"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendor.product.step1.label" sublabel="marketplace.create.vendor.product.step1.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="vendorSku" />
+                        <wz:property qualifier="baseProduct" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newProduct.vendorSku)"/>
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="marketplace.create.vendor.product.step2.label" sublabel="marketplace.create.vendor.product.step2.sublabel">
+                <wz:content id="step2.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="name"/>
+                        <wz:property editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)"
+							qualifier="description" type="java.lang.String" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel />
+                    <wz:next />
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+             <wz:step id="step3" label="marketplace.create.vendor.product.step3.label" sublabel="marketplace.create.vendor.product.step3.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property-list root="newProduct">
+                        <wz:property qualifier="supercategories"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+					<wz:custom handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+   	</context>
+
+   	<context type="VariantProduct" component="create-wizard-no-save" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="variantProductWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="variantProductPrepare">
+				<wz:initialize property="newProduct" type="ctx.TYPE_CODE"/>
+            </wz:prepare>
+            <wz:step id="step1" label="marketplace.create.vendor.product.step1.label" sublabel="marketplace.create.vendor.product.step1.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="vendorSku" />
+                        <wz:property qualifier="baseProduct" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+                    <wz:next visible="!#empty(newProduct.vendorSku)"/>
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="marketplace.create.vendor.product.step2.label" sublabel="marketplace.create.vendor.product.step2.sublabel">
+                <wz:content id="step2.content">
+					<wz:property-list root="newProduct">
+                        <wz:property qualifier="name"/>
+                        <wz:property editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)"
+							qualifier="description" type="java.lang.String" />
+                    </wz:property-list>
+                </wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel />
+                    <wz:next />
+                    <wz:custom visible="!#empty(newProduct.vendorSku)" handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+				</wz:navigation>
+			</wz:step>
+             <wz:step id="step3" label="marketplace.create.vendor.product.step3.label" sublabel="marketplace.create.vendor.product.step3.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property-list root="newProduct">
+                        <wz:property qualifier="supercategories"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:cancel />
+                    <wz:back/>
+					<wz:custom handler="createVendorVariantProductWizardHandler" label="label.marketplace.vendor.product.create.done"/>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+   	</context>
+
+	<context type="PriceRow" component="create-wizard-no-save" principal="vendorproductmanagerrole,vendoradministratorrole">
+		<wz:flow id="PriceRowWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="pricePrepare">
+				<wz:initialize property="newPrice" type="ctx.TYPE_CODE" />
+				<wz:assign property="newPrice.product" value="ctx.parentObject" />
+			</wz:prepare>
+			<wz:step id="step1" label="create.pricetrow.essential.label">
+				<wz:content id="step1.content">
+					<wz:property-list root="newPrice">
+						<wz:property qualifier="unit" />
+						<wz:property qualifier="price" />
+						<wz:property qualifier="currency" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+					<wz:done/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context component="pcmbackoffice-editorareaactions" merge-by="type" type="Product" principal="vendorproductmanagerrole,vendoradministratorrole">
+        <y:actions >
+            <y:group qualifier="common" >
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.approveProduct" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+    <context component="collectioneditorareaactions" merge-by="type" type="Product" principal="vendorproductmanagerrole,vendoradministratorrole">
+        <y:actions>
+            <y:group qualifier="common" >
+                <y:label>actiongroup.common</y:label>
+                <y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.marketplacebackoffice.action.approveProduct" property="currentObject"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+
+    <context component="cs-explorer-tree" module="customersupportbackoffice" principal="customersupportadministratorrole,customersupportmanagerrole,customersupportagentrole">
+        <n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree">
+        	<n:type-node code="CsTicket" id="customersupport_backoffice_explorerTree_tickets"/>
+			<n:type-node code="CustomerReview" id="customersupport_backoffice_explorerTree_reviews"/>
+			<n:type-node code="CustomerVendorReview" id="customersupport_backoffice_explorerTree_vendorReviews"/>
+        </n:explorer-tree>
+    </context>
+
+    <context component="cs-listview" type="CustomerVendorReview" module="customersupportbackoffice">
+        <list-view:list-view>
+            <list-view:column qualifier="consignment"/>
+            <list-view:column qualifier="user" />
+            <list-view:column qualifier="vendor" />
+            <list-view:column qualifier="approvalStatus" label="marketplace.backoffice.customerVendorReview.approvalStatus.label" />
+        </list-view:list-view>
+    </context>
+
+	<context merge-by="module" parent="GenericItem" type="CustomerVendorReview" component="cs-editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab>
+				<editorArea:section name="marketplacebackoffice.customervendorreview.essential">
+					<editorArea:attribute qualifier="consignment" />
+					<editorArea:attribute qualifier="user" />
+					<editorArea:attribute qualifier="vendor" />
+					<editorArea:attribute qualifier="approvalStatus" />
+					<editorArea:attribute qualifier="modifiedtime" />
+				</editorArea:section>
+				<editorArea:section name="marketplacebackoffice.customervendorreview.details">
+					<editorArea:panel rowspan="2" colspan="2">
+						<editorArea:attribute qualifier="satisfaction" />
+						<editorArea:attribute qualifier="delivery" />
+						<editorArea:attribute qualifier="communication" />
+						<editorArea:attribute qualifier="createDate" />
+						<editorArea:attribute qualifier="comment"
+							xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+							readonly="true">
+							<editor-parameter>
+								<name>rows</name>
+								<value>5</value>
+							</editor-parameter>
+						</editorArea:attribute>
+					</editorArea:panel>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.activateVendor" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="ActivateVendor" level="SUCCESS">
+	            <na:message>user.notification.vendor.activated</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.activateVendorUser" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="ActivateVendorUser" level="SUCCESS">
+	            <na:message>user.notification.vendor.user.activated</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.approveProduct" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="ApproveProduct" level="SUCCESS">
+	            <na:message>message.product.approve.success</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.approveProduct" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="ApproveProduct" level="FAILURE">
+	        	<na:message>message.product.approve.error</na:message>
+	        	<na:references>
+	            	<na:reference placeholder="0" link="false" message="#root"/>
+	            </na:references>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.deactivateVendor" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="DeactivateVendor" level="SUCCESS">
+	            <na:message>user.notification.vendor.deactivated</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.deactivateVendorUser" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="DeactivateVendorUser" level="SUCCESS">
+	            <na:message>user.notification.vendor.user.deactivated</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="de.hybris.platform.marketplacebackoffice.action.syncCarousel" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="SyncProductCarousel" level="SUCCESS">
+	            <na:message>user.notification.carousel.sync</na:message>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+  <context component="notification-area" source="configurableFlow" merge-by="source">
+	   <na:notification-area>
+	        <na:notifications eventType="CreateVendorVariantProduct" level="FAILURE">
+	        	<na:message>user.notification.vendor.variantproduct.error</na:message>
+	        	<na:references>
+	            	<na:reference placeholder="0" link="false" message="#root"/>
+	            </na:references>
+	        </na:notifications>
+	   </na:notification-area>
+  </context>
+
+</config>

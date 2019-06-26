@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="true">
+
+    <context:annotation-config/>
+
+    <alias name="defaultApiRegistryCacheRegion" alias="apiRegistryCacheRegion"/>
+    <bean name="defaultApiRegistryCacheRegion" class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" lazy-init="true">
+        <constructor-arg name="name" value="apiRegistryCacheRegion" />
+        <constructor-arg name="maxEntries" value="${apiregistry.cache.maxentries}"/>
+        <constructor-arg name="evictionPolicy" value="${apiregistry.cache.evictionpolicy}"/>
+        <constructor-arg name="ttlSeconds" value="${apiregistry.cache.ttl}"/>
+        <constructor-arg name="statsEnabled" value="${apiregistry.cache.stats.enabled}" />
+        <constructor-arg name="exclusiveComputation" value="${apiregistry.cache.exclusiveComputation}" />
+        <property name="handledTypes">
+            <array>
+                <value>6614</value>
+                <value>6610</value>
+                <value>6611</value>
+                <value>6612</value>
+                <value>6613</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="apiRegistryCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="apiRegistryCacheRegion" />
+</beans>

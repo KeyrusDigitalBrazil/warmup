@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.ruleengine.RuleEvaluationContext">
+		<property name="ruleEngineContext" type="de.hybris.platform.ruleengine.model.AbstractRuleEngineContextModel" >
+			<description>defines the context of the rule engine (e.g. which module to evaluate etc)</description>
+		</property>
+		<property name="facts" type="java.util.Set&lt;Object>" />
+		<property name="globals" type="java.util.Map&lt;String,Object>" >
+			<description>for Drools this map contains entries for global identifier and the reference to the global.</description>
+		</property>
+		<property name="filter" type="Object" >
+			<description>for Drools this optional attribute can contain an instance of an AgendaFilter.</description>
+		</property>
+		<property name="eventListeners" type="java.util.Set&lt;Object>" >
+			<description>contains a set of event listeners (e.g. for Drools this can be AgendaEventListener, RuleRuntimeEventListener or ProcessEventListener)</description>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.ruleengine.RuleEvaluationResult">
+		<property name="evaluationFailed" type="boolean" />
+		<property name="facts" type="java.util.Set&lt;Object>" />
+		<property name="errorMessage" type="String" />
+		<property name="executionResult" type="Object" >
+			<description>contains the rule engine's native result object (e.g. for Drools an instance of ExecutionResults)</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.ruleengine.RuleEngineActionResult" template="resources/ruleengineactionresult-template.vm">
+		<property name="moduleName" type="String" />
+		<property name="actionFailed" type="boolean" />
+		<property name="deployedVersion" type="String"/>
+		<property name="oldVersion" type="String"/>
+		<property name="results" type="java.util.Collection&lt;ResultItem>"/>
+		<property name="executionContext" type="de.hybris.platform.ruleengine.ExecutionContext"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.ruleengine.ResultItem">
+		<property name="message" type="String" />
+		<property name="level" type="de.hybris.platform.ruleengine.MessageLevel" />
+		<property name="path" type="String" />
+		<property name="line" type="int" />
+	</bean>
+
+	<enum class="de.hybris.platform.ruleengine.MessageLevel">
+		<value>ERROR</value>
+		<value>WARNING</value>
+		<value>INFO</value>
+	</enum>
+
+	<enum class="de.hybris.platform.ruleengine.InitializeMode">
+		<value>RESTORE</value>
+		<value>NEW</value>
+	</enum>
+	
+	<bean class="de.hybris.platform.ruleengine.ExecutionContext">
+		<description>ExecutionContext is a ruleengine specific context object used during rule initialization</description>
+		<property name="ruleVersions" type="java.util.Map&lt;String, Long>">
+			<description>this map contains entries of rule code and referenced engine rule version</description>
+		</property>
+		<property name="initializeMode" type="de.hybris.platform.ruleengine.InitializeMode">
+			<description>mode of Rule Engine initialization</description>
+		</property>
+		<property name="modifiedRuleCodes" type="java.util.Collection&lt;String>"/>
+	</bean>
+
+</beans>

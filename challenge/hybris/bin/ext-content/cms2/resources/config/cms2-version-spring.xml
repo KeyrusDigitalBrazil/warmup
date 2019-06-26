@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+   		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Prototype DTOs and object factories -->
+	<alias name="defaultContentSlotForPageRelationData" alias="cmsContentSlotForPageRelationData" />
+	<bean id="defaultContentSlotForPageRelationData" class="de.hybris.platform.cms2.version.converter.customattribute.data.ContentSlotForPageRelationData" scope="prototype"/>
+	<bean id="contentSlotForPageRelationDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean" >
+		<property name="targetBeanName" value="cmsContentSlotForPageRelationData" />
+	</bean>
+
+	<!-- generators -->
+	<bean id="versionUidGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init">
+		<property name="key" value="${keygen.version.uid.key}" />
+		<property name="digits" value="${keygen.version.uid.digits}" />
+		<property name="start" value="${keygen.version.uid.start}" />
+		<property name="type" value="${keygen.version.uid.type}" />
+	</bean>
+
+	<bean id="transactionIdGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init">
+		<property name="key" value="${keygen.version.transaction.id.key}" />
+		<property name="digits" value="${keygen.version.transaction.id.digits}" />
+		<property name="start" value="${keygen.version.transaction.id.start}" />
+		<property name="type" value="${keygen.version.transaction.id.type}" />
+	</bean>
+
+	<alias name="defaultCmsVersionHelper" alias="cmsVersionHelper" />
+	<bean name="defaultCmsVersionHelper" class="de.hybris.platform.cms2.version.service.impl.DefaultCMSVersionHelper">
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias name="defaultCmsVersionSessionContextProvider" alias="cmsVersionSessionContextProvider" />
+	<bean name="defaultCmsVersionSessionContextProvider" class="de.hybris.platform.cms2.version.service.impl.DefaultCMSVersionSessionContextProvider">
+		<property name="sessionCachedContextProvider" ref="cmsSessionCachedContextProvider" />
+		<property name="cmsItemDataFactory" ref="cmsItemDataFactory" />
+	</bean>
+
+	<!-- Services -->
+	<alias name="defaultCmsVersionService" alias="cmsVersionService" />
+	<bean id="defaultCmsVersionService" class="de.hybris.platform.cms2.version.service.impl.DefaultCMSVersionService">
+		<property name="versionUidGenerator" ref="versionUidGenerator" />
+		<property name="transactionIdGenerator" ref="transactionIdGenerator" />
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="cmsAdminItemService" ref="cmsAdminItemService" />
+		<property name="cmsVersionDao" ref="cmsVersionDao" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsVersionToDataConverter" ref="cmsVersionToDataConverter" />
+		<property name="cmsVersionToModelPreviewConverter" ref="cmsVersionToItemModelPreviewConverter" />
+		<property name="cmsVersionToModelRollbackConverter" ref="cmsVersionToItemModelRollbackConverter" />
+		<property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider" />
+		<property name="cmsSessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService"/>
+    </bean>
+
+	<alias name="defaultCmsVersionSearchService" alias="cmsVersionSearchService" />
+	<bean id="defaultCmsVersionSearchService" class="de.hybris.platform.cms2.version.service.impl.DefaultCMSVersionSearchService">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="namedQueryService" ref="flexibleSearchNamedQueryService" />
+		<property name="searchHelper" ref="cmsSearchHelper" />
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService" />
+	</bean>
+
+	<alias name="defaultCmsVersionGCService" alias="cmsVersionGCService" />
+	<bean id="defaultCmsVersionGCService" class="de.hybris.platform.cms2.version.service.impl.DefaultCMSVersionGCService">
+		<property name="timeService" ref="timeService"/>
+		<property name="cmsVersionGCDao" ref="cmsVersionGCDao"/>
+	</bean>
+
+	<!-- DAOs -->
+	<alias name="defaultCmsVersionDao" alias="cmsVersionDao" />
+	<bean id="defaultCmsVersionDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSVersionDao" parent="abstractItemDao"/>
+
+	<alias name="defaultCmsVersionGCDao" alias="cmsVersionGCDao" />
+	<bean id="defaultCmsVersionGCDao" class="de.hybris.platform.cms2.servicelayer.daos.impl.DefaultCMSVersionGCDao" parent="abstractCMSItemDao"/>
+
+</beans>

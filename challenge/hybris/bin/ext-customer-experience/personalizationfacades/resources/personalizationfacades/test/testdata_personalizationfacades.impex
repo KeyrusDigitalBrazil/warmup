@@ -1,0 +1,83 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$contentCatalog=testCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$contentCVOnline=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$testStore=testStore
+$testSite=testSite
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;$contentCatalog;Staged;false;EUR
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append];
+;$regulargroup;customergroup;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;customer1@hybris.com;customergroup;;Miljenko Calhoun 
+;customer2@hybris.com;customergroup;;John Doe 
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;segment0;
+;segment1;
+;segment2;
+
+# Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id)
+;$testStore;$contentCatalog;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)
+;$testSite;$testStore;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)
+;notRelatedBaseSite;$testStore;
+
+INSERT_UPDATE CxUserToSegment;segment(code)[unique=true];user(uid)[unique=true];affinity;baseSite(uid)[unique=true]
+;segment0;customer1@hybris.com;1;
+;segment2;customer1@hybris.com;1;$testSite
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+;default;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCVOnline[unique=true]
+;defaultOnline;
+
+#Cx Customizations
+INSERT_UPDATE CxCustomization;code[unique=true];name;rank;$contentCV[unique=true];group(code,$contentCV)[default='default'];status(code)[default=ENABLED]
+;customization0;customization0;0;;
+;customization1;customization1;1;;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;rank;$contentCVOnline[unique=true];group(code,$contentCVOnline)[default='defaultOnline'];status(code)[default=ENABLED]
+;customization0;customization0;0;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];active[default=true];customization(code,$contentCV)[unique=true];rank
+;variation0;variation0;;;customization0;0
+;variation1;variation1;;;customization0;1
+;variation2;variation2;;;customization0;2
+;variation3;variation3;;;customization0;3
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCVOnline[unique=true];active[default=true];customization(code,$contentCVOnline)[unique=true];rank
+;variation0;variation0;;;customization0;0
+
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCV[unique=true];variation(code,$contentCV)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger0;;variation0;segment0;
+;trigger0;;variation2;segment0,segment1;OR;
+;trigger0;;variation3;segment0,segment1;AND;
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCVOnline[unique=true];variation(code,$contentCVOnline)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger0;;variation0;segment0;
+

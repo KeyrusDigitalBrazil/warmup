@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype generate="true" code="ConversationStatus" autocreate="true" dynamic="true">
+			<description>Conversation Status</description>
+			<value code="OPEN" />
+			<value code="CLOSED" />
+		</enumtype>
+	</enumtypes>
+
+	<itemtypes>
+		<itemtype generate="true" code="Conversation" autocreate="true">
+			<deployment table="Conversations" typecode="9874" />
+			<attributes>
+				<attribute qualifier="uid" type="java.lang.String">
+					<modifiers read="true" write="true" optional="false" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="status" type="conversationStatus">
+					<modifiers read="true" write="true" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("conversationStatus","OPEN")</defaultvalue>
+				</attribute>
+				<attribute qualifier="agent" type="Employee">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="customer" type="Customer">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="closeTime" type="java.util.Date">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="messages" type="java.lang.String">
+					<modifiers read="true" write="true" optional="false" />
+		            <persistence type="property">
+		                <columntype>
+		                    <value>HYBRIS.JSON</value>
+		                </columntype>
+		            </persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

@@ -1,0 +1,602 @@
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="backofficeMainSlot">
+		<widget id="datahubBackofficePerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="perspectives" title="Data Hub" template="false">
+			<widget id="datahubNavigationArea" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="leftSlot" template="false">
+				<widget id="datahubInstanceSelector" widgetDefinitionId="de.hybris.platform.datahubbackoffice.datahubselector" slotId="headerSlot" template="false">
+					<widget id="datahubSelectionAdapter" widgetDefinitionId="de.hybris.platform.datahubbackoffice.datahubselectionadapter" slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="springBeanToUpdate" value="dataHubSelectionHandler" type="String"/>
+						<virtual-sockets/>
+					</widget>
+					<setting key="widgetStyleClass" type="String"></setting>
+					<setting key="widgetStyleAttribute" type="String"></setting>
+					<virtual-sockets/>
+				</widget>
+				<widget id="datahubPerspectiveMenu" widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree" slotId="centerSlot" template="false">
+					<widget id="datahubExplorerNodeToTypeAdapter" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible" title="" template="false">
+						<widget id="datahubExplorerTreeMultiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="publicationOrCompositionError_expression" type="String">#root eq 'Datahub_CompositionsInError' or #root eq 'Datahub_PublicationsInError'</setting>
+							<setting key="quickUpload_expression" type="String">#root eq 'QuickUpload'</setting>
+							<setting key="dataloadingfailures_expression" type="String">#root eq 'Datahub_DataLoadsInError'</setting>
+							<setting key="pools_expression" type="String">#root eq 'Datahub_Pool'</setting>
+							<setting key="feeds_expression" type="String">#root eq 'Datahub_Feed'</setting>
+							<virtual-sockets>
+								<output id="dataloadingfailures" type="java.lang.Object" visibility="external"/>
+								<output id="quickUpload" type="java.lang.Object" visibility="external"/>
+								<output id="publicationOrCompositionError" type="java.lang.String" visibility="external"/>
+								<output id="pools" type="java.lang.Object" visibility="external"/>
+								<output id="feeds" type="java.lang.Object" visibility="external" />
+							</virtual-sockets>
+						</widget>
+						<widget id="datahubDashboard_condition_eval" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="expression" type="String">#root eq 'Datahub_Dashboard'</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+							<virtual-sockets/>
+						</widget>
+						<setting key="expression" type="String">id</setting>
+						<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+						<virtual-sockets/>
+					</widget>
+					<widget id="defaultMenuSelectionAdapter" widgetDefinitionId="de.hybris.platform.datahubbackoffice.defaultmenuselection" slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="widgetStyleClass" type="String"></setting>
+						<virtual-sockets/>
+					</widget>
+					<setting key="explorerTreeConfigCtx" type="String">datahub-explorer-tree</setting>
+					<setting key="widgetStyleClass" type="String">datahub-explorer-tree</setting>
+					<setting key="allowFilteringEntries" type="Boolean">true</setting>
+					<setting key="cacheTreemodel" type="Boolean">false</setting>
+					<setting key="widgetStyleAttribute" type="String"></setting>
+					<virtual-sockets/>
+				</widget>
+				<setting key="eastDisabled" type="Boolean">true</setting>
+				<setting key="westDisabled" type="Boolean">true</setting>
+				<setting key="centerDisabled" type="Boolean">false</setting>
+				<setting key="northDisabled" type="Boolean">false</setting>
+				<setting key="northCollapsible" type="Boolean">false</setting>
+				<setting key="northHeight" type="String">80px</setting>
+				<setting key="widgetStyleClass" type="String"></setting>
+				<setting key="widgetStyleAttribute" type="String"></setting>
+				<virtual-sockets/>
+			</widget>
+			<widget id="datahub_view_switcher" widgetDefinitionId="com.hybris.backoffice.viewswitcher" slotId="centerSlot" template="false">
+				<widget id="datahub_dashboard" widgetDefinitionId="de.hybris.platform.datahubbackoffice.dashboardLayout" slotId="views" template="false">
+					<setting key="renderers_load" type="String">loadDashboardRenderer</setting>
+					<setting key="renderers_compose" type="String">composeDashboardRenderer</setting>
+					<setting key="renderers_publication" type="String">publicationDashboardRenderer</setting>
+				</widget>
+				<widget id="datahubContentArea" widgetDefinitionId="com.hybris.cockpitng.defaulttabwidget" slotId="views" template="false">
+					<widget id="datahubErrorsSearchTab" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer" slotId="children" title="Search-ResultList-DetailsList-Details Tab" template="true">
+						<widget id="datahubErrorsSearchCondition" widgetDefinitionId="com.hybris.cockpitng.advancedsearch" slotId="top" template="false">
+							<widget id="datahubErrorsSearchEngine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine" slotId="cockpitWidgetChildrenInvisible" template="false">
+								<setting key="defaultPageSize" type="Integer">10</setting>
+								<virtual-sockets/>
+							</widget>
+							<setting key="sendResetWhenDisableAutoSearch" type="Boolean">true</setting>
+							<setting key="disableSimpleSearch" type="Boolean">false</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="disableSubtypesCheckbox" type="Boolean">true</setting>
+							<setting key="simpleSearchConfigCtxCode" type="String">simple-search</setting>
+							<setting key="forceSearchForCode" type="String">Datahub_PublicationsInError</setting>
+							<setting key="disableAttributesComparator" type="Boolean">true</setting>
+							<setting key="advancedSearchConfigCtxCode" type="String">advanced-search</setting>
+							<setting key="disableSearchModelCache" type="Boolean">true</setting>
+							<setting key="disableSortOrder" type="Boolean">true</setting>
+							<setting key="addRowPosition" type="String">None</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="disableAdvancedSearchToolbar" type="Boolean">true</setting>
+							<setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="datahubErrorsSearchResultContainer" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="center" template="false">
+							<widget id="datahubPublicationErrorsSearchResultProvider" widgetDefinitionId="de.hybris.platform.datahubbackoffice.publicationerrors" slotId="cockpitWidgetChildrenInvisible" template="false">
+								<virtual-sockets/>
+							</widget>
+							<widget id="datahubTargetSystemOrCompositionEvaluator" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer" slotId="cockpitWidgetChildrenInvisible" template="false">
+								<setting key="targetSystemPublication_expression" type="String">#root instanceof T(com.hybris.datahub.dto.publication.TargetSystemPublicationData)</setting>
+								<setting key="compositionActionData_expression" type="String">#root instanceof T(com.hybris.datahub.dto.event.CompositionActionData)</setting>
+								<virtual-sockets>
+									<output id="compositionActionData" type="com.hybris.datahub.dto.event.CompositionActionData" visibility="external"/>
+									<output id="targetSystemPublication" type="com.hybris.datahub.dto.publication.TargetSystemPublicationData" visibility="external"/>
+								</virtual-sockets>
+							</widget>
+							<widget id="datahubCompositionsErrorsSearchResultProvider" widgetDefinitionId="de.hybris.platform.datahubbackoffice.compositionerrors" slotId="cockpitWidgetChildrenInvisible" template="false">
+								<virtual-sockets/>
+							</widget>
+							<setting key="listSubtitle" type="String"></setting>
+							<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="pageSize" type="Integer">10</setting>
+							<setting key="maxCharsInCell" type="Integer">70</setting>
+							<setting key="actionSlotComponentId" type="String">datahub_listviewactions</setting>
+							<setting key="invalidationSocketOutput" type="String">reset</setting>
+							<setting key="multiSelect" type="Boolean">false</setting>
+							<setting key="colConfigCtxCode" type="String">listview</setting>
+							<setting key="listTitle" type="String"></setting>
+							<setting key="itemRenderer" type="String">listViewRenderer</setting>
+							<setting key="sortableListHeader" type="Boolean">true</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="asyncLoading" type="Boolean">false</setting>
+							<virtual-sockets>
+								<output id="reset" type="java.util.Map" visibility="external"/>
+							</virtual-sockets>
+						</widget>
+						<widget id="datahubDataErrorsDetailsContainer" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="bottom" template="false">
+							<widget id="datahubDataErrorsList" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="centerSlot" template="false">
+								<setting key="listSubtitle" type="String"></setting>
+								<setting key="labels.test" type="String">Publication Errors</setting>
+								<setting key="socketDataType_$T" type="String">com.hybris.datahub.dto.item.ErrorData</setting>
+								<setting key="widgetStyleAttribute" type="String"></setting>
+								<setting key="pageSize" type="Integer">10</setting>
+								<setting key="maxCharsInCell" type="Integer">70</setting>
+								<setting key="actionSlotComponentId" type="String">datahub_listviewactions</setting>
+								<setting key="multiSelect" type="Boolean">false</setting>
+								<setting key="colConfigCtxCode" type="String">listview</setting>
+								<setting key="itemRenderer" type="String">listViewRenderer</setting>
+								<setting key="listTitle" type="String">targetsystemerrors</setting>
+								<setting key="sortableListHeader" type="Boolean">true</setting>
+								<setting key="widgetStyleClass" type="String"></setting>
+								<setting key="asyncLoading" type="Boolean">false</setting>
+								<virtual-sockets/>
+							</widget>
+							<widget id="datahubDataErrorArea" widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea" slotId="rightSlot" template="false">
+								<setting key="labels.datahub_canonicalItem" type="String">Canonical Item:</setting>
+								<setting key="widgetStyleAttribute" type="String"></setting>
+								<setting key="initViewMode" type="String">fluid</setting>
+								<setting key="embededTitle" type="String"></setting>
+								<setting key="embededTitlePrefix" type="String">datahub_canonicalItem</setting>
+								<setting key="editorAreaConfigCtx" type="String">editor-area-errors</setting>
+								<setting key="toolbarDisabled" type="Boolean">true</setting>
+								<setting key="bottomToolbar" type="Boolean">true</setting>
+								<setting key="actionSlotComponentId" type="String">editorareaactions</setting>
+								<setting key="viewModeBtnVisible" type="Boolean">false</setting>
+								<setting key="widgetStyleClass" type="String"></setting>
+								<setting key="fluidViewCode" type="String">fluid</setting>
+								<setting key="enableEmbededTitle" type="Boolean">true</setting>
+								<virtual-sockets/>
+							</widget>
+							<widget id="datahubDataErrorItemArea" widgetDefinitionId="de.hybris.platform.datahubbackoffice.relatedcanonicalitem" slotId="cockpitWidgetChildrenInvisible" template="false">
+								<setting key="widgetStyleClass" type="String"></setting>
+								<setting key="widgetStyleAttribute" type="String"></setting>
+								<virtual-sockets/>
+							</widget>
+							<setting key="northClosed" type="Boolean">false</setting>
+							<setting key="northHeight" type="String">50px</setting>
+							<setting key="eastClosed" type="Boolean">true</setting>
+							<setting key="northBorder" type="String">none</setting>
+							<setting key="broadcastHorizontalResize" type="Boolean">true</setting>
+							<setting key="eastDisabled" type="Boolean">false</setting>
+							<setting key="eastBorder" type="String">none</setting>
+							<setting key="westCollapsible" type="Boolean">true</setting>
+							<setting key="northCollapsible" type="Boolean">true</setting>
+							<setting key="border" type="String">none</setting>
+							<setting key="westDisabled" type="Boolean">true</setting>
+							<setting key="centerBorder" type="String">none</setting>
+							<setting key="opaqueBG" type="String">true</setting>
+							<setting key="southHeight" type="String">50px</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="westBorder" type="String">none</setting>
+							<setting key="westClosed" type="Boolean">false</setting>
+							<setting key="southBorder" type="String">none</setting>
+							<setting key="southDisabled" type="Boolean">true</setting>
+							<setting key="eastWidth" type="String">40%</setting>
+							<setting key="northDisabled" type="Boolean">true</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="autoCloseWest" type="Boolean">false</setting>
+							<setting key="southClosed" type="Boolean">false</setting>
+							<setting key="southCollapsible" type="Boolean">true</setting>
+							<setting key="westWidth" type="String">300px</setting>
+							<setting key="eastCollapsible" type="Boolean">true</setting>
+							<virtual-sockets/>
+						</widget>
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="true" reuseExisting="true"/>
+							<close/>
+							<select onInit="false">
+								<incoming-events>
+								   <socket-event id="activate"/>
+								</incoming-events>
+							</select>
+						</instance-settings>
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="widgetStyleClass" value="yw-com_hybris_datahub_errors" type="String"></setting>
+						<setting key="allowLockingCenterPanel" type="Boolean">false</setting>
+						<setting key="bottomPanelCollapsed" type="Boolean">false</setting>
+						<setting key="topHeight" type="String">30%</setting>
+						<setting key="centerCaption" type="String"></setting>
+						<setting key="bottomPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="centerHeight" type="String">40%</setting>
+						<setting key="topPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="allowLockingBottomPanel" type="Boolean">false</setting>
+						<setting key="thirdSectionDisabled" type="Boolean">false</setting>
+						<setting key="bottomCaption" type="String"></setting>
+						<setting key="centerPanelCollapsed" type="Boolean">false</setting>
+						<setting key="centerPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="topCaption" type="String"></setting>
+						<setting key="topPanelCollapsed" type="Boolean">true</setting>
+						<setting key="allowLockingTopPanel" type="Boolean">false</setting>
+						<virtual-sockets>
+							<input id="searchTypeSelected" type="java.lang.Object" visibility="external"/>
+						</virtual-sockets>
+					</widget>
+	
+	
+					<widget id="datahubSearchWithoutDetailsTab" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer" slotId="children" title="Search-ResultList Tab" template="true">
+						<widget id="datahubRefreshSearchWithoutDetailsCondition" widgetDefinitionId="de.hybris.platform.datahubbackoffice.refreshaftercreation" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="refreshResults" type="Boolean">true</setting>
+							<setting key="paramName" type="String">newPool</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="datahubSearchWithoutDetailsEngine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="defaultPageSize" type="Integer">30</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="datahubSearchWithoutDetailsCondition" widgetDefinitionId="com.hybris.cockpitng.advancedsearch" slotId="center" template="false">
+							<setting key="refreshAfterObjectCreation" type="Boolean">true</setting>
+							<setting key="sendResetWhenDisableAutoSearch" type="Boolean">true</setting>
+							<setting key="disableSimpleSearch" type="Boolean">false</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="disableSubtypesCheckbox" type="Boolean">true</setting>
+							<setting key="simpleSearchConfigCtxCode" type="String">simple-search</setting>
+							<setting key="forceSearchForCode" type="String"></setting>
+							<setting key="disableAttributesComparator" type="Boolean">true</setting>
+							<setting key="advancedSearchConfigCtxCode" type="String">advanced-search</setting>
+							<setting key="disableSearchModelCache" type="Boolean">true</setting>
+							<setting key="disableSortOrder" type="Boolean">false</setting>
+							<setting key="addRowPosition" type="String">None</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="disableAdvancedSearchToolbar" type="Boolean">true</setting>
+							<setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="datahubSearchWithoutDetailsResultContainer" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="bottom" template="false">
+							<setting key="listSubtitle" type="String"></setting>
+							<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="pageSize" type="Integer">30</setting>
+							<setting key="maxCharsInCell" type="Integer">70</setting>
+							<setting key="actionSlotComponentId" type="String">datahub_listviewactions</setting>
+							<setting key="invalidationSocketOutput" type="String">reset</setting>
+							<setting key="multiSelect" type="Boolean">false</setting>
+							<setting key="colConfigCtxCode" type="String">listview</setting>
+							<setting key="listTitle" type="String"></setting>
+							<setting key="itemRenderer" type="String">listViewRenderer</setting>
+							<setting key="sortableListHeader" type="Boolean">false</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="asyncLoading" type="Boolean">false</setting>
+							<virtual-sockets>
+								<output id="reset" type="java.util.Map" visibility="external"/>
+							</virtual-sockets>
+						</widget>
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="true" reuseExisting="true"/>
+							<close/>
+							<select onInit="false">
+								<incoming-events>
+									<socket-event id="activate"/>
+								</incoming-events>
+							</select>
+						</instance-settings>
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="allowLockingCenterPanel" type="Boolean">false</setting>
+						<setting key="bottomPanelCollapsed" type="Boolean">false</setting>
+						<setting key="topHeight" type="String"></setting>
+						<setting key="centerCaption" type="String"></setting>
+						<setting key="bottomPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="centerHeight" type="String">30%</setting>
+						<setting key="topPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="allowLockingBottomPanel" type="Boolean">false</setting>
+						<setting key="thirdSectionDisabled" type="Boolean">true</setting>
+						<setting key="bottomCaption" type="String"></setting>
+						<setting key="centerPanelCollapsed" type="Boolean">true</setting>
+						<setting key="widgetStyleClass" value="yw-com_hybris_datahub_hide-list-view-options" type="String"></setting>
+						<setting key="centerPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="topCaption" type="String"></setting>
+						<setting key="topPanelCollapsed" type="Boolean">true</setting>
+						<setting key="allowLockingTopPanel" type="Boolean">false</setting>
+						<virtual-sockets>
+							<input id="searchTypeSelected" type="java.lang.Object" visibility="external"/>
+						</virtual-sockets>
+					</widget>
+	
+	
+					<widget id="datahubSearchWithDetailsTab" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer"
+							slotId="children" title="Search-ResultList-Details Tab" template="true">
+						<widget id="datahubRefreshSearchWithDetailsCondition" widgetDefinitionId="de.hybris.platform.datahubbackoffice.refreshaftercreation" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="refreshResults" type="Boolean">true</setting>
+							<setting key="paramName" type="String">newFeed</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="datahubSearchWithDetailsEngine"
+								widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+								slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="defaultPageSize" type="Integer">30</setting>
+							<virtual-sockets />
+						</widget>
+	
+						<widget id="datahubSearchWithDetailsCondition" widgetDefinitionId="com.hybris.cockpitng.advancedsearch"
+								slotId="top" template="false">
+							<setting key="refreshAfterObjectCreation" type="Boolean">true</setting>
+							<setting key="sendResetWhenDisableAutoSearch" type="Boolean">true</setting>
+							<setting key="disableSimpleSearch" type="Boolean">false</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="disableSubtypesCheckbox" type="Boolean">true</setting>
+							<setting key="simpleSearchConfigCtxCode" type="String">simple-search</setting>
+							<setting key="forceSearchForCode" type="String"></setting>
+							<setting key="disableAttributesComparator" type="Boolean">true</setting>
+							<setting key="advancedSearchConfigCtxCode" type="String">advanced-search</setting>
+							<setting key="disableSearchModelCache" type="Boolean">true</setting>
+							<setting key="disableSortOrder" type="Boolean">false</setting>
+							<setting key="addRowPosition" type="String">None</setting>
+							<setting key="widgetStyleClass" value="yw-com_hybris_datahub_hide-list-view-options" type="String"></setting>
+							<setting key="disableAdvancedSearchToolbar" type="Boolean">true</setting>
+							<setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+							<virtual-sockets />
+						</widget>
+	
+						<widget id="datahubSearchWithDetailsResultContainer"
+								widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="center" template="false">
+							<setting key="listSubtitle" type="String"></setting>
+							<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="pageSize" type="Integer">15</setting>
+							<setting key="maxCharsInCell" type="Integer">70</setting>
+							<setting key="actionSlotComponentId" type="String">datahub_listviewactions</setting>
+							<setting key="invalidationSocketOutput" type="String">reset</setting>
+							<setting key="multiSelect" type="Boolean">false</setting>
+							<setting key="colConfigCtxCode" type="String">listview</setting>
+							<setting key="listTitle" type="String"></setting>
+							<setting key="itemRenderer" type="String">listViewRenderer</setting>
+							<setting key="sortableListHeader" type="Boolean">false</setting>
+							<setting key="widgetStyleClass" value="yw-com_hybris_datahub_hide-list-view-options" type="String"></setting>
+							<setting key="asyncLoading" type="Boolean">false</setting>
+							<virtual-sockets>
+								<output id="reset" type="java.util.Map" visibility="external" />
+							</virtual-sockets>
+							<widget id="datahubSearchWithDetailsResultContainerPropertyExtractor"
+									widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" template="false"
+									slotId="cockpitWidgetChildrenInvisible">
+								<setting key="expression" type="String">null</setting>
+								<setting key="socketDataType_$T" type="String">java.util.Map</setting>
+							</widget>
+						</widget>
+	
+						<widget id="datahubFeedDetailsArea" widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+								slotId="bottom" template="false">
+							<setting key="listSubtitle" type="String"></setting>
+							<setting key="labels.test" type="String">Feed Details</setting>
+							<setting key="socketDataType_$T" type="String">de.hybris.platform.datahubbackoffice.dto.feed.FeedData</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="pageSize" type="Integer">10</setting>
+							<setting key="maxCharsInCell" type="Integer">70</setting>
+							<setting key="actionSlotComponentId" type="String">datahub_feedDetail</setting>
+							<setting key="multiSelect" type="Boolean">false</setting>
+							<setting key="colConfigCtxCode" type="String">listview</setting>
+							<setting key="itemRenderer" type="String">listViewRenderer</setting>
+							<setting key="listTitle" type="String">targetsystemerrors</setting>
+							<setting key="sortableListHeader" type="Boolean">true</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="asyncLoading" type="Boolean">false</setting>
+							<virtual-sockets />
+						</widget>
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="true" reuseExisting="true" />
+							<close />
+							<select onInit="false">
+								<incoming-events>
+									<socket-event id="activate" />
+								</incoming-events>
+							</select>
+						</instance-settings>
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="allowLockingCenterPanel" type="Boolean">false</setting>
+						<setting key="bottomPanelCollapsed" type="Boolean">false</setting>
+						<setting key="topHeight" type="String">25%</setting>
+						<setting key="centerCaption" type="String"></setting>
+						<setting key="bottomPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="centerHeight" type="String">55%</setting>
+						<setting key="topPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="allowLockingBottomPanel" type="Boolean">false</setting>
+						<setting key="thirdSectionDisabled" type="Boolean">false</setting>
+						<setting key="bottomCaption" type="String"></setting>
+						<setting key="centerPanelCollapsed" type="Boolean">false</setting>
+						<setting key="widgetStyleClass" type="String"></setting>
+						<setting key="centerPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="topCaption" type="String"></setting>
+						<setting key="topPanelCollapsed" type="Boolean">true</setting>
+						<setting key="allowLockingTopPanel" type="Boolean">false</setting>
+						<virtual-sockets>
+							<input id="searchTypeSelected" type="java.lang.Object" visibility="external" />
+						</virtual-sockets>
+					</widget>
+	
+	
+					<widget id="dataLoadingErrorsTab" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="children" title="Data Load Errors" template="true">
+						<widget id="dataLoadingErrorsContent" widgetDefinitionId="de.hybris.platform.datahubbackoffice.dataloadingfailures" slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<virtual-sockets/>
+						</widget>
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="true" reuseExisting="true"/>
+							<close/>
+							<select onInit="false">
+								<incoming-events>
+									<socket-event id="pageable"/>
+								</incoming-events>
+							</select>
+						</instance-settings>
+						<setting key="listSubtitle" type="String"></setting>
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="pageSize" type="Integer">10</setting>
+						<setting key="maxCharsInCell" type="Integer">70</setting>
+						<setting key="actionSlotComponentId" type="String">datahub_listviewactions</setting>
+						<setting key="multiSelect" type="Boolean">false</setting>
+						<setting key="colConfigCtxCode" type="String">listview</setting>
+						<setting key="listTitle" type="String"></setting>
+						<setting key="itemRenderer" type="String">listViewRenderer</setting>
+						<setting key="sortableListHeader" type="Boolean">true</setting>
+						<setting key="widgetStyleClass" value="yw-com_hybris_datahub_errors" type="String"></setting>
+						<setting key="asyncLoading" type="Boolean">false</setting>
+						<virtual-sockets/>
+					</widget>
+					<widget id="datahubQuikUploadTab" widgetDefinitionId="de.hybris.platform.datahubbackoffice.quickUpload" slotId="children" template="true">
+						<widget id="datahubQuikUploadTabNotificationArea" widgetDefinitionId="com.hybris.backoffice.notificationarea" slotId="wizardNotificationarea" template="false">
+							<setting key="notificationId" type="String">quickUpload</setting>
+							<setting key="widgetStyleAttribute" type="String"></setting>
+							<setting key="debugLog" type="Boolean">false</setting>
+							<setting key="widgetStyleClass" type="String"></setting>
+							<setting key="stackSize" type="Integer">3</setting>
+							<virtual-sockets/>
+						</widget>
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="false" reuseExisting="true">
+								<all-incoming-events/>
+							</create>
+							<close/>
+							<select onInit="false">
+								<incoming-events>
+									<socket-event id="activate"/>
+								</incoming-events>
+							</select>
+						</instance-settings>
+						<setting key="widgetStyleClass" type="String"></setting>
+						<setting key="quickUploadTitle" type="String">quickupload.title</setting>
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="editorPageSize" type="Integer">10</setting>
+						<virtual-sockets>
+							<input id="activate" type="java.lang.Object" visibility="external"/>
+						</virtual-sockets>
+					</widget>
+					<setting key="widgetStyleClass" type="String"></setting>
+					<setting key="widgetStyleAttribute" type="String"></setting>
+					<setting key="type" type="String">flow</setting>
+					<virtual-sockets/>
+				</widget>
+				<setting key="widgetStyleClass" type="String"></setting>
+				<setting key="defaultView" type="String">datahub_dashboard</setting>
+				<setting key="selectViews_eval" type="String">#root.toLowerCase() eq 'datahub_dashboard' ? 'datahub_dashboard' : 'datahubContentArea'</setting>
+				<setting key="widgetStyleAttribute" type="String"></setting>
+				<setting key="initialView" type="String">datahub_dashboard</setting>
+				<virtual-sockets/>
+			</widget>
+			<setting key="northClosed" type="Boolean">false</setting>
+			<setting key="northHeight" type="String">50px</setting>
+			<setting key="eastClosed" type="Boolean">false</setting>
+			<setting key="northBorder" type="String">none</setting>
+			<setting key="broadcastHorizontalResize" type="Boolean">true</setting>
+			<setting key="eastDisabled" type="Boolean">true</setting>
+			<setting key="eastBorder" type="String">none</setting>
+			<setting key="westCollapsible" type="Boolean">true</setting>
+			<setting key="northCollapsible" type="Boolean">true</setting>
+			<setting key="border" type="String">none</setting>
+			<setting key="westDisabled" type="Boolean">false</setting>
+			<setting key="centerBorder" type="String">none</setting>
+			<setting key="opaqueBG" type="Boolean">true</setting>
+			<setting key="southHeight" type="String">50px</setting>
+			<setting key="widgetStyleAttribute" type="String"></setting>
+			<setting key="westBorder" type="String">none</setting>
+			<setting key="westClosed" type="Boolean">false</setting>
+			<setting key="southBorder" type="String">none</setting>
+			<setting key="southDisabled" type="Boolean">true</setting>
+			<setting key="northDisabled" type="Boolean">true</setting>
+			<setting key="eastWidth" type="String">25%</setting>
+			<setting key="widgetStyleClass" type="String"></setting>
+			<setting key="autoCloseWest" type="Boolean">false</setting>
+			<setting key="southClosed" type="Boolean">false</setting>
+			<setting key="southCollapsible" type="Boolean">true</setting>
+			<setting key="westWidth" type="String">300px</setting>
+			<setting key="eastCollapsible" type="Boolean">true</setting>
+			<virtual-sockets/>
+		</widget>
+		<setting key="autoCloseInactive" type="Boolean">false</setting>
+		<setting key="widgetStyleAttribute" type="String"></setting>
+		<setting key="widgetStyleClass" type="String"></setting>
+		<virtual-sockets/>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="datahubInstanceSelector" outputId="datahubSelected" targetWidgetId="datahubSelectionAdapter" inputId="datahubSelected"/>
+	<widget-connection sourceWidgetId="datahubInstanceSelector" outputId="datahubSelected" targetWidgetId="datahubQuikUploadTab" inputId="datahubInfo"/>
+	<widget-connection sourceWidgetId="datahubInstanceSelector" outputId="datahubSelected" targetWidgetId="defaultMenuSelectionAdapter" inputId="datahubSelected"/>
+	<widget-connection sourceWidgetId="defaultMenuSelectionAdapter" outputId="output" targetWidgetId="datahubPerspectiveMenu" inputId="nodeSelected"/>
+	<widget-connection sourceWidgetId="datahubPerspectiveMenu" outputId="nodeSelected" targetWidgetId="datahubExplorerNodeToTypeAdapter" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="datahubExplorerNodeToTypeAdapter" outputId="genericOutput" targetWidgetId="datahubExplorerTreeMultiplexer" inputId="element"/>
+	<widget-connection sourceWidgetId="datahubExplorerNodeToTypeAdapter" outputId="genericOutput" targetWidgetId="datahub_view_switcher" inputId="selectViews"/>
+	<widget-connection sourceWidgetId="datahubExplorerNodeToTypeAdapter" outputId="genericOutput" targetWidgetId="datahubDashboard_condition_eval" inputId="input"/>
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="dataloadingfailures" targetWidgetId="dataLoadingErrorsContent" inputId="dataloadingfailuresinput"/>
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="quickUpload" targetWidgetId="datahubQuikUploadTab" inputId="activate"/>
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="publicationOrCompositionError" targetWidgetId="datahubErrorsSearchCondition" inputId="type" />
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="publicationOrCompositionError" targetWidgetId="datahubErrorsSearchTab" inputId="activate"/>
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="pools" targetWidgetId="datahubSearchWithoutDetailsCondition" inputId="type"/>
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="pools" targetWidgetId="datahubSearchWithoutDetailsTab" inputId="activate"/>
+	<widget-connection sourceWidgetId="datahubDashboard_condition_eval" outputId="result" targetWidgetId="datahub_dashboard" inputId="active"/>
+
+	<!-- Feed Connections -->
+	
+	<!-- Connection between configurableFlow and pools -->
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult" 
+					   targetWidgetId="datahubRefreshSearchWithoutDetailsCondition" inputId="wizardResult" />
+	<widget-connection sourceWidgetId="datahubRefreshSearchWithoutDetailsCondition" outputId="refreshResults" 
+					   targetWidgetId="datahubSearchWithoutDetailsCondition" inputId="refreshResults" />
+
+	<!-- Connection between configurableFlow and feeds -->
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult" 
+					   targetWidgetId="datahubRefreshSearchWithDetailsCondition" inputId="wizardResult" />
+	<widget-connection sourceWidgetId="datahubRefreshSearchWithDetailsCondition" outputId="refreshResults" 
+					   targetWidgetId="datahubSearchWithDetailsCondition" inputId="refreshResults" />
+	
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="feeds"
+					   targetWidgetId="datahubSearchWithDetailsCondition" inputId="type" />
+	<widget-connection sourceWidgetId="datahubExplorerTreeMultiplexer" outputId="feeds"
+					   targetWidgetId="datahubSearchWithDetailsTab" inputId="activate" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsCondition" outputId="searchData"
+					   targetWidgetId="datahubSearchWithDetailsEngine" inputId="searchData" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsResultContainer" outputId="selectedItem"
+					   targetWidgetId="datahubFeedDetailsArea" inputId="inputObject" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsEngine" outputId="pageable"
+					   targetWidgetId="datahubSearchWithDetailsResultContainer" inputId="pageable" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsCondition" outputId="searchData"
+					   targetWidgetId="datahubSearchWithDetailsResultContainerPropertyExtractor" inputId="genericInput" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsResultContainerPropertyExtractor" outputId="genericOutput"
+					   targetWidgetId="datahubFeedDetailsArea" inputId="reset" />
+	<widget-connection sourceWidgetId="datahubSearchWithDetailsResultContainerPropertyExtractor" outputId="genericOutput"
+					   targetWidgetId="datahubFeedDetailsArea" inputId="resize" />
+
+
+	<widget-connection sourceWidgetId="datahubSearchWithoutDetailsCondition" outputId="searchData" targetWidgetId="datahubSearchWithoutDetailsEngine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="datahubSearchWithoutDetailsEngine" outputId="pageable" targetWidgetId="datahubSearchWithoutDetailsResultContainer" inputId="pageable"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchCondition" outputId="searchData" targetWidgetId="datahubErrorsSearchEngine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchCondition" outputId="reset" targetWidgetId="datahubErrorsSearchResultContainer" inputId="reset"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchCondition" outputId="reset" targetWidgetId="datahubDataErrorsList" inputId="reset"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchCondition" outputId="reset" targetWidgetId="datahubDataErrorsDetailsContainer" inputId="closeEast"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchCondition" outputId="reset" targetWidgetId="datahubDataErrorArea" inputId="reset"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchEngine" outputId="pageable" targetWidgetId="datahubErrorsSearchResultContainer" inputId="pageable"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchResultContainer" outputId="reset" targetWidgetId="datahubDataErrorsList" inputId="reset"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchResultContainer" outputId="reset" targetWidgetId="datahubDataErrorArea" inputId="reset"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchResultContainer" outputId="reset" targetWidgetId="datahubDataErrorsDetailsContainer" inputId="closeEast"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchResultContainer" outputId="selectedItem" targetWidgetId="datahubTargetSystemOrCompositionEvaluator" inputId="element"/>
+	<widget-connection sourceWidgetId="datahubErrorsSearchResultContainer" outputId="selectedItem" targetWidgetId="datahubDataErrorsDetailsContainer" inputId="closeEast"/>
+	<widget-connection sourceWidgetId="datahubTargetSystemOrCompositionEvaluator" outputId="targetSystemPublication" targetWidgetId="datahubPublicationErrorsSearchResultProvider" inputId="publication"/>
+	<widget-connection sourceWidgetId="datahubPublicationErrorsSearchResultProvider" outputId="errors" targetWidgetId="datahubDataErrorsList" inputId="pageable"/>
+	<widget-connection sourceWidgetId="datahubTargetSystemOrCompositionEvaluator" outputId="compositionActionData" targetWidgetId="datahubCompositionsErrorsSearchResultProvider" inputId="composition"/>
+	<widget-connection sourceWidgetId="datahubCompositionsErrorsSearchResultProvider" outputId="errors" targetWidgetId="datahubDataErrorsList" inputId="pageable"/>
+	<widget-connection sourceWidgetId="datahubDataErrorsList" outputId="selectedItem" targetWidgetId="datahubDataErrorsDetailsContainer" inputId="openEast"/>
+	<widget-connection sourceWidgetId="datahubDataErrorsList" outputId="selectedItem" targetWidgetId="datahubDataErrorItemArea" inputId="error"/>
+
+	<widget-connection sourceWidgetId="datahubDataErrorItemArea" outputId="canonicalItem" targetWidgetId="datahubDataErrorArea" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="dataLoadingErrorsContent" outputId="dataloadingfailuresoutput" targetWidgetId="dataLoadingErrorsTab" inputId="pageable"/>
+</widgets>

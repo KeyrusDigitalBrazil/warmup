@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <import resource="customercouponservices-spring-solrfacetsearch.xml" />
+
+	<alias name="defaultCustomerCouponDao" alias="customerCouponDao"/>
+	<bean id="defaultCustomerCouponDao" class="de.hybris.platform.customercouponservices.daos.impl.DefaultCustomerCouponDao">
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+		<property name="customerCouponSortCodeToQueryAlias" ref="customerCouponSortCodeToQueryAlias"/>
+	</bean>
+	
+	<alias name="defaultCouponNotificationDao" alias="couponNotificationDao"/>
+	<bean id="defaultCouponNotificationDao" class="de.hybris.platform.customercouponservices.daos.impl.DefaultCouponNotificationDao">
+	</bean>
+			
+	<alias name="defaultCustomerCouponService" alias="customerCouponService"/>
+	<bean id="defaultCustomerCouponService" class="de.hybris.platform.customercouponservices.impl.DefaultCustomerCouponService" parent="defaultCouponService">
+		<property name="customerCouponDao" ref="customerCouponDao"/>
+		<property name="promotionsDao" ref="promotionsDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="couponRedemptionDao" ref="couponRedemptionDao" />
+		<property name="languageDao" ref="languageDao" />
+		<property name="couponDao" ref="couponDao" />
+		<property name="couponNotificationDao" ref="couponNotificationDao" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+	
+	<alias name="defaultCouponNotificationThreadFactory" alias="couponNotificationThreadFactory" />
+	<bean id="defaultCouponNotificationThreadFactory" class="de.hybris.platform.customercouponservices.thread.factory.CouponNotificationThreadFactory" />
+	
+	<bean id="abstractCouponNotificationJob" class="de.hybris.platform.customercouponservices.cronjob.AbstractCouponNotificationJob"
+		abstract="true" parent="abstractJobPerformable">
+		<property name="customerCouponDao" ref="customerCouponDao" />
+		<property name="couponNotificationDao" ref="couponNotificationDao" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+				<property name="corePoolSize" value="${customercouponservices.notification.pool.coreSize}" />
+				<property name="maxPoolSize" value="${customercouponservices.notification.pool.maxSize}" />
+				<property name="queueCapacity" value="${customercouponservices.notification.pool.queueCapacity}" />
+				<property name="threadFactory" ref="couponNotificationThreadFactory" />
+			</bean>
+		</property>
+		<property name="notificationService" ref="notificationService" />
+		<property name="siteMessageService" ref="siteMessageService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+	</bean>	
+	
+	<alias name="defaultCouponNotificationJob" alias="couponNotificationJob" />
+	<bean id="defaultCouponNotificationJob" class="de.hybris.platform.customercouponservices.cronjob.CouponNotificationJob"
+		parent="abstractCouponNotificationJob">
+	</bean>
+	
+	<bean id="generateCouponNotificationEmail" parent="abstractGenerateEmailAction">
+		<property name="frontendTemplateName" value="CustomerCouponEmailTemplate" />
+	</bean>
+	
+	<alias name="defaultCouponNotificationProcessContextStrategy" alias="couponNotificationProcessContextStrategy" />
+	<bean id="defaultCouponNotificationProcessContextStrategy" class="de.hybris.platform.customercouponservices.strategies.CouponNotificationProcessContextStrategy"
+		parent="abstractProcessContextStrategy">
+	</bean>
+	
+	<bean depends-on="processContextResolutionStrategyMap" parent="mapMergeDirective">
+		<property name="key">
+			<value type="java.lang.Class">de.hybris.platform.customercouponservices.model.CouponNotificationProcessModel</value>
+		</property>
+		<property name="value" ref="couponNotificationProcessContextStrategy" />
+	</bean>
+	
+	<bean id="CouponEffectiveNotificationEmailRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="COUPON_EFFECTIVE"></property>
+		<property name="notificationChannel" value="EMAIL"></property>
+		<property name="processor" ref="couponNotificationEmailProcessor"></property>
+	</bean>
+	
+	<bean id="CouponExpireNotificationEmailRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="COUPON_EXPIRE"></property>
+		<property name="notificationChannel" value="EMAIL"></property>
+		<property name="processor" ref="couponNotificationEmailProcessor"></property>
+	</bean>
+	
+	<bean id="CouponEffectiveNotificationSmsRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="COUPON_EFFECTIVE"></property>
+		<property name="notificationChannel" value="SMS"></property>
+		<property name="processor" ref="couponNotificationSmsProcessor"></property>
+	</bean>
+	
+	<bean id="CouponExpireNotificationSmsRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="COUPON_EXPIRE"></property>
+		<property name="notificationChannel" value="SMS"></property>
+		<property name="processor" ref="couponNotificationSmsProcessor"></property>
+	</bean>
+	
+	<bean id="couponNotificationSiteMessageProcessor" class="de.hybris.platform.customercouponservices.sitemsg.process.impl.CouponNotificationSiteMessageProcessor">
+    	<property name="sendSiteMessageStrategies" ref="sendSiteMessageStrategies"/>
+    </bean>
+    
+    <bean class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"/>
+		<property name="notificationType" value="COUPON_EFFECTIVE"/>
+		<property name="notificationChannel" value="SITE_MESSAGE"/>
+		<property name="processor" ref="couponNotificationSiteMessageProcessor"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"/>
+		<property name="notificationType" value="COUPON_EXPIRE"/>
+		<property name="notificationChannel" value="SITE_MESSAGE"/>
+		<property name="processor" ref="couponNotificationSiteMessageProcessor"/>
+	</bean>
+	
+	<alias name="defaultCouponNotificationEmailProcessor" alias="couponNotificationEmailProcessor" />
+	<bean id="defaultCouponNotificationEmailProcessor" class="de.hybris.platform.customercouponservices.email.process.impl.DefaultCouponNotificationEmailProcessor">
+		<property name="modelService" ref="modelService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+	</bean>
+
+	<bean id="couponNotificationEmailProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/customercouponservices/processes/couponNotificationEmailProcess.xml" />
+	</bean>
+
+	<alias name="defaultCouponNotificationSmsProcessor" alias="couponNotificationSmsProcessor" />
+	<bean id="defaultCouponNotificationSmsProcessor" class="de.hybris.platform.customercouponservices.sms.process.impl.DefaultCouponNotificationSmsProcessor">
+		<property name="sendSmsMessageStrategy" ref="sendSmsMessageStrategy" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<alias name="defaultCouponCampaignURLGenerationStrategy" alias="couponCampaignURLGenerationStrategy"/>
+	<bean id="defaultCouponCampaignURLGenerationStrategy" class="de.hybris.platform.customercouponservices.strategies.impl.DefaultCouponCampaignURLGenerationStrategy"/>
+
+	<alias name="defaultCouponConditionResolutionStrategy" alias="couponConditionResolutionStrategy"/>	
+	<bean id="defaultCouponConditionResolutionStrategy" class="de.hybris.platform.customercouponservices.compiler.strategies.impl.DefaultCouponConditionResolutionStrategy">
+		<property name="modelService" ref="modelService"/>
+		<property name="customerCouponDao" ref="customerCouponDao"/>
+	</bean>
+	
+	<bean parent="mapMergeDirective" depends-on="conditionResolutionStrategies">
+		<property name="key" value="y_qualifying_coupons"/>
+		<property name="value" ref="couponConditionResolutionStrategy"/>
+	</bean>
+	
+    <bean parent="mapMergeDirective" depends-on="redemptionStrategyMap">
+    	<property name="key" value="CustomerCoupon"/>
+		<property name="value" ref="customerCouponRedemptionStrategy"/>
+     </bean>
+    
+    <alias name="defaultCustomerCouponRedemptionStrategy" alias="customerCouponRedemptionStrategy" />
+	<bean id="defaultCustomerCouponRedemptionStrategy" class="de.hybris.platform.customercouponservices.redemption.strategies.impl.DefaultCustomerCouponRedemptionStrategy">
+	  <property name="customerCouponDao" ref="customerCouponDao"/>
+	</bean>
+	
+	<bean id="customerCouponCommercePlaceOrderMethodHook" class="de.hybris.platform.customercouponservices.order.impl.CustomerCouponCommercePlaceOrderMethodHook">		
+		<property name="customerCouponService" ref="customerCouponService"></property>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<bean id="customerCouponCommercePlaceOrderMethodHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective">
+    	<property name="add" ref="customerCouponCommercePlaceOrderMethodHook"/>
+	</bean>
+	
+	<alias name="customerCouponValidateInterceptor" alias="couponValidateInterceptor"/>
+	<bean id="customerCouponValidateInterceptor" class="de.hybris.platform.customercouponservices.interceptor.CustomerCouponValidateInterceptor" />
+	
+	<alias name="customerCouponValidateProcessor" alias="couponValidateProcessor"/>
+	<bean id="customerCouponValidateProcessor" class="de.hybris.platform.customercouponservices.interceptor.CustomerCouponValidateProcessor">
+		<property name="couponValidateInterceptor" ref="couponValidateInterceptor" />
+	</bean>
+	
+	<alias name="findCustomerCouponStrategy" alias="findCustomerCouponStrategy" />
+	<bean id="findCustomerCouponStrategy" class="de.hybris.platform.customercouponservices.strategies.impl.DefaultFindCustomerCouponStrategy">
+		<property name="couponDao" ref="couponDao" />
+	</bean>
+	
+	<bean depends-on="findCouponStrategiesList" parent="listMergeDirective">
+    	<property name="add" ref="findCustomerCouponStrategy"/>
+	</bean>
+	
+	<util:map id="customerCouponSortCodeToQueryAlias">
+		<entry key="couponid" value="cp"/>
+		<entry key="name" value="cp"/>
+		<entry key="startdate" value="cp"/>
+		<entry key="enddate" value="cp"/>
+	</util:map>
+	
+    <bean id="couponNotificationCleanupHook" class="de.hybris.platform.customercouponservices.retention.hook.CouponNotificationCleanupHook">
+    	<property name="modelService" ref="modelService"/>
+    	<property name="customerCouponService" ref="customerCouponService"/>
+    </bean>
+    
+    <bean id="couponNotificationCleanupHookListMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective" >
+        <property name="add" ref="couponNotificationCleanupHook" />
+    </bean>
+    
+</beans>

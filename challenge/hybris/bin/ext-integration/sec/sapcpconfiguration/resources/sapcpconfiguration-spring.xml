@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2018 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<alias name="defaultSapCpServiceFactory" alias="sapCpServiceFactory" />
+	<bean id="defaultSapCpServiceFactory"
+		class="com.sap.platform.sapcpconfiguration.service.impl.DefaultSapCpServiceFactory">
+		<property name="sapCharonFactory" ref="sapCharonFactory" />
+		<property name="sapCpConfigurationService" ref="sapCpConfigurationService" />
+		<property name="lookupCredentials" ref="cecTechnicalUserLookup" />
+
+	</bean>
+	<alias name="cecModelInterceptor" alias="cecModelInterceptor" />
+	<bean id="cecModelInterceptor"
+		class="com.sap.platform.sapcpconfiguration.interceptor.CecModelInterceptor"
+		autowire="byName">
+		<property name="modelService" ref="modelService" />
+		<property name="sapCharonFactory" ref="sapCharonFactory" />
+	</bean>
+	<bean id="cecServiceInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="cecModelInterceptor" />
+		<property name="typeCode" value="CecService" />
+	</bean>
+
+	<bean id="cecTechnicalUserInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="cecModelInterceptor" />
+		<property name="typeCode" value="CecTechnicalUser" />
+	</bean>
+
+	<alias name="defaultSapCpConfigurationService" alias="sapCpConfigurationService" />
+	<bean id="defaultSapCpConfigurationService"
+		class="com.sap.platform.sapcpconfiguration.service.impl.DefaultSapCpConfigurationService">
+		<property name="modelService" ref="modelService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultCecTechnicalUserLookup" alias="cecTechnicalUserLookup" />
+	<bean id="defaultCecTechnicalUserLookup"
+		class="com.sap.platform.sapcpconfiguration.service.impl.DefaultCecTechnicalUserLookup">
+		<property name="sapCpConfigurationService" ref="defaultSapCpConfigurationService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+
+	</bean>
+
+	<alias name="sapCharonFactory" alias="sapCharonFactory" />
+	<bean id="sapCharonFactory" class="com.sap.platform.factory.SapCharonFactory">
+	</bean>
+
+
+</beans>

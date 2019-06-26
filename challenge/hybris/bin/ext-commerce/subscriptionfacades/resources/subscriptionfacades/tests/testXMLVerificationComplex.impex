@@ -1,0 +1,54 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+#create test subscription terms
+INSERT SubscriptionTerm;id[unique=true];name[lang=$lang];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id[default=MonthlyPlan]);cancellable[default=true]
+;T1;T1;monthly;10;auto_renewing;;
+;T2;T2;monthly;11;non_renewing;;
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"P1";;
+;"P2";;
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;P1;P1;testCategory0;;T1
+;P2;P2;testCategory0;;T2
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;PP1;;;USD;P1
+;PP2;;;EUR;P2
+
+INSERT PerUnitUsageCharge;id[unique=true];name[lang=$lang];subscriptionPricePlanUsage(name[lang=$lang, unique=true]);usageUnit(id);usageChargeType(code);$catalogversion
+;PUC1;PUC1;PP1;video;each_respective_tier
+;PUC2;PUC2;PP2;usageUnitTest1;highest_applicable_tier
+
+INSERT VolumeUsageCharge;id[unique=true];name[lang=$lang];usageUnit(id);subscriptionPricePlanUsage(name[lang=$lang, unique=true]);$catalogversion
+;VC1;VC1;minute;PP1
+;VC2;VC2;textMessage;PP2
+
+INSERT OverageUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;$catalogversion
+;OC11;PUC1;11
+;OC21;VC1;25
+;OC31;PUC2;1
+;OC41;VC2;5
+
+
+INSERT TierUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;tierStart;tierEnd;$catalogversion
+;TC11;PUC1;12;1;2
+;TC12;PUC1;13;3;6
+;TC21;VC1;26;1;5
+;TC22;VC1;27;6;10
+;TC31;PUC2;2;1;2
+;TC32;PUC2;3;3;4
+;TC41;VC2;6;5;7
+;TC42;VC2;7;8;11
+
+

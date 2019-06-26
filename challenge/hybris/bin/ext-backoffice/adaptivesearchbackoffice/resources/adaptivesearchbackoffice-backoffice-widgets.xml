@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="backofficeMainSlot">
+		<widget id="adaptiveSearch" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="perspectives"
+			template="false" title="adaptivesearch.perspective.name">
+
+			<widget id="asLeftContainer" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer" slotId="leftSlot"
+				template="false">
+
+				<widget id="asNavigationContext" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.navigationContext"
+					slotId="center" template="false">
+					<setting key="widgetStyleClass" type="String" value="yas-navigation-context" />
+					<virtual-sockets />
+				</widget>
+
+				<widget id="asCategorySelector" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.categorySelector"
+					slotId="bottom" template="false">
+					<setting key="widgetStyleClass" type="String" value="yas-category-selector" />
+					<virtual-sockets />
+				</widget>
+
+				<setting key="topCaption" type="String" value="adaptivesearch.navigationContext" />
+				<setting key="bottomCaption" type="String" value="adaptivesearch.categories" />
+				<setting key="allowLockingCenterPanel" type="Boolean" value="false" />
+				<setting key="thirdSectionDisabled" type="Boolean" value="true" />
+				<setting key="widgetStyleClass" type="String" value="yas-left-container" />
+			</widget>
+
+			<widget id="asMainLayout" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.mainLayout" slotId="centerSlot"
+				template="false">
+
+				<widget id="asSearchProfileContext" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.searchProfileContext"
+					slotId="context" template="false">
+					<virtual-sockets />
+				</widget>
+
+				<widget id="asMainController" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.mainController"
+					slotId="search" template="false">
+
+					<widget id="asSimpleSearchInput" widgetDefinitionId="com.hybris.cockpitng.textsearch" slotId="topLeft"
+						template="false" />
+
+					<widget id="asSearchContext" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.searchContext"
+						slotId="topRight" template="false" />
+				</widget>
+
+				<widget id="asSearchResultBrowser" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.searchResultBrowser"
+					slotId="searchResult" template="false">
+					<virtual-sockets />
+				</widget>
+
+			</widget>
+
+			<widget id="asSearchConfigurationAdapter" widgetDefinitionId="de.hybris.platform.adaptivesearch.widgets.searchConfigurationAdapter"
+				slotId="rightSlot" template="false">
+				<widget id="asSearchConfigurationEditor" widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+					slotId="searchConfigurationEditor" template="false">
+					<setting key="editorAreaConfigCtx" type="String" value="as-editor-area" />
+					<virtual-sockets>
+						<output id="searchRequest" type="de.hybris.platform.adaptivesearchbackoffice.data.AbstractSearchRequestData" />
+						<output id="de.hybris.platform.adaptivesearchbackoffice.actions.deletesearchconfiguration.success" type="java.lang.Object"
+							visibility="default" />
+					</virtual-sockets>
+				</widget>
+			</widget>
+
+			<setting key="northDisabled" type="Boolean" value="true" />
+			<setting key="centerDisabled" type="Boolean" value="false" />
+			<setting key="southDisabled" type="Boolean" value="true" />
+			<setting key="westDisabled" type="Boolean" value="false" />
+			<setting key="eastDisabled" type="Boolean" value="false" />
+			<setting key="perspectiveImageUrl" type="String" value="/cng/images/adaptivesearchbackoffice-perspective.svg" />
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="asNavigationContext" outputId="collapseState" targetWidgetId="asLeftContainer"
+		inputId="collapseState" />
+	<widget-connection sourceWidgetId="asNavigationContext" outputId="navigationContext" targetWidgetId="asCategorySelector"
+		inputId="navigationContext" />
+	<widget-connection sourceWidgetId="asCategorySelector" outputId="selectedCategory" targetWidgetId="asNavigationContext"
+		inputId="category" />
+
+	<widget-connection sourceWidgetId="asNavigationContext" outputId="navigationContext" targetWidgetId="asMainController"
+		inputId="navigationContext" />
+
+	<widget-connection sourceWidgetId="asMainController" outputId="searchResult" targetWidgetId="asCategorySelector"
+		inputId="refresh" />
+
+	<widget-connection sourceWidgetId="asSimpleSearchInput" outputId="query" targetWidgetId="asMainController"
+		inputId="searchText" />
+	<widget-connection sourceWidgetId="asMainController" outputId="clearQuery" targetWidgetId="asSimpleSearchInput"
+		inputId="clearQuery" />
+
+	<widget-connection sourceWidgetId="asMainController" outputId="searchResult" targetWidgetId="asSearchProfileContext"
+		inputId="searchResult" />
+		
+	<widget-connection sourceWidgetId="asSearchProfileContext" outputId="searchProfile" targetWidgetId="synchronizationPopup"
+		inputId="inputObject" />
+
+	<widget-connection sourceWidgetId="asMainController" outputId="searchResult" targetWidgetId="asSearchResultBrowser"
+		inputId="searchResult" />
+	<widget-connection sourceWidgetId="asSearchResultBrowser" outputId="searchRequest" targetWidgetId="asMainController"
+		inputId="searchRequest" />
+	<widget-connection sourceWidgetId="asSearchResultBrowser" outputId="paginationRequest"
+		targetWidgetId="asMainController" inputId="paginationRequest" />
+	<widget-connection sourceWidgetId="asSearchResultBrowser" outputId="refreshSearch" targetWidgetId="asMainController"
+		inputId="refreshSearch" />
+
+	<widget-connection sourceWidgetId="asSearchContext" outputId="searchContext" targetWidgetId="asMainController"
+		inputId="searchContext" />
+	<widget-connection sourceWidgetId="asNavigationContext" outputId="navigationContext" targetWidgetId="asSearchContext"
+		inputId="navigationContext" />
+
+	<widget-connection sourceWidgetId="asMainController" outputId="searchResult" targetWidgetId="asSearchConfigurationAdapter"
+		inputId="searchResult" />
+	<widget-connection sourceWidgetId="asSearchConfigurationAdapter" outputId="searchConfiguration"
+		targetWidgetId="asSearchConfigurationEditor" inputId="inputObject" />
+	<widget-connection sourceWidgetId="asSearchConfigurationEditor" outputId="objectSaved"
+		targetWidgetId="asSearchConfigurationAdapter" inputId="refreshSearchConfiguration" />
+	<widget-connection sourceWidgetId="asSearchConfigurationEditor"
+		outputId="de.hybris.platform.adaptivesearchbackoffice.actions.deletesearchconfiguration.success" targetWidgetId="asSearchConfigurationAdapter"
+		inputId="refreshSearchConfiguration" />
+	<widget-connection sourceWidgetId="asSearchConfigurationAdapter" outputId="refreshSearch"
+		targetWidgetId="asMainController" inputId="refreshSearch" />
+	<widget-connection sourceWidgetId="asSearchConfigurationEditor" outputId="searchRequest"
+		targetWidgetId="asSearchConfigurationAdapter" inputId="searchRequest" />
+	<widget-connection sourceWidgetId="asSearchConfigurationAdapter" outputId="searchRequest"
+		targetWidgetId="asMainController" inputId="searchRequest" />
+
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference"
+		outputId="createRequest" targetWidgetId="configurableFlow" inputId="context" />
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference" inputId="createResult" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference"
+		outputId="updateRequest" targetWidgetId="collectionEditorAreaGroup" inputId="inputDataInput" />
+	<widget-connection sourceWidgetId="collectionEditorAreaGroup" outputId="singleObjectSavedOutput"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference" inputId="updateResult" />
+
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue"
+		outputId="createRequest" targetWidgetId="configurableFlow" inputId="context" />
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue" inputId="createResult" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue"
+		outputId="updateRequest" targetWidgetId="collectionEditorAreaGroup" inputId="inputDataInput" />
+	<widget-connection sourceWidgetId="collectionEditorAreaGroup" outputId="singleObjectSavedOutput"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue" inputId="updateResult" />
+
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference"
+		outputId="referenceEditorOutput" targetWidgetId="configurableFlow" inputId="context" />
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference" inputId="referenceEditorInput" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference"
+		outputId="referenceSelected" targetWidgetId="collectionEditorAreaGroup" inputId="inputDataInput" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference"
+		outputId="referenceSearchCtx" targetWidgetId="referenceadvancedsearchgroup" inputId="referenceSearchCtx" />
+	<widget-connection sourceWidgetId="referenceadvancedsearchgroup" outputId="selectedReferencesOutput"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference" inputId="referenceEditorInput" />
+
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference"
+		outputId="referenceEditorOutput" targetWidgetId="configurableFlow" inputId="context" />
+	<widget-connection sourceWidgetId="configurableFlow" outputId="wizardResult"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference" inputId="referenceEditorInput" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference"
+		outputId="referenceSelected" targetWidgetId="collectionEditorAreaGroup" inputId="inputDataInput" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference"
+		outputId="referenceSearchCtx" targetWidgetId="referenceadvancedsearchgroup" inputId="referenceSearchCtx" />
+	<widget-connection sourceWidgetId="referenceadvancedsearchgroup" outputId="selectedReferencesOutput"
+		targetWidgetId="STUB_de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference" inputId="referenceEditorInput" />
+
+</widgets>

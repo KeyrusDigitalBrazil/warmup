@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="beans.xsd">
+
+    <bean class="de.hybris.platform.ticketsystem.data.CsTicketParameter">
+        <property name="customer" type="de.hybris.platform.core.model.user.UserModel"/>
+        <property name="associatedTo" type="de.hybris.platform.core.model.order.AbstractOrderModel"/>
+        <property name="category" type="de.hybris.platform.ticket.enums.CsTicketCategory"/>
+        <property name="priority" type="de.hybris.platform.ticket.enums.CsTicketPriority"/>
+        <property name="assignedAgent" type="de.hybris.platform.core.model.user.EmployeeModel"/>
+        <property name="assignedGroup" type="de.hybris.platform.ticket.model.CsAgentGroupModel"/>
+        <property name="headline" type="String"/>
+        <property name="interventionType" type="de.hybris.platform.ticket.enums.CsInterventionType"/>
+        <property name="reason" type="de.hybris.platform.ticket.enums.CsEventReason"/>
+        <property name="creationNotes" type="String"/>
+        <property name="attachments" type="java.util.List&lt;org.springframework.web.multipart.MultipartFile&gt;" />
+    </bean>
+
+    <bean class="de.hybris.platform.ticketsystem.events.SessionEvent" extends="de.hybris.platform.servicelayer.event.events.AbstractEvent">
+        <property name="customer" type="de.hybris.platform.core.model.user.UserModel"/>
+        <property name="agent" type="de.hybris.platform.core.model.user.UserModel"/>
+        <property name="agentGroups" type="java.util.List&lt;de.hybris.platform.core.model.security.PrincipalGroupModel&gt;" />
+        <property name="site" type="de.hybris.platform.basecommerce.model.site.BaseSiteModel"/>
+        <property name="sessionID" type="java.lang.String"/>
+        <property name="createdAt" type="java.util.Date"/>
+        <property name="eventType" type="de.hybris.platform.ticket.enums.EventType"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="de.hybris.platform.chinesetaxinvoicefacades" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<bean id="chineseTaxInvoiceCheckoutFacade" class="de.hybris.platform.chinesetaxinvoicefacades.facades.impl.ChineseTaxInvoiceCheckoutFacade"
+		parent="acceleratorCheckoutFacade">
+		<property name="taxInvoiceService" ref="chineseTaxInvoiceService" />
+		<property name="taxInvoiceReverseConverter" ref="taxInvoiceReverseConverter" />
+	</bean>
+	
+	<alias name="defaultTaxInvoiceReverseConverter" alias="taxInvoiceReverseConverter"/>
+	<bean id="defaultTaxInvoiceReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.chinesetaxinvoiceservices.model.TaxInvoiceModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="taxInvoiceReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="defaultOrderConverter"/>
+        <property name="add"  ref="orderTaxInvoicePopulator"/>
+    </bean>	
+    
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="accExtendedCartConverter"/>
+        <property name="add"  ref="cartTaxInvoicePopulator"/>
+    </bean>
+</beans>

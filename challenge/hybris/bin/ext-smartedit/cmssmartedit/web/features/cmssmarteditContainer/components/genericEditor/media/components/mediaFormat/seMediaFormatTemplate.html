@@ -1,0 +1,84 @@
+<div class="{{ctrl.mediaFormat}} se-media-format">
+    <div class="se-media-format-screentype">
+        {{ctrl.mediaFormatI18NKey | translate}}
+    </div>
+    <!-- when the image is already uploaded -->
+    <div class="media-present"
+        data-ng-if="ctrl.isMediaPreviewEnabled()">
+        <div class="media-present-preview">
+            <se-media-preview data-image-url="ctrl.media.url"></se-media-preview>
+            <div class="se-media-preview-image-wrapper  se-media-format-image-wrapper">
+                <img class="thumbnail thumbnail--image-preview"
+                    data-ng-src="{{ctrl.media.url}}">
+            </div>
+            <span class="media-preview-code se-media-format--code">{{ctrl.media.code}}</span>
+
+        </div>
+
+        <se-media-advanced-properties-condensed data-adv-info-icon="ctrl.advInfoIconUrl"
+            data-code="ctrl.media.code"
+            data-description="ctrl.media.description"
+            data-alt-text="ctrl.media.altText"></se-media-advanced-properties-condensed>
+
+        <se-file-selector data-custom-class="'media-format-present-replace' + (ctrl.geField.isFieldDisabled() ? ' file-selector-disabled' : '')"
+            data-disabled="ctrl.geField.isFieldDisabled()"
+            data-label-i18n-key="ctrl.i18nKeys.REPLACE "
+            data-accepted-file-types="ctrl.acceptedFileTypes "
+            data-on-file-select="ctrl.onFileSelect({files: files, format: ctrl.mediaFormat}) "
+            data-upload-icon="ctrl.replaceIconUrl "
+            data-image-root="ctrl.imageRoot "></se-file-selector>
+
+        <button class="media-selector--preview__left remove-image btn btn-subordinate "
+            data-ng-click="ctrl.onDelete({format: ctrl.mediaFormat}) "
+            data-ng-disabled="ctrl.geField.isFieldDisabled()">
+            <img class="media-selector--preview--icon "
+                data-ng-src="{{ctrl.deleteIconUrl}} "
+                alt="{{ctrl.i18nKeys.REMOVE | translate}} " />
+            <p class="media-selector--preview__left--p media-selector--preview__left--p__error"
+                data-ng-class="{'media-selector--preview-btn__disabled':!ctrl.field.editable}">{{ctrl.i18nKeys.REMOVE | translate}}</p>
+        </button>
+    </div>
+
+    <!-- when the image is not yet uploaded -->
+    <div class="media-absent "
+        data-ng-if="ctrl.isMediaEditEnabled()">
+        <!-- when the file selector is enabled -->
+        <se-file-selector data-ng-if="ctrl.field.editable"
+            data-label-i18n-key="ctrl.i18nKeys.UPLOAD"
+            data-custom-class="ctrl.geField.isFieldDisabled() ? 'file-selector-disabled' : ''"
+            data-disabled="ctrl.geField.isFieldDisabled()"
+            data-accepted-file-types="ctrl.acceptedFileTypes"
+            data-on-file-select="ctrl.onFileSelect({files: files, format: ctrl.mediaFormat})"
+            data-upload-icon="ctrl.uploadIconUrl"
+            data-image-root="ctrl.imageRoot "></se-file-selector>
+        <!-- when the file selector is disabled -->
+        <se-file-selector data-ng-if="!ctrl.field.editable"
+            data-label-i18n-key="ctrl.i18nKeys.UPLOAD"
+            data-custom-class="!ctrl.field.editable ? 'file-selector-disabled' : ''"
+            data-disabled="!ctrl.field.editable"
+            data-accepted-file-types="ctrl.acceptedFileTypes"
+            data-on-file-select="ctrl.onFileSelect({files: files, format: ctrl.mediaFormat})"
+            data-upload-icon="ctrl.uploadIconDisabledUrl ? ctrl.uploadIconDisabledUrl : ctrl.uploadIconUrl"
+            data-image-root="ctrl.imageRoot"></se-file-selector>
+    </div>
+
+    <!-- when the image is under edit -->
+    <div data-ng-if="ctrl.isUnderEdit "
+        class="media-under-edit-parent">
+        <div class="media-is-under-edit ">
+            <se-file-selector data-label-i18n-key="ctrl.i18nKeys.UPLOAD "
+                data-disabled="true"
+                data-custom-class=" 'file-selector-disabled' "
+                data-accepted-file-types="ctrl.acceptedFileTypes "
+                data-on-file-select="ctrl.onFileSelect({files: files, format: ctrl.mediaFormat}) "
+                data-upload-icon="ctrl.uploadIconDisabledUrl "
+                data-image-root="ctrl.imageRoot "></se-file-selector>
+        </div>
+        <span class="media-preview-under-edit ">{{ctrl.i18nKeys.UNDER_EDIT | translate}}</span>
+    </div>
+
+    <div class="error-input help-block "
+        data-ng-repeat="error in ctrl.getErrors() ">
+        {{error}}
+    </div>
+</div>

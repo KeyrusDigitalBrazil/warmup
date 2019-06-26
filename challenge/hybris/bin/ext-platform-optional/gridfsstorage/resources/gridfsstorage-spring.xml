@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+       xsi:schemaLocation="http://www.springframework.org/schema/data/mongo
+			  http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+	 		  http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <mongo:mongo-client id="mongo"
+                        credentials="${media.globalSettings.gridFsStorageStrategy.mongo.username}:${media.globalSettings.gridFsStorageStrategy.mongo.password}@${media.globalSettings.gridFsStorageStrategy.mongo.dbname}"
+                        host="${media.globalSettings.gridFsStorageStrategy.mongo.host}"
+                        port="${media.globalSettings.gridFsStorageStrategy.mongo.port}"/>
+
+
+    <mongo:db-factory
+            mongo-ref="mongo"
+            dbname="${media.globalSettings.gridFsStorageStrategy.mongo.dbname}"/>
+
+    <bean id="gridFsStorageStrategy" class="de.hybris.platform.gridfs.media.storage.GridFSMediaStorageStrategy"
+          init-method="setTenantPrefix">
+        <constructor-arg ref="mongoDbFactory"/>
+        <constructor-arg ref="mediaLocationHashService"/>
+    </bean>
+
+    <bean id="gridFsStorageCleaner" class="de.hybris.platform.gridfs.media.storage.GridFSMediaStorageCleaner"
+          init-method="setTenantPrefix">
+        <property name="cleanOnInit" value="${media.globalSettings.gridFsStorageStrategy.cleanOnInit}"/>
+        <property name="dbFactory" ref="mongoDbFactory"/>
+        <property name="storageConfigService" ref="mediaStorageConfigService"/>
+    </bean>
+</beans>

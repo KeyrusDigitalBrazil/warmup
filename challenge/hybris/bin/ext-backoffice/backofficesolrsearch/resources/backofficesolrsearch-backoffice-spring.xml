@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:cng="http://www.hybris.com/cockpitng/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.hybris.com/cockpitng/spring
+           http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<bean id="backofficesolrsearchLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator"
+	      scope="singleton"
+	      init-method="init" lazy-init="false">
+		<property name="location" value="/backofficesolrsearch-backoffice-labels/"/>
+		<property name="name" value="labels"/>
+	</bean>
+
+	<alias name="defaultSearchQueryConditionsConverter" alias="searchQueryConditionsConverter"/>
+	<bean id="defaultSearchQueryConditionsConverter"
+	      class="com.hybris.backoffice.solrsearch.converters.impl.DefaultSearchQueryConditionsConverter"/>
+
+	<alias name="defaultSolrFieldSearchFacadeStrategy" alias="solrFieldSearchFacadeStrategy"/>
+	<bean id="defaultSolrFieldSearchFacadeStrategy"
+	      class="com.hybris.backoffice.solrsearch.dataaccess.facades.DefaultSolrFieldSearchFacadeStrategy">
+		<property name="order" value="100"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="facetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+		<property name="facetSearchService" ref="backofficeFacetSearchService"/>
+		<property name="solrFieldSearchDAO" ref="solrFieldSearchDAO"/>
+		<property name="solrAutoSuggestService" ref="solrAutoSuggestService"/>
+		<property name="fullTextSearchDataConverter" ref="fullTextSearchDataConverter"/>
+	</bean>
+
+	<alias name="defaultFullTextSearchDataConverter" alias="fullTextSearchDataConverter"/>
+	<bean id="defaultFullTextSearchDataConverter"
+	      class="com.hybris.backoffice.solrsearch.converters.impl.DefaultFullTextSearchDataConverter"/>
+
+	<alias name="defaultBackofficeFacetSearchService" alias="backofficeFacetSearchService"/>
+	<bean id="defaultBackofficeFacetSearchService"
+	      class="com.hybris.backoffice.solrsearch.services.impl.DefaultBackofficeFacetSearchService"
+	      parent="facetSearchService">
+		<property name="facetSearchStrategyFactory" ref="backofficeFacetSearchStrategyFactory"/>
+		<property name="searchQueryConditionsConverter" ref="searchQueryConditionsConverter"/>
+		<property name="facetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+		<property name="conditionsDecorators" ref="backofficeConditionsDecorators"/>
+		<property name="searchConditionDataConverter" ref="searchConditionDataConverter"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="catalogTypeService" ref="catalogTypeService" />
+		<property name="indexedTypeToCatalogVersionPropertyMapping" ref="indexedTypeToCatalogVersionPropertyMapping" />
+	</bean>
+
+	<alias name="defaultIndexedTypeToCatalogVersionPropertyMapping" alias="indexedTypeToCatalogVersionPropertyMapping"/>
+	<util:map id="defaultIndexedTypeToCatalogVersionPropertyMapping">
+		<entry key="BackofficeProduct" >
+			<util:constant static-field="com.hybris.backoffice.solrsearch.constants.BackofficesolrsearchConstants.CATALOG_VERSION_PK"/>
+		</entry>
+	</util:map>
+
+	<alias name="defaultSearchConditionDataConverter" alias="searchConditionDataConverter"/>
+	<bean id="defaultSearchConditionDataConverter"
+	      class="com.hybris.backoffice.solrsearch.converters.impl.DefaultSearchConditionDataConverter">
+		<property name="fqApplicableOperators" ref="backofficeFqApplicableOperators"/>
+		<property name="fqApplicablePropertiesTypes" ref="backofficeFqApplicablePropertiesTypes"/>
+	</bean>
+
+	<alias name="defaultBackofficeFqApplicablePropertiesTypes" alias="backofficeFqApplicablePropertiesTypes"/>
+	<util:set id="defaultBackofficeFqApplicablePropertiesTypes">
+		<util:constant static-field="de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes.LONG"/>
+		<util:constant static-field="de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes.STRING"/>
+		<util:constant static-field="de.hybris.platform.solrfacetsearch.enums.SolrPropertiesTypes.BOOLEAN"/>
+	</util:set>
+
+	<alias name="defaultBackofficeConditionsDecorators" alias="backofficeConditionsDecorators"/>
+	<util:list id="defaultBackofficeConditionsDecorators"
+	           value-type="com.hybris.backoffice.solrsearch.decorators.SearchConditionDecorator">
+	</util:list>
+
+	<alias name="defaultBackofficeFqApplicableOperators" alias="backofficeFqApplicableOperators"/>
+	<util:set id="defaultBackofficeFqApplicableOperators">
+		<util:constant static-field="com.hybris.cockpitng.search.data.ValueComparisonOperator.EQUALS"/>
+	</util:set>
+
+	<alias name="defaultBackofficeFacetSearchStrategyFactory" alias="backofficeFacetSearchStrategyFactory"/>
+	<bean id="defaultBackofficeFacetSearchStrategyFactory" parent="facetSearchStrategyFactory">
+		<property name="defaultFacetSearchStrategy" ref="backofficeFacetSearchStrategy"/>
+	</bean>
+
+	<alias name="defaultBackofficeFacetSearchStrategy" alias="backofficeFacetSearchStrategy"/>
+	<bean id="defaultBackofficeFacetSearchStrategy" parent="defaultFacetSearchStrategy">
+		<property name="facetSearchQueryConverter" ref="backoffficeSearchQueryConverter"/>
+
+	</bean>
+
+	<alias name="defaultBackoffficeSearchQueryConverter" alias="backoffficeSearchQueryConverter"/>
+	<bean id="defaultBackoffficeSearchQueryConverter" parent="facetSearchQueryConverter">
+		<property name="populators">
+			<list>
+				<ref bean="backofficeFacetSearchQueryBasicPopulator"/>
+				<ref bean="backofficeFacetSearchQueryFilterQueriesPopulator"/>
+				<ref bean="facetSearchQueryGroupingPopulator"/>
+				<ref bean="backofficeSolrSearchQuerySortsPopulator"/>
+				<ref bean="facetSearchQueryPagingPopulator"/>
+				<ref bean="facetSearchQueryFacetsPopulator"/>
+				<ref bean="backofficeFacetSearchQueryFieldsPopulator"/>
+				<ref bean="facetSearchQuerySpellcheckPopulator"/>
+				<ref bean="facetSearchQueryParamsPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultBackofficeFacetSearchQueryBasicPopulator" alias="backofficeFacetSearchQueryBasicPopulator"/>
+	<bean id="defaultBackofficeFacetSearchQueryBasicPopulator"
+	      class="com.hybris.backoffice.solrsearch.populators.BackofficeFacetSearchQueryBasicPopulator"
+	      parent="facetSearchQueryBasicPopulator">
+		<property name="freeTextQueryBuilderFactory" ref="freeTextQueryBuilderFactory"/>
+		<property name="fieldNamePostProcessor" ref="defaultBackofficeFieldNamePostProcessor"/>
+	</bean>
+
+
+	<alias name="defaultBackofficeFacetSearchQueryFieldsPopulator" alias="backofficeFacetSearchQueryFieldsPopulator"/>
+	<bean id="defaultBackofficeFacetSearchQueryFieldsPopulator"
+	      class="com.hybris.backoffice.solrsearch.populators.BackofficeFacetSearchQueryFieldsPopulator"
+	      parent="facetSearchQueryFieldsPopulator"/>
+
+	<alias name="defaultBackofficeSolrSearchQuerySortsPopulator" alias="backofficeSolrSearchQuerySortsPopulator"/>
+	<bean id="defaultBackofficeSolrSearchQuerySortsPopulator"
+	      class="com.hybris.backoffice.solrsearch.populators.BackofficeSearchQuerySortsPopulator">
+		<property name="fieldNameTranslator" ref="fieldNameTranslator"/>
+		<property name="fieldNamePostProcessor" ref="backofficeFieldNamePostProcessor"/>
+	</bean>
+
+	<alias name="defaultBackofficeFacetSearchQueryFilterQueriesPopulator"
+	       alias="backofficeFacetSearchQueryFilterQueriesPopulator"/>
+	<bean id="defaultBackofficeFacetSearchQueryFilterQueriesPopulator"
+	      class="com.hybris.backoffice.solrsearch.populators.BackofficeFacetSearchQueryFilterQueriesPopulator"
+	      parent="facetSearchQueryFilterQueriesPopulator">
+		<property name="fieldNamePostProcessor" ref="backofficeFieldNamePostProcessor"/>
+		<property name="conditionValueConverterMap">
+			<map key-type="java.lang.String">
+				<entry key="java.util.Date">
+					<bean class="com.hybris.backoffice.solrsearch.populators.conditionvalueconverters.DateConditionValueConverter"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultBackofficeFieldNamePostProcessor" alias="backofficeFieldNamePostProcessor"/>
+	<bean id="defaultBackofficeFieldNamePostProcessor"
+	      class="com.hybris.backoffice.solrsearch.populators.DefaultBackofficeFieldNamePostProcessor">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="labelServiceProxyExtender" alias="solrLabelProxyExtender"/>
+	<cng:property-extender id="labelServiceProxyExtender" bean="backofficeValueResolver" property="labelServiceProxy">
+		<ref bean="labelServiceProxy"/>
+	</cng:property-extender>
+
+	<alias name="labelServiceProxyExtenderForCatalog" alias="solrLabelProxyExtenderForCatalog"/>
+	<cng:property-extender id="labelServiceProxyExtenderForCatalog" bean="catalogLabelValueResolver"
+						   property="labelServiceProxy">
+		<ref bean="labelServiceProxy"/>
+	</cng:property-extender>
+
+	<cng:property-extender bean="itemModelLabelValueResolver" property="labelServiceProxy">
+		<ref bean="labelServiceProxy"/>
+	</cng:property-extender>
+
+	<alias name="labelServiceProxyExtenderForCatalogVersion" alias="solrLabelProxyExtenderForCatalogVersion"/>
+	<cng:property-extender id="labelServiceProxyExtenderForCatalogVersion" bean="catalogVersionLabelValueResolver"
+						   property="labelServiceProxy">
+		<ref bean="labelServiceProxy"/>
+	</cng:property-extender>
+
+	<alias name="defaultBackofficeTokenizedFieldTypes" alias="backofficeTokenizedFieldTypes"/>
+	<util:set id="defaultBackofficeTokenizedFieldTypes" value-type="java.lang.String">
+		<value>text</value>
+	</util:set>
+
+	<alias name="defaultSolrSearchStrategy" alias="solrSearchStrategy"/>
+	<bean name="defaultSolrSearchStrategy" class="com.hybris.backoffice.solrsearch.dataaccess.SolrSearchStrategy">
+		<property name="backofficeFacetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+		<property name="typeMappings">
+			<map key-type="java.lang.String" value-type="java.lang.String">
+				<entry key="text" value="java.lang.String"/>
+				<entry key="long" value="java.lang.Long"/>
+				<entry key="string" value="java.lang.String"/>
+				<entry key="double" value="java.lang.Double"/>
+				<entry key="boolean" value="java.lang.Boolean"/>
+				<entry key="int" value="java.lang.Integer"/>
+				<entry key="sortabletext" value="java.lang.String"/>
+				<entry key="float" value="java.lang.Float"/>
+				<entry key="date" value="java.util.Date"/>
+			</map>
+		</property>
+		<property name="operatorConfig">
+			<map key-type="java.lang.String" value-type="com.hybris.cockpitng.search.data.ValueComparisonOperator">
+				<entry key="default" >
+					<set>
+						<value>EQUALS</value>
+						<value>CONTAINS</value>
+					</set>
+				</entry>
+				<entry key="java.lang.Integer" >
+					<set>
+						<value>GREATER</value>
+						<value>GREATER_OR_EQUAL</value>
+						<value>EQUALS</value>
+						<value>LESS</value>
+						<value>LESS_OR_EQUAL</value>
+					</set>
+				</entry>
+				<entry key="java.lang.Long" >
+					<set>
+						<value>GREATER</value>
+						<value>GREATER_OR_EQUAL</value>
+						<value>EQUALS</value>
+						<value>LESS</value>
+						<value>LESS_OR_EQUAL</value>
+					</set>
+				</entry>
+				<entry key="java.lang.Double" >
+					<set>
+						<value>GREATER</value>
+						<value>GREATER_OR_EQUAL</value>
+						<value>EQUALS</value>
+						<value>LESS</value>
+						<value>LESS_OR_EQUAL</value>
+					</set>
+				</entry>
+				<entry key="java.util.Date" >
+					<set>
+						<value>GREATER</value>
+						<value>GREATER_OR_EQUAL</value>
+						<value>EQUALS</value>
+						<value>LESS</value>
+						<value>LESS_OR_EQUAL</value>
+					</set>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<cng:list-extender bean="fieldQueryFieldRenderer" property="searchStrategies">
+		<cng:add value-type="com.hybris.backoffice.widgets.fulltextsearch.FullTextSearchStrategy">
+			<ref bean="solrSearchStrategy"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<cng:property-extender bean="fieldQueryFieldRenderer" property="defaultSearchStrategy">
+		<ref bean="solrSearchStrategy"/>
+	</cng:property-extender>
+
+	<alias name="solrFullTextSearchConfigurationFallbackStrategy" alias="fullTextSearchConfigurationFallbackStrategy"/>
+	<alias name="defaultSolrFullTextSearchConfigurationFallbackStrategy"
+	       alias="solrFullTextSearchConfigurationFallbackStrategy"/>
+
+	<bean name="defaultSolrFullTextSearchConfigurationFallbackStrategy"
+	      class="com.hybris.backoffice.solrsearch.core.config.SolrFullTextSearchConfigurationFallbackStrategy"
+	      parent="defaultFullTextSearchConfigurationFallbackStrategy">
+		<property name="facetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+	</bean>
+
+	<bean class="com.hybris.cockpitng.core.config.util.CockpitConfigurationServiceExtender"
+	      init-method="addAll" destroy-method="removeAll" lazy-init="false">
+		<property name="configurationService" ref="cockpitConfigurationService"/>
+		<property name="fallbackStrategies">
+			<map>
+				<entry key="com.hybris.cockpitng.config.fulltextsearch.jaxb.FulltextSearch">
+					<list>
+						<ref bean="solrFullTextSearchConfigurationFallbackStrategy"/>
+						<ref bean="defaultFullTextSearchConfigurationFallbackStrategy"/>
+					</list>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultSolrSearchAllCatalogsConditionAdapter" alias="solrSearchAllCatalogsConditionAdapter"/>
+	<bean id="defaultSolrSearchAllCatalogsConditionAdapter"
+	      class="com.hybris.backoffice.widgets.searchadapters.conditions.products.AllCatalogsConditionAdapter"/>
+
+	<alias name="defaultSolrSearchUncategorizedConditionAdapter" alias="solrSearchUncategorizedConditionAdapter"/>
+	<bean id="defaultSolrSearchUncategorizedConditionAdapter"
+	      class="com.hybris.backoffice.solrsearch.adapters.conditions.product.SolrSearchUncategorizedConditionAdapter">
+		<property name="conditionsAdapters" ref="solrSearchConditionsAdapters"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+		<property name="uncategorizedPropertyName" value="uncategorized"/>
+	</bean>
+
+	<alias name="defaultSolrSearchClassificationSystemConditionAdapter"
+	       alias="solrSearchClassificationSystemConditionAdapter"/>
+	<bean id="defaultSolrSearchClassificationSystemConditionAdapter"
+	      class="com.hybris.backoffice.solrsearch.adapters.conditions.product.SolrSearchClassificationSystemConditionAdapter">
+		<property name="classificationSystemPropertyName" value="classificationCatalogs"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+	</bean>
+
+	<alias name="defaultSolrSearchClassificationSystemVersionConditionAdapter"
+	       alias="solrSearchClassificationSystemVersionConditionAdapter"/>
+	<bean id="defaultSolrSearchClassificationSystemVersionConditionAdapter"
+	      class="com.hybris.backoffice.solrsearch.adapters.conditions.product.SolrSearchClassificationSystemVersionConditionAdapter">
+		<property name="classificationSystemVersionPropertyName" value="classificationCatalogsVersions"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+	</bean>
+
+	<alias name="defaultSolrSearchCatalogConditionAdapter" alias="solrSearchCatalogConditionAdapter"/>
+	<bean id="defaultSolrSearchCatalogConditionAdapter"
+	      class="com.hybris.backoffice.widgets.searchadapters.conditions.products.CatalogConditionAdapter">
+		<property name="catalogPropertyName" value="catalogPk"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+	</bean>
+
+	<alias name="defaultSolrSearchCatalogVersionConditionAdapter" alias="solrSearchCatalogVersionConditionAdapter"/>
+	<bean id="defaultSolrSearchCatalogVersionConditionAdapter"
+	      class="com.hybris.backoffice.widgets.searchadapters.conditions.products.CatalogVersionConditionAdapter">
+		<property name="catalogVersionPropertyName" value="catalogVersionPk"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+	</bean>
+
+	<alias name="defaultSolrSearchCategoryConditionAdapter" alias="solrSearchCategoryConditionAdapter"/>
+	<bean id="defaultSolrSearchCategoryConditionAdapter"
+	      class="com.hybris.backoffice.widgets.searchadapters.conditions.products.CategoryConditionAdapter">
+		<property name="categoryPropertyName" value="categoryPk"/>
+		<property name="operator" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}"/>
+	</bean>
+
+	<alias name="defaultSolrSearchConditionsAdapters" alias="solrSearchConditionsAdapters"/>
+	<util:list id="defaultSolrSearchConditionsAdapters"
+	           value-type="com.hybris.backoffice.widgets.searchadapters.conditions.SearchConditionAdapter">
+		<ref bean="solrSearchUncategorizedConditionAdapter"/>
+		<ref bean="solrSearchAllCatalogsConditionAdapter"/>
+		<ref bean="solrSearchClassificationSystemConditionAdapter"/>
+		<ref bean="solrSearchClassificationSystemVersionConditionAdapter"/>
+		<ref bean="solrSearchCatalogConditionAdapter"/>
+		<ref bean="solrSearchCatalogVersionConditionAdapter"/>
+		<ref bean="solrSearchCategoryConditionAdapter"/>
+	</util:list>
+
+	<alias name="defaultCatalogTreeFilterAdvancedSolrSearchInitializer"
+	       alias="catalogTreeFilterAdvancedSolrSearchInitializer"/>
+	<bean id="defaultCatalogTreeFilterAdvancedSolrSearchInitializer"
+	      class="com.hybris.backoffice.widgets.searchadapters.CatalogTreeFilterAdvancedSearchInitializer">
+		<property name="conditionsAdapters" ref="solrSearchConditionsAdapters"/>
+	</bean>
+
+	<!--solrFieldSearchFacadeStrategy-->
+	<bean class="com.hybris.cockpitng.dataaccess.util.DataAccessStrategyExtender"
+		  lazy-init="false"
+		  init-method="addAll"
+		  destroy-method="removeAll">
+		<property name="fieldSearchFacadeStrategies">
+			<list>
+				<ref bean="solrFieldSearchFacadeStrategy" />
+			</list>
+		</property>
+		<property name="fieldSearchFacadeStrategyRegistry" ref="fieldSearchFacadeStrategyRegistry" />
+	</bean>
+
+	<cng:list-extender bean="fixedBeanResolver" property="availableBeanNames" >
+		<cng:add value-type="java.lang.String" >
+			<value>backofficeFacetSearchConfigService</value>
+		</cng:add>
+	</cng:list-extender>
+
+    <alias name="defaultSolrIndexSynchronizationStrategy" alias="solrIndexSynchronizationStrategy"/>
+    <bean name="defaultSolrIndexSynchronizationStrategy"
+		    class="com.hybris.backoffice.solrsearch.events.DirectSolrIndexSynchronizationStrategy">
+        <property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="indexerService" ref="indexerService"/>
+	    <property name="backofficeFacetSearchConfigService" ref="backofficeFacetSearchConfigService" />
+    </bean>
+
+	<alias name="defaultBackofficeSolrSearchIndexInitializer" alias="backofficeSolrSearchIndexInitializer"/>
+	<bean id="defaultBackofficeSolrSearchIndexInitializer" class="com.hybris.backoffice.solrsearch.setup.BackofficeSolrSearchIndexInitializer"
+		lazy-init="false" init-method="initialize">
+        <property name="backofficeFacetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+        <property name="solrIndexService" ref="solrIndexService"/>
+        <property name="indexerService" ref="indexerService"/>
+        <property name="afterInitializationEndBackofficeListener" ref="afterInitializationEndBackofficeSolrSearchListener"/>
+    </bean>
+
+	<!-- Aspects -->
+	<alias name="defaultSolrHotUpdater" alias="solrHotUpdater" />
+	<bean id="defaultSolrHotUpdater" class="com.hybris.backoffice.solrsearch.aspects.ObjectFacadeSolrIndexingAspect" >
+		<property name="modelService" ref="modelService" />
+		<property name="solrIndexSynchronizationStrategy" ref="solrIndexSynchronizationStrategy" />
+	</bean>
+
+	<aop:config>
+		<aop:aspect id="solrIndexHotUpdaterAspect" ref="solrHotUpdater" >
+			<aop:after-returning pointcut-ref="objectsModifiedByFacade" method="updateChanged" returning="retVal" />
+			<aop:after-returning pointcut-ref="objectsRemovedByFacade" method="updateRemoved" returning="retVal" />
+		</aop:aspect>
+	</aop:config>
+
+	<import resource="backofficesolrsearch-backoffice-spring-testing.xml"/>
+
+	<cng:property-extender bean="coreDataQualityValueResolver" property="dataQualityCalculationServiceProxy">
+		<ref bean="dataQualityCalculationServiceProxy"/>
+	</cng:property-extender>
+
+	<cng:property-extender bean="marketingDataQualityValueResolver" property="dataQualityCalculationServiceProxy">
+		<ref bean="dataQualityCalculationServiceProxy"/>
+	</cng:property-extender>
+
+		<cng:list-extender bean="defaultCoverageCalculationStrategyRegistry" property="domainStrategies"
+	                   getter="@domainStrategiesList">
+		<cng:add>
+			<bean class="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping">
+				<property name="domainID" value="pcmCoreAttributesCoverageGroup"/>
+				<property name="strategyMap">
+					<map>
+						<entry key="Product">
+							<bean class="de.hybris.platform.validation.coverage.strategies.impl.ValidationBasedCoverageCalculationStrategy">
+								<property name="validationService" ref="validationService"/>
+								<property name="typeService" ref="typeService"/>
+								<property name="coverageConstraintGroupDao" ref="coverageConstraintGroupDao"/>
+								<property name="sortProperties" value="true"/>
+								<property name="constraintGroupID" value="pcmCoreAttributesCoverageGroup"/>
+							</bean>
+						</entry>
+					</map>
+				</property>
+			</bean>
+			<bean class="de.hybris.platform.validation.coverage.strategies.impl.CoverageCalculationStrategyMapping">
+				<property name="domainID" value="pcmMarketingAttributesCoverageGroup"/>
+				<property name="strategyMap">
+					<map>
+						<entry key="Product">
+							<bean class="de.hybris.platform.validation.coverage.strategies.impl.ValidationBasedCoverageCalculationStrategy">
+								<property name="validationService" ref="validationService"/>
+								<property name="typeService" ref="typeService"/>
+								<property name="coverageConstraintGroupDao" ref="coverageConstraintGroupDao"/>
+								<property name="sortProperties" value="true"/>
+								<property name="constraintGroupID" value="pcmMarketingAttributesCoverageGroup"/>
+							</bean>
+						</entry>
+					</map>
+				</property>
+			</bean>
+		</cng:add>
+	</cng:list-extender>
+</beans>

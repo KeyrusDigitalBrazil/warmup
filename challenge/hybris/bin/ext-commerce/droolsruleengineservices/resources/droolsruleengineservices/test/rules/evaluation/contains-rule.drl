@@ -1,0 +1,35 @@
+package de.hybris.platform.promotionengineservices.test
+
+import java.math.BigDecimal;
+import de.hybris.platform.ruleengineservices.rao.ProductRAO;
+import de.hybris.platform.ruleengineservices.rao.CategoryRAO;
+import de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO;
+import de.hybris.platform.ruleengineservices.rrd.*;
+import java.util.Map;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleAddProductPercentageDiscountAction;
+
+//Product Promotion Test Rule For Category1
+rule "contains-rule"
+@ruleCode("contains-rule.drl")
+@moduleName("rules-module-junit")
+dialect "mvel"
+
+no-loop true
+
+    when
+    	$config := RuleConfigurationRRD(ruleCode == "contains-rule.drl")
+		$groupExecution := RuleGroupExecutionRRD(code == $config.ruleGroupCode)
+    	$category:CategoryRAO(code == "testCategory1")
+    	$product:ProductRAO(categories contains $category)
+    	$result:RuleEngineResultRAO()
+    	eval($groupExecution.allowedToExecute($config))
+    then
+    	Map variables = [
+      		"de.hybris.platform.ruleengineservices.rao.ProductRAO" : $product,
+      		"de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO" : $result
+   		];
+		ruleAddProductPercentageDiscountAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["value":["USD":new BigDecimal(10)]]);
+		$groupExecution.trackRuleGroupExecution($config);
+end

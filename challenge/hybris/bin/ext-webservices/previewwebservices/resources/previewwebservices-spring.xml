@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util
+        	http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="previewTicketPopulator" class="de.hybris.platform.previewwebservices.populators.PreviewTicketPopulator">
+		<property name="localViewExecutor" ref="localViewExecutor" />
+	</bean>
+	
+	<bean id="previewTicketReversePopulator" class="de.hybris.platform.previewwebservices.populators.PreviewTicketReversePopulator">
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="userService" ref="userService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="cmsPageService" ref="cmsPageService"/>
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="localViewExecutor" ref="localViewExecutor" />
+		<property name="cmsVersionService" ref="cmsVersionService" />
+		<property name="cmsCatalogVersionLevelComparator" ref="cmsCatalogVersionLevelComparator" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="previewTicketConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.previewwebservices.dto.PreviewTicketWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="previewTicketPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="previewTicketReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cms2.model.preview.PreviewDataModel" />
+		<property name="populators">
+			<list>
+				<ref bean="previewTicketReversePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPreviewFacade" alias="previewFacade"/>
+	<bean id="defaultPreviewFacade" class="de.hybris.platform.previewwebservices.facades.impl.DefaultPreviewFacade">
+		<property name="previewTicketConverter" ref="previewTicketConverter" />
+		<property name="previewTicketReverseConverter" ref="previewTicketReverseConverter" />
+		<property name="modelService" ref="modelService"/>
+		<property name="cmsPreviewService" ref="cmsPreviewService"/>		
+	</bean>
+			
+</beans>

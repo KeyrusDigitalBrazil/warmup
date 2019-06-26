@@ -1,0 +1,143 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalog-version-staged=Staged
+
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$catalogversion-staged=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version-staged])[unique=true,default=$catalog-id:$catalog-version-staged]
+$ruleType=ruleType(code)[default='ANY']
+
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version-staged;true;USD
+
+
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;description[lang=en];unit(code)[default=pieces];ean;variantType(code);$catalogversion
+;2047052;;Apple;MB496T/A;21.03.2009;;
+;3417125;;Apple;MC131T/A;27.06.2009;;885909362059
+;3417130;;Apple;MC134T/A;27.06.2009;;885909319596
+;GALAXY_NEXUS;;Samsung;Samsung;27.06.2009;;8806071785585
+;GALAXY_S2;;Samsung;Samsung;27.06.2009;;8806071648507
+;APPLE_IPHONE_4S_16GB;;Apple;Apple;27.06.2009;;802971153485
+;APPLE_IPHONE_4S_32GB;;Apple;Apple;27.06.2009;;802971153486
+;MOTOROLA_RAZR;;Motorola;Motorola;27.06.2009;;6947681511507
+;HTC_INCREDIBLE_S;;htc;htc;27.06.2009;;843163074606
+;NO_STOCK_PRODUCT;;isnich;isnich;27.06.2009;;000000000000
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code)[default=approved];$catalogversion
+;Status_SMART
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id);status(id)[default=Status_SMART]
+;SmartPhonePackage;;;;
+;SmartPhoneDeviceSelection;;;SmartPhonePackage;
+;SmartPhonePlanSelection;;;SmartPhonePackage;
+;SmartPhoneAddonSelection;;;SmartPhonePackage;
+;IPhonePackage;;;;
+;IPhoneDeviceSelection;;;IPhonePackage;
+;IPhonePlanSelection;;;IPhonePackage;
+;IPhoneAddonSelection;;;IPhonePackage;
+;SmartPhoneValuePackSelection1;;;SmartPhonePackage;
+;SmartPhoneValuePackSelection2;;;SmartPhonePackage;
+;IphoneValuePackSelection1;;;IPhonePackage;
+;PayAsYouGoPackage;;;;
+;PayAsYouGoDeviceSelection;;;PayAsYouGoPackage;
+;PayAsYouGoPlanSelection;;;PayAsYouGoPackage;
+;PayAsYouGoActivationFee;;;PayAsYouGoPackage;
+;PayAsYouGoAddOnSelection;;;PayAsYouGoPackage;
+;PayAsYouGoInternetSelection;;;PayAsYouGoPackage;
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion-staged;parentTemplate(id);
+;SyncPackage;;;;
+;SyncDeviceSelection;;;SyncPackage;
+;SyncPlanSelection;;;SyncPackage;
+;SyncActivationFee;;;SyncPackage;
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion);$catalogversion
+;SmartPhoneDeviceSelection;;GALAXY_NEXUS,GALAXY_S2,MOTOROLA_RAZR,HTC_INCREDIBLE_S,NO_STOCK_PRODUCT;
+;SmartPhonePlanSelection;;PLAN_STANDARD_1Y,PLAN_STANDARD_2Y,PLAN_STANDARD_3Y,ACTIVATION_FEE,Y_STARTER_100_1Y,Y_STARTER_200_2Y,Y_STARTER_100_2Y;
+;IPhoneDeviceSelection;;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB,NO_STOCK_PRODUCT;
+;IPhonePlanSelection;;PLAN_STANDARD_1Y,PLAN_ADVANCED_1Y,PLAN_STANDARD_3Y,PLAN_ADVANCED_2Y,PLAN_ADVANCED_3Y,ACTIVATION_FEE,Y_STARTER_100_1Y,Y_STARTER_200_2Y,Y_STARTER_100_2Y;
+;SmartPhoneValuePackSelection2;;Y_STARTER_300_2Y
+;IPhoneAddonSelection;;Y_STARTER_100_2Y
+;PayAsYouGoDeviceSelection;;MOTOROLA_RAZR,HTC_INCREDIBLE_S,3417125
+;PayAsYouGoPlanSelection;;Y_STARTER_300_2Y,Y_STARTER_200_1Y
+;PayAsYouGoActivationFee;;ACTIVATION_FEE,SERVICE_FEE_MONTHLY
+;PayAsYouGoAddOnSelection;;MOTOROLA_RAZR,HTC_INCREDIBLE_S,3417130
+;PayAsYouGoInternetSelection;;3417130
+
+INSERT_UPDATE ChangeProductPriceBundleRule;$catalogversion;id[unique=true,forceWrite=true,allownull=true];currency(isocode)[default=USD, unique=true];bundleTemplate(id, version, $catalogversion)[unique=true];ruleType(code)[default=ANY];conditionalProducts(code, $catalogversion);targetProducts(code, $catalogversion);price
+;;price_NON_IPHONE_with_PLAN_STANDARD_1Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_1Y;GALAXY_NEXUS,GALAXY_S2;300
+;;price_NON_IPHONE_with_PLAN_STANDARD_2Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_2Y;GALAXY_NEXUS,GALAXY_S2;200
+;;price_NON_IPHONE_with_PLAN_STANDARD_3Y;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_3Y;GALAXY_NEXUS,GALAXY_S2;100
+;;price_NON_IPHONE_with_PLAN_STANDARD_3Y_ACTIVATION_FEE;;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_3Y,ACTIVATION_FEE;GALAXY_NEXUS,GALAXY_S2;50
+;;price_NON_IPHONE_with_NO_CONDITIONS;;SmartPhoneDeviceSelection:1.0;ALL;;GALAXY_NEXUS,GALAXY_S2;650
+;;price_NON_IPHONE_with_ACTIVATION_FEE;;SmartPhonePlanSelection:1.0;ALL;ACTIVATION_FEE;PLAN_STANDARD_3Y;30
+;;price_NON_IPHONE_with_FANCY_GALAXY_S2;;SmartPhonePlanSelection:1.0;ALL;GALAXY_S2;PLAN_STANDARD_3Y;9
+;;price_IPHONE_with_PLAN_STANDARD_3Y;;IPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_3Y;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB;275
+;;price_IPHONE_with_PLAN_STANDARD_3Y_ACTIVATION_FEE;;IPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_3Y,ACTIVATION_FEE;APPLE_IPHONE_4S_16GB,APPLE_IPHONE_4S_32GB;175
+# add a second price entry (currency EUR) for rule price_NON_IPHONE_with_PLAN_STANDARD_1Y
+;;price_NON_IPHONE_with_PLAN_STANDARD_1Y;EUR;SmartPhoneDeviceSelection:1.0;ALL;PLAN_STANDARD_1Y;GALAXY_NEXUS,GALAXY_S2;250
+;;price_600_24M;;SmartPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_3Y;NOKIA_3310;1
+;;price_600_12M;;SmartPhoneDeviceSelection:1.0;ANY;PLAN_STANDARD_1Y;NOKIA_3310;129
+
+INSERT_UPDATE User;uid[unique=true];name;previewCatalogVersions(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version];readableCatalogVersions(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+;TEST_USER;Regular User
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;restrictedType(code);active[default=true];principal(uid)[default='TEST_USER'];generate[default=false];
+;inStoreProductVisibility;In-Store Product Visibility;{approvalStatus} IN ({{ SELECT {a:pk} FROM {ArticleApprovalStatus AS a} WHERE {a:code} = 'approved' }});Product;
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion
+;PayAsYouGo_DeviceSelection_Pick1To2;1;2
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion-staged
+;SYNC_DeviceSelection_Pick1To2;1;2
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion
+;PayAsYouGo_PlanSelection_PickExactly1;1
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion-staged
+;SYNC_PlanSelection_PickExactly1;1
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion);$catalogversion
+;PayAsYouGoDeviceSelection;;PayAsYouGo_DeviceSelection_Pick1To2
+;PayAsYouGoPlanSelection;;PayAsYouGo_PlanSelection_PickExactly1
+
+# Bundle dependencies
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];requiredBundleTemplates(id,version[default=1.0]);$catalogversion
+;PayAsYouGoAddOnSelection;;PayAsYouGoPlanSelection,PayAsYouGoActivationFee
+;PayAsYouGoInternetSelection;;PayAsYouGoPlanSelection,PayAsYouGoAddOnSelection
+
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogversion;bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType
+;PayAsYouGo_DisableMotorolaWhenHtc;;PayAsYouGoAddOnSelection;HTC_INCREDIBLE_S;MOTOROLA_RAZR
+;PayAsYouGo_DisableHtcWhenMotorola;;PayAsYouGoAddOnSelection;MOTOROLA_RAZR;HTC_INCREDIBLE_S
+;PayAsYouGo_DisableMotorolaWithCheapPlan;;PayAsYouGoAddOnSelection;Y_STARTER_200_1Y;MOTOROLA_RAZR
+;PayAsYouGo_DisableHtcWith3417130AndCheapPlan;;PayAsYouGoAddOnSelection;Y_STARTER_200_1Y,3417130;HTC_INCREDIBLE_S;ALL
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;soldIndividually[default=true]
+;Y_STARTER_100_1Y
+;Y_STARTER_100_2Y
+;Y_STARTER_200_1Y
+;Y_STARTER_200_2Y
+;Y_STARTER_300_1Y
+;Y_STARTER_300_2Y
+;PLAN_STANDARD_1Y
+;PLAN_STANDARD_2Y
+;PLAN_STANDARD_3Y
+;PLAN_ADVANCED_1Y
+;PLAN_ADVANCED_2Y
+;PLAN_ADVANCED_3Y
+;ACTIVATION_FEE
+;SERVICE_FEE_MONTHLY
+
+;NOKIA_3310

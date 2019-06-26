@@ -1,0 +1,59 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$languages=en,fr
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;fr;true
+
+UPDATE Language;isocode[unique=true];name[lang=en];name[lang=en]
+;fr;Francais;French
+
+INSERT_UPDATE UserGroup; UID[unique=true]  ; groups(uid)[mode=append]     ; locname[lang=en] ; readableLanguages(isocode); writeableLanguages(isocode)
+; basecmsmanagergroup   ; employeegroup                     ; Base CMS Manager Group ; ;
+; cmsmanagergroup       ; employeegroup,basecmsmanagergroup ; Cms Manager Group ; $languages ; $languages
+; cmseditorgroup			; employeegroup,basecmsmanagergroup	; CMS Editor Group ; $languages ; en
+
+INSERT_UPDATE User; UID[unique=true]; name      ; groups(uid);
+; cmsmanager      ; CmsManager	; cmsmanagergroup;
+; cmseditor	; CmsEditor; cmseditorgroup;
+
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmsmanagergroup;;;;;;;;
+
+;;;;CatalogVersion;+;+;-;-;-;
+;;;;Item;+;-;-;-;-;
+;;;;Type;+;-;-;-;-;
+;;;;Media;+;+;+;+;+;
+
+# cms2 items
+;;;;CMSItem;+;+;+;+;+;
+;;;;CMSVersion;+;+;+;+;+;
+
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmseditorgroup;;;;;;;;
+
+;;;;CatalogVersion;+;+;-;-;-;
+;;;;Item;+;-;-;-;-;
+;;;;Type;+;-;-;-;-;
+;;;;Media;+;;;;;
+
+# cms2 items
+;;;;CMSItem;+;+;-;-;-;
+;;;;CMSItem.name;+;-;-;-;-;
+;;;;CMSLinkComponent.styleAttributes;-;-;-;-;-;
+
+$END_USERRIGHTS;;;;;

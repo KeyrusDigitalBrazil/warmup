@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="backoffice-excel-classification-spring.xml"/>
+	<import resource="backoffice-excel-decorators-spring.xml"/>
+	<import resource="backoffice-excel-filters-spring.xml"/>
+	<import resource="backoffice-excel-mappers-spring.xml"/>
+	<import resource="backoffice-excel-parsers-spring.xml"/>
+	<import resource="backoffice-excel-populators-spring.xml"/>
+	<import resource="backoffice-excel-template-spring.xml"/>
+	<import resource="backoffice-excel-translators-spring.xml"/>
+	<import resource="backoffice-excel-validators-spring.xml"/>
+
+	<alias name="defaultPermissionCrudTypePredicate" alias="permissionCrudTypePredicate"/>
+	<bean id="defaultPermissionCrudTypePredicate"
+		  class="com.hybris.backoffice.excel.exporting.data.filter.PermissionCrudTypePredicate">
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+	</bean>
+
+	<alias name="defaultExcelExportTypePredicates" alias="excelExportTypePredicates"/>
+	<util:set id="defaultExcelExportTypePredicates"
+			  value-type="com.hybris.backoffice.excel.exporting.data.filter.ExcelExportTypePredicate">
+		<ref bean="permissionCrudTypePredicate"/>
+	</util:set>
+
+	<alias name="defaultPermissionCrudAttributePredicate" alias="permissionCrudAttributePredicate"/>
+	<bean id="defaultPermissionCrudAttributePredicate"
+		  class="com.hybris.backoffice.excel.exporting.data.filter.PermissionCrudAttributePredicate">
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+	</bean>
+
+	<alias name="defaultExcelExportAttributePredicates" alias="excelExportAttributePredicates"/>
+	<util:set id="defaultExcelExportAttributePredicates"
+			  value-type="com.hybris.backoffice.excel.exporting.data.filter.ExcelExportAttributePredicate">
+		<ref bean="permissionCrudAttributePredicate"/>
+	</util:set>
+
+	<alias name="defaultExcelExportService" alias="excelExportService"/>
+	<bean id="defaultExcelExportService" class="com.hybris.backoffice.excel.exporting.DefaultExcelExportService">
+		<property name="excelExportDivider" ref="excelExportDivider"/>
+		<property name="templatePath" value="/excel/excelImpExMasterTemplate.xlsx"/>
+		<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="excelSheetService" ref="excelSheetService"/>
+		<property name="excelWorkbookService" ref="excelWorkbookService" />
+        <property name="excelCellService" ref="excelCellService" />
+        <property name="excelHeaderService" ref="excelHeaderService" />
+		<property name="sessionService" ref="sessionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="i18NService" ref="i18NService"/>
+		<property name="backofficeVariantsService" ref="backofficeVariantsService"/>
+		<property name="typePredicates" ref="excelExportTypePredicates"/>
+		<property name="attributePredicates" ref="excelExportAttributePredicates"/>
+	</bean>
+
+	<alias name="defaultExcelImportService" alias="excelImportService"/>
+	<bean id="defaultExcelImportService" class="com.hybris.backoffice.excel.importing.DefaultExcelImportService">
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+		<property name="workbookValidators" ref="excelWorkbookValidators"/>
+		<property name="excelValidationEngineAwareValidator" ref="excelPlatformValidationEngineAwareValidator" />
+		<property name="parserRegistry" ref="parserRegistry"/>
+        <property name="excelWorkbookService" ref="excelWorkbookService" />
+        <property name="excelSheetService" ref="excelSheetService" />
+	    <property name="excelCellService" ref="excelCellService" />
+        <property name="excelHeaderService" ref="excelHeaderService" />
+        <property name="displayNameAttributeNameFormatter" ref="displayNameAttributeNameFormatter" />
+    </bean>
+
+	<alias name="defaultExcelSheetNamingStrategy" alias="excelSheetNamingStrategy"/>
+	<bean id="defaultExcelSheetNamingStrategy"
+		  class="com.hybris.backoffice.excel.template.DefaultExcelSheetNamingStrategy"/>
+
+	<alias name="defaultExcelExportDivider" alias="excelExportDivider"/>
+	<bean id="defaultExcelExportDivider" class="com.hybris.backoffice.excel.exporting.DefaultExcelExportDivider">
+		<property name="typeService" ref="typeService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="mapper">
+			<bean parent="fromComposedTypeToAttributeDescriptorsMapper">
+				<property name="filters">
+					<list>
+						<bean class="com.hybris.backoffice.excel.template.filter.OrFilter">
+							<property name="excelFilter1" ref="uniqueAndAvailableCheckingFilter"/>
+							<property name="excelFilter2" ref="mandatoryAndAvailableCheckingFilter"/>
+						</bean>
+						<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+							<property name="excelFilter" ref="valueCheckingFilter"/>
+						</bean>
+						<ref bean="skippingPkFilter"/>
+						<ref bean="permissionCheckingFilter"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelImpexConverter" alias="excelImpexConverter"/>
+	<bean id="defaultExcelImpexConverter" class="com.hybris.backoffice.excel.importing.DefaultImpexConverter"/>
+
+	<alias name="defaultExcelCronJobService" alias="excelCronJobService"/>
+	<bean id="defaultExcelCronJobService" class="com.hybris.backoffice.excel.jobs.DefaultExcelCronJobService">
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="mediaFolder" value="backofficeexcelimport"/>
+		<property name="cronJobPerformableSpringId" value="excelImportJobPerformable"/>
+	</bean>
+
+	<alias name="defaultExcelImportJobPerformable" alias="excelImportJobPerformable"/>
+	<bean id="defaultExcelImportJobPerformable" class="com.hybris.backoffice.excel.jobs.ExcelImportJobPerformable"
+		  parent="abstractJobPerformable">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="importService" ref="importService"/>
+		<property name="impexConverter" ref="excelImpexConverter"/>
+		<property name="excelImportService" ref="excelImportService"/>
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="excelWorkbookService" ref="excelWorkbookService" />
+		<property name="excelImportWorkbookPostProcessor" ref="excelImportWorkbookPostProcessor" />
+	</bean>
+
+	<alias name="defaultExcelDateUtils" alias="excelDateUtils"/>
+	<bean name="defaultExcelDateUtils" class="com.hybris.backoffice.excel.util.DefaultExcelDateUtils"/>
+
+</beans>

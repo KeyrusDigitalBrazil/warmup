@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<alias name="defaultCmsPageFacade" alias="cmsPageFacade" />
+	<bean id="defaultCmsPageFacade" class="de.hybris.platform.cmsfacades.pages.impl.DefaultPageFacade">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="pageDataPopulatorFactory" ref="pageDataPopulatorFactory" />
+		<property name="pageModelConverterFactory" ref="pageModelConverterFactory" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="cmsFindVariationPageValidator" ref="cmsFindVariationPageValidator" />
+		<property name="pageTypeModelConverter" ref="pageTypeModelConverter" />
+		<property name="pageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry" />
+		<property name="cmsPageComparator" ref="cmsPageComparator" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="cmsItemSearchTypeBlacklistMap" ref="cmsItemSearchTypeBlacklistMap" />
+		<property name="pageRenderingService" ref="cmsPageRenderingService" />
+	</bean>
+
+	<!-- Page data populators and converters -->
+	<alias name="defaultPageDataPopulatingConverters" alias="pageDataPopulatorFactory" />
+	<util:map id="defaultPageDataPopulatingConverters">
+		<description>deprecated since 6.6</description>
+		<entry value-ref="contentPageDataConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cmsfacades.data.ContentPageData</value>
+			</key>
+		</entry>
+		<entry value-ref="productPageDataConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cmsfacades.data.ProductPageData</value>
+			</key>
+		</entry>
+
+		<entry value-ref="categoryPageDataConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cmsfacades.data.CategoryPageData</value>
+			</key>
+		</entry>
+
+		<entry value-ref="catalogPageDataConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cmsfacades.data.CatalogPageData</value>
+			</key>
+		</entry>
+	</util:map>
+
+	<alias name="defaultCatalogPageDataConverter" alias="catalogPageDataConverter" />
+	<bean id="defaultCatalogPageDataConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cms2.model.pages.CatalogPageModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCategoryPageDataConverter" alias="categoryPageDataConverter" />
+	<bean id="defaultCategoryPageDataConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cms2.model.pages.CategoryPageModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultProductPageDataConverter" alias="productPageDataConverter" />
+	<bean id="defaultProductPageDataConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cms2.model.pages.ProductPageModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultContentPageDataConverter" alias="contentPageDataConverter" />
+	<bean id="defaultContentPageDataConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cms2.model.pages.ContentPageModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageDataPopulator" />
+				<ref bean="contentPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPageInitializer" alias="pageInitializer" />
+	<bean id="defaultPageInitializer" class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageInitializer">
+		<property name="adminContentSlotService" ref="cmsAdminContentSlotService" />
+	</bean>
+
+	<!-- Page model populators and converters -->
+	<alias name="defaultPageModelPopulatingConverters" alias="pageModelConverterFactory" />
+	<util:map id="defaultPageModelPopulatingConverters">
+		<description>deprecated since 6.6</description>
+		<entry value-ref="contentPageModelConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.ContentPageModel</value>
+			</key>
+		</entry>
+
+		<entry value-ref="productPageModelConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.ProductPageModel</value>
+			</key>
+		</entry>
+
+		<entry value-ref="categoryPageModelConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.CategoryPageModel</value>
+			</key>
+		</entry>
+
+		<entry value-ref="defaultPageModelConverter">
+			<key>
+				<value type="java.lang.Class">de.hybris.platform.cms2.model.pages.CatalogPageModel</value>
+			</key>
+		</entry>
+	</util:map>
+
+	<alias name="defaultContentPageModelConverter" alias="contentPageModelConverter" />
+	<bean id="defaultContentPageModelConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ContentPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageModelPopulator" />
+				<ref bean="contentPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCategoryPageModelConverter" alias="categoryPageModelConverter" />
+	<bean id="defaultCategoryPageModelConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CategoryPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultProductPageModelConverter" alias="productPageModelConverter" />
+	<bean id="defaultProductPageModelConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ProductPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPageModelConverter" alias="pageModelConverter" />
+	<bean id="defaultPageModelConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.AbstractPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="basicPageDataPopulator" class="de.hybris.platform.cmsfacades.pages.populator.data.BasicPageDataPopulator">
+		<description>deprecated since 6.6</description>
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+
+	<bean id="contentPageDataPopulator" class="de.hybris.platform.cmsfacades.pages.populator.data.ContentPageDataPopulator">
+		<description>deprecated since 6.6</description>
+	</bean>
+
+	<bean id="basicPageModelPopulator" class="de.hybris.platform.cmsfacades.pages.populator.model.BasicPageModelPopulator">
+		<description>deprecated since 6.6</description>
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<bean id="contentPageModelPopulator" class="de.hybris.platform.cmsfacades.pages.populator.model.ContentPageModelPopulator">
+		<description>deprecated since 6.6</description>
+	</bean>
+
+	<bean id="cmsPageTemplateModelPopulator" class="de.hybris.platform.cmsfacades.pagetemplates.populator.PageTemplateModelPopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultPageTemplateModelConverter" alias="pageTemplateModelConverter" />
+	<bean id="defaultPageTemplateModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.PageTemplateData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsPageTemplateModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPageTemplateFacade" alias="pageTemplateFacade" />
+	<bean id="defaultPageTemplateFacade" class="de.hybris.platform.cmsfacades.pagetemplates.impl.DefaultPageTemplateFacade">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="pageTemplateModelConverter" ref="pageTemplateModelConverter" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService" />
+	</bean>
+
+	<alias name="defaultPageTypeModelConverter" alias="pageTypeModelConverter" />
+	<bean id="defaultPageTypeModelConverter" parent="abstractPopulatingConverter">
+		<description>deprecated since 6.6</description>
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.PageTypeData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="composedTypeModelPopulator" />
+				<ref bean="pageTypeModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="pageTypeModelPopulator" class="de.hybris.platform.cmsfacades.pages.populator.model.PageTypeModelPopulator">
+		<description>deprecated since 6.6</description>
+		<property name="pageTypeMappingRegistry" ref="pageTypeMappingRegistry" />
+	</bean>
+
+	<alias name="defaultPageTypeMappingRegistry" alias="pageTypeMappingRegistry" />
+	<bean id="defaultPageTypeMappingRegistry" class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageTypeMappingRegistry">
+		<description>deprecated since 6.6</description>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageTypeMapping" p:typecode="CategoryPage"
+		p:typedata="de.hybris.platform.cmsfacades.data.CategoryPageData">
+		<description>deprecated since 6.6</description>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageTypeMapping" p:typecode="ContentPage"
+		p:typedata="de.hybris.platform.cmsfacades.data.ContentPageData">
+		<description>deprecated since 6.6</description>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageTypeMapping" p:typecode="ProductPage"
+		p:typedata="de.hybris.platform.cmsfacades.data.ProductPageData">
+		<description>deprecated since 6.6</description>
+	</bean>
+
+	<!-- Page variation resolvers -->
+	<alias name="defaultPageVariationResolver" alias="cmsPageVariationResolver" />
+	<bean id="defaultPageVariationResolver" class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageVariationResolver">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="adminRestrictionService" ref="cmsAdminRestrictionService" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias name="defaultContentPageVariationResolver" alias="cmsContentPageVariationResolver" />
+	<bean id="defaultContentPageVariationResolver" class="de.hybris.platform.cmsfacades.pages.service.impl.ContentPageVariationResolver">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="adminRestrictionService" ref="cmsAdminRestrictionService" />
+	</bean>
+
+	<alias name="defaultPageVariationResolverTypeRegistry" alias="cmsPageVariationResolverTypeRegistry" />
+	<bean id="defaultPageVariationResolverTypeRegistry" class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageVariationResolverTypeRegistry" />
+
+	<bean class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageVariationResolverType" p:typecode="AbstractPage"
+		p:resolver-ref="cmsPageVariationResolver" />
+	<bean class="de.hybris.platform.cmsfacades.pages.service.impl.DefaultPageVariationResolverType" p:typecode="ContentPage"
+		p:resolver-ref="cmsContentPageVariationResolver" />
+
+</beans>

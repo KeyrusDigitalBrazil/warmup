@@ -1,0 +1,89 @@
+<div class="account-section-header ${empty supportTickets ? '':'no-border'}">
+  <ng-container i18n="@@text.account.supportTickets.list.support.tickets"> Support Tickets</ng-container>
+
+
+  <div class="account-section-header-add pull-right">
+    <a class="add-address" (click)="addNewTicket()">
+      <ng-container i18n="@@text.account.supportTickets.list.add">Add new</ng-container>
+    </a>
+  </div>
+</div>
+<div class="clearfix visible-md-block visible-lg-block"></div>
+
+
+<div class="customer-ticketing account-overview-table">
+
+
+  <div class="pagination-bar top">
+    <div class="pagination-toolbar">
+      <sort-page-tickets ></sort-page-tickets>
+    </div>
+  </div>
+
+  <table class="responsive-table">
+    <thead>
+    <tr class="responsive-table-head hidden-xs">
+      <th>
+        <ng-container i18n="@@text.account.supportTickets.list.ticketId">Ticket ID</ng-container>
+        </th>
+      <th>
+        <ng-container i18n="@@text.account.supportTickets.list.subject">Subject</ng-container>
+       </th>
+      <th>
+        <ng-container i18n="@@text.account.supportTickets.list.dateCreated">Date Created</ng-container>
+        </th>
+      <th>
+        <ng-container i18n="@@text.account.supportTickets.list.dateUpdated">Date Updated</ng-container>
+      </th>
+      <th>
+        <ng-container i18n="@@text.account.supportTickets.list.priority">Priority</ng-container>
+      </th>
+      <th class="supportTicketsTableState">
+        <ng-container i18n="@@text.account.supportTickets.list.status">Status</ng-container>
+      </th>
+    </tr>
+    </thead>
+    <div *ngIf="!tickets">
+      <ng-container i18n="@@text.account.supportTickets.list.loading">Loading...</ng-container>
+    </div>
+
+    <tbody *ngIf="tickets">
+      <tr class="responsive-table-item" *ngFor="let ticket of tickets" >
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.ticketId">Ticket ID</ng-container>
+        </td>
+        <td (click)="goToDetails(ticket.id)"><a class="responsive-table-link" >{{ticket.ticketNumber}}</a></td>
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.subject">Subject</ng-container>
+        </td>
+        <td class="customer-ticketing-table-subject" (click)="goToDetails(ticket.id)"><a title="{{ticket.shortDescription}}" class="responsive-table-link">{{ticket.shortDescription}}</a></td>
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.dateCreated">Date Created</ng-container>
+        </td>
+        <td>{{formatDate(ticket.metadata.createdAt)}}</td>
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.dateUpdated">Date Updated</ng-container>
+        </td>
+        <td>{{formatDate(ticket.metadata.modifiedAt)}}</td>
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.priority">Priority</ng-container>
+        </td>
+        <td>{{getPriority(ticket)}}</td>
+        <td class="hidden-sm hidden-md hidden-lg">
+          <ng-container i18n="@@text.account.supportTickets.list.status">Status</ng-container>
+        </td>
+        <td>{{getStatus(ticket)}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination-bar bottom">
+    <div class="pagination-toolbar">
+      <div class="helper clearfix hidden-md hidden-lg"></div>
+      <sort-page-tickets ></sort-page-tickets>
+    </div>
+  </div>
+
+</div>
+
+

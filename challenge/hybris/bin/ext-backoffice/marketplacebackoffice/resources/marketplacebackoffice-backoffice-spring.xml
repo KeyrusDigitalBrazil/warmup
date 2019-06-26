@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.hybris.com/cockpitng/spring
+           http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<bean id="marketplacebackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/marketplacebackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+  	
+  	<bean id="createVendorWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateVendorWizardHandler">
+        <property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="vendorService" ref="vendorService"/>
+        <property name="validationService" ref="validationService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+     <bean id="createVendorUesrWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateVendorUserWizardHandler">
+        <property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+     </bean>
+     
+    <bean id="vendorUserUserGroupWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.AssignVendorUserUserGroupWizardHandler">
+    	<property name="userService" ref="userService"/>
+    </bean>
+    
+     <bean id="createMediaWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateMediaWizardHandler">
+        <property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+     </bean>
+
+    <bean id="createMediaContainerWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateMediaContainerWizardHandler">
+        <property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+     </bean>
+    
+    <bean id="createVendorProductWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateVendorProductWizardHandler">
+    	<property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+    	<property name="sessionService" ref="sessionService"/>
+    	<property name="modelService" ref="modelService"/>
+    </bean>
+    
+    <bean id="createVendorVariantProductWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateVendorVariantProductWizardHandler" parent="createVendorProductWizardHandler">
+    	<property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <bean id="marketplaceNestedAttributePanelRenderer" class="de.hybris.platform.marketplacebackoffice.renderes.NestedAttributePanelRenderer" parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="nestedAttributeUtils" ref="marketplaceNestedAttributeUtils" />
+        <property name="labelService" ref="labelService"/>
+    </bean>
+    
+    <bean id="marketplaceNestedAttributeUtils" class="de.hybris.platform.marketplacebackoffice.utils.NestedAttributeUtils"/>
+    
+    <bean id="onSuccessLoginHandler" class="de.hybris.platform.marketplacebackoffice.customization.OnSuccessLoginHandler"
+      lazy-init="false">
+   	 	<property name="sessionService" ref="sessionService"/>
+   	 	<property name="vendorService" ref="vendorService"/>
+        <property name="searchRestrictionService" ref="searchRestrictionService"/>
+        <property name="vendorCmsStrategy" ref="vendorCmsStrategy"/>
+        <property name="classificationClassesResolverStrategy" ref="classificationClassesResolverStrategy"/>
+	</bean>
+    
+	<cng:property-extender bean="cockpitWidgetEngine" property="cockpitThreadContextCreator" >
+    	<ref bean="customCockpitThreadContextCreator"/>
+    </cng:property-extender>
+    
+    <bean id="customCockpitThreadContextCreator" class="de.hybris.platform.marketplacebackoffice.customization.CustomBackofficeThreadCreator" parent="backofficeCockpitThreadContextCreator">
+    	<property name="sessionService" ref="sessionService"/>
+	</bean>
+	  
+	<bean id="productSaleableEditorAreaLogicHandler" class="de.hybris.platform.marketplacebackoffice.widgets.ProductSaleableEditorAreaLogicHandler" parent="defaultEditorAreaLogicHandler">
+		<property name="autoApproveProductStrategy" ref="autoApproveProductStrategy"/>
+		<property name="validationCoverageCalculationStrategy" ref="validationCoverageCalculationStrategy"/>
+	</bean>
+	
+	<bean id="stockLevelForm" class="de.hybris.platform.marketplacebackoffice.data.StockLevelForm" scope="prototype"/>
+	
+	<bean id="createStockLevelWizardHandler" class="de.hybris.platform.marketplacebackoffice.widgets.CreateStockLevelWizardHandler">
+        <property name="vendorService" ref="vendorService"/>
+        <property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+        <property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<bean id="productCarouselComponentEssentialSectionRenderer" class="de.hybris.platform.marketplacebackoffice.renderes.ProductCarouselComponentEssentialSectionRenderer" parent="abstractEditorAreaComponentRenderer">
+		<property name="vendorCmsService" ref="vendorCmsService"/>
+	</bean>
+	
+</beans>

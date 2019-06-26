@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:c="http://www.springframework.org/schema/c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Analytics Data Cache -->
+	<alias alias="sapProductConfigAnalyticsDataCacheRegion" name="sapProductConfigDefaultAnalyticsDataCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigDefaultAnalyticsDataCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigDefaultAnalyticsDataCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfiganalyticsdatacacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfiganalyticsdatacacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfiganalyticsdatacacheregion.timeToLive}"/>
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- Price Summary Data Cache -->
+	<alias alias="sapProductConfigPriceSummaryCacheRegion" name="sapProductConfigDefaultPriceSummaryCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigDefaultPriceSummaryCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigDefaultPriceSummaryCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigpricesummarycacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigpricesummarycacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigpricesummarycacheregion.timeToLive}"/>
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- Configuration Data Cache -->
+	<alias alias="sapProductConfigCacheRegion" name="sapProductConfigDefaultConfigCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigDefaultConfigCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigDefaultConfigCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigcacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigcacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigcacheregion.timeToLive}"/>
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- Classification System CPQ Attributes Cache -->
+	<alias alias="sapProductConfigClassificationSystemCPQAttributesCacheRegion" name="sapProductConfigDefaultClassificationSystemCPQAttributesCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigDefaultClassificationSystemCPQAttributesCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigDefaultClassificationSystemCPQAttributesCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigclassificationsystemattributescacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigclassificationsystemattributescacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigclassificationsystemattributescacheregion.timeToLive}"/>
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+		
+	 <!-- Add the cache region to the list displayed in the hac -->
+	 <bean id="sapProductConfigDefaultAnalyticsDataCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigAnalyticsDataCacheRegion" />
+	 <bean id="sapProductConfigDefaultPriceSummaryCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigPriceSummaryCacheRegion" />
+	 <bean id="sapProductConfigDefaultConfigCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCacheRegion" />
+	 <bean id="sapProductClassificationSystemCPQAttributesCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigClassificationSystemCPQAttributesCacheRegion" />
+</beans>

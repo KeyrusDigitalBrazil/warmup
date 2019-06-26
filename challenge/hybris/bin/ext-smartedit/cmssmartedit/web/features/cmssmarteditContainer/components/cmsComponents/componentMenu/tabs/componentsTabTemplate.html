@@ -1,0 +1,47 @@
+<div class="se-component-menu--tabs-header">
+
+    <div class="se-component-menu--clone-on-drop checkbox">
+        <input type="checkbox"
+            id="component-clone-checkbox"
+            class="se-component-item--details"
+            name="clone-on-drop"
+            data-ng-model="$ctrl.cloneOnDrop"
+            data-ng-change="$ctrl.onComponentCloneOnDropChange()">
+        <label class="control-label se-component-menu--clone-on-drop--label"
+            for="component-clone-checkbox"
+            data-translate="se.cms.component.clone.on.drop.label" />
+    </div>
+
+    <div data-ng-if="$ctrl.hasMultipleContentCatalogs == true">
+        <y-select class="se-component-menu--select"
+            data-id="uuid"
+            data-ng-model="$ctrl.selectedCatalogVersionId"
+            data-on-change="$ctrl.onCatalogVersionChange"
+            data-fetch-strategy="$ctrl.catalogVersionsFetchStrategy"
+            data-item-template="::$ctrl.catalogVersionTemplate"
+            data-search-enabled="false" />
+    </div>
+
+</div>
+
+<component-search data-on-change="$ctrl.onSearchTermChanged(searchTerm)"
+    data-placeholder="se.cms.componentmenu.search.placeholder"></component-search>
+
+<div class="se-component-menu--item-container"
+    recompile-dom="$ctrl.resetComponentsList">
+    <y-infinite-scrolling data-ng-if="$ctrl.isActive"
+        class="se-component-menu--infinite-scroll"
+        data-drop-down-class="ySEComponents"
+        data-page-size="10"
+        data-mask="$ctrl.searchTerm"
+        data-fetch-page="$ctrl.loadComponentItems"
+        data-context="$ctrl">
+        <div class="se-component-menu--results se-component-menu--results__custom">
+            <component-item class="se-component-menu--item-wrap"
+                data-component-info="item"
+                data-clone-on-drop="$ctrl.cloneOnDrop"
+                data-ng-repeat="item in $ctrl.items track by item.uid"></component-item>
+
+        </div>
+    </y-infinite-scrolling>
+</div>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+ All hybris buildcallbacks.xml macrodefinitions:
+
+ Build/Documentation
+
+	 before/after ant macro "clean"
+		 <macrodef name="sapproductavailabilitybackoffice_before_clean"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="sapproductavailabilitybackoffice_before_build"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="sapproductavailabilitybackoffice_before_compile_core">
+		 <macrodef name="sapproductavailabilitybackoffice_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="sapproductavailabilitybackoffice_before_compile_web" />
+		 <macrodef name="sapproductavailabilitybackoffice_after_compile_web" />
+
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="sapproductavailabilitybackoffice_before_compile_hmc" />
+		 <macrodef name="sapproductavailabilitybackoffice_after_compile_hmc" />
+
+ Preparing extension
+
+	 will be called in the beginning of the ant call and only once (also when using multiple
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="sapproductavailabilitybackoffice_only_once_prepare"/>
+
+ Creating ear module/production
+
+	 before/after ant macro "ear"
+		 <macrodef name="sapproductavailabilitybackoffice_before_ear"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="sapproductavailabilitybackoffice_before_production" />
+		 <macrodef name="sapproductavailabilitybackoffice_after_production" />
+
+ JUnit Test
+
+	 before/after ant macro "yunitinit"
+		 <macrodef name="sapproductavailabilitybackoffice_before_yunitinit" />
+		 <macrodef name="sapproductavailabilitybackoffice_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="sapproductavailabilitybackoffice_before_yunit" />
+		 <macrodef name="sapproductavailabilitybackoffice_after_yunit" />
+
+ Distribution package
+
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapproductavailabilitybackoffice_after_dist"/>
+		 <macrodef name="sapproductavailabilitybackoffice_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapproductavailabilitybackoffice_before_dist_copy"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_dist_copy"/>
+
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.sapproductavailabilitybackoffice.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.sapproductavailabilitybackoffice.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+
+ Backoffice module
+
+ 	 before/after ant macro "backoffice" - internal target; only for use when extensin is a backoffice module
+		 <macrodef name="sapproductavailabilitybackoffice_before_clean_backoffice"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_clean_backoffice"/>
+		 <macrodef name="sapproductavailabilitybackoffice_before_compile_backoffice"/>
+		 <macrodef name="sapproductavailabilitybackoffice_after_compile_backoffice"/>
+
+--><project name="sapproductavailabilitybackoffice_buildcallbacks">
+	<property name="sapproductavailabilitybackofficeWebFragmentSrc" value="${ext.sapproductavailabilitybackoffice.path}/resources/web-fragment.xml"/>
+	<property name="sapproductavailabilitybackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_sapproductavailabilitybackoffice.jar"/>
+
+	
+
+	
+
+	<macrodef name="sapproductavailabilitybackoffice_after_clean">
+		<sequential>
+			<sapproductavailabilitybackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapproductavailabilitybackoffice_after_build">
+		<sequential>
+			<sapproductavailabilitybackoffice_remove_web_fragment/>
+			<sapproductavailabilitybackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapproductavailabilitybackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${sapproductavailabilitybackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${sapproductavailabilitybackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapproductavailabilitybackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${sapproductavailabilitybackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${sapproductavailabilitybackofficeWebFragmentDestJar}">
+							<metainf file="${sapproductavailabilitybackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+</project>

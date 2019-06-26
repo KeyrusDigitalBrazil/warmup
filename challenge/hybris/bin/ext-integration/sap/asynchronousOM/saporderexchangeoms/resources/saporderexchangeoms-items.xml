@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="ConsignmentStatus" generate="false"
+			autocreate="false">
+			<value code="CANCELLING" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<!-- relations with subtypes of BusinessProcess -->
+		<relation generate="true" localized="false"
+				  code="Consignment2SapConsignmentProcess" autocreate="true">
+			<sourceElement type="Consignment" cardinality="one"
+						   qualifier="consignment">
+				<modifiers initial="true" optional="true" />
+			</sourceElement>
+			<targetElement type="SapConsignmentProcess"
+						   cardinality="many" qualifier="sapConsignmentProcesses">
+				<modifiers initial="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false"
+				  code="OrderProcess2SapConsignmentProcess" autocreate="true">
+			<sourceElement type="OrderProcess" cardinality="one"
+						   qualifier="parentProcess">
+				<modifiers initial="true" optional="true" />
+			</sourceElement>
+			<targetElement type="SapConsignmentProcess"
+						   cardinality="many" qualifier="sapConsignmentProcesses">
+				<modifiers initial="true" optional="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+
+		<!-- Subtypes of SapBusinessProcess -->
+		<itemtype code="SapConsignmentProcess" autocreate="true"
+			generate="true"
+			jaloclass="de.hybris.platform.sap.saporderexchangeoms.jalo.SapConsignmentProcess"
+			extends="BusinessProcess">
+	
+			<attributes>
+	
+				<attribute qualifier="waitingForConsignment" type="boolean">
+					<description>Mark that process is waiting for consignment</description>
+					<modifiers optional="false" initial="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+	
+				<attribute qualifier="warehouseConsignmentState" type="WarehouseConsignmentState">
+					<description>State of warehouse process.</description>
+					<persistence type="property" />
+					<modifiers initial="false" optional="true" />
+				</attribute>
+	
+				<attribute qualifier="done" type="boolean">
+					<description>Mark process as done</description>
+					<modifiers optional="false" initial="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+	
+			</attributes>
+	
+		</itemtype>
+
+		<itemtype code="Order" autocreate="false" generate="false">
+			<description>Extending Order type with additional attributes.</description>
+			<attributes>
+				<attribute qualifier="sapLogicalSystem" type="java.lang.String">
+					<description>SAP logical system</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapSalesOrganization" type="SAPSalesOrganization">
+					<description>SAP Sales Organization</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapSystemType" type="SapSystemType">
+					<description>SAP System Type</description>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("SapSystemType", "SAP_ERP")</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+
+</items>

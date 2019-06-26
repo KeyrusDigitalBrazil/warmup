@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+
+
+	<!-- Explorer tree configuration -->
+	<context component="explorer-tree" merge-by="module" parent="auto">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="merchnode">
+				<explorer-tree:navigation-node id="merchconfignode">
+					<explorer-tree:type-node code="MerchIndexingConfig" id="merchIndexingConfig" />
+					<explorer-tree:type-node code="MerchSynchronizationConfig" id="merchSynchronizationConfig" />
+				</explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="MerchIndexingConfig">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" type="MerchIndexingConfig">
+			<y:base>
+				<y:labels>
+					<y:label>@labelService.getObjectLabel(indexedType)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<!-- List view configuration -->
+
+		<context component="listview" type="MerchIndexingConfig" merge-by="type">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+								 refresh-after-object-creation="true">
+				<list-view:column qualifier="indexedType" />
+				<list-view:column qualifier="enabled" />
+			</list-view:list-view>
+		</context>
+
+		<!-- Reference list view configuration -->
+
+		<context type="MerchIndexingConfig" component="referenceListView">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="indexedType" />
+				<list-view:column qualifier="enabled" />
+			</list-view:list-view>
+		</context>
+
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="MerchIndexingConfig" merge-by="type">
+			<editorArea:editorArea>
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="indexedType" />
+						<editorArea:attribute qualifier="enabled" />
+						<editorArea:attribute qualifier="language" />
+						<editorArea:attribute qualifier="currency" />
+						<editorArea:attribute qualifier="baseImageUrl" />
+						<editorArea:attribute qualifier="baseProductPageUrl" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+				<editorArea:tab name="tab.configuration.indexedprops">
+					<editorArea:section name="sec.configuration.indexedprops.details">
+						<editorArea:attribute qualifier="merchProperties" />
+						<editorArea:attribute qualifier="merchImageProperties" />
+						<editorArea:attribute qualifier="merchCatalogVersions" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard" type="MerchIndexingConfig">
+			<wz:flow id="MerchIndexingConfigWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="MerchIndexingConfigPrepare">
+					<wz:initialize property="newMerchIndexingConfig" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.merchIndexingConfig.name.label" sublabel="create.merchIndexingConfig.name.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newMerchIndexingConfig">
+							<wz:property qualifier="indexedType"/>
+							<wz:property qualifier="enabled"/>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:next
+								visible="newMerchIndexingConfig.indexedType != null" />
+					</wz:navigation>
+				</wz:step>
+				<wz:step id="step2" label="create.merchIndexingConfig.indexedproperty.label" sublabel="create.merchIndexingConfig.indexedproperty.sublabel">
+					<wz:content id="step2.content">
+						<wz:property-list root="newMerchIndexingConfig">
+							<wz:property qualifier="language"/>
+							<wz:property qualifier="currency"/>
+							<wz:property qualifier="baseImageUrl"/>
+							<wz:property qualifier="baseProductPageUrl"/>
+							<wz:property qualifier="merchCatalogVersions"/>
+							<wz:property qualifier="merchProperties" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+								<wz:editor-parameter>
+									<wz:name>isNestedObjectCreationDisabled</wz:name>
+									<wz:value>false</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="merchImageProperties" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+								<wz:editor-parameter>
+									<wz:name>isNestedObjectCreationDisabled</wz:name>
+									<wz:value>false</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step2.navigation">
+						<wz:back/>
+						<wz:cancel/>
+						<wz:done
+								visible="newMerchIndexingConfig.language != null AND newMerchIndexingConfig.currency != null" >
+							<wz:save-all/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="MerchSynchronizationConfig">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" type="MerchSynchronizationConfig">
+			<y:base>
+				<y:labels>
+					<y:label>@labelService.getObjectLabel(indexedType)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<!-- List view configuration -->
+
+		<context component="listview" type="MerchSynchronizationConfig" merge-by="type">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+								 refresh-after-object-creation="true">
+				<list-view:column qualifier="baseSite" />
+				<list-view:column qualifier="catalog" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="enabled" />
+			</list-view:list-view>
+		</context>
+
+		<!-- Reference list view configuration -->
+
+		<context type="MerchSynchronizationConfig" component="referenceListView">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="baseSite" />
+				<list-view:column qualifier="catalog" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="enabled" />
+			</list-view:list-view>
+		</context>
+
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="MerchSynchronizationConfig" merge-by="type">
+			<editorArea:editorArea>
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="baseSite" />
+						<editorArea:attribute qualifier="catalog" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="enabled" />
+						<editorArea:attribute qualifier="baseCategoryUrl" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard" type="MerchSynchronizationConfig">
+			<wz:flow id="MerchSynchronizationConfigWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="MerchSynchronizationConfigPrepare">
+					<wz:initialize property="newMerchSynchronizationConfig" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.merchSynchronizationConfig.name.label" sublabel="create.merchSynchronizationConfig.name.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newMerchSynchronizationConfig">
+							<wz:property qualifier="baseSite" />
+ 							<wz:property qualifier="catalog"/>
+ 							<wz:property qualifier="catalogVersion"/>
+							<wz:property qualifier="enabled"/>
+							<wz:property qualifier="baseCategoryUrl"/>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:back/>
+						<wz:cancel/>
+						<wz:done
+								visible="newMerchSynchronizationConfig.baseSite != null AND newMerchSynchronizationConfig.catalog != null AND newMerchSynchronizationConfig.catalogVersion != null" >
+							<wz:save-all/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+	<context type="AbstractMerchProperty">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" type="AbstractMerchProperty">
+			<y:base>
+				<y:labels>
+					<y:label>@labelService.getObjectLabel(indexedProperty)+ ' -> ' + merchMappedName</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<!-- List view configuration -->
+
+		<context component="listview" type="AbstractMerchProperty" merge-by="type">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+								 refresh-after-object-creation="true">
+				<list-view:column qualifier="indexedProperty" />
+				<list-view:column qualifier="merchMappedName" />
+			</list-view:list-view>
+		</context>
+
+		<!-- Reference list view configuration -->
+
+		<context type="AbstractMerchProperty" component="referenceListView">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="indexedProperty" />
+				<list-view:column qualifier="merchMappedName" />
+			</list-view:list-view>
+		</context>
+
+		<context component="create-wizard" type="AbstractMerchProperty">
+			<wz:flow id="MerchPropertyWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="MerchPropertyPrepare">
+					<wz:initialize property="newMerchProperty" type="ctx.TYPE_CODE" />
+					<wz:assign property="newMerchProperty.merchIndexingConfig" value="ctx.parentObject" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.merchIndexingProperty.name.label" sublabel="create.merchIndexingProperty.name.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newMerchProperty">
+							<wz:property qualifier="merchMappedName"/>
+							<wz:property qualifier="indexedProperty">
+								<wz:editor-parameter>
+									<wz:name>referenceSearchCondition_solrIndexedType</wz:name>
+									<wz:value>{parentObject.merchIndexingConfig.indexedType}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done
+								visible="newMerchProperty.indexedProperty != null" >
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+</config>

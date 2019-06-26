@@ -1,0 +1,39 @@
+$destination_target=kymaDefaultTarget
+
+INSERT_UPDATE DestinationTarget;id[unique=true];destinationChannel(code)[default=KYMA]
+                               ;$destination_target;
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true];resourceIds;scope;authorizedGrantTypes;clientSecret;authorities
+;kyma;hybris;basic;authorization_code,refresh_token,password,client_credentials;password;ROLE_TRUSTED_CLIENT
+
+INSERT_UPDATE ExposedOAuthCredential;id[unique=true];oAuthClientDetails(clientId);password
+;kymaCred;kyma;secret
+
+INSERT_UPDATE EventConfiguration;eventClass[unique=true];destinationTarget(id)[unique = true,default=$destination_target];version[unique=true];exportFlag;priority(code);exportName;mappingType(code);eventPropertyConfigurations(&property)
+;de.hybris.RegisterEvent;;1;true;HIGH;ECRegisterEvent;GENERIC
+
+INSERT_UPDATE Endpoint;id[unique=true];version[unique=true];description;specUrl;specData;name
+;ec-ycommercewebservices;v2;"EC OCC Commerce Webservices v2";https://my.hybrisplatform.fqn[:port]/rest/v2/api-docs;"{""specData"":""empty""}";EC OCC Commerce Webservices v2
+;ec-assistedservicewebservices;v1;"EC Assisted Service Module Webservices v1";https://my.hybrisplatform.fqn[:port]/assistedservicewebservices/v2/api-docs;"{""specData"":""empty""}";EC Assisted Service Module Webservices v2
+;ec-ycommercewebservices_inactive;v3;"EC OCC Commerce Webservices v3";https://my.hybrisplatform.fqn[:port]/rest/v2/api-docs;"{""specData"":""empty""}"; EC OCC Commerce Webservices v3
+;ec-assistedservicewebservices_inactive;v2;"EC Assisted Service Module Webservices v2";https://my.hybrisplatform.fqn[:port]/assistedservicewebservices/v2/api-docs;"{""specData"":""empty""}";EC Assisted Service Module Webservices v3
+;ec-all-events;v1;"EC Events v1";"empty";;EC Events v1
+;kyma-events;v1;"EventsEndpoint";"empty";;Events Endpoint v1
+;kyma-services;v1;"MetadataServicesEndpoint";"empty";;Metadata Services Endpoint v1
+
+INSERT_UPDATE ExposedDestination;id[unique=true];url;endpoint(id);additionalProperties(key,value)[map-delimiter=|];destinationTarget(id)[unique = true,default=$destination_target];active;credential(id);
+;ec-assistedservicewebservices;https://my.hybrisplatform.fqn[:port]/assistedservicewebservices;ec-assistedservicewebservices;;;true;kymaCred;
+;ec-ycommercewebservices;https://my.hybrisplatform.fqn[:port]/rest/v2;ec-ycommercewebservices;;;true;kymaCred;
+;ec-assistedservicewebservices_inactive;https://my.hybrisplatform.fqn[:port]/assistedservicewebservices;ec-assistedservicewebservices_inactive;;;false;kymaCred;
+;ec-ycommercewebservices_inactive;https://my.hybrisplatform.fqn[:port]/rest/v2;ec-ycommercewebservices_inactive;;;false;kymaCred;
+;ec-assistedservicewebservices2;https://my.hybrisplatform.fqn[:port]/assistedservicewebservices;ec-assistedservicewebservices;;;true;kymaCred;
+;ec-ycommercewebservices2;https://my.hybrisplatform.fqn[:port]/rest/v2;ec-ycommercewebservices;;;true;kymaCred;
+;ec-all-events;"empty";ec-all-events;;;true;
+
+INSERT_UPDATE ConsumedCertificateCredential;id[unique=true]
+;kyma-cert
+
+INSERT_UPDATE ConsumedDestination;id[unique=true];url;endpoint(id);additionalProperties(key,value)[map-delimiter=|];destinationTarget(id)[unique = true,default=$destination_target];active;credential(id)
+;kyma-events;https://localhost:8081/v1/events;kyma-events;;;;kyma-cert
+;kyma-events-no-credentials;https://localhost:8081/v1/events;kyma-events;;;;
+;kyma-services;https://localhost:8081/v1/metadata/services;kyma-services;;;;kyma-cert

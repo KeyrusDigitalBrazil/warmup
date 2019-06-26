@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="angulartestancillary_buildcallbacks" xmlns:if="ant:if">
+
+<!--
+	<patternset id="extension.angulartestancillary.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+    </patternset>
+
+    <patternset id="extension.angulartestancillary.source.filter">
+        <patternset refid="extension.source.filter"/>
+    </patternset> 
+-->
+
+    <patternset id="extension.angulartestancillary.production.filter">
+        <patternset refid="extension.production.filter" />
+        <exclude name="resources/npm/**" />
+    </patternset>
+
+    <patternset id="extension.angulartestancillary.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="resources${file.separator}npm${file.separator}node_modules${file.separator}phantomjs-prebuilt${file.separator}lib${file.separator}phantom${file.separator}bin"/>
+    </patternset>
+
+    <patternset id="extension.angulartestancillary.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="resources${file.separator}npm${file.separator}node_modules${file.separator}phantomjs-prebuilt${file.separator}lib${file.separator}phantom${file.separator}bin"/>
+    </patternset>
+
+    <property name="ext.angulartestancillary.node.modules.dir" value="${ext.angulartestancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" />
+    <property name="ext.angulartestancillary.phantomjs.driver.dir" value="${ext.angulartestancillary.node.modules.dir}${file.separator}phantomjs-prebuilt${file.separator}lib${file.separator}phantom${file.separator}bin" />
+    <property name="ext.angulartestancillary.phantomjs.driver.path" value="${ext.angulartestancillary.phantomjs.driver.dir}${file.separator}phantomjs" />
+
+    <condition property="angulartestancillary.ready">
+        <and>
+            <available file="${ext.angularancillary.node.modules.dir}" type="dir"/>
+            <available file="${ext.angulartestancillary.node.modules.dir}" type="dir"/>
+            <available file="${loc.PHANTOM_JS_DIR}/phantomjs" type="file"/>
+        </and>
+    </condition>
+
+    <macrodef name="angulartestancillary_before_build" if:true="${angulartestancillary.ready}">
+       <sequential>
+            <if>
+                <not>
+                     <available file="${ext.angulartestancillary.phantomjs.driver.path}" />
+                </not>
+                <then>
+                    <if>
+                        <or>
+                            <os family="mac" />
+                            <os family="unix" />
+                        </or>
+                        <then>
+                            <echo message="Linking to phantomjs driver provided in npmtestancillary" />
+                            <mkdir dir="${ext.angulartestancillary.phantomjs.driver.dir}" />
+                            <exec executable="rm">
+                                <arg line="-f ${ext.angulartestancillary.phantomjs.driver.path}" />
+                            </exec>
+                            <exec executable="ln">
+                                <arg line="-sf ${loc.PHANTOM_JS_DIR}/phantomjs ${ext.angulartestancillary.phantomjs.driver.path}" />
+                            </exec>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="angulartestancillary_before_clean" if:true="${angulartestancillary.ready}">
+        <sequential>
+            <if>
+                <or>
+                    <os family="mac" />
+                    <os family="unix" />
+                </or>
+                <then>
+                    <delete file="${ext.angulartestancillary.phantomjs.driver.path}" followsymlinks="false" removenotfollowedsymlinks="true" />
+                </then>
+            </if> 
+        </sequential>
+    </macrodef>
+
+    <macrodef name="prepare_node_modules_for_test">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <if>
+                <and>
+                    <available file="@{angular.project.path}" type="dir" />
+                    <available file="@{angular.project.path}${file.separator}node_modules" type="dir" />
+                    <available file="${ext.angulartestancillary.path}/resources/npm/node_modules" type="dir" />
+                </and>
+                <then>
+                    <var name="y.main.node.modules.dir" value="@{angular.project.path}${file.separator}node_modules" />
+                    <symLinkSubDirs source.root.dir="${ext.angulartestancillary.path}/resources/npm/node_modules" target.root.dir="${y.main.node.modules.dir}" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="run_npm_test">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <if>
+                <and>
+                    <available file="@{angular.project.path}" type="dir" />
+                    <available file="${ext.angularancillary.node.modules.dir}" type="dir" />
+                </and>
+                <then>
+                    <if>
+                        <or>
+                            <os family="mac" />
+                            <os family="unix" />
+                        </or>
+                        <then>
+                            <echo message="Executing npm run test"/>
+                            <exec executable="sh" dir="@{angular.project.path}" failonerror="true">
+                                <env key="PATH" value="${env.PATH}:${loc.NODE_HOME}/bin"/>
+                                <env key="NODE_PATH" value="${ext.angulartestancillary.node.modules.dir}:${ext.angularancillary.node.modules.dir}"/>
+                                <arg value="-c" />
+                                <arg value="./npm test" />
+                            </exec>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="prepare_and_test_angular_project">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <sequential  if:true="${angulartestancillary.ready}">
+                <echo message="Preparing and testing @{angular.project.path}"/>
+                <prepare_node_modules_for_build angular.project.path="@{angular.project.path}" />
+                <prepare_node_modules_for_test angular.project.path="@{angular.project.path}" />
+                <angulartestancillary_before_build/>
+                <run_npm_test angular.project.path="@{angular.project.path}" />
+            </sequential>
+        </sequential>
+    </macrodef>
+
+    <target name="npmtest" description="Run npm test. Specify -Dangular.extension to denote the directory of where to run npm test command ">
+        <propertycopy name="angular.extension.path" from="ext.${angular.extension}.path" />
+        <prepare_and_test_angular_project angular.project.path="${angular.extension.path}${file.separator}y-main" />
+    </target>
+
+</project>

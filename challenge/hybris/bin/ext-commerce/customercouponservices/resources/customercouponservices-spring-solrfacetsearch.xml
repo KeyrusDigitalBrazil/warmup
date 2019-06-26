@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="customerCouponCodeValueProvider"
+	      class="de.hybris.platform.customercouponservices.solrsearch.CustomerCouponCodeValueProvider"
+	      parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="customerCouponService" ref="customerCouponService"/>
+		<property name="productDao" ref="productDao" />
+		<property name="categoryDao" ref="categoryDao" />
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<bean id="customerCouponCodeValueResolver"
+		  class="de.hybris.platform.customercouponservices.solrsearch.CustomerCouponCodeValueResolver"
+		  parent="abstractValueResolver" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="customerCouponService" ref="customerCouponService"/>
+		<property name="productDao" ref="productDao" />
+	</bean>
+	
+	<bean id="customerCouponFacetDisplayNameProvider"
+	      class="de.hybris.platform.customercouponservices.solrsearch.CustomerCouponFacetDisplayNameProvider" >
+		<property name="customerCouponDao" ref="customerCouponDao"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="couponDao" ref="couponDao" />
+	</bean>
+	
+</beans>

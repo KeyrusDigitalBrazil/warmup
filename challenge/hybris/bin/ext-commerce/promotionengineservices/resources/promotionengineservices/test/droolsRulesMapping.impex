@@ -1,0 +1,71 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang = en
+
+INSERT_UPDATE PromotionGroup; identifier[unique = true]
+; website1
+
+INSERT_UPDATE Catalog; id[unique = true];
+; testRuleMappingCatalog ;
+
+INSERT_UPDATE CatalogVersion; version[unique = true]; catalog(id)[unique = true];
+; NoMappings      ; testRuleMappingCatalog ;
+; SingleMappings  ; testRuleMappingCatalog ;
+; DoubledMappings ; testRuleMappingCatalog ;
+
+INSERT_UPDATE DroolsKIEModule; name[unique = true]; mvnGroupId; mvnArtifactId; mvnVersion; ruleType(code); active; version;
+; promotions-module1-junit ; hybris-rules ; promotions1-junit ; 1.0.0 ; PROMOTION ; true ; 0 ;
+; promotions-module2-junit ; hybris-rules ; promotions2-junit ; 1.0.0 ; PROMOTION ; true ; 0 ;
+; promotions-module3-junit ; hybris-rules ; promotions3-junit ; 1.0.0 ; PROMOTION ; true ; 0 ;
+
+INSERT_UPDATE DroolsKIEBase; name[unique = true]; kieModule(name)[unique = true]; equalityBehavior(code); eventProcessingMode(code)
+; promotions-base1-junit ; promotions-module1-junit ; EQUALITY ; STREAM
+; promotions-base2-junit ; promotions-module2-junit ; EQUALITY ; STREAM
+; promotions-base3-junit ; promotions-module3-junit ; EQUALITY ; STREAM
+
+INSERT_UPDATE DroolsKIESession; name[unique = true]; kieBase(name)[unique = true]; sessionType(code)
+; promotions-session1-junit ; promotions-base1-junit ; STATEFUL
+; promotions-session2-junit ; promotions-base2-junit ; STATEFUL
+; promotions-session3-junit ; promotions-base3-junit ; STATEFUL
+
+INSERT_UPDATE DroolsRuleEngineContext; name[unique = true]; kieSession(name); ruleFiringLimit;
+; promotions-junit-context1 ; promotions-session1-junit ; 200 ;
+; promotions-junit-context2 ; promotions-session2-junit ; 200 ;
+; promotions-junit-context3 ; promotions-session3-junit ; 200 ;
+
+INSERT_UPDATE CatalogVersionToRuleEngineContextMapping; context(name)[unique = true]; catalogVersion(catalog(id), version)[unique = true]
+; promotions-junit-context1 ; testRuleMappingCatalog:DoubledMappings
+; promotions-junit-context2 ; testRuleMappingCatalog:DoubledMappings
+; promotions-junit-context3 ; testRuleMappingCatalog:SingleMappings
+
+UPDATE DroolsKIEModule; name[unique = true]; defaultKIEBase(name)
+; promotions-module1-junit ; promotions-base1-junit
+; promotions-module2-junit ; promotions-base2-junit
+; promotions-module3-junit ; promotions-base3-junit
+
+UPDATE DroolsKIEBase; name[unique = true]; defaultKIESession(name)
+; promotions-base1-junit ; promotions-session1-junit
+; promotions-base2-junit ; promotions-session2-junit
+; promotions-base3-junit ; promotions-session3-junit
+
+INSERT_UPDATE PromotionSourceRule; code[unique = true]; name[lang = en]; description[lang = en]; priority; status(code); website(identifier); version[default = 1]; startDate[default = 01-01-2000, dateformat = dd-MM-yyyy]; endDate[default = 01-01-2099, dateformat = dd-MM-yyyy];
+; rule1 ; rule1 ; description1 ; 1 ; PUBLISHED ; website1 ; 2
+; rule2 ; rule2 ; description2 ; 1 ; PUBLISHED ; website1 ; 1
+; rule3 ; rule3 ; description3 ; 1 ; PUBLISHED ; website1 ; 3
+; rule3 ; rule3 ; description3 ; 1 ; ARCHIVED  ; website1 ; 2
+; rule3 ; rule3 ; description3 ; 1 ; ARCHIVED  ; website1 ; 1
+
+INSERT_UPDATE DroolsRule; code[unique = true]; kieBase(name)[unique = true]; uuid[unique = true]; sourceRule(code); version[default = 1]; active[default = true]; currentVersion[default = true]; ruleType(code)[default = PROMOTION]
+; drools-rule1-junit ; promotions-base1-junit ; drools-rule1-junit ;
+; drools-rule2-junit ; promotions-base2-junit ; drools-rule2-junit ;
+; drools-rule3-junit ; promotions-base3-junit ; drools-rule3-junit ;
+

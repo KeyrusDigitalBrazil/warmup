@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+			  http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Orika : Converters -->
+	<bean class="de.hybris.platform.warehousingwebservices.mapping.converters.stocklevel.StockLevelAdjustmentReasonConverter"/>
+
+	<!-- Field mapping configuration -->
+	<bean id="dataMapper"
+		class="de.hybris.platform.webservicescommons.mapping.impl.DefaultDataMapper">
+		<property name="fieldSetBuilder" ref="fieldSetBuilder" />
+	</bean>
+
+	<bean id="fieldSetBuilder"
+		class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetBuilder">
+		<property name="defaultRecurrencyLevel" value="4" />
+		<property name="defaultMaxFieldSetSize" value="50000" />
+		<property name="fieldSetLevelHelper" ref="fieldSetLevelHelper" />
+	</bean>
+
+	<alias alias="fieldSetLevelHelper" name="defaultFieldSetLevelHelper" />
+	<bean id="defaultFieldSetLevelHelper"
+		class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetLevelHelper">
+	</bean>
+	
+	<bean class="de.hybris.platform.webservicescommons.mapping.filters.GeneralFieldFilter">
+		<property name="fieldSelectionStrategy" ref="fieldSelectionStrategy"/>
+	</bean>
+
+	<!-- Field mapping -->
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.warehousingfacades.order.data.PackagingInfoData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.order.PackagingInfoWsDTO"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commercefacades.order.data.ConsignmentData"/>
+		<property name="destClass" value="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.warehousingfacades.storelocator.data.WarehouseData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.store.WarehouseWsDto"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.search.pagedata.PaginationData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="totalNumberOfResults" value="totalResults"/>
+				<entry key="numberOfPages" value="totalPages"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.order.ConsignmentSearchPageWsDto"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="consignments"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.order.ConsignmentEntrySearchPageWsDto"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="consignmentEntries"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.store.WarehouseSearchPageWsDto"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="warehouses"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.product.StockLevelSearchPageWsDto"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="stockLevels"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.warehousingwebservices.dto.store.PointOfServiceSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="pointsOfService"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- Fieldset mapping -->
+
+
+	<!-- Fieldset mapping -->
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.store.PointOfServiceSearchPageWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="pointsOfService(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="pointsOfService(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="pointsOfService(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.order.ConsignmentSearchPageWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="consignments(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="consignments(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="consignments(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.order.ConsignmentEntrySearchPageWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="consignmentEntries(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="consignmentEntries(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="consignmentEntries(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentEntryWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="orderEntry(BASIC),quantityShipped,quantity"/>
+				<entry key="DEFAULT" value="orderEntry(DEFAULT),quantityShipped,quantity,quantityPending,quantityDeclined"/>
+				<entry key="FULL" value="orderEntry(FULL),quantityShipped,quantity,quantityPending,quantityDeclined"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code,orderCode,status,warehouseCode"/>
+				<entry key="DEFAULT" value="code,orderCode,warehouseCode,shippingDate,deliveryMode(DEFAULT),trackingID,status,entries(DEFAULT),packagingInfo"/>
+				<entry key="FULL" value="code,orderCode,warehouseCode,shippingDate,deliveryMode(FULL),trackingID,status,entries(FULL),deliveryPointOfService(FULL),shippingAddress(FULL),packagingInfo"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+				  value="de.hybris.platform.commercewebservicescommons.dto.order.OrderEntryWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="entryNumber,quantity,url"/>
+				<entry key="DEFAULT" value="BASIC,totalPrice,product,quantityAllocated,quantityUnallocated,quantityCancelled,quantityPending,quantityShipped,quantityReturned"/>
+				<entry key="FULL"
+					   value="product(FULL),deliveryPointOfService(FULL),entryNumber,updateable,deliveryMode(FULL),quantity,basePrice(FULL),totalPrice(FULL),url,quantityAllocated,quantityUnallocated,quantityCancelled,quantityPending,quantityShipped,quantityReturned"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.store.WarehouseWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code,url"/>
+				<entry key="DEFAULT" value="code,url,pointsOfServices(DEFAULT),isDefault"/>
+				<entry key="FULL" value="code,url,pointsOfServices(FULL),isDefault,consignments(FULL),priority,deliveryModes(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.store.WarehouseSearchPageWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="warehouses(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="warehouses(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="warehouses(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="pageSize,currentPage"/>
+				<entry key="DEFAULT" value="totalResults,pageSize,currentPage"/>
+				<entry key="FULL" value="totalResults,pageSize,currentPage,totalPages,sort"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.product.StockLevelSearchPageWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="stockLevels(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="stockLevels(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="stockLevels(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.product.StockLevelWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="productCode,warehouse(BASIC),initialQuantityOnHand"/>
+				<entry key="DEFAULT" value="productCode,initialQuantityOnHand,bin,warehouse(DEFAULT)"/>
+				<entry key="FULL" value="productCode,initialQuantityOnHand,bin,warehouse(FULL),releaseDate,nextDeliveryTime,inStockStatus"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.store.PointOfServiceWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="name,description,address(BASIC),warehouseCodes"/>
+				<entry key="DEFAULT" value="name,description,address(DEFAULT),displayName,formattedDistance,distanceKm,geoPoint(DEFAULT),url,openingHours(DEFAULT),warehouseCodes"/>
+				<entry key="FULL" value="name,description,address(FULL),displayName,formattedDistance,distanceKm,geoPoint(FULL),url,mapIcon(FULL),features,storeImages(FULL),openingHours(FULL),storeContent,warehouseCodes"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.asn.AsnEntryWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="productCode,quantity"/>
+				<entry key="DEFAULT" value="productCode,quantity" />
+				<entry key="FULL" value="productCode,quantity"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.warehousingwebservices.dto.asn.AsnWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="externalId,pointOfServiceName,releaseDate"/>
+				<entry key="DEFAULT" value="externalId,warehouseCode,asnEntries(DEFAULT),pointOfServiceName,comment,releaseDate,internalId,status"/>
+				<entry key="FULL" value="externalId,warehouseCode,asnEntries(FULL),pointOfServiceName,comment,releaseDate,internalId,status"/>
+			</map>
+		</property>
+	</bean>
+
+</beans>

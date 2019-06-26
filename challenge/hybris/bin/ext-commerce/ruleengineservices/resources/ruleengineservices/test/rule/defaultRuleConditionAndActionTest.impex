@@ -1,0 +1,87 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang=en
+$defaultPromoGrp=testPromoGrp
+
+############################# CONDITIONS ##########################
+
+INSERT_UPDATE RuleConditionDefinitionCategory;id[unique=true];name[lang=$lang];priority;icon(code)
+;general;General;100;
+
+INSERT_UPDATE RuleConditionDefinition;id[unique=true];name[lang=$lang];priority;breadcrumb[lang=$lang];allowsChildren;translatorId;translatorParameters;categories(id)
+;y_group;Group;200;{operator};true;ruleGroupConditionTranslator;;general
+;y_container;Container;100;{id};true;ruleContainerConditionTranslator;;general
+
+INSERT_UPDATE RuleConditionDefinitionRuleTypeMapping;definition(id)[unique=true];ruleType(code)[default=AbstractRule][unique=true]
+;y_group;
+;y_container;
+
+INSERT_UPDATE RuleConditionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;name[lang=$lang];description[lang=$lang];type;value;required[default=true]
+;y_group;operator;100;Group operator;Combine the conditions in the group using OR/AND;Enum(de.hybris.platform.ruleengineservices.definitions.conditions.RuleGroupOperator);"""AND""";
+;y_container;id;100;Container ID;Enter ID of the container to be referred in actions;java.lang.String;;
+
+INSERT_UPDATE RuleConditionDefinitionCategory;id[unique=true];name[lang=$lang];priority
+;cart;Cart;1300
+
+INSERT_UPDATE RuleConditionDefinition;id[unique=true];name[lang=$lang];priority;breadcrumb[lang=$lang];allowsChildren;translatorId;translatorParameters;categories(id)
+;y_qualifying_products;Qualifying products;200;Cart contains {products_operator} products {products};false;ruleQualifyingProductsConditionTranslator;;cart
+;y_qualifying_categories;Qualifying categories;100;Cart contains products from {categories_operator} categories {categories};false;qualifyingCategoriesConditionTranslator;;cart
+
+INSERT_UPDATE RuleConditionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;name[lang=$lang];description[lang=$lang];type;value;required[default=true]
+;y_qualifying_products;operator;400;Operator;Operator to compare the quantity required for qualifying products;Enum(de.hybris.platform.ruledefinitions.AmountOperator);"""GREATER_THAN_OR_EQUAL""";
+;y_qualifying_products;quantity;300;Quantity;Quantity of qualifying products required;java.lang.Integer;1;
+;y_qualifying_products;products_operator;200;Product selection operator;Select ANY product or select ALL products from list of qualifying products;Enum(de.hybris.platform.ruledefinitions.CollectionOperator);"""CONTAINS_ANY""";
+;y_qualifying_products;products;100;Products;List of qualifying products;List(ItemType(Product));;false
+;y_qualifying_categories;operator;600;Operator;Operator to compare the quantity required for products in qualifying categories;Enum(de.hybris.platform.ruledefinitions.AmountOperator);"""GREATER_THAN_OR_EQUAL""";
+;y_qualifying_categories;quantity;500;Quantity;Quantity of products required from qualifying categories;java.lang.Integer;1;
+;y_qualifying_categories;categories_operator;400;Category selection operator;Select ANY category or select ALL categories from list of qualifying categories;Enum(de.hybris.platform.ruledefinitions.CollectionOperator);"""CONTAINS_ANY""";
+;y_qualifying_categories;categories;300;Categories;List of qualifying categories;List(ItemType(Category));;false
+;y_qualifying_categories;excluded_categories;200;Excluded categories;List of sub-categories to be excluded from qualifying categories;List(ItemType(Category));;false
+;y_qualifying_categories;excluded_products;100;Excluded products;List of products from qualifying categories to be excluded;List(ItemType(Product));;false
+
+INSERT_UPDATE RuleConditionDefinitionRuleTypeMapping;definition(id)[unique=true];ruleType(code)[default=SourceRule][unique=true]
+;y_qualifying_products;
+;y_qualifying_categories;
+
+############################# ACTIONS ##########################
+
+INSERT_UPDATE RuleActionDefinitionCategory;id[unique=true];name[lang=$lang];priority;icon(code)
+;general;General;100
+
+INSERT_UPDATE RuleActionDefinitionCategory;id[unique=true];name[lang=$lang];priority
+;product_discounts;Product discounts;400
+
+
+INSERT_UPDATE RuleActionDefinition;id[unique=true];name[lang=$lang];priority;breadcrumb[lang=$lang];translatorId;translatorParameters;categories(id)
+;y_order_entry_fixed_price;Target fixed price on products;300;Apply target price {value} on the qualifying products;ruleExecutableActionTranslator;actionId->ruleOrderEntryFixedPriceAction;product_discounts
+
+
+INSERT_UPDATE RuleActionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;name[lang=$lang];description[lang=$lang];type;value;required[default=true]
+;y_order_entry_fixed_price;value;100;Target fixed price;Map of currency and target price value that will be applied on the qualifying products;Map(ItemType(Currency),java.math.BigDecimal);;
+
+
+
+INSERT_UPDATE RuleActionDefinitionRuleTypeMapping;definition(id)[unique=true];ruleType(code)[default=AbstractRule][unique=true]
+;y_order_entry_fixed_price;
+
+############################# RULE GROUPS ##########################
+
+INSERT_UPDATE RuleGroup;code[unique=true]
+;productPromotionRuleGroup
+
+############################# RULES ##########################
+
+INSERT_UPDATE SourceRule;code[unique=true];priority;maxAllowedRuns;ruleGroup(code);conditions;actions;
+;product_fixed_price;100;1;productPromotionRuleGroup;"[{""children"":[{""children"":[],""parameters"":{""quantity"":{""type"":""java.lang.Integer"",""uuid"":""31aa64d3-f5dc-4746-92ec-6b55dc13c733"",""value"":1},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""34cf09db-877c-486d-8f9f-86ceb1fae48f"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""type"":""List(ItemType(Product))"",""uuid"":""b40ee63a-1229-4012-a6ab-549003863819""}},""definitionId"":""y_qualifying_products""},{""children"":[],""parameters"":{""quantity"":{""type"":""java.lang.Integer"",""uuid"":""aa032a4d-8d1e-44ba-8d91-0e194b2814d1"",""value"":1},""categories_operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.CollectionOperator)"",""uuid"":""fc339392-817f-4bba-9125-adcc7b353e73"",""value"":""CONTAINS_ALL""},""excluded_categories"":{""type"":""List(ItemType(Category))"",""uuid"":""ee9f977b-cea1-4bbe-8d27-6d8abb382d62""},""categories"":{""type"":""List(ItemType(Category))"",""uuid"":""da55c42b-b985-44b8-9a13-e60a6a36dbcb"",""value"":[""576"",""brand_10""]},""excluded_products"":{""type"":""List(ItemType(Product))"",""uuid"":""bf7e4277-0dca-4e31-8b5c-67629c466e01""},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""0d8e0b50-62ae-4d0e-9ef9-d1479aece520"",""value"":""GREATER_THAN_OR_EQUAL""}},""definitionId"":""y_qualifying_categories""}],""parameters"":{""operator"":{""type"":""Enum(de.hybris.platform.ruleengineservices.definitions.conditions.RuleGroupOperator)"",""uuid"":""45a8d810-6e6f-4149-80ae-696164c1870a"",""value"":""OR""}},""definitionId"":""y_group""}]";"[{""parameters"":{""value"":{""value"":{""USD"":60}}},""definitionId"":""y_order_entry_fixed_price""}]";
+
+INSERT_UPDATE RuleToEngineRuleTypeMapping;ruleType(code)[unique=true];engineRuleType(code)[default=DEFAULT]
+;AbstractRule;

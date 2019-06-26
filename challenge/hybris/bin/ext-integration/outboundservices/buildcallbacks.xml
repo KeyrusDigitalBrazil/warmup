@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="outboundservices_buildcallbacks">
+
+	<macrodef name="outboundservices_clean_classpath_file">
+		<sequential>
+			<copy file="${ext.outboundservices.path}/.classpath" tofile="${ext.outboundservices.path}/.classpath.edit"
+			      overwrite="true" failonerror="true">
+				<filterchain>
+					<linecontainsregexp negate="true">
+						<regexp pattern="^(\t\t\t\t|)$" />  <!-- added by script -->
+					</linecontainsregexp>
+				</filterchain>
+			</copy>
+			<move file="${ext.outboundservices.path}/.classpath.edit" tofile="${ext.outboundservices.path}/.classpath"
+			      overwrite="true" failonerror="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="outboundservices_after_clean">
+		<sequential>
+			<echo level="info" message="Generating .classpath file for outboundservices" />
+			<create_extension_classpath_file extname="outboundservices" />
+			<outboundservices_clean_classpath_file />
+		</sequential>
+	</macrodef>
+
+</project>

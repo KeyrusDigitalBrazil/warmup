@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	
+	<!--  converter -->
+	<bean id="testIntegrationConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.personalizationintegration.mapping.MappingData"/>
+		<property name="populators">
+			<list>
+				<ref bean="cxTestFixedSegmentsProfileMapper"/>
+				<ref bean="cxTestScriptProfileMapper"/>
+				<ref bean="cxTestSuffixMapper"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean depends-on="cxIntegrationConvertersMap" parent="mapMergeDirective">
+		<property name="key" value="testConverterName" />
+		<property name="value" ref="testIntegrationConverter" />
+	</bean>	
+	
+	
+	<!-- test mappers -->
+	<bean id="cxTestFixedSegmentsProfileMapper" class="de.hybris.platform.personalizationintegration.mapping.mapper.impl.CxTestFixedSegmentsProfileMapper" parent="cxFixedSegmentsProfileMapper"/>
+	<bean id="cxTestScriptProfileMapper" class="de.hybris.platform.personalizationintegration.mapping.mapper.impl.CxTestScriptProfileMapper" parent="cxScriptProfileMapper">
+		<property name="scriptGroup" value="testGroup"/>
+	</bean>
+	<bean id="cxTestSuffixMapper" class="de.hybris.platform.personalizationintegration.mapping.mapper.impl.CxTestSuffixMapper"/>
+	
+	<!-- just a test strategy to update the segments until we start using the process engine to define it -->
+	<alias name="cxTestUpdateUserSegmentStrategy" alias="updateUserSegmentStrategy"/>
+	<bean id="cxTestUpdateUserSegmentStrategy" class="de.hybris.platform.personalizationintegration.strategies.impl.DefaultCxTestUpdateUserSegmentStrategy">
+		<property name="modelService" ref="modelService" />
+		<property name="cxSegmentService" ref="cxSegmentService" /> 
+		<property name="cxIntegrationMappingService" ref="cxIntegrationMappingService"/>
+		<property name="externalIds">
+			<list>
+				<value>segment1</value>
+				<value>segment2</value>              
+        	</list>
+		</property>
+	</bean>
+	
+	
+	
+</beans>

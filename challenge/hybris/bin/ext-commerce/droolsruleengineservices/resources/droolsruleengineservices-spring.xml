@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+    	   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<import resource="droolsruleengineservices-spring-compiler.xml" />
+
+	<context:annotation-config />
+
+	<alias name="defaultCommerceRuleEngineService" alias="commerceRuleEngineService" />
+	<bean id="defaultCommerceRuleEngineService" class="de.hybris.platform.droolsruleengineservices.impl.DefaultCommerceRuleEngineService" >
+		<property name="platformRuleEngineService" ref="platformRuleEngineService" />
+		<property name="agendaFilterFactory" ref="agendaFilterFactory" />
+		<property name="agendaEventListenerFactory" ref="agendaEventListenerFactory" />
+		<property name="ruleConfigurationProvider" ref="ruleConfigurationRRDProvider" />
+		<property name="ruleGroupExecutionProvider" ref="ruleGroupExecutionRRDProvider" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="factContextFactory" ref="factContextFactory" />
+		<property name="engineRuleDao" ref="engineRuleDao" />
+	</bean>
+
+	<!-- begin intercepters -->
+	<bean id="droolsRuleValidateInterceptor" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsRuleValidateInterceptor">
+		<property name="sameNameAndPackageBiPredicate" ref="droolsRuleSameNameAndPackageBiPredicate"/>
+		<property name="configurationService" ref="configurationService" />
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+	</bean>
+	<bean id="droolsRuleValidateInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="droolsRuleValidateInterceptor"/>
+		<property name="typeCode" value="DroolsRule"/>
+	</bean>
+
+	<bean id="droolsKIEBaseValidateInterceptor" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsKIEBaseValidateInterceptor">
+		<property name="sameNameAndPackageBiPredicate" ref="droolsRuleSameNameAndPackageBiPredicate"/>
+	</bean>
+	<bean id="droolsKIEBaseValidateInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="droolsKIEBaseValidateInterceptor"/>
+		<property name="typeCode" value="DroolsKIEBase"/>
+	</bean>
+
+	<bean id="droolsKIEBasePrepareInterceptor" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsKIEBasePrepareInterceptor">
+		<property name="moduleVersioningService" ref="moduleVersioningService"/>
+	</bean>
+	<alias name="defaultDroolsKIEBasePrepareInterceptorMapping" alias="droolsKIEBasePrepareInterceptorMapping"/>
+	<bean id="defaultDroolsKIEBasePrepareInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="droolsKIEBasePrepareInterceptor"/>
+		<property name="typeCode" value="DroolsKIEBase"/>
+	</bean>
+
+	<bean id="droolsKIESessionValidateInterceptor" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsKIESessionValidateInterceptor" />
+	<bean id="droolsKIESessionValidateInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="droolsKIESessionValidateInterceptor"/>
+		<property name="typeCode" value="DroolsKIESession"/>
+	</bean>
+
+	<alias name="droolsKIEModulePrepareInterceptorMapping" alias="ruleModulePrepareInterceptorMapping" />
+	<bean id="droolsKIEModulePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="droolsKIEModulePrepareInterceptor" />
+		<property name="typeCode" value="DroolsKIEModule" />
+	</bean>
+
+	<bean id="droolsKIEModulePrepareInterceptor" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsKIEModulePrepareInterceptor">
+		<property name="moduleVersioningService" ref="moduleVersioningService"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+	</bean>
+	<!-- end intercepters -->
+
+	<bean id="droolsRuleSameNameAndPackageBiPredicate" class="de.hybris.platform.droolsruleengineservices.interceptors.DroolsRuleSameNameAndPackageBiPredicate" />
+	<bean id="defaultNoOpRuleActionStrategy" class="de.hybris.platform.ruleengineservices.action.impl.DefaultNoOpRuleActionStrategy" />
+	
+	<alias name="defaultAgendaFilterFactory" alias="agendaFilterFactory" />
+	<bean id="defaultAgendaFilterFactory" class="de.hybris.platform.droolsruleengineservices.agendafilter.impl.DefaultAgendaFilterFactory">
+		<property name="targetClass" value="de.hybris.platform.droolsruleengineservices.agendafilter.impl.DefaultCompoundAgendaFilter" />
+		<property name="strategies" ref="agendaFilterStrategies" />
+		<property name="forceAllEvaluations" value="false" />
+	</bean>
+
+	<alias alias="agendaFilterStrategies" name="defaultAgendaFilterStrategies"/>
+	<util:list id="defaultAgendaFilterStrategies"/>
+
+	<aop:aspectj-autoproxy />
+	<bean class="de.hybris.platform.droolsruleengineservices.aspect.RuleEvaluationLogger"/>
+
+	<alias name="ruleMatchAgendaListenerFactory" alias="agendaEventListenerFactory" />
+	<bean id="ruleMatchAgendaListenerFactory" class="de.hybris.platform.droolsruleengineservices.eventlisteners.impl.DefaultAgendaEventListenerFactory">
+	</bean>
+
+	<alias name="droolsModuleVersioningService" alias="moduleVersioningService" />
+	<bean id="droolsModuleVersioningService" class="de.hybris.platform.droolsruleengineservices.versioning.impl.DroolsModuleVersioningService">
+		<property name="ruleEngineService" ref="platformRuleEngineService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="moduleVersionResolver" ref="moduleVersionResolver"/>
+	</bean>
+
+	<bean id="droolsEngineHistoricalRuleContentProvider" class="de.hybris.platform.droolsruleengineservices.versioning.impl.DroolsEngineHistoricalRuleContentProvider"/>
+
+	<bean depends-on="historicalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="droolsEngineHistoricalRuleContentProvider"/>
+	</bean>
+
+</beans>

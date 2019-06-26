@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<context:annotation-config/>
+
+
+	<!-- Expose /smarteditaddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultSmarteditaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="smarteditaddon"/>
+	</bean>
+
+	<bean id="defaultSmarteditaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultSmarteditaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getSmarteditaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultSmarteditaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+
+	<bean id="smarteditaddonCmsPageBeforeViewHandler" class="de.hybris.platform.smarteditaddon.interceptors.beforeview.SmarteditaddonCmsPageBeforeViewHandler">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+	</bean>
+
+	<bean id="SmarteditaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getSmarteditaddonBeforeViewHandler"/>
+	</bean>
+
+	<bean id="smarteditaddonCmsPageBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="smarteditaddonCmsPageBeforeViewHandler"/>
+	</bean>
+
+	<bean id="cmsSmarteditDynamicAttributeService"
+		  class="de.hybris.platform.smarteditaddon.cms.services.impl.CMSSmartEditDynamicAttributeService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cmsComponentContainerRegistry" ref="cmsComponentContainerRegistry" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+</beans>

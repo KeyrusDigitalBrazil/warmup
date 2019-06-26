@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultBundleCartFacade" alias="bundleCartFacade"/>
+	<alias name="defaultBundleCartFacade" alias="configurableBundleCartFacade"/>
+	<bean id="defaultBundleCartFacade" class="de.hybris.platform.configurablebundlefacades.order.impl.DefaultBundleCartFacade"
+		parent="defaultBundleCommerceCartFacade">
+		<property name="bundleCommerceCartService" ref="commerceCartService"/>
+		<property name="cartModificationConverter" ref="cartModificationConverter"/>
+		<property name="subscriptionCartFacade" ref="subscriptionCartFacade"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryConverter"/>
+		<property name="remove" ref="defaultBundleCommerceOrderEntryPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryConverter"/>
+		<property name="add" ref="bundleOrderEntryPopulator"/>
+	</bean>
+
+	<alias name="defaultBundleOrderEntryPopulator" alias="bundleOrderEntryPopulator" />
+	<bean id="defaultBundleOrderEntryPopulator" class="de.hybris.platform.configurablebundlefacades.order.converters.populator.BundleOrderEntryPopulator" parent="defaultBundleCommerceOrderEntryPopulator" >
+		<property name="bundleCommerceCartService" ref="bundleCommerceCartService" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter"/>
+		<property name="remove" ref="defaultBundleCommerceCartPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="extendedCartConverter"/>
+		<property name="remove" ref="defaultBundleCommerceCartPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter"/>
+		<property name="add" ref="bundleCartPopulator"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="extendedCartConverter"/>
+		<property name="add" ref="bundleCartPopulator"/>
+	</bean>
+
+	<alias name="defaultBundleCartPopulator"	alias="bundleCartPopulator" />
+	<bean id="defaultBundleCartPopulator" class="de.hybris.platform.configurablebundlefacades.order.converters.populator.BundleCartPopulator" parent="defaultBundleCommerceCartPopulator"    >
+		<property name="bundleCommerceCartService" ref="bundleCommerceCartService" />
+		<property name="l10NService" ref="l10nService" />
+		<property name="bundleTemplateConverter" ref="bundleTemplateConverter" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="miniCartConverter"/>
+		<property name="add" ref="bundleMiniCartPopulator"/>
+	</bean>
+
+	<alias name="defaultBundleMiniCartPopulator"	alias="bundleMiniCartPopulator" />
+	<bean id="defaultBundleMiniCartPopulator" class="de.hybris.platform.configurablebundlefacades.order.converters.populator.BundleMiniCartPopulator" parent="abstractBundleOrderPopulator"    >
+		<property name="orderEntryConverter" ref="orderEntryConverter"/>
+	</bean>
+
+	<bean id="defaultProductBundlePopulator" class="de.hybris.platform.configurablebundlefacades.converters.populator.ProductBundlePopulator" parent="baseProductPopulator">
+		<property name="bundleTemplateConverter" ref="bundleTemplateConverter"/>
+		<property name="productConverter" ref="productConverter"/>
+	</bean>
+
+	<alias name="defaultBundleCartPotentialProductsPopulator" alias="bundleCartPotentialProductsPopulator"/>
+	<bean id="defaultBundleCartPotentialProductsPopulator" parent="abstractBundleOrderPopulator"
+		  class="de.hybris.platform.configurablebundlefacades.order.converters.populator.BundleCartPotentialProductsPopulator">
+		<property name="orderEntryDataComparators" ref="bundleOrderEntryDataComparators"/>
+		<property name="productBundlePopulator" ref="productBundlePopulator"/>
+		<property name="bundleCommerceCartService" ref="bundleCommerceCartService"/>
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultBundleCartPotentialProductDisableRulePopulator"
+		   alias="bundleCartPotentialProductDisableRulePopulator"/>
+	<bean id="defaultBundleCartPotentialProductDisableRulePopulator" parent="abstractBundleOrderPopulator"
+		  class="de.hybris.platform.configurablebundlefacades.order.converters.populator.BundleCartPotentialProductDisableRulePopulator">
+		<property name="bundleCommerceCartService" ref="bundleCommerceCartService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+
+	<bean id="bundleXStreamConverter" class="de.hybris.platform.configurablebundlefacades.converters.BundleXStreamConverter">
+		<property name="aliasConverter" ref="subscriptionXStreamAliasConverter"/>
+	</bean>
+</beans>

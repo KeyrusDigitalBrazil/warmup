@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--
+	The hybris platform provides one single Spring application context for beans located at the jalo layer.
+	Each extension can add beans to this context by specifying them at this configuration file.
+	 
+	You can use and/or redefine beans defined at configuration files of other extensions as well as
+	adding new one.
+		
+	If you want to locate this file at a different location or want to use several files for better,
+	structuring, please use the '<yourextension>.application-context' property at your project.properties file.
+	There you can specify a comma separated list of files where first is tried to find a file per classpath and
+	then per file system.
+
+	
+	If you want to configure beans for your web module please have a look at
+	your web/webroot/WEB-INF/<extname>-web-spring.xml.
+	-->
+	
+		
+    <alias name="defaultsapRevenueCloudCustomerOutboundService" alias="sapRevenueCloudCustomerOutboundService" />
+	<bean id="defaultsapRevenueCloudCustomerOutboundService"
+		class="com.sap.hybris.saprevenuecloudcustomer.service.impl.DefaultSapRevenueCloudCustomerOutboundService">
+		<property name="configurationService" ref="configurationService" />
+		<property name="sapCpiCustomerConversionService" ref="sapRevenueCloudCustomerConversionService"/>
+		<property name="outboundServiceFacade" ref="sapCpiOutboundServiceFacade" />
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudCustomerPopulator" alias="sapRevenueCloudCustomerPopulator" />
+	<bean id="defaultSapRevenueCloudCustomerPopulator"
+		class="com.sap.hybris.saprevenuecloudcustomer.populator.DefaultSapRevenueCloudCustomerPopulator">
+		<property name="customerNameStrategy" ref="customerNameStrategy" />
+		<property name="addressPopulator" ref="sapRevenueCloudAddressPopulator" />
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudAddressPopulator" alias="sapRevenueCloudAddressPopulator" />
+	<bean id="defaultSapRevenueCloudAddressPopulator"
+		class="com.sap.hybris.saprevenuecloudcustomer.populator.DefaultSapRevenueCloudAddressPopulator">
+	</bean>
+	
+	<bean id="defaultSapRevenueCloudCustomerValidateInterceptor" class="com.sap.hybris.saprevenuecloudcustomer.interceptor.DefaultSapRevenueCloudCustomerValidateInterceptor" >
+		<property name="sapRevenueCloudConfigurationModelGenericDao" ref="sapRevenueCloudConfigurationModelGenericDao" />
+		<property name="sapRevenueCloudCustomerOutboundService" ref="sapRevenueCloudCustomerOutboundService"/>
+	</bean>
+	
+	<bean id="defaultSapRevenueCloudAddressValidateInterceptor" class="com.sap.hybris.saprevenuecloudcustomer.interceptor.DefaultSapRevenueCloudAddressValidateInterceptor" >
+		<property name="sapRevenueCloudCustomerOutboundService" ref="sapRevenueCloudCustomerOutboundService"/>
+		<property name="sapRevenueCloudConfigurationModelGenericDao" ref="sapRevenueCloudConfigurationModelGenericDao" />
+	</bean>
+    
+    
+    <bean id="sapRevenueCloudCustomerInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultSapRevenueCloudCustomerValidateInterceptor" />
+		<property name="typeCode" value="Customer" />
+		<property name="order" value="5000" />
+	</bean>
+	
+	<bean id="sapRevenueCloudAddressInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultSapRevenueCloudAddressValidateInterceptor" />
+		<property name="typeCode" value="Address" />
+		<property name="order" value="5000" />
+	</bean>
+	
+	<alias alias="sapRevenueCloudCustomerPublishAction" name="defaultSapRevenueCloudCustomerPublishAction" />
+	<bean id="defaultSapRevenueCloudCustomerPublishAction" class="com.sap.hybris.saprevenuecloudcustomer.action.SapRevenueCloudCustomerPublishAction" parent="abstractAction">
+		<property name="sapRevenueCloudCustomerOutboundService" ref="sapRevenueCloudCustomerOutboundService"/>
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudCustomerProcessDefinitionResource" alias="sapRevenueCloudCustomerProcessDefinitionResource" />
+	<bean id="defaultSapRevenueCloudCustomerProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/process/revenuecloud-customer-process.xml" />
+	</bean>
+	
+	<alias alias="sapRevenueCloudCustomerRegistrationEventListener" name="defaultSapRevenueCloudCustomerRegistrationEventListener" />
+	<bean id="defaultSapRevenueCloudCustomerRegistrationEventListener" parent="abstractEventListener" class="com.sap.hybris.saprevenuecloudcustomer.listener.SapRevenueCloudCustomerRegistrationEventListener">
+		<property name="modelService" ref="modelService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="sapRevenueCloudConfigurationModelGenericDao" ref="sapRevenueCloudConfigurationModelGenericDao" />
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudCustomerImportJob" alias="sapRevenueCloudCustomerImportJob"/>
+    <bean id="defaultSapRevenueCloudCustomerImportJob"
+		  class="com.sap.hybris.saprevenuecloudcustomer.jobs.SAPRevenueCloudCustomerImportJob"
+		  parent="abstractJobPerformable">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="sapRevenueCloudCustomerOutboundService" ref="sapRevenueCloudCustomerOutboundService" />
+	</bean>
+	
+	<!-- Outbound Customer Conversion Service -->
+    <alias name="defaultSapRevenueCloudCustomerConversionService" alias="sapRevenueCloudCustomerConversionService"/>
+    <bean id="defaultSapRevenueCloudCustomerConversionService"
+          class="com.sap.hybris.saprevenuecloudcustomer.service.impl.SapRevenueCloudCustomerConversionService">
+        <property name="modelService" ref="modelService"/>
+        <property name="customerNameStrategy" ref="customerNameStrategy"/>
+        <property name="sapRevenueCloudConfigurationModelGenericDao" ref="sapRevenueCloudConfigurationModelGenericDao" />
+    </bean>
+	
+			
+</beans>

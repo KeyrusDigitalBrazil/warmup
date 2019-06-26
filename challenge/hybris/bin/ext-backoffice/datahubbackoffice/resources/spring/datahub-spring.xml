@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		   http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<bean id="defaultDropdownProvider" class="de.hybris.platform.datahubbackoffice.presentation.editor.DefaultDropdownProvider" />
+
+	<bean id="canonicalItemTypesProvider" class="de.hybris.platform.datahubbackoffice.presentation.editor.CanonicalItemTypesProvider">
+		<property name="client" ref="canonicalItemClassClient" />
+	</bean>
+
+	<bean id="rawItemTypesProvider" class="de.hybris.platform.datahubbackoffice.presentation.editor.RawTypesProvider">
+		<property name="client" ref="rawItemClassClient" />
+	</bean>
+
+	<bean id="dataPoolsProvider" class="de.hybris.platform.datahubbackoffice.presentation.editor.DataPoolsProvider">
+		<property name="client" ref="dataPoolClient" />
+	</bean>
+
+	<alias name="defaultLoadProcessingStrategy" alias="loadProcessingStrategy" />
+	<bean id="defaultLoadProcessingStrategy" class="de.hybris.platform.datahubbackoffice.presentation.widgets.quickupload.LoadProcessingStrategy">
+		<property name="csvImportClient" ref="csvImportClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<alias name="defaultComposeProcessingStrategy" alias="composeProcessingStrategy" />
+	<bean id="defaultComposeProcessingStrategy"
+		  class="de.hybris.platform.datahubbackoffice.presentation.widgets.quickupload.ComposeProcessingStrategy">
+		<property name="poolActionClient" ref="poolActionClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<alias name="defaultPublishProcessingStrategy" alias="publishProcessingStrategy" />
+	<bean id="defaultPublishProcessingStrategy"
+		  class="de.hybris.platform.datahubbackoffice.presentation.widgets.quickupload.PublishProcessingStrategy">
+		<property name="publicationClient" ref="publicationClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<bean id="processingStrategies" class="org.springframework.beans.factory.config.ListFactoryBean">
+		<property name="sourceList">
+			<list merge="true">
+				<ref bean="loadProcessingStrategy" />
+				<ref bean="composeProcessingStrategy" />
+				<ref bean="publishProcessingStrategy" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCanonicalItemCustomSection" alias="canonicalItemCustomSection" />
+	<bean id="defaultCanonicalItemCustomSection" class="de.hybris.platform.datahubbackoffice.presentation.renderer.CanonicalItemCustomSection"
+		  parent="defaultEditorAreaSectionRenderer">
+		<property name="cockpitLocaleService" ref="cockpitLocaleService" />
+		<property name="attributesRetrievalStrategy">
+			<bean class="de.hybris.platform.datahubbackoffice.presentation.renderer.UserGroupBasedAttributesRetrievalStrategy">
+				<property name="providers">
+					<map>
+						<entry key="datahubadmingroup">
+							<bean class="de.hybris.platform.datahubbackoffice.presentation.renderer.UnrestrictedCanonicalItemAttributesProvider">
+								<property name="canonicalItemClassClient" ref="canonicalItemClassClient" />
+							</bean>
+						</entry>
+					</map>
+				</property>
+				<property name="userContext" ref="userContext" />
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultDatahubPropertyAccessorsExtender" alias="datahubPropertyAccessorsExtender"/>
+	<cng:list-extender id="defaultDatahubPropertyAccessorsExtender" bean="evaluationContextFactory"
+					   property="additionalPropertyAccessors">
+		<cng:add>
+			<ref bean="datahubItemDataPropertyAccessor"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultDatahubItemDataPropertyAccessor" alias="datahubItemDataPropertyAccessor"/>
+	<bean id="defaultDatahubItemDataPropertyAccessor" class="de.hybris.platform.datahubbackoffice.service.cockpitng.ItemDataPropertyAccessor">
+		<property name="typeFacade" ref="typeFacade" />
+	</bean>
+
+	<util:list id="datahubPropertyAccessors">
+		<bean class="de.hybris.platform.datahubbackoffice.service.cockpitng.ItemDataPropertyAccessor">
+			<property name="typeFacade" ref="typeFacade" />
+		</bean>
+	</util:list>
+
+	<bean name="abstractDashboardRenderer" abstract="true" class="de.hybris.platform.datahubbackoffice.datahub.dashboard.AbstractDashboardRowRenderer">
+		<property name="statusCountClient" ref="statusCountClient"/>
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<alias name="defaultLoadDashboardRenderer" alias="loadDashboardRenderer"/>
+	<bean id="defaultLoadDashboardRenderer" class="de.hybris.platform.datahubbackoffice.datahub.dashboard.LoadDashboardRowRenderer"
+		  parent="abstractDashboardRenderer"/>
+
+	<alias name="defaultComposeDashboardRenderer" alias="composeDashboardRenderer"/>
+	<bean id="defaultComposeDashboardRenderer" class="de.hybris.platform.datahubbackoffice.datahub.dashboard.ComposeDashboardRowRenderer"
+		  parent="abstractDashboardRenderer" />
+
+	<alias name="defaultPublicationDashboardRenderer" alias="publicationDashboardRenderer"/>
+	<bean id="defaultPublicationDashboardRenderer" class="de.hybris.platform.datahubbackoffice.datahub.dashboard.PublicationDashboardRowRenderer"
+		  parent="abstractDashboardRenderer"/>
+</beans>

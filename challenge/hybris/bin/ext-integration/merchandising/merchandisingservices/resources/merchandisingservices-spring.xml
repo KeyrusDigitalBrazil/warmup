@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<import resource="merchandisingservices-field-mapping-spring.xml" />
+
+    <!--DAOs-->
+    <alias name="defaultMerchIndexingConfigDao" alias="merchIndexingConfigDao"/>
+    <bean id="defaultMerchIndexingConfigDao" class="com.hybris.merchandising.dao.impl.DefaultMerchIndexingConfigDao"/>
+
+    <!--Services-->
+    <alias name="defaultMerchIndexingConfigService" alias="merchIndexingConfigService"/>
+    <bean id="defaultMerchIndexingConfigService" class="com.hybris.merchandising.service.impl.DefaultMerchIndexingConfigService">
+        <property name="solrIndexedTypeDao" ref="solrIndexedTypeDao"/>
+        <property name="merchIndexingConfigDao" ref="merchIndexingConfigDao"/>
+    </bean>
+
+    <!-- listeners declaration -->
+    <bean id="merchIndexingListener" class="com.hybris.merchandising.indexer.listeners.MerchIndexingListener">
+        <property name="facetSearchService" ref="facetSearchService" />
+        <property name="fieldNameTranslator" ref="fieldNameTranslator" />
+        <property name="merchCatalogServiceClient" ref="merchCatalogServiceClient"/>
+        <property name="merchIndexingConfigService" ref="merchIndexingConfigService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="merchCategoryExporter" ref="merchCategoryExporter"/>
+    </bean>
+
+    <bean id="merchIndexingListenerDefinition" parent="solrListenerDefinition">
+        <property name="priority" value="1179" />
+        <property name="listener" ref="merchIndexingListener" />
+    </bean>
+
+    <!--YAAS Adapter-->
+	<alias name="defaultMerchCatalogServiceClient" alias="merchCatalogServiceClient"/>
+    <bean id="defaultMerchCatalogServiceClient" class="com.hybris.merchandising.yaas.client.MerchCatalogServiceClientAdapter">
+        <property name="apiRegistryClientService" ref="apiRegistryClientService"/>
+    </bean>
+
+	<alias name="defaultMerchSynchronizationConfigDao" alias="merchSynchronizationConfigDao"/>
+	<bean id="defaultMerchSynchronizationConfigDao" class="com.hybris.merchandising.dao.impl.DefaultMerchSynchronizationConfigDao"/>
+
+	<bean id="merchDataMapper"
+		  class="de.hybris.platform.webservicescommons.mapping.impl.DefaultDataMapper" >
+		<property name="fieldSetBuilder" ref="merchFieldSetBuilder" />
+	</bean>
+
+	<bean id="merchSubclassRegistry"
+		  class="de.hybris.platform.webservicescommons.mapping.impl.DefaultSubclassRegistry"
+		  init-method="init">
+	</bean>
+
+	<bean id="merchFieldSetBuilder"
+		  class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetBuilder">
+		<property name="defaultRecurrencyLevel" value="4" />
+		<property name="defaultMaxFieldSetSize" value="50000" />
+		<property name="fieldSetLevelHelper" ref="merchFieldSetLevelHelper" />
+		<property name="subclassRegistry" ref="merchSubclassRegistry" />
+	</bean>
+
+	<bean id="merchFieldSetLevelHelper"
+		  class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetLevelHelper">
+	</bean>
+
+	<alias name="defaultMerchCategoryExporter" alias="merchCategoryExporter"/>
+	<bean id="defaultMerchCategoryExporter" class="com.hybris.merchandising.exporter.DefaultMerchCategoryExporter">
+		<property name="merchSynchronizationConfigDao" ref="merchSynchronizationConfigDao"/>
+		<property name="merchCatalogService" ref="merchCatalogService"/>
+		<property name="client" ref="merchCatalogServiceClient"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="changeDetectionService" ref="changeDetectionService"/>
+		<property name="modelService" ref="modelService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+	<alias name="defaultMerchCatalogService" alias="merchCatalogService"/>
+	<bean id="defaultMerchCatalogService" class="com.hybris.merchandising.service.impl.DefaultMerchCatalogService">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="categoryUrlResolver" ref="categoryModelUrlResolver"/>
+	</bean>
+</beans>

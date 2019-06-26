@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# This file needs testQuotes.impex and testCommerceCart.csv to be loaded before it
+
+$testCategory0-id=testCategory0;
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;name[lang=de];name[lang=en];unit(code);$prices;approvalStatus(code);owner(Principal.uid);startLineNumber;$supercategories
+;HW1210-3422;;testDE;testEN;pieces;57,95 EUR;approved;quotecustomer;0;$testCategory0-id
+
+UPDATE Quote;code[unique=true];version[unique=true];quoteDiscountValuesInternal;
+;quote0;1;[<DV<QuoteDiscount#20.0#true#20.0#EUR#false>VD>]
+
+INSERT QuoteEntry;order(Quote.code);creationTime[dateformat=dd.MM.yyyy HH:mm:ss];product(code,catalogVersion(catalog(id),version));quantity;unit(code);entryNumber;;;;
+;quote0;27.04.2010 00:00:00;HW1210-3422:$catalog-id:$catalog-version;1;pieces;1;;;;

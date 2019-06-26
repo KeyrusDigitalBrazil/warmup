@@ -1,0 +1,56 @@
+<div class="ySERestrictionsContainer ySERestrictionsContainer-left {{$ctrl.customClass}}">
+    <div data-ng-if="$ctrl.restrictions.length > 1">
+        <div data-ng-if="$ctrl.editable">
+            <ui-select on-select="$ctrl.criteriaClicked($item)"
+                data-ng-model="$ctrl.restrictionCriteria"
+                class="form-control ySERestriction-select"
+                search-enabled="false"
+                theme="select2"
+                data-dropdown-auto-width="false">
+                <ui-select-match placeholder="{{ 'se.cms.restrictions.picker.type.placeholder' | translate }}"
+                    class="ySERestriction-select__placeholder">
+                    {{$select.selected.editLabel | translate}}
+                </ui-select-match>
+                <ui-select-choices repeat="criteriaOption in $ctrl.criteriaOptions"
+                    class="ySERestriction-select__choices"
+                    position="down ">
+                    {{ criteriaOption.editLabel | translate }}
+                </ui-select-choices>
+            </ui-select>
+        </div>
+        <div class="ySERestrictionsCriteria"
+            data-ng-if="!$ctrl.editable">
+            <span class="ySERestrictionsCriteriaLabel">{{ 'se.cms.restrictions.criteria' | translate }} {{ $ctrl.restrictionCriteria.label | translate }}</span>
+        </div>
+    </div>
+
+    <div data-ng-if="$ctrl.showRemoveAllButton()"
+        class="ySERestrictionsContainer__clear_all">
+        <button class="btn btn-link cms-clean-btn ySERestrictionsContainer__clear_all__btn"
+            data-ng-click="$ctrl.removeAllRestrictions()"
+            data-translate="se.cms.restrictions.list.clear.all">
+        </button>
+    </div>
+
+    <div class="se-restrictions-list"
+        data-ng-if="$ctrl.restrictions.length > 0">
+        <div id="restriction-{{$index+1}}"
+            data-ng-repeat="restriction in $ctrl.restrictions"
+            class="se-restrictions-list--item">
+            <div class="se-restrictions-list--content"
+                data-ng-click="$ctrl.onSelect(restriction)">
+                <p class="ySERestrictionsNameHeader ng-class:{'error-input':$ctrl.isInError($index)}">{{ restriction.name }}</p>
+                <div class="ySERestrictionsTypeAndID ng-class:{'error-input':$ctrl.isInError($index)}">{{ restriction.typeCode }}</div>
+                <div class="ySERestrictionsDescription ng-class:{'error-input':$ctrl.isInError($index)}"
+                    title="{{ restriction.description }}">{{ restriction.description }}</div>
+            </div>
+            <div class="se-restrictions-list--options"
+                data-ng-if="$ctrl.editable">
+                <y-drop-down-menu dropdown-items="$ctrl.actions"
+                    selected-item="restriction"
+                    class="y-dropdown ySERestrictionsList-item-btn__more pull-right" />
+            </div>
+        </div>
+    </div>
+
+</div>

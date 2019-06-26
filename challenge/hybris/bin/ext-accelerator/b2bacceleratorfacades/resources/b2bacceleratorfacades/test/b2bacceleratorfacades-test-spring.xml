@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation=
+        "http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util.xsd">
+		
+	<bean id="legacyB2BCommercePermissionFacade" class="de.hybris.platform.b2bacceleratorfacades.company.impl.DefaultB2BCommercePermissionFacade"
+		parent="b2bCommerceFacade" />
+	
+	<bean id="legacyB2BCommerceUserFacade" class="de.hybris.platform.b2bacceleratorfacades.company.impl.DefaultB2BCommerceUserFacade"
+		parent="b2bCommerceFacade" />
+		
+	<bean id="legacyB2BCommerceB2BUserGroupFacade" class="de.hybris.platform.b2bacceleratorfacades.company.impl.DefaultB2BCommerceB2BUserGroupFacade"
+		 parent="b2bCommerceFacade" />
+		
+	<bean id="legacyB2BCommerceUnitFacade" class="de.hybris.platform.b2bacceleratorfacades.company.impl.DefaultB2BCommerceUnitFacade"
+		parent="b2bCommerceFacade" />
+	
+	<bean id="legacyB2BCostCenterFacade" class="de.hybris.platform.b2bacceleratorfacades.company.refactoring.impl.DefaultB2BCostCenterFacade">
+		<property name="b2bCostCenterService" ref="b2bCostCenterService" />
+		<property name="b2BCommerceCostCenterService" ref="b2bCommerceCostCenterService" />
+		<property name="b2bCostCenterConverter" ref="b2bCostCenterConverter" />
+		<property name="b2BCostCenterReversePopulator" ref="legacyCostCenterReversePopulator" />
+		<property name="b2BCommerceBudgetService" ref="b2bCommerceBudgetService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="legacy2BBudgetFacade" class="de.hybris.platform.b2bacceleratorfacades.company.refactoring.impl.DefaultB2BBudgetFacade">
+		<property name="b2bBudgetConverter" ref="legacyB2BBudgetConverter" />
+		<property name="b2bCommerceBudgetService" ref="b2bCommerceBudgetService" />
+		<property name="b2bCostCenterConverter" ref="b2bCostCenterConverter"/>
+		<property name="b2bBudgetReversePopulator" ref="legacyB2BBudgetReversePopulator" />
+		<property name="costCenterFacade" ref="costCenterFacade" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="legacyCostCenterReversePopulator" class="de.hybris.platform.b2bacceleratorfacades.order.populators.B2BCostCenterReversePopulator">
+	    <property name="b2BUnitService" ref="b2bUnitService" />
+	    <property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<bean id="legacyB2BBudgetReversePopulator" class="de.hybris.platform.b2bacceleratorfacades.order.populators.B2BBudgetReversePopulator">
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<bean id="legacyB2BBudgetConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bBudgetData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bBudgetPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>

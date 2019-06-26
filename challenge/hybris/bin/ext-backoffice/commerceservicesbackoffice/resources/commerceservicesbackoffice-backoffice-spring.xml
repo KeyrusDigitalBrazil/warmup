@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="commerceservicesbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/commerceservicesbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+  	
+  	<bean id="parentUnitEditor" class="de.hybris.platform.commerceservices.backoffice.editor.ParentUnitEditor" parent="defaultEditorAreaPanelRenderer" >
+		<property name="orgUnitAuthorizationStrategy" ref="orgUnitAuthorizationStrategy"/>
+		<property name="userService" ref ="userService"/>
+	</bean>
+
+	<alias alias="createSalesUnitWizardHandler" name="defaultCreateSalesUnitWizardHandler"/>
+	<bean id="defaultCreateSalesUnitWizardHandler" class="de.hybris.platform.commerceservices.backoffice.widgets.organization.create.salesunit.CreateSalesUnitWizardHandler">
+		<property name="notificationStack" ref="notificationStack"/>
+		<property name="orgUnitService" ref="orgUnitService"/>
+		<property name="notificationService" ref="notificationService"/>
+	</bean>
+    
+	<bean id="unitEmployeesEditor" class="de.hybris.platform.commerceservices.backoffice.editor.OrgUnitEmployeesEditor" >
+		<property name="orgUnitAuthorizationStrategy" ref="orgUnitAuthorizationStrategy"/>
+		<property name="userService" ref ="userService"/>
+	</bean>
+	
+	<bean id="orgUnitLogicHandler" class="de.hybris.platform.commerceservices.backoffice.editor.OrgUnitLogicHandler" parent="defaultEditorAreaLogicHandler">
+		<property name="orgUnitService" ref="orgUnitService"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<alias name="defaultOrgRolesEditorSearchFacade" alias="orgRolesEditorSearchFacade" />
+	<bean id="defaultOrgRolesEditorSearchFacade" class="de.hybris.platform.commerceservices.backoffice.editor.DefaultOrgRolesEditorSearchFacade">
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<alias alias="createOrgUnitEmployeeWizardHandler" name="defaultCreateOrgUnitEmployeeWizardHandler"/>
+	<bean id="defaultCreateOrgUnitEmployeeWizardHandler" class="de.hybris.platform.commerceservices.backoffice.widgets.organization.create.orgunit.employee.DefaultCreateOrgUnitEmployeeWizardHandler">
+		<property name="notificationStack" ref="notificationStack"/>
+		<property name="orgUnitService" ref="orgUnitService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="notificationService" ref="notificationService"/>
+	</bean>
+	
+	<alias alias="orgUnitEmployeeRolesEditor" name="defaultOrgUnitEmployeeRolesEditor"/>
+	<bean id="defaultOrgUnitEmployeeRolesEditor" class="de.hybris.platform.commerceservices.backoffice.editor.DefaultOrgUnitEmployeeRolesEditor" parent="defaultEditorAreaPanelRenderer" />
+	
+	<alias alias="orgUnitEmployeeUnitsEditor" name="defaultOrgUnitEmployeeUnitsEditor"/>
+	<bean id="defaultOrgUnitEmployeeUnitsEditor" class="de.hybris.platform.commerceservices.backoffice.editor.DefaultOrgUnitEmployeeUnitsEditor" parent="defaultEditorAreaPanelRenderer" />
+	
+	<alias alias="orgUnitEmployeeLogicHandler" name="DefaultOrgUnitEmployeeLogicHandler"/>
+	<bean id="DefaultOrgUnitEmployeeLogicHandler" class="de.hybris.platform.commerceservices.backoffice.editor.DefaultOrgUnitEmployeeLogicHandler" parent="defaultEditorAreaLogicHandler">
+		<property name="orgUnitService" ref="orgUnitService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="orgUnitAuthorizationStrategy" ref="orgUnitAuthorizationStrategy"/>
+	</bean>
+</beans>

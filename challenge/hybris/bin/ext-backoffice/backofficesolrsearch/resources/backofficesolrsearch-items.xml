@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+
+		<enumtype code="SolrItemModificationType" autocreate="true" generate="true">
+			<value code="DELETE" />
+			<value code="UPDATE" />
+		</enumtype>
+
+	</enumtypes>
+
+	<relations>
+
+		<relation code="BackofficeIndexerCronJob2RemovedItemRelation" localized="false">
+			<sourceElement type="BackofficeSolrIndexerCronJob" cardinality="one" qualifier="parent" />
+			<targetElement type="SolrModifiedItem" cardinality="many" qualifier="modifiedItems" />
+		</relation>
+
+	</relations>
+
+
+	<itemtypes>
+		<itemtype code="BackofficeIndexedTypeToSolrFacetSearchConfig" jaloclass="com.hybris.backoffice.solrsearch.jalo.BackofficeIndexedTypeToSolrFacetSearchConfig"
+				  autocreate="true" generate="true">
+			<deployment table="boidxtype2solrfctsrcfg" typecode="6700" />
+			<attributes>
+				<attribute qualifier="indexedType" type="ComposedType">
+					<modifiers read="true" write="true" optional="false" search="true" removable="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="solrFacetSearchConfig" type="SolrFacetSearchConfig">
+					<modifiers read="true" write="true" optional="false" search="true" removable="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SolrIndexedProperty" autocreate="false"
+				  generate="false">
+			<description>Extending SolrIndexedProperty type with additional attributes.</description>
+			<attributes>
+
+				<!-- The following attributes are specific for facet properties -->
+				<attribute qualifier="backofficeDisplayName" type="localized:java.lang.String">
+					<description>The display name for this property in the list of backoffice facets.</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="SolrModifiedItem" autocreate="true" generate="true" jaloclass="com.hybris.backoffice.solrsearch.jalo.SolrModifiedItem">
+			<deployment table="solrmodifiedentry" typecode="6701" />
+			<attributes>
+				<attribute qualifier="modifiedTypeCode" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="modifiedPk" type="java.lang.Long" >
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="modificationType" type="SolrItemModificationType" >
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+
+		</itemtype>
+
+		<itemtype code="BackofficeSolrIndexerCronJob" extends="SolrIndexerCronJob" />
+
+	</itemtypes>
+
+</items>

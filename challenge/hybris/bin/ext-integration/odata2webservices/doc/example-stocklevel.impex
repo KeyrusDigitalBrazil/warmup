@@ -1,0 +1,19 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]
+; StockLevel
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; StockLevel ; StockLevel ; StockLevel
+; StockLevel ; Warehouse  ; Warehouse
+; StockLevel ; Vendor     ; Vendor
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; StockLevel:StockLevel ; available   ; StockLevel:available   ;
+; StockLevel:StockLevel ; maxPreOrder ; StockLevel:maxPreOrder ;
+; StockLevel:StockLevel ; productCode ; StockLevel:productCode ;                      ; true
+; StockLevel:StockLevel ; warehouse   ; StockLevel:warehouse   ; StockLevel:Warehouse ; true
+
+; StockLevel:Warehouse  ; code        ; Warehouse:code         ;                      ; true
+; StockLevel:Warehouse  ; vendor      ; Warehouse:vendor       ; StockLevel:Vendor    ; true
+; StockLevel:Warehouse  ; name        ; Warehouse:name         ;                      ;
+
+; StockLevel:Vendor     ; code        ; Vendor:code            ;                      ; true

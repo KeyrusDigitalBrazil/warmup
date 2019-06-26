@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+              http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd 
+			  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Enable auto-wiring -->
+    <context:annotation-config/>
+    
+
+    <!-- Unsecured pages -->
+    
+    <security:http security="none" pattern="/logout.jsp"/>
+    <security:http security="none" pattern="/500.jsp"/>
+    <security:http security="none" pattern="/404.jsp"/>
+    <security:http security="none" pattern="/static/**"/>
+    
+
+
+    <!-- Secured pages -->
+    <security:http entry-point-ref="jwtEntryPoint" use-expressions="false">
+		<security:intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY"/>
+        <security:custom-filter after="BASIC_AUTH_FILTER" ref="jwtFilter"/>
+        <security:csrf disabled="true"/>
+    </security:http>
+    
+    <bean id="jwtFilter" class="org.springframework.security.web.FilterChainProxy">
+        <security:filter-chain-map request-matcher="ant">
+            <security:filter-chain pattern="/oauth/**" filters="jWTFilter"/>
+        </security:filter-chain-map>
+    </bean>
+    
+    
+    <bean id="jWTFilter" class="com.sap.hybris.cec.sso.jwt.JWTFilter">
+    	<property name="authenticationManager" ref="authenticationManager" />
+    	<property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler" />
+    	<property name="defalutJWTUtil" ref="defalutJWTUtil" />
+	</bean>		
+	
+	<bean id="jwtAuthenticationSuccessHandler"
+          class="com.sap.hybris.cec.sso.jwt.JwtAuthenticationSuccessHandler">        
+    </bean>
+  
+    <!-- Register authentication manager with JWT provider -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider ref="jwtAuthenticationProvider"/>        
+    </security:authentication-manager>    
+
+    <!-- Entry point to initialize authentication, default values taken from properties file -->
+    <bean id="jwtEntryPoint" class="com.sap.hybris.cec.sso.jwt.JwtEntryPoint">
+    </bean>
+
+	<bean id="jwtAuthenticationProvider" class="com.sap.hybris.cec.sso.jwt.JwtAuthenticationProvider">
+        <property name="defalutJWTUtil" ref="defalutJWTUtil" />     
+    </bean>
+    	
+</beans>

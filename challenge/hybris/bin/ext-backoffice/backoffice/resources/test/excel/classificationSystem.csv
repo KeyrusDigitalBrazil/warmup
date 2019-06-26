@@ -1,0 +1,66 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# -------------------------------------------;
+# --- create languages;
+# -------------------------------------------;
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+# -------------------------------------------;
+# --- create system;
+# -------------------------------------------;
+
+$systemName=SampleClassification;
+$systemVersion=1.0;
+
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=de]; name[lang=en];
+; $systemName ; Beispiel-Klassifikationssystem ; Sample ClassificationSystem;
+
+INSERT_UPDATE ClassificationSystemversion; catalog(id)[unique=true] ; categorySystemID; version[unique=true] ; active ; writeprincipals(uid); languages(isocode); inclPacking[virtual=true,default=true]; inclDuty[virtual=true,default=true]; inclFreight[virtual=true,default=true]; inclAssurance[virtual=true,default=true]
+; $systemName ; $systemName ; $systemVersion ; true ; employeegroup;de,en;
+
+# -------------------------------------------
+# --- create classes
+# -------------------------------------------
+
+$sysVer=catalogVersion(catalog(id[default=$systemName]),version[default=$systemVersion]);
+$superClass=superCategories(code,$sysVer);
+
+INSERT_UPDATE ClassificationClass; code[unique=true]; $superClass; name[lang=de]; name[lang=en]; hmcXML; $sysVer[virtual=true,unique=true]
+; software ; ; Software ; Software;
+
+# -------------------------------------------;
+# --- create attributes;
+# -------------------------------------------;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);
+
+INSERT_UPDATE ClassificationAttribute;code[unique=true];name[lang=de]; name[lang=en]; defaultAttributeValues(code,$sysVer);$sysVer[virtual=true,unique=true]
+; manufacturerURL ; Hersteller-Website ; Manufacturer website
+
+# -------------------------------------------;
+# --- assign attributes;
+# -------------------------------------------;
+
+$sysVer=systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']);
+$class=classificationClass(ClassificationClass.code,catalogVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));
+$attribute=classificationAttribute(code,systemVersion(catalog(id[default='$systemName']),version[default='$systemVersion']));
+# ---------------------------------------------------------;
+
+INSERT_UPDATE ClassAttributeAssignment; $class[unique=true]; $attribute[unique=true] ;attributeType(code[default=string]) ; position ; unit(code,$sysVer) ;searchable[default=false]; listable[default=false] ;comparable[default=true]; multiValued[default=false]; localized[default=true] ; range[default=false] ; attributeValues(code,$sysVer); $sysVer[virtual=true,unique=true]
+; software ; manufacturerURL ; string;0;

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2 
+     	http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+
+	<!-- Commons security imports -->
+	<import resource="classpath:webservicescommons/commons-security-spring.xml"/>
+
+	<beans>
+	
+		<security:http pattern="/#{configurationService.configuration.getProperty('springfox.documentation.swagger.v2.path')}" security="none"/>
+		<security:http pattern="/swagger-resources/**" security="none"/>
+		<security:http pattern="/swagger-ui.html" security="none"/>
+		<security:http pattern="/webjars/*swagger*/**" security="none"/>
+		
+		<http pattern="/**" entry-point-ref="oauthAuthenticationEntryPoint" use-expressions="true" xmlns="http://www.springframework.org/schema/security">
+			<session-management session-authentication-strategy-ref="fixation" />
+
+			<!-- for PRODUCTION make sure that webservicescommons.required.channel=https -->
+			
+			<intercept-url pattern="/v1/segments" method="GET" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP') or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" /> 
+			<intercept-url pattern="/v1/segments/**" method="GET" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP') or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" /> 
+			<intercept-url pattern="/v1/query/**" method="POST" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( hasRole('ROLE_CXMANAGERGROUP') or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" /> 			
+			<!-- Catalog aware endpoints have catalog access rights verification-->
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/customizationpackages" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/customizationpackages/**" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/customizations" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/customizations/**" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/triggers" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/triggers/**" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+			<intercept-url pattern="/v1/catalogs/{catalog}/catalogVersions/{catalogVersion}/actions" access="@oauthSecurityChecker.hasScope(authentication,'personalizationwebservices') and( ((hasRole('ROLE_CXREADONLYGROUP') or hasRole('ROLE_CXMANAGERGROUP')) and @catalogPermissionsChecker.hasAccessToCatalog(authentication, request, #catalog, #catalogVersion)) or hasRole('ROLE_ADMINGROUP') )" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+
+			<!-- other endpoints (e.g. customersegmentations) are denied by default because of security reason. If you need them configure it properly-->
+			<intercept-url pattern="/**" access="denyAll" requires-channel="#{configurationService.configuration.getString('webservicescommons.required.channel', 'https')}" />
+
+			<port-mappings>
+				<port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}" https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}" />
+				<port-mapping http="#{configurationService.configuration.getProperty('embeddedserver.http.port')}" https="#{configurationService.configuration.getProperty('embeddedserver.ssl.port')}" />
+			</port-mappings>
+
+			<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+			<custom-filter ref="hybrisUserFilter" after="LAST" />
+			<access-denied-handler ref="oauthAccessDeniedHandler" />
+			
+			<headers>
+				<content-type-options />
+				<hsts include-subdomains="true" max-age-seconds="16070400" />
+				<xss-protection />
+				<security:frame-options disabled="true"/>
+			</headers>
+			<security:csrf disabled="true"/>
+		</http>
+		
+	</beans>
+</beans>

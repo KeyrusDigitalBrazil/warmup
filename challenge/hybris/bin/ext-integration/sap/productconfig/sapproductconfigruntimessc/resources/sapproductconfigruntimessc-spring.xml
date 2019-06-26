@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="sapProductConfigDefaultSSCProviderFactory" alias="sapProductConfigSSCProviderFactory" />
+	<bean id="sapProductConfigDefaultSSCProviderFactory"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.SSCProviderFactoryImpl">
+		<property name="configurationProviderBeanName" value="sapProductConfigConfigurationProviderSSC" />
+		<property name="pricingProvider" ref="sapProductConfigDefaultPricingProvider" />
+		<property name="analyticsProvider" ref="sapProductConfigDefaultAnalyticsProvider" />
+		<property name="productCsticAndValueParameterProvider"
+			ref="sapProductConfigDefaultProductCsticAndValueParameterProviderSSC" />
+		<property name="pricingParameter" ref="sapProductConfigPricingParametersSSC" />
+		<property name="sessionAccessService" ref="sapProductConfigSSCSessionAccessService" />
+	</bean>
+
+
+	<bean id="sapProductConfigRegisteredProviderFactoriesSSCListMergeDirective"
+		depends-on="sapProductConfigRegisteredProviderFactories" parent="listMergeDirective">
+		<property name="add" value="sapProductConfigSSCProviderFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultSSCSessionAccessService" alias="sapProductConfigSSCSessionAccessService" />
+	<bean id="sapProductConfigDefaultSSCSessionAccessService"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.SSCSessionAccessServiceImpl">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<alias name="sapProductConfigConfigurationProviderSSC" alias="sapProductConfigConfigurationProvider" />
+	<bean id="sapProductConfigConfigurationProviderSSC" scope="prototype"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.CommonConfigurationProviderSSCImpl">
+		<property name="contextAndPricingWrapper" ref="sapProductConfigurationContextAndPricingWrapper" />
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+		<property name="textConverter" ref="sapProductConfigurationTextConverter" />
+		<property name="conflictAdapter" ref="sapProductConfigConflictAdapter" />
+		<property name="configurationUpdateAdapter" ref="sapProductConfigConfigurationUpdateAdapter" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="configurationSessionContainer" ref="sapProductConfigConfigurationSessionContainer" />
+		<property name="enginePropertiesInitializer" ref="sapProductConfigEnginePropertiesInitializer" />
+		<property name="configurationProductUtil" ref="sapProductConfigProductUtil" />
+	</bean>
+
+	<alias name="sapDefaultProductConfigurationContextAndPricingWrapper"
+		alias="sapProductConfigurationContextAndPricingWrapper" />
+	<bean id="sapDefaultProductConfigurationContextAndPricingWrapper"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.ConfigurationContextAndPricingWrapperImpl">
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+		<property name="i18NService" ref="commonI18NService" />
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersSSC" />
+		<property name="configurationParameterB2B" value="#{getObject('sapproductconfigParametersB2B')}" />
+		<property name="configurationProductUtil" ref="sapProductConfigProductUtil" />
+	</bean>
+
+	<alias name="sapDefaultProductConfigurationTextConverter" alias="sapProductConfigurationTextConverter" />
+	<bean id="sapDefaultProductConfigurationTextConverter"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.TextConverterImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultConflictAdapter" alias="sapProductConfigConflictAdapter" />
+	<bean id="sapProductConfigDefaultConflictAdapter"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.SolvableConflictAdapterImpl">
+		<property name="textConverter" ref="sapProductConfigurationTextConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigurationUpdateAdapter" alias="sapProductConfigConfigurationUpdateAdapter" />
+	<bean id="sapProductConfigDefaultConfigurationUpdateAdapter"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.ConfigurationUpdateAdapterImpl">
+		<property name="conflictAdapter" ref="sapProductConfigConflictAdapter" />
+		<property name="trackingEnabled" value="${sapproductconfigruntimeinterface.tracking.enabled}" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigurationSessionContainer" alias="sapProductConfigConfigurationSessionContainer" />
+	<bean id="sapProductConfigDefaultConfigurationSessionContainer"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.ConfigurationSessionContainerImpl" scope="prototype">
+	</bean>
+
+	<alias name="sapProductConfigDefaultEnginePropertiesInitializer" alias="sapProductConfigEnginePropertiesInitializer" />
+	<bean id="sapProductConfigDefaultEnginePropertiesInitializer"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.SSCEnginePropertiesInitializerImpl" scope="prototype"
+		init-method="initializeEngineProperties">
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingParametersSSC" alias="sapProductConfigPricingParameters" />
+	<alias name="sapProductConfigDefaultPricingParametersSSC" alias="sapProductConfigPricingParametersSSC" />
+	<bean id="sapProductConfigDefaultPricingParametersSSC" parent="sapProductConfigDefaultPricingParameters"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.DefaultPricingConfigurationParameterSSC">
+	</bean>
+
+	<alias alias="sapProductConfigProductCsticAndValueParameterProvider"
+		name="sapProductConfigDefaultProductCsticAndValueParameterProviderSSC" />
+	<bean id="sapProductConfigDefaultProductCsticAndValueParameterProviderSSC"
+		class="de.hybris.platform.sap.productconfig.runtime.ssc.impl.ProductCsticAndValueParameterProviderSSCImpl">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+
+</beans>

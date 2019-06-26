@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config />
+
+	<alias name="defaultAssistedServiceFacade" alias="assistedServiceFacade"/>
+	<bean id="defaultAssistedServiceFacade" class="de.hybris.platform.assistedservicefacades.impl.DefaultAssistedServiceFacade">
+		<property name="cartService" ref="cartService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userService" ref="userService" />
+		<property name="passwordEncoderService" ref="passwordEncoderService" />
+		<property name="modelService" ref="modelService" />
+		<property name="eventService" ref="eventService" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="assistedServiceService" ref="assistedServiceService" />
+		<property name="customerConverter" ref="customerConverter"/>
+		<property name="cartConverter" ref="cartConverter"/>
+	</bean>
+
+	<bean id="assistedServicePlaceOrderMethodHook" class="de.hybris.platform.assistedservicefacades.hook.AssistedServicePlaceOrderMethodHook">
+		<property name="assistedServiceFacade" ref="assistedServiceFacade"/>
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="addAsmPlaceOrderMethodHooksMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective">
+		<property name="add" ref="assistedServicePlaceOrderMethodHook"/>
+	</bean>
+	
+	<bean id="asmSessionEventListener" class="de.hybris.platform.assistedservicefacades.event.AsmSessionEventListener" parent="abstractEventListener" >
+		<property name="customerSupportEventService" ref="customerSupportEventService"/>
+	</bean>
+	
+	<bean id="assistedServiceCartRecalculator" class="de.hybris.platform.assistedservicefacades.event.AssistedServiceCartRecalculator" parent="abstractEventListener" >
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="cartService" ref="cartService"/>
+	</bean>
+
+	<alias name="assistedServiceCustomerListFacade" alias="customerListFacade"/>
+	<bean id="assistedServiceCustomerListFacade" parent="defaultCustomerListFacade">
+		<property name="customerConverter" ref="asmCustomerConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomersListCustomerPopulator" alias="customersListCustomerPopulator"/>
+	<bean id="defaultCustomersListCustomerPopulator" class="de.hybris.platform.assistedservicefacades.customer.converters.populator.CustomersListCustomerPopulator">
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="assistedServiceService" ref="assistedServiceService"/>
+		<property name="addressConverter" ref="addressConverter"/>
+		<property name="imageConverter" ref="imageConverter"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+	
+	<alias name="defaultAsmCustomerConverter" alias="asmCustomerConverter"/>
+	<bean id="defaultAsmCustomerConverter" parent="defaultCustomerConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerPopulator"/>
+				<ref bean="customersListCustomerPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultAdditionalInformationFrameworkFacade" alias="additionalInformationFrameworkFacade"/>
+	<bean id="defaultAdditionalInformationFrameworkFacade" class="de.hybris.platform.assistedservicefacades.customer360.impl.DefaultAdditionalInformationFrameworkFacade">
+		<property name="sections" ref="customer360Sections"/>
+		<property name="modelProvidersMap" ref="customer360ModelProvidersMap"/>
+		<property name="jspProvidersMap" ref="customer360JspProvidersMap"/>
+	</bean>
+	
+	<alias name="defaultCustomer360Sections" alias="customer360Sections"/>
+	<util:list id="defaultCustomer360Sections" value-type="de.hybris.platform.assistedservicefacades.customer360.Section"/>
+	
+	<alias name="defaultCustomer360ModelProvidersMap" alias="customer360ModelProvidersMap"/>
+	<util:map id="defaultCustomer360ModelProvidersMap" key-type="java.lang.String" value-type="de.hybris.platform.assistedservicefacades.customer360.FragmentModelProvider"/>
+	
+	<alias name="defaultCustomer360JspProvidersMap" alias="customer360JspProvidersMap"/>
+	<util:map id="defaultCustomer360JspProvidersMap" key-type="java.lang.String" value-type="java.lang.String"/>
+</beans>

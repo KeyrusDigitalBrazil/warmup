@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Query endpoint -->
+
+    <bean id="cxcmscomponentsfromvariations" class="de.hybris.platform.personalizationcmsweb.queries.CmsContainersFromVariationQueryExecutor" parent="abstractFlexibleSearchRestQuery"/>
+
+    <bean id="cxReplaceComponentWithContainer" class="de.hybris.platform.personalizationcmsweb.queries.CxReplaceComponentWithContainerExecutor" parent="abstractRestQueryExecutor">
+        <property name="cmsComponentService" ref="cmsComponentService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="catalogService" ref="catalogService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="converter" ref="cxCmsComponentContainerConverter"/>
+    </bean>
+
+    <bean id="cxUpdateCustomizationRank" class="de.hybris.platform.personalizationcmsweb.queries.CxUpdateCustomizationRankExecutor" parent="abstractRestQueryExecutor">
+        <property name="customizationFacade" ref="cxCustomizationFacade"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+
+    <bean id="cxCmsPageVersionCheck" class="de.hybris.platform.personalizationcmsweb.queries.CmsPageVersionSwitchQueryExecutor" parent="abstractRestQueryExecutor">
+        <property name="catalogVersionService" ref="catalogVersionService" />
+        <property name="flexibleSearchService" ref="flexibleSearchService" />
+        <property name="cmsVersionService" ref="cmsVersionService" />
+        <property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider" />
+        <property name="cmsPageService" ref="cmsPageService" />
+    </bean>
+
+    <!-- Validation -->
+    <bean name="cmsActionValidator" class="de.hybris.platform.personalizationcmsweb.validator.CmsActionValidator"/>
+
+    <!-- Action conversion -->
+    <alias name="defaultCxCmsActionPopulator" alias="cxCmsActionPopulator"/>
+    <bean id="defaultCxCmsActionPopulator" class="de.hybris.platform.personalizationcmsweb.populators.CxCmsActionPopulator"/>
+
+    <alias name="defaultCxCmsActionPopulators" alias="cxCmsActionPopulators"/>
+    <bean id="defaultCxCmsActionPopulators" parent="abstractPopulatorList">
+        <property name="populators">
+            <list>
+                <ref bean="cxCmsActionPopulator"/>
+                <ref bean="cxActionPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultCxCmsActionConverter" parent="cxActionPopulatingConverter">
+        <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationcms.model.CxCmsActionModel"/>
+        <property name="targetClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+        <property name="populators">
+            <map>
+                <entry key="BASE" value-ref="cxCmsActionPopulators"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Action reverse conversion -->
+
+    <alias name="defaultCxCmsActionReversePopulator" alias="cxCmsActionReversePopulator"/>
+    <bean id="defaultCxCmsActionReversePopulator" class="de.hybris.platform.personalizationcmsweb.populators.CxCmsActionReversePopulator"/>
+
+    <alias name="defaultCxCmsActionReversePopulators" alias="cxCmsActionReversePopulators"/>
+    <bean id="defaultCxCmsActionReversePopulators" parent="abstractPopulatorList">
+        <property name="populators">
+            <list>
+                <ref bean="cxCmsActionReversePopulator"/>
+                <ref bean="cxActionReversePopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultCxCmsActionReverseConverter" parent="cxActionReversePopulatingConverter">
+        <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+        <property name="targetClass" value="de.hybris.platform.personalizationcms.model.CxCmsActionModel"/>
+        <property name="populators">
+            <map>
+                <entry key="BASE" value-ref="cxCmsActionReversePopulators"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Action full data conversion -->
+    <alias name="defaultCxCmsActionFullPopulator" alias="cxCmsActionFullPopulator"/>
+    <bean id="defaultCxCmsActionFullPopulator" class="de.hybris.platform.personalizationcmsweb.populators.CxCmsActionFullPopulator"/>
+
+    <alias name="defaultCxCmsActionFullPopulators" alias="cxCmsActionFullPopulators"/>
+    <bean id="defaultCxCmsActionFullPopulators" parent="abstractPopulatorList">
+        <property name="populators">
+            <list>
+                <ref bean="cxCmsActionFullPopulator"/>
+                <ref bean="cxActionFullPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="defaultCxCmsActionFullConverter" parent="cxActionFullPopulatingConverter">
+        <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationcms.model.CxCmsActionModel"/>
+        <property name="targetClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionFullData"/>
+        <property name="populators">
+            <map>
+                <entry key="BASE" value-ref="cxCmsActionFullPopulators"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- Container conversion -->
+
+    <alias name="defaultCxCmsComponentContainerPopulator" alias="cxCmsComponentContainerPopulator"/>
+    <bean id="defaultCxCmsComponentContainerPopulator" class="de.hybris.platform.personalizationcmsweb.populators.CxCmsComponentContainerPopulator"/>
+
+    <alias name="defaultCxCmsComponentContainerConverter" alias="cxCmsComponentContainerConverter"/>
+    <bean id="defaultCxCmsComponentContainerConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsComponentContainerData"/>
+        <property name="populators">
+            <list>
+                <ref bean="cxCmsComponentContainerPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <!-- Orika mapper -->
+
+    <bean id="cxCmsActionSubclassMapping" parent="subclassMapping">
+        <property name="parentClass" value="de.hybris.platform.personalizationfacades.data.ActionData"/>
+        <property name="subclassesSet" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+    </bean>
+
+    <bean id="cxCmsActionFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+    </bean>
+
+    <bean id="CxCmsActionDataFieldSetLevelMapping" parent="fieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,componentId,componentCatalog,containerId"/>
+                <entry key="FULL" value="code,componentId,componentCatalog,containerId"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="cxCmsActionFullSubclassMapping" parent="subclassMapping">
+        <property name="parentClass" value="de.hybris.platform.personalizationfacades.data.ActionFullData"/>
+        <property name="subclassesSet" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionFullData"/>
+    </bean>
+
+    <bean id="cxCmsActionFullFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionFullData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionFullData"/>
+    </bean>
+
+    <bean id="CxCmsActionFullDataFieldSetLevelMapping" parent="fieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationcmsweb.data.CxCmsActionFullData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="customizationCode,variationCode,actionCode,actionCatalog,actionCatalogVersion"/>
+                <entry key="DEFAULT" value="customizationCode,customizationStatus,variationCode,variationStatus,actionCode,actionCatalog,actionCatalogVersion,componentId,containerId"/>
+                <entry key="FULL" value="customizationCode,customizationName,customizationStatus,customizationRank,variationCode,variationName,variationStatus,variationRank,actionCode,actionCatalog,actionCatalogVersion,actionRank,componentId,componentCatalog,containerId"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

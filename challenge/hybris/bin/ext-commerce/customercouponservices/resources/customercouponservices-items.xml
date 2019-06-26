@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+	<enumtypes>
+		<enumtype generate="true" code="couponNotificationStatus"
+			autocreate="true" dynamic="true">
+			<description>Coupon notification status.</description>
+			<value code="INIT" />
+			<value code="EFFECTIVESENT" />
+			<value code="EXPIRESENT" />
+		</enumtype>
+		<enumtype code="NotificationType" autocreate="false" generate="false">
+			<value code="COUPON_EFFECTIVE"></value>
+			<value code="COUPON_EXPIRE"></value>
+		</enumtype>
+	</enumtypes>
+	<relations>
+		<relation code="CustomerCoupon2Customer" autocreate="true" generate="true" localized="false">
+			<deployment table="CusCoupon2Cus" typecode="9869" />
+			<sourceElement qualifier="customerCoupons" type="CustomerCoupon" cardinality="many" ordered="false">
+				<description>Customer Coupons</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="customers" type="Customer" cardinality="many" ordered="false">
+				<description>Customers</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+	<itemtypes>
+		<itemtype code="CustomerCoupon" extends="AbstractCoupon" abstract="false" autocreate="true" generate="true" 
+				jaloclass="de.hybris.platform.customercouponservices.jalo.CustomerCoupon">
+			<deployment table="CustomerCoupons" typecode="9871"/>
+			<attributes>
+				<attribute qualifier="assignable" type="java.lang.Boolean">
+					<persistence type="property"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<modifiers read="true" write="true"/>
+				</attribute>
+				<attribute qualifier="description" type="localized:java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="CustomerCouponForPromotionSourceRule" extends="GenericItem">
+			<deployment table="CusCouponForRules" typecode="9870" />
+			<attributes>
+				<attribute qualifier="customerCouponCode" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="rule" type="PromotionSourceRule">
+					<persistence type="property" />
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="promotion" type="RuleBasedPromotion">
+					<persistence type="property" />
+					<modifiers read="true" write="false" initial="true" optional="false"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="CusCouponForRule_IDX">
+					<key attribute="customerCouponCode"/>
+					<key attribute="rule"/>
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="CouponNotification" autocreate="true" generate="true">
+				<deployment table="CouponNotification" typecode="9872" />
+				<attributes>
+					<attribute qualifier="customerCoupon" type="CustomerCoupon">
+						<modifiers read="true" write="true" optional="false" />
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="customer" type="Customer">
+						<modifiers read="true" write="true" optional="false" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="couponNotificationStatus" qualifier="status">
+						<persistence type="property" />
+						<defaultvalue>em().getEnumerationValue("couponNotificationStatus", "INIT")</defaultvalue>
+						<modifiers />
+						<description>Coupon notification status.</description>
+					</attribute>
+					<attribute qualifier="baseSite" type="BaseSite">
+						<modifiers read="true" write="true" optional="false" />
+						<persistence type="property" />
+						<description>Attribute contains base site object that will be used in the process.</description>
+					</attribute>
+					<attribute qualifier="language" type="Language">
+						<modifiers read="true" write="true" optional="false" />
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+				<indexes>
+					<index name="IdxCouponNotification" unique="true">
+						<key attribute="customer" />
+						<key attribute="customerCoupon" />
+					</index>
+				</indexes>
+		</itemtype>
+		<itemtype code="couponNotificationProcess" autocreate="true" generate="true" extends="BusinessProcess">
+			<description>Represents The coupon notification Process</description>
+			<attributes>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+					<description>Attribute contains language that will be used in the process.</description>
+				</attribute>
+				<attribute qualifier="couponNotification" type="couponNotification">
+					<persistence type="property" />
+					<description>Attribute contains the coupon notification</description>
+				</attribute>
+				<attribute qualifier="notificationType" type="notificationType">
+					<persistence type="property" />
+					<description>Notification type</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

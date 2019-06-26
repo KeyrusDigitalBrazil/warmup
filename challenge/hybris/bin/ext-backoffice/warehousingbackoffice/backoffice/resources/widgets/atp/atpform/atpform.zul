@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<widget xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd"
+		sclass="oms-widget-atpform" height="100%" width="100%"
+		id="atpform">
+
+	<separator width="100%" height="10px"/>
+
+	<vlayout height="250px" sclass="oms-widget-atpform-form">
+		<hlayout sclass="oms-widget-atpform-row">
+			<hbox sclass="oms-widget-atpform-body">
+				<vbox sclass="oms-widget-atpform-body--vbox">
+					<label sclass="oms-widget-atpform-label"  value="${labels.warehousingbackoffice.atpform.base.stores}" width="100%"/>
+					<combobox xmlns:w="client" w:onSelect="CockpitNG.sendEvent(this.uuid,'onStoreChange',this._value)"
+						id="baseStores" readonly="true">
+						<template name="model">
+							<comboitem label="${labelService.getObjectLabel(each)}"/>
+						</template>
+					</combobox>
+				</vbox>
+			</hbox>
+			<hbox sclass="oms-widget-atpform-body">
+				<vbox sclass="oms-widget-atpform-body--vbox">
+					<hbox>
+						<label sclass="oms-widget-atpform-label" value="${labels.warehousingbackoffice.atpform.pos.label}" width="100%"/>
+						<!--<label sclass="oms-widget-atpform-label" value="${labels.warehousingbackoffice.atpform.pos.optional}" width="100%" style="font-style:italic;"/>-->
+					</hbox>
+					<combobox xmlns:w="client" w:onSelect="CockpitNG.sendEvent(this.uuid,'onPoSChange',this._value)"
+						id="pointOfServices" readonly="true">
+						<template name="model">
+							<comboitem label="${labelService.getObjectLabel(each)}"/>
+						</template>
+					</combobox>
+				</vbox>
+			</hbox>
+		</hlayout>
+		<hlayout sclass="oms-widget-atpform-row oms-widget-atpform-row--button">
+			<hbox sclass="oms-widget-atpform-body">
+				<vbox sclass="oms-widget-atpform-body--vbox">
+					<label sclass="oms-widget-atpform-label" value="${labels.warehousingbackoffice.atpform.product.code}" width="100%"/>
+					<editor id="product" type="Reference(Product)" >
+						<custom-attributes pageSize="5"/>
+						<custom-attributes isNestedObjectCreationDisabled="true"/>
+					</editor>
+				</vbox>
+			</hbox>
+			<hbox sclass="oms-widget-atpform-body oms-widget-atpform-searchbutton--hbox">
+				<div class="oms-widget-atpform-searchbutton--wrapper">
+					<button id="searchAtp" sclass="y-btn-primary oms-widget-atpform-searchbutton" label="${labels.warehousingbackoffice.atpform.search}"/>
+				</div>
+			</hbox>
+		</hlayout>
+		
+	</vlayout>
+
+</widget>

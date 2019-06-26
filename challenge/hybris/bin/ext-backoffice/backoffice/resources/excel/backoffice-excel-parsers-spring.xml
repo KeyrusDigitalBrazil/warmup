@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultDateExcelParserMatcher" alias="dateExcelParserMatcher"/>
+	<bean id="defaultDateExcelParserMatcher"
+		  class="com.hybris.backoffice.excel.importing.parser.matcher.DateExcelParserMatcher">
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<bean id="defaultExcelParserMatcher"
+		  class="com.hybris.backoffice.excel.importing.parser.matcher.DefaultExcelParserMatcher"/>
+
+	<alias name="defaultDateExcelParserSplitter" alias="dateExcelParserSplitter"/>
+	<bean id="defaultDateExcelParserSplitter"
+		  class="com.hybris.backoffice.excel.importing.parser.splitter.DateExcelParserSplitter"/>
+
+	<bean id="defaultExcelParserSplitter"
+		  class="com.hybris.backoffice.excel.importing.parser.splitter.DefaultExcelParserSplitter"/>
+
+	<alias name="defaultUnitExcelParserSplitter" alias="unitExcelParserSplitter"/>
+	<bean id="defaultUnitExcelParserSplitter"
+		  class="com.hybris.backoffice.excel.importing.parser.splitter.UnitExcelParserSplitter"/>
+
+	<bean id="defaultImportParameterParser"
+		  class="com.hybris.backoffice.excel.importing.parser.DefaultImportParameterParser">
+		<property name="order" value="#{T(org.springframework.core.Ordered).LOWEST_PRECEDENCE - 1}"/>
+		<property name="splitter" ref="defaultExcelParserSplitter"/>
+		<property name="matcher" ref="defaultExcelParserMatcher"/>
+	</bean>
+
+	<alias name="defaultExcelDateParser" alias="excelDateParser"/>
+	<bean id="defaultExcelDateParser" class="com.hybris.backoffice.excel.importing.parser.DefaultImportParameterParser">
+		<property name="order" value="3000"/>
+		<property name="splitter" ref="dateExcelParserSplitter"/>
+		<property name="matcher" ref="dateExcelParserMatcher"/>
+	</bean>
+
+	<alias name="defaultRangeParser" alias="rangeParser"/>
+	<bean id="defaultRangeParser" class="com.hybris.backoffice.excel.importing.parser.RangeParser">
+		<property name="parserRegistry">
+			<bean class="com.hybris.backoffice.excel.importing.parser.DefaultParserRegistry">
+				<property name="parsers">
+					<list>
+						<ref bean="excelDateParser"/>
+						<ref bean="defaultImportParameterParser"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<util:list id="parsers">
+		<ref bean="rangeParser"/>
+		<ref bean="excelDateParser"/>
+		<ref bean="defaultImportParameterParser"/>
+	</util:list>
+
+	<alias name="defaultParserRegistry" alias="parserRegistry"/>
+	<bean id="defaultParserRegistry" class="com.hybris.backoffice.excel.importing.parser.DefaultParserRegistry">
+		<property name="parsers" ref="parsers"/>
+	</bean>
+</beans>

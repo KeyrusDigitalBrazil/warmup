@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+ 
+	
+	<!-- Converters and Populators -->
+	<bean id="singleCodeCouponWsDTOPopulator" class="de.hybris.platform.couponwebservices.populators.SingleCodeCouponWsPopulator">
+		<property name="couponWsUtils" ref="couponWsUtils"/>
+	</bean>
+	
+	<bean id="multiCodeCouponWsDTOPopulator" class="de.hybris.platform.couponwebservices.populators.MultiCodeCouponWsPopulator">
+		<property name="couponWsUtils" ref="couponWsUtils"/>
+	</bean>
+	
+	<bean id="couponRedemptionWsDTOPopulator" class="de.hybris.platform.couponwebservices.populators.CouponRedemptionWsPopulator">
+	  <property name="couponRedemptionDao" ref="couponRedemptionDao"/>
+	</bean>
+	
+	<bean id="codeGenerationConfigurationWsDTOPopulator" class="de.hybris.platform.couponwebservices.populators.CodeGenerationConfigurationWsPopulator" />
+	
+	<bean id="couponValidationResponseWsDTOPopulator" class="de.hybris.platform.couponwebservices.populators.CouponValidationResponseWsPopulator" />
+
+	<bean id="singleCodeCouponWsDTOConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.couponwebservices.dto.SingleCodeCouponWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="singleCodeCouponWsDTOPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="multiCodeCouponWsDTOConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.couponwebservices.dto.MultiCodeCouponWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="multiCodeCouponWsDTOPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="couponRedemptionWsDTOConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.couponwebservices.dto.CouponRedemptionWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="couponRedemptionWsDTOPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="codeGenerationConfigurationWsDTOConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.couponwebservices.dto.CodeGenerationConfigurationWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="codeGenerationConfigurationWsDTOPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="couponValidationResponseWsDTOConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.couponwebservices.dto.CouponValidationResponseWsDTO" />
+		<property name="populators">
+			<list>
+				<ref bean="couponValidationResponseWsDTOPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- util beans -->
+	<bean id="couponWsUtils" class="de.hybris.platform.couponwebservices.util.CouponWsUtils">
+		<property name="couponDao" ref="couponDao"/>
+	</bean>
+	
+ 	<!-- facades -->
+ 	<bean name="abstractCouponWsFacades" abstract="true" class="de.hybris.platform.couponwebservices.facades.impl.AbstractCouponWsFacades">
+ 		<property name="couponDao" ref="couponDao"/>
+ 		<property name="modelService" ref="modelService"/>
+ 		<property name="userService" ref="userService"/>
+ 		<property name="couponService" ref="couponService"/>
+ 		<property name="couponWsUtils" ref="couponWsUtils"/>
+ 		<property name="couponValidationResponseWsDTOConverter" ref="couponValidationResponseWsDTOConverter"/>
+ 	</bean>
+ 	
+	<alias name="defaultSingleCodeCouponWsFacades" alias="singleCodeCouponWsFacades"/>
+	<bean id="defaultSingleCodeCouponWsFacades" class="de.hybris.platform.couponwebservices.facades.impl.DefaultSingleCodeCouponWsFacades" parent="abstractCouponWsFacades">
+		<property name="singleCodeCouponWsDTOConverter" ref="singleCodeCouponWsDTOConverter"/>
+		<property name="singleCodeCouponPaginatedGenericDao" ref="singleCodeCouponPaginatedGenericDao"/>
+	</bean>
+	<alias name="defaultMultiCodeCouponWsFacades" alias="multiCodeCouponWsFacades"/>
+	<bean id="defaultMultiCodeCouponWsFacades" class="de.hybris.platform.couponwebservices.facades.impl.DefaultMultiCodeCouponWsFacades" parent="abstractCouponWsFacades">
+		<property name="codeGenerationConfigurationDao" ref="codeGenerationConfigurationDao"/>
+		<property name="multiCodeCouponWsDTOConverter" ref="multiCodeCouponWsDTOConverter"/>
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+		<property name="multiCodeCouponPaginatedGenericDao" ref="multiCodeCouponPaginatedGenericDao"/>
+	</bean>
+	
+	<alias name="defaultCouponCodeGenerationWsFacade" alias="couponCodeGenerationWsFacade"/>
+	<bean name="defaultCouponCodeGenerationWsFacade" class="de.hybris.platform.couponwebservices.facades.impl.DefaultCouponCodeGenerationWsFacade">
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+		<property name="couponDao" ref="couponDao"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="couponWsUtils" ref="couponWsUtils"/>
+	</bean>
+	
+	<alias name="defaultCouponRedemptionWsFacade" alias="couponRedemptionWsFacade"/>
+	<bean name="defaultCouponRedemptionWsFacade" class="de.hybris.platform.couponwebservices.facades.impl.DefaultCouponRedemptionWsFacade">
+		<property name="couponDao" ref="couponDao"/>
+		<property name="couponRedemptionDao" ref="couponRedemptionDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="couponRedemptionWsDTOConverter" ref="couponRedemptionWsDTOConverter"/>
+	</bean>
+	
+	<alias name="defaultCodeGenerationConfigurationWsFacade" alias="codeGenerationConfigurationWsFacade"/>
+	<bean id="defaultCodeGenerationConfigurationWsFacade" class="de.hybris.platform.couponwebservices.facades.impl.DefaultCodeGenerationConfigurationWsFacade">
+	    <property name="codeGenerationConfigurationWsDTOConverter" ref="codeGenerationConfigurationWsDTOConverter" />
+	    <property name="codeGenerationConfigurationDao" ref="codeGenerationConfigurationDao" />
+	    <property name="codeGenerationConfigurationPaginatedGenericDao" ref="codeGenerationConfigurationPaginatedGenericDao" />
+	</bean>
+	
+	<alias name="defaultSingleCodeCouponPaginatedGenericDao" alias="singleCodeCouponPaginatedGenericDao"/>
+	<bean name="defaultSingleCodeCouponPaginatedGenericDao"
+	      class="de.hybris.platform.servicelayer.search.paginated.dao.impl.DefaultPaginatedGenericDao">
+		<constructor-arg value="SingleCodeCoupon"/>
+		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultMultiCodeCouponPaginatedGenericDao" alias="multiCodeCouponPaginatedGenericDao"/>
+	<bean name="defaultMultiCodeCouponPaginatedGenericDao"
+	      class="de.hybris.platform.servicelayer.search.paginated.dao.impl.DefaultPaginatedGenericDao">
+		<constructor-arg value="MultiCodeCoupon"/>
+		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+	</bean>
+	
+	<alias name="defaultCodeGenerationConfigurationPagedGenericDao" alias="codeGenerationConfigurationPagedGenericDao"/>
+	<bean name="defaultCodeGenerationConfigurationPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="CodeGenerationConfiguration"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultCodeGenerationConfigurationPaginatedGenericDao" alias="codeGenerationConfigurationPaginatedGenericDao"/>
+	<bean name="defaultCodeGenerationConfigurationPaginatedGenericDao"
+		  class="de.hybris.platform.servicelayer.search.paginated.dao.impl.DefaultPaginatedGenericDao">
+		<constructor-arg value="CodeGenerationConfiguration"/>
+		<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+	</bean>
+			
+	<beans profile="tenant_junit">
+	<!-- Configuration needed for tests to run properly. -->
+		<util:list id="jaxbTypeAdaptersList">
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.DateAdapter</value>
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.VariableMapAdapter</value>
+			<value>de.hybris.platform.webservicescommons.jaxb.adapters.XSSStringAdapter</value>
+		</util:list>
+	
+		<util:list id="jaxbContextClasses">
+			<value>java.lang.Long</value>
+			<value>java.lang.String</value>
+			<value>java.util.ArrayList</value>
+		</util:list>
+	
+		<bean id="jaxbWrapperSupport" class="de.hybris.platform.webservicescommons.jaxb.wrapper.JaxbWrapperSupport">
+		<property name="wrapperFactories">
+			<list>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbStringWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbLongWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbDoubleWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbListWrapperFactory"/>
+				<bean class="de.hybris.platform.webservicescommons.jaxb.wrapper.impl.JaxbMapWrapperFactory"/>
+			</list>
+		</property>
+		</bean>
+	</beans>
+</beans>

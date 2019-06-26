@@ -1,0 +1,58 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$standardHours=electronics-northamerica-standard-hours
+
+INSERT_UPDATE Country;isocode[unique=true];name;active;
+;DE;Germany;true;
+;CA;Canada;true;
+;;
+#Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];name;
+;test_store;Test Store;
+;test_store2;Test Store2;
+;;
+INSERT_UPDATE PointOfService;name[unique=true];description;type(code);basestore(uid)[default='test_store']
+;shop_1;description_shop_1;STORE;
+;shop_2;description_shop_2;STORE;
+;shop_3;description_shop_3;STORE;
+;shop_4;description_shop_4;STORE;
+;shop_5;description_shop_5;STORE;
+;shop_6;description_shop_6;STORE;test_store2;
+;;
+INSERT_UPDATE Address;owner(PointOfService.name)[unique=true];streetname;streetnumber;postalcode;town;country(isocode);region(isocode)
+;shop_1;Nymphenburger Strasse;32;80636;Muenchen;DE;DE-BW;
+;shop_2;Nyr Strasse;34;80636;exception;DE;DE-BW;
+;shop_3;Nymphenburger Strasse;36;80636;Muenchen;DE;DE-BY;
+;shop_4;Nymphenburger Strasse;38;80636;Muenchen;DE;DE-BY;
+;shop_5;Nymphenburger Strasse;40;80636;Muenchen;DE;DE-BY;
+;shop_6;de Maisonneuve West;999;hohoho;Montreal;CA;;
+;;
+UPDATE PointOfService;name[unique=true];description;type(code);address(owner(PointOfService.name));basestore(uid)[default='test_store'];openingSchedule(code)[default=$standardHours]
+;shop_1;description_shop_1;STORE;shop_1;;
+;shop_2;description_shop_2;STORE;shop_2;;
+;shop_3;description_shop_3;STORE;shop_3;;
+;shop_4;description_shop_4;STORE;shop_4;;
+;shop_5;description_shop_5;STORE;shop_5;;
+;shop_6;description_shop_6;STORE;shop_6;test_store2;
+;;
+
+
+INSERT_UPDATE OpeningSchedule;code[unique=true];
+;$standardHours;
+
+INSERT_UPDATE WeekdayOpeningDay;openingSchedule(code)[unique=true];dayOfWeek(code)[unique=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm];
+;$standardHours;MONDAY   ; 09:00; 20:00
+;$standardHours;TUESDAY  ; 09:00; 20:00
+;$standardHours;WEDNESDAY; 09:00; 20:00
+;$standardHours;THURSDAY ; 09:00; 20:00
+;$standardHours;FRIDAY   ; 09:00; 20:00
+;$standardHours;SATURDAY ; 10:00; 20:00

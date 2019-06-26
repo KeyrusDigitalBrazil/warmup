@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:de.hybris.platform.notificationaddon.constants.NotificationaddonConstants&/notificationaddon/import/cockpit/cmscockpit
+
+# create my notification preference cms link components for my account pages
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;target(code)[default='sameWindow']
+;;NotificationPreferenceLink;NotificationPreferenceLink;/my-account/notification-preference;NotificationPreferenceLink;
+
+#create notification preference navigation node
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;NotificationPreferenceNavNode;;NotificationPreferenceNavNode;MyAccountNavNode;;NotificationPreferenceNavNode
+
+
+# create notification preference cms navigation entry for my interest navigation node
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;NotificationPreferenceNavNodeEntry;;NotificationPreferenceNavNodeEntry;NotificationPreferenceNavNode;NotificationPreferenceLink;
+
+# notification preference page
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false']
+;;notification-preference;Notification Preference Setting Page;AccountPageTemplate;notification-preference
+
+#Insert Notification Preference Component
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;NotificationPreferenceComponent;Notification Preference Component;/WEB-INF/views/addons/notificationaddon/responsive/pages/account/accountNotificationPreferencePage.jsp;;NotificationPreferenceComponent
+
+#create side content and body content slot for notification preference page
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;BodyContent-notification-preference;Body Content Slot for Notification Preference;true;NotificationPreferenceComponent;;;
+;;SideContent-notification-preference;Side Content Slot for Notification Preference;true;;;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='notification-preference'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-notification-preference;SideContent;;SideContent-notification-preference;;;;
+;;BodyContent-notification-preference;BodyContent;;BodyContent-notification-preference;;;;

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+			
+	 <enumtypes>
+        <enumtype code="TermOfServiceFrequency" autocreate="false" generate="false" dynamic="false">
+            <value code="half_yearly"/>
+        </enumtype>
+        
+        <enumtype code="SubscriptionTypeEnum" autocreate="true" generate="true" dynamic="false">
+            <value code="commercial"/>
+            <value code="internal_billing"/>
+            <value code="trial_beta"/>
+        </enumtype>
+        
+        <enumtype code="UsageChargeType" autocreate="false" generate="false" dynamic="false">
+            <value code="block_usage_charge"/>
+        </enumtype>
+        
+        <enumtype code="RatePlanElementType">
+            <value code="OneTime"/>
+            <value code="Recurring"/>
+            <value code="Usage"/>
+        </enumtype>
+        
+         <enumtype code="SapRevenueCloudReplicationModeEnum">
+            <value code="Full"/>
+            <value code="Delta"/>
+        </enumtype>
+     
+    </enumtypes>
+    
+    
+			
+	<relations>
+		<relation autocreate="true" code="SAPRevenueCloudConfiguration2SAPMarketToCatalogMapping" generate="true" localized="false">
+			<sourceElement cardinality="one" qualifier="revenueCloudConfig" type="SAPRevenueCloudConfiguration"/>
+			<targetElement cardinality="many" qualifier="marketToCatalogMappings" type="SAPMarketToCatalogMapping"/>
+		</relation>
+	</relations>
+
+	<itemtypes>
+	
+	<itemtype code="SAPRevenueCloudConfiguration" generate="true" autocreate="true" singleton="true"
+				  jaloclass="com.sap.hybris.saprevenuecloudproduct.jalo.SAPRevenueCloudConfiguration">
+			<deployment table="SAPReveuneCloudConfig" typecode="9340" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Sap Revenue Cloud configuration name</description>
+					<modifiers read="true" write="true" search="true"
+                               optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="replicateCustomer" type="boolean">
+					<description>Indicate if the B2C customer has to be replicated to SAP Revenue Cloud</description>
+					<modifiers read="true" write="true" search="true"
+                               optional="true"/>
+					<persistence type="property" />
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="defaultCountryCode" type="java.lang.String">
+					<description>Default Country Code for the Customer if no address is entered.</description>
+					<modifiers read="true" write="true" search="true"
+                               optional="true"/>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	
+	
+		<itemtype code="SAPMarketToCatalogMapping" extends="GenericItem"
+			autocreate="true" generate="true"
+			jaloclass="com.sap.hybris.saprevenuecloudproduct.jalo.SAPMarketToCatalogMapping">
+			<deployment table="SAPMarket2Catalog" typecode="9339" />
+			<attributes>
+				<attribute type="java.lang.String" qualifier="marketId">
+					<modifiers unique="false" search="true" optional="false" />
+					<persistence type="property" />
+					<description>Market Id maintained at Revenue Cloud</description>
+				</attribute>
+				<attribute type="Catalog" qualifier="catalog">
+					<modifiers unique="false" search="true" optional="false" />
+					<persistence type="property" />
+					<description>Catalog in SAP Hybris commerce</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		 <itemtype code="SubscriptionPricePlan"  autocreate="false"
+            generate="false" >            
+            <attributes>
+              	 <attribute type="java.lang.String" qualifier="pricePlanId">
+                    <description>Rate plan ID from Revenue Cloud</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        <!-- Enhance product with subscription code -->
+        <itemtype code="Product" autocreate="false" generate="false">
+            <attributes>
+                <attribute type="java.lang.String" qualifier="subscriptionCode">
+                    <description>Subscription Code</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="java.lang.Integer" qualifier="contractTerms">
+                    <description>Contract term for the product</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute type="SubscriptionTypeEnum" qualifier="subscriptionType">
+                    <description>Subscription Type for the product</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        
+        
+         <itemtype code="RecurringChargeEntry" generate="false" 
+            autocreate="false">
+            <attributes>
+                <attribute qualifier="isProrated" type="java.lang.Boolean" >
+                    <description>Is Prorated</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+                <attribute qualifier="isAdvanceBilled" type="java.lang.Boolean" >
+                    <description>Is Billed in Advance</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        
+         <itemtype code="PerUnitUsageCharge" generate="false"
+            autocreate="false">
+            <attributes>
+                <attribute qualifier="includedQty" type="java.lang.Integer" >
+                    <description>Included quantity</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Integer.valueOf(0)</defaultvalue>
+                </attribute>
+
+            </attributes>
+        </itemtype>
+        
+       <itemtype code="UsageChargeEntry" generate="false"
+            autocreate="false">
+            <attributes>
+                 <attribute qualifier="fixedPrice" type="java.lang.Double" >
+                    <description>Fixed price</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                     <defaultvalue>Double.valueOf(0)</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+         <itemtype code="UsageCharge" generate="false"
+            autocreate="false">
+            <attributes>
+                 <attribute qualifier="blockSize" type="java.lang.Integer" >
+                    <description>Block size</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Integer.valueOf(1)</defaultvalue>
+                </attribute>
+                <attribute qualifier="minBlocks" type="java.lang.Integer" >
+                    <description>Minimum blocks</description>
+                    <modifiers read="true" write="true" search="true"
+                               optional="true"/>
+                    <persistence type="property"/>
+                    <defaultvalue>Integer.valueOf(0)</defaultvalue>
+                </attribute>
+            </attributes>
+        </itemtype>
+        
+        
+         <itemtype code="PerUnitUsageChargeEntry" generate="true" jaloclass="com.sap.hybris.saprevenuecloudproduct.jalo.PerUnitUsageChargeEntry"
+            extends="UsageChargeEntry"
+            autocreate="true">
+            <attributes>
+            </attributes>
+        </itemtype>
+        
+        <itemtype code="SAPRatePlanElement" generate="true" autocreate="true"
+				  jaloclass="com.sap.hybris.saprevenuecloudproduct.jalo.SAPRatePlanElement">
+				  <description>Sap Revenue Cloud Rate plan elements</description>
+			<deployment table="SAPRatePlanElement" typecode="9354" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<description>Sap Revenue Cloud configuration name</description>
+					<modifiers read="true" write="true" search="true" unique="true"
+                               optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<description></description>
+					<modifiers read="true" write="true" search="true"
+                               optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="type" type="RatePlanElementType">
+					<description></description>
+					<modifiers read="true" write="true" search="true"
+                               optional="true"/>
+					<persistence type="property" />
+				</attribute>
+				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SapRevenueCloudProductCronjob" generate="true" jaloclass="com.sap.hybris.saprevenuecloudproduct.jalo.SapRevenueCloudProductCronjob"
+            extends="Cronjob"
+            autocreate="true">
+            <attributes>
+            <attribute qualifier="replicationMode" type="SapRevenueCloudReplicationModeEnum">
+					<description>Sap Revenue Cloud replication mode enum</description>
+					<persistence type="property" />
+			</attribute>
+			 <attribute qualifier="replicationTime" type="java.util.Date">
+					<description>Sap Revenue Cloud replication time</description>
+					<persistence type="property" />
+			</attribute>
+            </attributes>
+        </itemtype>
+	
+        
+        
+	</itemtypes>
+</items>

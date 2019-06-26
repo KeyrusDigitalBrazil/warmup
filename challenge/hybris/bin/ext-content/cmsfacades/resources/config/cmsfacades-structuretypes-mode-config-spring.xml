@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Structure Type and Attribute Mode Definitions -->
+	<alias name="defaultCmsStructureTypeModeAttributeFilter" alias="cmsStructureTypeModeAttributeFilter"/>
+	<bean id="defaultCmsStructureTypeModeAttributeFilter" class="de.hybris.platform.cmsfacades.types.service.impl.DefaultStructureTypeModeAttributeFilter" abstract="true"/>
+
+	<alias name="defaultCmsStructureTypeModeAttributePopulators" alias="cmsStructureTypeModeAttributePopulators"/>
+	<bean id="defaultCmsStructureTypeModeAttributePopulators" class="de.hybris.platform.cmsfacades.types.service.impl.DefaultStructureTypeModeAttributePopulators" abstract="true"/>
+
+
+	<!-- Predicates -->
+	<alias name="defaultCmsEqualsTypeAndModeBiPredicate" alias="cmsEqualsTypeAndModeBiPredicate"/>
+	<bean id="defaultCmsEqualsTypeAndModeBiPredicate" 
+		  class="de.hybris.platform.cmsfacades.types.modepredicates.EqualsTypeAndModeBiPredicate" abstract="true"/>
+	
+	<alias name="defaultCmsEqualsModeAttributeBiPredicate" alias="cmsEqualsModeAttributeBiPredicate"/>
+	<bean id="defaultCmsEqualsModeAttributeBiPredicate"
+		  class="de.hybris.platform.cmsfacades.types.modepredicates.EqualsModeAttributeBiPredicate" abstract="true"/>
+
+	<!-- Structure Type Mode Data List -->
+	<alias name="defaultCmsStructureTypeModeAttributeFilterList" alias="cmsStructureTypeModeAttributeFilterList"/>
+	<bean id="defaultCmsStructureTypeModeAttributeFilterList" class="org.springframework.beans.factory.config.ListFactoryBean" >
+		<property name="targetListClass" value="java.util.LinkedList"/>
+		<property name="sourceList">
+			<list>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSItem" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>name</value>
+							<value>visible</value>
+							<value>restrictions</value>
+						</list>
+					</property>
+				</bean>
+				
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="AbstractRestriction" p:mode="DEFAULT"/>
+					</property>
+					<property name="excludes">
+						<list>
+							<value>description</value>
+							<value>pages</value>
+							<value>components</value>
+							<value>inverseRestrictions</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSTimeRestriction" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>name</value>
+							<value>activeFrom</value>
+							<value>activeUntil</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSCategoryRestriction" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>name</value>
+							<value>recursive</value>
+							<value>categories</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSUserGroupRestriction" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>name</value>
+							<value>includeSubgroups</value>
+							<value>userGroups</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="ProductCarouselComponent" p:mode="DEFAULT"/>
+					</property>
+					<property name="excludes">
+						<list>
+							<value>productCodes</value>
+							<value>categoryCodes</value>
+							<value>searchQuery</value>
+							<value>categoryCode</value>
+							<value>popup</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>title</value>
+							<value>products</value>
+							<value>categories</value>
+							<value>scroll</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="PreviewData" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>previewCatalog</value>
+							<value>language</value>
+							<value>time</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSLinkComponent" p:mode="DEFAULT"/>
+					</property>
+					<property name="excludes">
+						<list>
+							<value>contentPage</value>
+							<value>product</value>
+							<value>target</value>
+							<value>category</value>
+							<value>url</value>
+							<value>external</value>
+							<value>contentPageLabelOrId</value>
+							<value>productCode</value>
+							<value>categoryCode</value>
+							<value>navigationNodes</value>
+							<value>contentPagePOS</value>
+							<value>productPOS</value>
+							<value>categoryPOS</value>
+							<value>styleAttributes</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>linkName</value>
+							<value>linkTo</value>
+						</list>
+					</property>
+				</bean>
+
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSLinkComponent" p:mode="CONTENT"/>
+					</property>
+					<property name="includes">
+						<list>
+							<value>contentPage</value>
+							<value>target</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>linkName</value>
+							<value>linkTo</value>
+							<value>contentPage</value>
+							<value>target</value>
+						</list>
+					</property>
+				</bean>
+
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSLinkComponent" p:mode="PRODUCT"/>
+					</property>
+					<property name="includes">
+						<list>
+							<value>product</value>
+							<value>target</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>linkName</value>
+							<value>linkTo</value>
+							<value>product</value>
+							<value>target</value>
+						</list>
+					</property>
+				</bean>
+
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSLinkComponent" p:mode="CATEGORY"/>
+					</property>
+					<property name="includes">
+						<list>
+							<value>category</value>
+							<value>target</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>linkName</value>
+							<value>linkTo</value>
+							<value>category</value>
+							<value>target</value>
+						</list>
+					</property>
+				</bean>
+
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSLinkComponent" p:mode="EXTERNAL"/>
+					</property>
+					<property name="includes">
+						<list>
+							<value>url</value>
+							<value>target</value>
+						</list>
+					</property>
+					<property name="order">
+						<list>
+							<value>linkName</value>
+							<value>linkTo</value>
+							<value>url</value>
+							<value>target</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSNavigationNode" p:mode="DEFAULT"/>
+					</property>
+					<property name="order">
+						<list>
+							<value>name</value>
+							<value>title</value>
+							<value>entries</value>
+						</list>
+					</property>
+					<property name="excludes">
+						<list>
+							<value>uid</value>
+						</list>
+					</property>
+				</bean>
+
+				<bean parent="cmsStructureTypeModeAttributeFilter">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSNavigationEntry" p:mode="DEFAULT"/>
+					</property>
+					<property name="excludes">
+						<list>
+							<value>uid</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- Attribute Structure Type Mode Data List -->
+	<alias name="defaultCmsStructureTypeModeAttributePopulatorsList" alias="cmsStructureTypeModeAttributePopulatorsList"/>
+	<bean id="defaultCmsStructureTypeModeAttributePopulatorsList" class="org.springframework.beans.factory.config.ListFactoryBean" >
+		<property name="targetListClass" value="java.util.LinkedList"/>
+		<property name="sourceList">
+			<list>
+				
+				<bean parent="cmsStructureTypeModeAttributePopulators">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsModeAttributeBiPredicate" p:mode="ADD"/>
+					</property>
+					<property name="attributePopulators">
+						<list>
+							<ref bean="nonEditableComponentTypeAttributePopulator" />
+						</list>
+					</property>
+				</bean>
+				
+				<bean parent="cmsStructureTypeModeAttributePopulators">
+					<property name="constrainedBy">
+						<bean parent="cmsEqualsModeAttributeBiPredicate" p:mode="PREVIEWVERSION"/>
+					</property>
+					<property name="attributePopulators">
+						<list>
+							<ref bean="cmsPreviewDataForVersionModeEditableAttributesPopulator" />
+						</list>
+					</property>
+				</bean>
+				
+			</list>
+		</property>
+	</bean>
+	
+	
+	
+</beans>

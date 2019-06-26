@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><!--
+ All hybris buildcallbacks.xml macrodefinitions:
+ 
+ Build/Documentation
+ 
+	 before/after ant macro "clean"
+		 <macrodef name="orbeonweb_before_clean"/>
+		 <macrodef name="orbeonweb_after_clean"/>
+	 
+	 before/after ant macro "build"
+		 <macrodef name="orbeonweb_before_build"/>
+		 <macrodef name="orbeonweb_after_build"/>
+		 
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="orbeonweb_before_compile_core">
+		 <macrodef name="orbeonweb_after_compile_core">
+	 
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="orbeonweb_before_compile_web" />
+		 <macrodef name="orbeonweb_after_compile_web" />
+	 
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="orbeonweb_before_compile_hmc" />
+		 <macrodef name="orbeonweb_after_compile_hmc" />
+ 
+ Preparing extension
+ 
+	 will be called in the beginning of the ant call and only once (also when using multiple 
+	 ant targets e.g. ant build yunittest)	
+		 <macrodef name="orbeonweb_only_once_prepare"/>
+ 
+ Creating ear module/production
+ 
+	 before/after ant macro "ear"
+		 <macrodef name="orbeonweb_before_ear"/>
+		 <macrodef name="orbeonweb_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="orbeonweb_before_production" />
+		 <macrodef name="orbeonweb_after_production" />
+ 
+ JUnit Test
+ 
+	 before/after ant macro "yunitinit" 
+		 <macrodef name="orbeonweb_before_yunitinit" />
+		 <macrodef name="orbeonweb_after_yunitinit" />
+	 
+	 before/after ant macro "yunit"
+		 <macrodef name="orbeonweb_before_yunit" />
+		 <macrodef name="orbeonweb_after_yunit" /> 
+		 
+ Distribution package
+ 
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="orbeonweb_after_dist"/>
+		 <macrodef name="orbeonweb_before_dist"/>
+	 
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="orbeonweb_before_dist_copy"/>
+		 <macrodef name="orbeonweb_after_dist_copy"/>
+		  
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.orbeonweb.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.orbeonweb.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+     With this filter you can decide what should be excluded from development zip.
+ 	  	 <patternset id="extension.orbeonweb.devzip.filter">
+ 	  	 Include all files from extension.source.filter.
+ 	  	     <patternset refid="extension.source.filter" />
+         Exclude unwanted files.
+ 	  	  	 <exclude name="lib/exclude-me.jar" />
+ 	  	 </patternset>
+ 
+--><project name="orbeonweb_buildcallbacks">
+
+	<!-- 
+	    Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+	
+	     ${ear.path}: 			path to ear
+	 -->
+	<macrodef name="orbeonweb_before_ear">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+
+		</sequential>
+	</macrodef>
+	
+	<macrodef name="orbeonweb_after_build">
+		<sequential>
+			<if>
+				<available file="${HYBRIS_CONFIG_DIR}/orbeon" />
+				<then>
+					<echo level="info" message="Orbeon config folder already exists"/>
+				</then>
+				<else>
+					<foreachext>
+						<do> 
+							<if>
+								<equals arg1="${@{extname}.orbeon.config}" arg2="$${@{extname}.orbeon.config}"/>
+								<then>
+									<echo message="Not found orbeon config for extension:  @{extname}" />
+								</then>
+								<else>
+									<echo message="Found orbeon config for extension:  @{extname}" />
+									<copy_orbeon_config extname="@{extname}" />
+								</else>
+							</if>
+						</do>
+					</foreachext>
+				</else>
+			</if>
+		</sequential>
+	</macrodef>
+	
+   <macrodef name="copy_orbeon_config">
+		<attribute name="extname"/>
+		<sequential>
+			<echo level="info" message="copy orbeon config from @{extname} to hybris config dir..."/>
+			<copy todir="${HYBRIS_CONFIG_DIR}/orbeon" overwrite="true" verbose="true" filtering="false">
+				<fileset dir="${ext.@{extname}.path}/${@{extname}.orbeon.config}">
+					<include name="**/**.*" />
+					<exclude name="**/properties-*.xml" />
+				</fileset>
+			</copy>
+			<pathconvert targetos="unix" property="platformhome.unix">
+				<path>
+					<pathelement path="${platformhome}" />
+				</path>
+			</pathconvert>
+         <copy todir="${HYBRIS_CONFIG_DIR}/orbeon" overwrite="true" verbose="true" filtering="true">
+	         <filterset begintoken="${" endtoken="}" recurse="true">
+					<filter token="platformhome" value="${platformhome.unix}" />
+	            <filtersfile file="${ext.@{extname}.path}/project.properties" />
+	         	<filtersfile file="${ext.orbeonweb.path}/project.properties" />
+	            <filtersfile file="project.properties"/> 
+	            <filtersfile file="${HYBRIS_CONFIG_DIR}/local.properties"/>
+	         </filterset>
+            <fileset dir="${ext.@{extname}.path}/${@{extname}.orbeon.config}">
+               <include name="**/properties-*.xml" />
+            </fileset>
+         </copy>
+		</sequential>
+	</macrodef>
+	
+</project>

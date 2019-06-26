@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="chineseC2LItemZoneDeliveryModeDao" alias="c2LItemZoneDeliveryModeDao"/>
+	<bean id="chineseC2LItemZoneDeliveryModeDao" class="de.hybris.platform.chineselogisticservices.delivery.dao.impl.ChineseC2LItemZoneDeliveryModeDao" parent="countryZoneDeliveryModeDao"/>
+	
+	<alias name="chineseDeliveryTimeSlotDao" alias="deliveryTimeSlotDao"/>
+	<bean id="chineseDeliveryTimeSlotDao" class="de.hybris.platform.chineselogisticservices.delivery.dao.impl.DefaultChineseDeliveryTimeSlotDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+	</bean>
+	
+	<alias name="chineseC2LItemZoneDeliveryModeValueDao" alias="c2LItemZoneDeliveryModeValueDao"/>
+	<bean id="chineseC2LItemZoneDeliveryModeValueDao" class="de.hybris.platform.chineselogisticservices.delivery.dao.impl.ChineseC2LItemZoneDeliveryModeValueDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+	</bean>
+	
+	<alias name="chineseDeliveryModeLookupStrategy" alias="deliveryModeLookupStrategy"/>
+	<bean id="chineseDeliveryModeLookupStrategy" class="de.hybris.platform.chineselogisticservices.strategies.impl.ChineseDeliveryModeLookupStrategy" parent="defaultDeliveryModeLookupStrategy">
+		<property name="c2LItemZoneDeliveryModeDao" ref="c2LItemZoneDeliveryModeDao"></property>
+	</bean>		
+	
+	<alias name="chineseDeliveryTimeSlotService" alias="deliveryTimeSlotService"/>
+	<bean id="chineseDeliveryTimeSlotService" class="de.hybris.platform.chineselogisticservices.delivery.impl.DefaultChineseDeliveryTimeSlotService">
+		<property name="deliveryTimeSlotDao" ref="deliveryTimeSlotDao"></property>
+		<property name="modelService" ref="modelService"></property>
+	</bean>		
+			
+	<alias name="chineseDeliveryService" alias="deliveryService"/>
+	<bean id="chineseDeliveryService" class="de.hybris.platform.chineselogisticservices.delivery.impl.ChineseDeliveryService" parent="defaultDeliveryService">
+		<property name="c2LItemZoneDeliveryModeValueDao" ref="c2LItemZoneDeliveryModeValueDao"></property>
+	</bean>			
+		
+	<alias name="chineseFindDeliveryCostStrategy" alias="findDeliveryCostStrategy"/>
+	<bean id="chineseFindDeliveryCostStrategy" class="de.hybris.platform.chineselogisticservices.strategies.impl.ChineseFindDeliveryCostStrategy" parent="defaultFindDeliveryCostStrategy">
+		<property name="chineseDeliveryModeLookupStrategy" ref="chineseDeliveryModeLookupStrategy"></property>
+		<property name="chineseDeliveryService" ref="chineseDeliveryService"></property>
+	</bean>				
+
+	<alias name="chineseSLFindDeliveryCostStrategy" alias="slFindDeliveryCostStrategy"/>
+	<bean id="chineseSLFindDeliveryCostStrategy" class="de.hybris.platform.chineselogisticservices.strategies.impl.ChineseSLFindDeliveryCostStrategy" parent="defaultSLFindDeliveryCostStrategy">
+		<property name="chineseDeliveryService" ref="chineseDeliveryService"></property>
+		<property name="chineseDeliveryModeLookupStrategy" ref="chineseDeliveryModeLookupStrategy"></property>
+	</bean>		
+</beans>

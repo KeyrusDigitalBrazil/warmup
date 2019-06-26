@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<alias name="defaultOmsBaseFacade" alias="omsBaseFacade"/>
+	<bean id="defaultOmsBaseFacade" class="de.hybris.platform.ordermanagementfacades.OmsBaseFacade" abstract="true">
+		<property name="modelService" ref="modelService" />
+		<property name="orderGenericDao" ref="orderGenericDao"/>
+	</bean>
+
+	<!--orders -->
+	<alias name="defaultOmsOrderFacade" alias="omsOrderFacade"/>
+	<bean id="defaultOmsOrderFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.ordermanagementfacades.order.impl.DefaultOmsOrderFacade">
+		<property name="orderByNullVersionIdPagedDao" ref="orderByNullVersionIdPagedDao"/>
+		<property name="orderSearchByStatusPagedDao" ref="orderSearchByStatusPagedDao"/>
+		<property name="orderEntryPagedGenericDao" ref="orderEntryPagedGenericDao"/>
+		<property name="orderConverter" ref="ordermanagementOrderConverter"/>
+		<property name="orderRequestReverseConverter" ref="orderRequestReverseConverter"/>
+		<property name="orderCancelRecordEntryConverter" ref="orderCancelRecordEntryConverter"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="orderEntryConverter" ref="ordermanagementOrderEntryConverter"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="fraudReportGenericDao" ref="fraudReportGenericDao"/>
+		<property name="fraudReportConverter" ref="ordermanagementFraudReportConverter"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="orderCancelService" ref="orderCancelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="customerReverseConverter" ref="customerReverseConverter"/>
+	</bean>
+
+	<alias name="defaultOrderPagedGenericDao" alias="orderPagedGenericDao"/>
+	<bean name="defaultOrderPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="Order"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultOrderSearchByStatusPagedDao" alias="orderSearchByStatusPagedDao"/>
+	<bean name="defaultOrderSearchByStatusPagedDao"
+	      class="de.hybris.platform.ordermanagementfacades.search.dao.impl.SearchByStatusPagedGenericDao">
+		<constructor-arg value="Order"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultOrderByNullVersionIdPagedDao" alias="orderByNullVersionIdPagedDao"/>
+	<bean name="defaultOrderByNullVersionIdPagedDao"
+          class="de.hybris.platform.ordermanagementfacades.search.dao.impl.OrderByNullVersionIdPagedDao">
+		<constructor-arg value="Order"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultOrderEntryPagedGenericDao" alias="orderEntryPagedGenericDao"/>
+	<bean name="defaultOrderEntryPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="OrderEntry"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultOrderGenericDao" alias="orderGenericDao"/>
+	<bean name="defaultOrderGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="Order"/>
+	</bean>
+
+	<alias name="defaultPointOfServiceGenericDao" alias="pointOfServiceGenericDao"/>
+	<bean name="defaultPointOfServiceGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="PointOfService"/>
+	</bean>
+
+	<alias name="defaultPaymentTransactionGenericDao" alias="paymentTransactionGenericDao"/>
+	<bean name="defaultPaymentTransactionGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="PaymentTransaction"/>
+	</bean>
+
+	<alias name="defaultFraudReportGenericDao" alias="fraudReportGenericDao"/>
+	<bean name="defaultFraudReportGenericDao"
+	      class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="FraudReport"/>
+	</bean>
+
+	<alias name="defaultDeliveryModeGenericDao" alias="deliveryModeGenericDao"/>
+	<bean name="defaultDeliveryModeGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="DeliveryMode"/>
+	</bean>
+
+	<alias name="defaultUserGenericDao" alias="userGenericDao"/>
+	<bean name="defaultUserGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="User"/>
+	</bean>
+
+	<alias name="defaultProductGenericDao" alias="productGenericDao"/>
+	<bean name="defaultProductGenericDao"
+		  class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="Product"/>
+	</bean>
+
+	<bean id="ordermanagementOrderConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementOrderPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementOrderPopulator"
+	      class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrdermanagementOrderPopulator" parent="baseOrderPopulator">
+		<property name="orderEntryConverter" ref="ordermanagementOrderEntryConverter"/>
+	</bean>
+
+	<alias name="defaultOrderRequestReverseConverter" alias="orderRequestReverseConverter"/>
+	<bean id="defaultOrderRequestReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.core.model.order.OrderModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="orderRequestReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="orderCancelRecordEntryPopulator"
+		  class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrderCancelRecordEntryPopulator"/>
+
+	<alias name="defaultOrderCancelRecordEntryConverter" alias="orderCancelRecordEntryConverter"/>
+	<bean id="defaultOrderCancelRecordEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.order.cancel.OrderCancelRecordEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="orderCancelRecordEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOrderRequestReversePopulator" alias="orderRequestReversePopulator"/>
+	<bean id="defaultOrderRequestReversePopulator"
+		  class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrderRequestReversePopulator">
+		<property name="orderEntryRequestReverseConverter" ref="orderEntryRequestReverseConverter"/>
+		<property name="addressReverseConverter" ref="addressReverseConverter"/>
+		<property name="paymentTransactionReverseConverter" ref="paymentTransactionReverseConverter"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="deliveryModeService" ref="deliveryModeService"/>
+		<property name="userService" ref="userService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="productService" ref="productService"/>
+		<property name="storeFinderService" ref="storeFinderService"/>
+        <property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultPaymentTransactionReverseConverter" alias="paymentTransactionReverseConverter"/>
+	<bean id="defaultPaymentTransactionReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.payment.model.PaymentTransactionModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="paymentTransactionReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPaymentTransactionReversePopulator" alias="paymentTransactionReversePopulator"/>
+	<bean id="defaultPaymentTransactionReversePopulator"
+		  class="de.hybris.platform.ordermanagementfacades.payment.converters.populator.PaymentTransactionReversePopulator">
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="cardPaymentInfoReverseConverter" ref="cardPaymentInfoReverseConverter"/>
+		<property name="paymentTransactionEntryReverseConverter" ref="paymentTransactionEntryReverseConverter"/>
+		<property name="addressReverseConverter" ref="addressReverseConverter"/>
+	</bean>
+
+	<alias name="defaultPaymentTransactionEntryReverseConverter" alias="paymentTransactionEntryReverseConverter"/>
+	<bean id="defaultPaymentTransactionEntryReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.payment.model.PaymentTransactionEntryModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="paymentTransactionEntryReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPaymentTransactionEntryReversePopulator" alias="paymentTransactionEntryReversePopulator"/>
+	<bean id="defaultPaymentTransactionEntryReversePopulator"
+		  class="de.hybris.platform.ordermanagementfacades.payment.converters.populator.PaymentTransactionEntryReversePopulator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultOrderEntryRequestReverseConverter" alias="orderEntryRequestReverseConverter"/>
+	<bean id="defaultOrderEntryRequestReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.core.model.order.OrderEntryModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="orderEntryRequestReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOrderEntryRequestReversePopulator" alias="orderEntryRequestReversePopulator"/>
+	<bean id="defaultOrderEntryRequestReversePopulator"
+		  class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrderEntryRequestReversePopulator">
+		<property name="deliveryModeService" ref="deliveryModeService"/>
+		<property name="unitService" ref="unitService"/>
+		<property name="pointOfServiceService" ref="pointOfServiceService"/>
+	</bean>
+
+	<bean id="ordermanagementConsignmentConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.ConsignmentData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementConsignmentPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOrdermanagementConsignmentPopulator" alias="ordermanagementConsignmentPopulator" />
+	<bean id="defaultOrdermanagementConsignmentPopulator" parent="defaultConsignmentPopulator">
+		<property name="consignmentEntryConverter" ref="ordermanagementConsignmentEntryConverter"/>
+	</bean>
+
+	<bean id="ordermanagementConsignmentEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.ConsignmentEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementConsignmentEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOrdermanagementConsignmentEntryPopulator" alias="ordermanagementConsignmentEntryPopulator"/>
+	<bean id="defaultOrdermanagementConsignmentEntryPopulator" parent="defaultConsignmentEntryPopulator">
+	      <property name="orderEntryConverter" ref="ordermanagementOrderEntryConverter"/>
+	</bean>
+
+	<bean id="ordermanagementOrderEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementOrderEntryPopulator"/>
+				<ref bean="ordermanagementOrderEntryUrlPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOrdermanagementOrderEntryPopulator" alias="ordermanagementOrderEntryPopulator"/>
+	<bean id="defaultOrdermanagementOrderEntryPopulator" parent="defaultOrderEntryPopulator">
+		<property name="productConverter" ref="ordermanagementProductConverter"/>
+	</bean>
+
+	<bean id="ordermanagementProductConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.product.data.ProductData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementProductPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementProductPopulator" class="de.hybris.platform.ordermanagementfacades.product.converters.populator.OrdermanagementProductBasicPopulator"
+	      parent="productBasicPopulator" />
+
+	<bean id="ordermanagementOrderEntryUrlPopulator"
+	      class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrdermanagementOrderEntryUrlPopulator">
+		<property name="orderEntryUrlResolver" ref="ordermanagementOrderEntryUrlResolver"/>
+	</bean>
+
+	<bean id="ordermanagementOrderEntryUrlResolver"
+	      class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrdermanagementOrderEntryUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value="/ordermanagementwebservices/orders/{code}/entries/{entryNumber}"/>
+	</bean>
+
+
+    <!--order cancel-->
+
+    <alias name="defaultOrderCancelPopulator" alias="orderCancelPopulator"/>
+    <bean id="defaultOrderCancelPopulator"
+          class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrderCancelPopulator">
+        <property name="orderCancelService" ref="orderCancelService"/>
+        <property name="userService" ref="userService"/>
+        <property name="cancelableEntriesStrategy" ref="cancelableEntriesStrategy"/>
+    </bean>
+
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="orderConverter"/>
+        <property name="add" ref="orderCancelPopulator"/>
+    </bean>
+
+    <alias name="defaultOrderReturnPopulator" alias="orderReturnPopulator"/>
+    <bean id="defaultOrderReturnPopulator"
+          class="de.hybris.platform.ordermanagementfacades.order.converters.populator.OrderReturnPopulator">
+        <property name="returnService" ref="returnService"/>
+    </bean>
+
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="orderConverter"/>
+        <property name="add" ref="orderReturnPopulator"/>
+    </bean>
+
+	<!--returns-->
+	<alias name="defaultOmsReturnFacade" alias="omsReturnFacade"/>
+	<bean id="defaultOmsReturnFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.ordermanagementfacades.returns.impl.DefaultOmsReturnFacade">
+		<property name="returnPagedGenericDao" ref="returnPagedGenericDao"/>
+		<property name="returnConverter" ref="ordermanagementReturnConverter"/>
+		<property name="returnHistoryConverter" ref="returnHistoryConverter"/>
+		<property name="returnEntryConverter" ref="ordermanagementReturnEntryConverter"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="returnGenericDao" ref="returnGenericDao"/>
+		<property name="returnEntryPagedGenericDao" ref="returnEntryPagedGenericDao"/>
+		<property name="returnService" ref="returnService"/>
+		<property name="refundService" ref="refundService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="impersonationService" ref="impersonationService"/>
+		<property name="returnCallbackService" ref="returnCallbackService"/>
+        <property name="userService" ref="userService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="invalidReturnStatusForRefundDeliveryCost" ref="invalidReturnStatusForRefundDeliveryCost"/>
+	</bean>
+
+	<alias name="defaultReturnGenericDao" alias="returnGenericDao"/>
+	<bean name="defaultReturnGenericDao"
+	      class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="ReturnRequest"/>
+	</bean>
+
+	<alias name="defaultReturnEntryPagedGenericDao" alias="returnEntryPagedGenericDao"/>
+	<bean name="defaultReturnEntryPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="ReturnEntry"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultReturnPagedGenericDao" alias="returnPagedGenericDao"/>
+	<bean name="defaultReturnPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="ReturnRequest"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="ordermanagementReturnHistoryConverter" alias="returnHistoryConverter"/>
+	<bean id="ordermanagementReturnHistoryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.returns.data.ReturnRequestData"/>
+		<property name="populators">
+			<list>
+				<ref bean="returnHistoryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="ordermanagementReturnHistoryPopulator" alias="returnHistoryPopulator" />
+	<bean id="ordermanagementReturnHistoryPopulator" class="de.hybris.platform.ordermanagementfacades.returns.converters.populator.OrdermanagementReturnHistoryPopulator">
+		<property name="orderConverter" ref="ordermanagementOrderConverter"/>
+	</bean>
+
+	<bean id="ordermanagementReturnConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.returns.data.ReturnRequestData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementReturnPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementReturnPopulator"
+	      class="de.hybris.platform.ordermanagementfacades.returns.converters.populator.OrdermanagementReturnPopulator">
+		<property name="returnEntryConverter" ref="ordermanagementReturnEntryConverter"/>
+		<property name="orderConverter" ref="ordermanagementOrderConverter"/>
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+		<property name="cancellableReturnStatusList" ref="cancellableReturnStatusList"/>
+	</bean>
+
+	<bean id="ordermanagementReturnEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.returns.data.ReturnEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementReturnEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementReturnEntryPopulator"
+	      class="de.hybris.platform.ordermanagementfacades.returns.converters.populator.OrdermanagementReturnEntryPopulator">
+		<property name="orderEntryConverter" ref="ordermanagementOrderEntryConverter"/>
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+	</bean>
+
+	<!-- Fraud Reports -->
+	<bean id="ordermanagementFraudReportConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.fraud.data.FraudReportData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementFraudReportPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementFraudReportPopulator" class="de.hybris.platform.ordermanagementfacades.fraud.converters.populator.OrdermanagementFraudReportPopulator">
+		<property name="fraudSymptomScoringConverter" ref="ordermanagementFraudSymptomScoringConverter" />
+	</bean>
+
+	<bean id="ordermanagementFraudSymptomScoringConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.fraud.data.FraudSymptomScoringsData" />
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementFraudSymptomScoringPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ordermanagementFraudSymptomScoringPopulator" class="de.hybris.platform.ordermanagementfacades.fraud.converters.populator.OrdermanagementFraudSymptomScoringPopulator" />
+
+	<!-- Return status exclude from isRefundDeliveryCostPossible in return service-->
+	<alias alias="invalidReturnStatusForRefundDeliveryCost" name="defaultInvalidReturnStatusForRefundDeliveryCost"/>
+	<util:set id="defaultInvalidReturnStatusForRefundDeliveryCost" value-type="de.hybris.platform.basecommerce.enums.ReturnStatus">
+		<value>CANCELED</value>
+		<value>CANCELLING</value>
+	</util:set>
+
+	<!-- Cancellable return status list -->
+	<alias name="defaultCancellableReturnStatusList" alias="cancellableReturnStatusList"/>
+	<util:list id="defaultCancellableReturnStatusList" value-type="de.hybris.platform.basecommerce.enums.ReturnStatus">
+		<value>APPROVAL_PENDING</value>
+		<value>APPROVING</value>
+		<value>WAIT</value>
+		<value>PAYMENT_REVERSAL_FAILED</value>
+	</util:list>
+
+	<alias name="defaultPaymentTransactionEntryConverter" alias="ordermanagementPaymentTransactionEntryConverter"/>
+	<bean id="defaultPaymentTransactionEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ordermanagementfacades.payment.data.PaymentTransactionEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementPaymentTransactionEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPaymentTransactionEntryPopulator" alias="ordermanagementPaymentTransactionEntryPopulator"/>
+	<bean id="defaultPaymentTransactionEntryPopulator"
+		  class="de.hybris.platform.ordermanagementfacades.payment.converters.populator.PaymentTransactionEntryPopulator"/>
+
+</beans>

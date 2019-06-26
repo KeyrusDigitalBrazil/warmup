@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultWishlistEntryConverter" alias="wishlistEntryConverter"/>
+	<bean id="defaultWishlistEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.selectivecartfacades.data.Wishlist2EntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="wishlistEntryForSelectiveCartPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultWishlistEntryForSelectiveCartPopulator" alias="wishlistEntryForSelectiveCartPopulator"/>
+	<bean id="defaultWishlistEntryForSelectiveCartPopulator"
+			class="de.hybris.platform.selectivecartfacades.populators.WishlistEntryForSelectiveCartPopulator">
+		<property name="productConverter" ref="productConverter"/>
+		<property name="productPriceAndStockConverter" ref="productPriceAndStockConverter"/>
+	</bean>
+	
+	<alias name="defaultProductPriceAndStockConverter" alias="productPriceAndStockConverter"/>
+	<bean id="defaultProductPriceAndStockConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ProductData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productPricePopulator"/>
+				<ref bean="productStockPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultWishlistConverter" alias="wishlistConverter"/>
+	<bean id="defaultWishlistConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.selectivecartfacades.data.Wishlist2Data"/>
+		<property name="populators">
+			<list>
+				<ref bean="wishlistForSelectiveCartPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultWishlistForSelectiveCartPopulator" alias="wishlistForSelectiveCartPopulator"/>
+	<bean id="defaultWishlistForSelectiveCartPopulator"
+			class="de.hybris.platform.selectivecartfacades.populators.WishlistForSelectiveCartPopulator">
+		<property name="principalConverter" ref="principalConverter"/>
+		<property name="wishlistEntryConverter" ref="wishlistEntryConverter"/>
+	</bean>
+	
+			
+    <alias name="defaultSelectiveCartFacade" alias="selectiveCartFacade"/>
+    <bean id="defaultSelectiveCartFacade" class="de.hybris.platform.selectivecartfacades.impl.DefaultSelectiveCartFacade">
+        <property name="wishlistConverter" ref="wishlistConverter"/>
+        <property name="selectiveCartService" ref="selectiveCartService"/>
+        <property name="productService" ref="productService"/>
+        <property name="cartFacade" ref="cartFacade"/>
+        <property name="wishlish2EntryModelToOrderEntryConverter" ref="wishlish2EntryModelToOrderEntryConverter" />
+    </bean>
+
+    
+    <!-- populators added to keep the sequencing of wishlist entries and cart entries -->
+	
+	<alias name="defaultSelectiveCartOrderEntryPopulator" alias="selectiveCartOrderEntryPopulator"/>
+	<bean id="defaultSelectiveCartOrderEntryPopulator"
+			class="de.hybris.platform.selectivecartfacades.populators.SelectiveCartOrderEntryPopulator">
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryConverter"/>
+		<property name="add" ref="selectiveCartOrderEntryPopulator"/>
+	</bean>
+	
+	<alias name="defaultWishlish2EntryModelToOrderEntryPopulator" alias="wishlish2EntryModelToOrderEntryPopulator"/>
+	<bean id="defaultWishlish2EntryModelToOrderEntryPopulator"
+			class="de.hybris.platform.selectivecartfacades.populators.Wishlish2EntryModelToOrderEntryPopulator">
+		<property name="productConverter" ref="productConverter"/>
+		<property name="productPriceAndStockConverter" ref="productPriceAndStockConverter"/>
+	</bean>
+	
+	<alias name="defaultWishlish2EntryModelToOrderEntryConverter" alias="wishlish2EntryModelToOrderEntryConverter"/>
+	<bean id="defaultWishlish2EntryModelToOrderEntryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.OrderEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="wishlish2EntryModelToOrderEntryPopulator"/>
+			</list>
+		</property>
+	</bean>
+		
+	<alias name="selectiveCartEntriesOrderingStrategy" alias="cartEntriesOrderingStrategy"/>
+	<bean id="selectiveCartEntriesOrderingStrategy"
+          class="de.hybris.platform.selectivecartfacades.strategies.impl.SelectiveCartEntriesOrderingStrategy"/>
+
+
+    <alias name="defaultSelectiveCartUpdateStrategy" alias="selectiveCartUpdateStrategy"/>
+    <bean id="defaultSelectiveCartUpdateStrategy"
+          class="de.hybris.platform.selectivecartfacades.strategies.impl.DefaultSelectiveCartUpdateStrategy">
+           <property name="selectiveCartFacade" ref="selectiveCartFacade"/>
+    </bean>
+</beans>

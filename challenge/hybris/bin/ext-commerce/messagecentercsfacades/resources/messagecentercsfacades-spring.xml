@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+	<alias name="defaultConversationFacade" alias="conversationFacade"/>
+	<bean id="defaultConversationFacade" class="de.hybris.platform.messagecentercsfacades.impl.DefaultConversationFacade">
+		<property name="userService" ref="userService"/>
+		<property name="conversationService" ref="conversationService"/>
+		<property name="conversationConverter" ref="conversationConverter"/>
+		<property name="conversationListConverter" ref="conversationListConverter"/>
+		<property name="messageListConverter" ref="messageListConverter"/>
+		<property name="principalConverter" ref="principalConverter"/>
+	</bean>
+
+	<bean id="conversationPopulator" class="de.hybris.platform.messagecentercsfacades.populators.ConversationPopulator">
+		<property name="principalConverter" ref="principalConverter"/>
+	</bean>
+
+	<alias name="defaultConversationConverter" alias="conversationConverter"/>
+	<bean id="defaultConversationConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.messagecentercsfacades.data.ConversationData"/>
+		<property name="populators">
+			<list>
+				<ref bean="conversationPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="conversationListPopulator" class="de.hybris.platform.messagecentercsfacades.populators.ConversationListPopulator">		
+	</bean>
+
+	<alias name="defaultConversationListConverter" alias="conversationListConverter"/>
+	<bean id="defaultConversationListConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.messagecentercsfacades.data.ConversationDataList"/>
+		<property name="populators">
+			<list>
+				<ref bean="conversationListPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="messageListPopulator" class="de.hybris.platform.messagecentercsfacades.populators.MessageListPopulator">		
+	</bean>	
+	
+	<alias name="defaultMessageListConverter" alias="messageListConverter"/>
+	<bean id="defaultMessageListConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.messagecentercsfacades.data.ConversationMessageListData"/>
+		<property name="populators">
+			<list>
+				<ref bean="messageListPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+</beans>

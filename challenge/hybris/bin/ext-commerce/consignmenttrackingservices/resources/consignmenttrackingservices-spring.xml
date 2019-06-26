@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultConsignmentDao" alias="consignmentDao"/>
+	<bean id="defaultConsignmentDao" class="de.hybris.platform.consignmenttrackingservices.daos.impl.DefaultConsignmentDao"/>
+	
+	
+	<util:map id="carrierAdaptors" />
+	
+	<alias name="defaultConsignmentTrackingService" alias="consignmentTrackingService"/>		
+	<bean id="defaultConsignmentTrackingService" class="de.hybris.platform.consignmenttrackingservices.service.impl.DefaultConsignmentTrackingService">
+		<property name="carrierAdaptors" ref="carrierAdaptors" />
+		<property name="configurationService" ref="configurationService"/>
+		<property name="consignmentDao" ref="consignmentDao"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="siteBaseUrlResolutionService" ref="siteBaseUrlResolutionService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+	
+	<util:map id="consignmentStatusDisplayMap" key-type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">
+		<entry key="IN_TRANSIT" value="shipped"/>
+		<entry key="DELIVERING" value="shipped"/>
+		<entry key="DELIVERY_COMPLETED" value="shipped"/>
+		<entry key="DELIVERY_REJECTED" value="shipped"/>
+	</util:map>
+	
+	<bean class="de.hybris.platform.consignmenttrackingservices.processor.ConsignmentStatusDisplayDynamicAttributeProcessor">
+		<property name="consignmentStatusDisplayMap" ref="consignmentStatusDisplayMap"/>
+	</bean>
+	
+	<bean id="consignmentPrepareInterceptor" class="de.hybris.platform.consignmenttrackingservices.interceptor.ConsignmentPrepareInterceptor"/>
+	
+	<bean id="consignmentPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="consignmentPrepareInterceptor"/>
+		<property name="typeCode" value="Consignment"/>
+	</bean>
+	
+</beans>

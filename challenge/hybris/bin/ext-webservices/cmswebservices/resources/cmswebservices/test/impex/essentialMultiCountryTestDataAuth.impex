@@ -1,0 +1,80 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$defaultPassword=nimda
+$lang=en
+
+$superContentCatalog=MULTI_COUNTRY_ID_CARS
+$superContentCatalogCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$superContentCatalog]),CatalogVersion.version[default=online])[default=$superContentCatalog:online]
+
+$euContentCatalog=MULTI_COUNTRY_ID_EUROPE_CARS
+$euContentCatalogCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$euContentCatalog]),CatalogVersion.version[default=staged])[default=$euContentCatalog:staged]
+
+INSERT_UPDATE Employee; UID[unique=true]      ; groups(uid)[mode=append]   ; sessionLanguage(isocode); password[default=$defaultPassword]; name
+                      ; multicountrycmsmanager; multicountrycmsmanagergroup; $lang                   ; 1234                              ; Multicountry-CmsManager
+
+INSERT_UPDATE UserGroup; UID[unique=true]           ; groups(uid)[mode=append]     ; locname[lang=en]
+                       ; multicountrycmsmanagergroup; employeegroup,cmsmanagergroup; MultiCountry-CmsManagerGroup
+
+INSERT_UPDATE User; UID[unique=true]      ; name                   ; groups(uid);
+                  ; multicountrycmsmanager; Multicountry-CmsManager; multicountrycmsmanagergroup;
+
+INSERT_UPDATE ContentCatalog; id[unique=true]             ; name[lang=$lang]             ; defaultCatalog;
+                            ; MULTI_COUNTRY_ID_CARS       ; Car's Content Catalog        ; false         ;
+                            ; MULTI_COUNTRY_ID_EUROPE_CARS; Europe Cars's Content Catalog; false         ;
+                            ; MULTI_COUNTRY_DE_CARS       ; DE Car's Content Catalog     ; false         ;
+                            ; MULTI_COUNTRY_UK_CARS       ; UK Car's Content Catalog     ; false         ;
+
+INSERT_UPDATE CMSSite; uid[unique=true]         ; contentCatalogs(id)
+                     ; multiCountryCarSite      ; MULTI_COUNTRY_ID_CARS
+                     ; multiCountryCarEuropeSite; MULTI_COUNTRY_ID_EUROPE_CARS
+                     ; multiCountryCarDeSite    ; MULTI_COUNTRY_DE_CARS
+                     ; multiCountryCarUkSite    ; MULTI_COUNTRY_UK_CARS
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]    ; version[unique=true]; active; languages(isoCode); readPrincipals(uid)         ; writePrincipals(uid)
+; MULTI_COUNTRY_ID_CARS       ; online              ; true  ; $lang             ; multicountrycmsmanagergroup ;
+; MULTI_COUNTRY_ID_CARS       ; staged              ; false ; $lang             ; multicountrycmsmanagergroup ; multicountrycmsmanagergroup
+; MULTI_COUNTRY_ID_EUROPE_CARS; online              ; true  ; $lang             ; multicountrycmsmanagergroup ;
+; MULTI_COUNTRY_ID_EUROPE_CARS; staged              ; false ; $lang             ; multicountrycmsmanagergroup ; multicountrycmsmanagergroup
+; MULTI_COUNTRY_DE_CARS       ; online              ; true  ; $lang             ; multicountrycmsmanagergroup ;
+; MULTI_COUNTRY_DE_CARS       ; staged              ; false ; $lang             ; multicountrycmsmanagergroup ; multicountrycmsmanagergroup
+; MULTI_COUNTRY_UK_CARS       ; online              ; true  ; $lang             ; multicountrycmsmanagergroup ;
+; MULTI_COUNTRY_UK_CARS       ; staged              ; false ; $lang             ; multicountrycmsmanagergroup ; multicountrycmsmanagergroup
+; MULTI_COUNTRY_UK_CARS       ; staged              ; false ; $lang             ; multicountrycmsmanagergroup ; multicountrycmsmanagergroup
+
+INSERT_UPDATE ContentCatalog; id[unique=true]             ; supercatalog(id)            ; subcatalogs(id);
+; MULTI_COUNTRY_ID_CARS       ;                             ; MULTI_COUNTRY_ID_EUROPE_CARS               ;
+; MULTI_COUNTRY_ID_EUROPE_CARS; MULTI_COUNTRY_ID_CARS       ; MULTI_COUNTRY_DE_CARS,MULTI_COUNTRY_UK_CARS;
+; MULTI_COUNTRY_DE_CARS       ; MULTI_COUNTRY_ID_EUROPE_CARS;                                            ;
+; MULTI_COUNTRY_UK_CARS       ; MULTI_COUNTRY_ID_EUROPE_CARS;                                            ;
+
+########
+## TODO: Create the below test data using Object Model Mothers instead
+########
+
+INSERT_UPDATE PageTemplate;$superContentCatalogCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;uid-home-page-template;Home Page Template;;ContentPage
+
+INSERT_UPDATE ContentPage;$superContentCatalogCV[unique=true];uid[unique=true];name;masterTemplate(uid);label;approvalStatus(code)[default='approved']
+;;uid-homepage;Homepage;uid-home-page-template;
+
+INSERT_UPDATE ContentPage;originalPage(uid,$superContentCatalogCV)[default='uid-homepage'];$euContentCatalogCV[unique=true];uid[unique=true];name;masterTemplate(uid,$superContentCatalogCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;;uid-homepage-eu;Homepage EU;uid-home-page-template;uid-homepage
+
+INSERT_UPDATE ContentSlot;$superContentCatalogCV[unique=true];uid[unique=true];name;active;
+;;uid-contentslot-header;Header for Homepage;true;
+;;uid-contentslot-footer;Footer for Homepage;true;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$superContentCatalogCV)[unique=true][default='uid-home-page-template'];validComponentTypes(code)
+;name-header;;CMSLinkComponent,CMSParagraphComponent
+
+INSERT_UPDATE ContentSlotForTemplate;$superContentCatalogCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$superContentCatalogCV)[unique=true][default='uid-home-page-template'];contentSlot(uid,$superContentCatalogCV)[unique=true];allowOverwrite
+;;uid-header-homepage-template-relation;name-header;;uid-contentslot-header;true

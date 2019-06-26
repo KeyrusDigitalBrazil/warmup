@@ -1,0 +1,56 @@
+<div data-ng-cloak
+    class="se-login">
+    <div class="se-login--wrapper">
+        <div class="se-login--logo-wrapper"
+            data-ng-class="{'se-login--logo-wrapper_full': !modalController.initialized}">
+            <img src="static-resources/images/SAP_R_grad.svg"
+                class="se-login--logo">
+            <span class="se-login--logo-text"
+                data-translate="se.application.name"></span>
+        </div>
+        <form autocomplete="off"
+            data-ng-submit="modalController.submit(loginDialogForm)"
+            class="se-login--form"
+            name='loginDialogForm'
+            novalidate>
+            <div class="se-login--auth-message"
+                data-ng-if="modalController.initialized">
+                <div data-translate="se.logindialogform.reauth.message1"></div>
+                <div data-translate="se.logindialogform.reauth.message2"></div>
+            </div>
+            <div class="se-login--form-group"
+                data-ng-if="loginDialogForm.errorMessage && loginDialogForm.posted && (loginDialogForm.$invalid || loginDialogForm.failed)">
+                <div class="alert se-login--alert-error"
+                    id="invalidError"
+                    data-translate="{{ loginDialogForm.errorMessage }}"></div>
+            </div>
+            <div class="se-login--form-group">
+                <input class="se-login--form-control"
+                    type="text"
+                    id="username_{{modalController.authURIKey}}"
+                    name="username"
+                    placeholder="{{ 'se.authentication.form.input.username' | translate}}"
+                    autofocus
+                    data-ng-model="modalController.auth.username"
+                    required/>
+            </div>
+            <div class="se-login--form-group">
+                <input class="se-login--form-control"
+                    type="password"
+                    id='password_{{modalController.authURIKey}}'
+                    name='password'
+                    placeholder="{{ 'se.authentication.form.input.password' | translate}}"
+                    data-ng-model="modalController.auth.password"
+                    required/>
+            </div>
+            <div class="se-login--form-group">
+                <language-selector class="se-login-language"></language-selector>
+            </div>
+            <button class="btn btn-lg btn-primary btn-block se-login--btn"
+                id="submit_{{modalController.authURIKey}}"
+                name="submit"
+                type="submit"
+                data-translate="se.authentication.form.button.submit"></button>
+        </form>
+    </div>
+</div>

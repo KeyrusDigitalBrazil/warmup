@@ -1,0 +1,104 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$contentCatalog1=testCatalog1
+$contentCV1=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog1]),CatalogVersion.version[default=Online])[default=$contentCatalog1:Online]
+$contentCatalog2=testCatalog2
+$contentCV2=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog2]),CatalogVersion.version[default=Online])[default=$contentCatalog2:Online]
+$defaultCurrency=EUR
+$languages=en
+$defaultLanguage=en
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;de;true
+;en;true
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$contentCatalog1;$contentCatalog1;$contentCatalog1;true
+;$contentCatalog2;$contentCatalog2;$contentCatalog2;true
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$contentCatalog1;Online;false;$defaultCurrency;$languages
+;$contentCatalog2;Online;false;$defaultCurrency;$languages
+
+INSERT_UPDATE PageTemplate;$contentCV1[unique=true];uid[unique=true];name;frontendTemplateName;active[default=true]
+;;pagetemplate1;pagetemplate1;layout/landingLayout2Page;
+
+INSERT_UPDATE ContentPage;$contentCV1[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV1);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;contentpage1;contentpage1;pagetemplate1;contentpage1
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV1[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;component1;component1;;component1
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV1[unique=true];uid[unique=true];sourceId;name;defaultCmsComponent(&componentRef);&componentRef
+;;container1;container1;container1;component1;container1
+
+INSERT_UPDATE ContentSlot;$contentCV1[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-contentpage1;true;container1
+
+# ContentSlotForPage 
+INSERT_UPDATE ContentSlotForPage;$contentCV1[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV1)[unique=true][default='contentpage1'];contentSlot(uid,$contentCV1)[unique=true];;;
+;;Section1-contentpage1;Section1;;Section1Slot-contentpage1;;;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV2[unique=true]
+;default;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV2[unique=true];group(code,$contentCV2)[default='default'];status(code)[default=ENABLED]
+;customization1;customization1;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV2[unique=true];enabled[default=true];customization(code,$contentCV2)[unique=true];status(code)[default=ENABLED]
+;variation1;variation1;;;customization1;
+
+INSERT_UPDATE CxCmsAction;code[unique=true];$contentCV2[unique=true];componentId;variation(code,$contentCV2)[unique=true];target;type(code);containerId;
+;cmsaction1;;cxcomponent1;variation1;cxCmsActionPerformable;PLAIN;container1
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV2[unique=true];uid[unique=true];sourceId;name;&containerRef
+;;container1;container1;container1;container1;
+
+## multicountry ##
+$multiCatalog1=multiCatalog1
+$multiCV1=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog1]),CatalogVersion.version[default=Online])[default=$multiCatalog1:Online]
+$multiCatalog2=multiCatalog2
+$multiCV2=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog2]),CatalogVersion.version[default=Online])[default=$multiCatalog2:Online]
+$multiCatalog3a=multiCatalog3a
+$multiCV3a=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog3a]),CatalogVersion.version[default=Online])[default=$multiCatalog3a:Online]
+$multiCatalog3b=multiCatalog3b
+$multiCV3b=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$multiCatalog3b]),CatalogVersion.version[default=Online])[default=$multiCatalog3b:Online]
+
+
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=de];name[lang=en];superCatalog(id);
+;$multiCatalog1;$multiCatalog1;$multiCatalog1;
+;$multiCatalog2;$multiCatalog2;$multiCatalog2;multiCatalog1
+;$multiCatalog3a;$multiCatalog3a;$multiCatalog3a;multiCatalog2
+;$multiCatalog3b;$multiCatalog3b;$multiCatalog3b;multiCatalog2
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$multiCatalog1;Online;false;$defaultCurrency;$languages
+;$multiCatalog2;Online;false;$defaultCurrency;$languages
+;$multiCatalog3a;Online;false;$defaultCurrency;$languages
+;$multiCatalog3b;Online;false;$defaultCurrency;$languages
+
+INSERT_UPDATE CxCustomizationsGroup;code;$multiCV1[unique=true]
+;default;$multiCatalog1:Online;
+;default;$multiCatalog2:Online;
+;default;$multiCatalog3a:Online;
+;default;$multiCatalog3b:Online;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$multiCV1[unique=true];group(code,$multiCV1)[default='default'];status(code)[default=ENABLED]
+;customization1;customization1;$multiCatalog1:Online;
+;customization1;customization1;$multiCatalog3a:Online;

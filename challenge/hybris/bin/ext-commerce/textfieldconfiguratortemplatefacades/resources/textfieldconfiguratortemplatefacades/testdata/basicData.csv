@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;P1;pieces
+;P2;pieces
+;P3;pieces
+
+INSERT PriceRow;productId[unique=true];unit(code[unique=true,default=pieces]);currency(isocode)[unique=true];price;$catalogversion
+;P1;pieces;USD;120
+;P2;pieces;USD;120
+;P3;pieces;USD;120
+
+INSERT_UPDATE ConfigurationCategory;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogversion
+;testConfigurationCategory;;;
+
+INSERT_UPDATE Product;code[unique=true];$supercategories[mode='append'];$catalogversion
+;P1;testConfigurationCategory;
+;P2;testConfigurationCategory;
+;P3;testConfigurationCategory;
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]));qualifier;$catalogversion
+;testTextFieldConf;;testConfigurationCategory;testTextQualifier;
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogversion;textFieldLabel[lang=$lang];textFieldDefaultValue[lang=$lang]
+;testTextFieldConf;;fontSize;12
+
+INSERT_UPDATE StockLevel;productCode[unique=true];inStockStatus(code)[default=forceInStock];warehouse(code)[default=warehouse]
+;P1;;warehouse
+;P3;;warehouse

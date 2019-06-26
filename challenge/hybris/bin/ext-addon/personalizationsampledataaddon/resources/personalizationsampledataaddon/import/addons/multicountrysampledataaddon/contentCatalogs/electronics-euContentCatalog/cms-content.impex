@@ -1,0 +1,61 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=electronics-euContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$siteResource=jar:de.hybris.platform.personalizationsampledataaddon.constants.PersonalizationsampledataaddonConstants&/personalizationsampledataaddon/import/addons/multicountrysampledataaddon/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$lang=en
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+$masterContentCatalog=electronicsContentCatalog
+$masterContentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$masterContentCatalog]),CatalogVersion.version[default=Online])[default=$masterContentCatalog:Online]
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images];
+;mobile		;Electronics_SummerVacationSale_EN_480W.jpg	;$siteResource/images/Electronics_SummerVacationSale_EN_480W.jpg	;Electronics_SummerVacationSale_EN_480W.jpg	;"Summer Vacation Sale";
+;tablet		;Electronics_SummerVacationSale_EN_770W.jpg	;$siteResource/images/Electronics_SummerVacationSale_EN_770W.jpg	;Electronics_SummerVacationSale_EN_770W.jpg	;"Summer Vacation Sale";
+;desktop	;Electronics_SummerVacationSale_EN_960W.jpg	;$siteResource/images/Electronics_SummerVacationSale_EN_960W.jpg	;Electronics_SummerVacationSale_EN_960W.jpg	;"Summer Vacation Sale";
+;widescreen ;Electronics_SummerVacationSale_EN_1400W.jpg;$siteResource/images/Electronics_SummerVacationSale_EN_1400W.jpg	;Electronics_SummerVacationSale_EN_1400W.jpg;"Summer Vacation Sale";
+;mobile		;Electronics_CompactCameras_Summer_480W.jpg	;$siteResource/images/Electronics_CompactCameras_Summer.jpg			;Electronics_CompactCameras_Summer.jpg		;"Summer Vacation Sale";
+;tablet		;Electronics_CompactCameras_Summer_770W.jpg	;$siteResource/images/Electronics_CompactCameras_Summer.jpg			;Electronics_CompactCameras_Summer.jpg		;"Summer Vacation Sale";
+;desktop	;Electronics_CompactCameras_Summer_960W.jpg	;$siteResource/images/Electronics_CompactCameras_Summer.jpg			;Electronics_CompactCameras_Summer.jpg		;"Summer Vacation Sale";
+;widescreen ;Electronics_CompactCameras_Summer_1400W.jpg;$siteResource/images/Electronics_CompactCameras_Summer.jpg			;Electronics_CompactCameras_Summer.jpg		;"Summer Vacation Sale";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-summer-vacation-sale-homepage-splash-en;Electronics_SummerVacationSale_EN_480W.jpg,Electronics_SummerVacationSale_EN_770W.jpg,Electronics_SummerVacationSale_EN_960W.jpg,Electronics_SummerVacationSale_EN_1400W.jpg
+;electronics-CompactCameras-summer-en;Electronics_CompactCameras_Summer_480W.jpg,Electronics_CompactCameras_Summer_770W.jpg,Electronics_CompactCameras_Summer_960W.jpg,Electronics_CompactCameras_Summer_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer;name;urlLink;&componentRef
+;;summerSaleElectronicsEUHomepageSplashBannerComponent;electronics-summer-vacation-sale-homepage-splash-en;Electronics EU Summer Homepage Splash Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;summerSaleElectronicsEUHomepageSplashBannerComponent
+;;summerSaleElectronicsEUCompactCamerasBannerComponent;electronics-CompactCameras-summer-en;Electronics EU Summer Compact Cameras Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;summerSaleElectronicsEUCompactCamerasBannerComponent
+
+#Remove default components from the slots
+REMOVE ElementsForSlot;source(uid,$contentCV)[unique=true];target(uid,$masterContentCV)[unique=true];
+;Section1Slot-Homepage-eu;ElectronicsHompageSplashBannerComponent
+;Section2ASlot-Homepage-eu;ElectronicsHompageLightFamBannerComponent
+;Section2ASlot-Homepage-eu;ElectronicsHompageLightFamTextBannerComponent
+;Section2BSlot-Homepage-eu;ElectronicsHompageCamcordersChildBannerComponent
+;Section2BSlot-Homepage-eu;ElectronicsHompageCamcordersBannerComponent
+;Section4Slot-Homepage-eu;ElectronicsHompageSmDiscountBannerComponent
+;Section4Slot-Homepage-eu;ElectronicsHompageShopBannerComponent
+;Section4Slot-Homepage-eu;ElectronicsHompageShipmentBannerComponent
+;Section4Slot-Homepage-eu;ElectronicsHompageServiceBannerComponent
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];sourceId;name;defaultCmsComponent(uid,$masterContentCV);slots(uid,$contentCV)
+;;Section1SlotHomepageCxContainer;Section1SlotHomepageCxContainer;Section1SlotHomepageCxContainer;ElectronicsHompageSplashBannerComponent;Section1Slot-Homepage-eu
+;;Section2ASlotHomepageCxContainer;Section2ASlotHomepageCxContainer;Section2ASlotHomepageCxContainer;ElectronicsHompageLightFamBannerComponent;Section2ASlot-Homepage-eu
+;;Section2BSlotHomepageCxContainer;Section2BSlotHomepageCxContainer;Section2BSlotHomepageCxContainer;ElectronicsHompageCamcordersBannerComponent;Section2BSlot-Homepage-eu
+;;Section4SlotHomepageCxContainer;Section4SlotHomepageCxContainer;Section4SlotHomepageCxContainer;ElectronicsHompageShipmentBannerComponent;Section4Slot-Homepage-eu
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(uid,$masterContentCV)[mode=append];
+;;Section2ASlot-Homepage-eu;true;ElectronicsHompageLightFamTextBannerComponent;
+;;Section2BSlot-Homepage-eu;true;ElectronicsHompageCamcordersChildBannerComponent;
+;;Section4Slot-Homepage-eu;true;ElectronicsHompageShopBannerComponent,ElectronicsHompageSmDiscountBannerComponent,ElectronicsHompageServiceBannerComponent;

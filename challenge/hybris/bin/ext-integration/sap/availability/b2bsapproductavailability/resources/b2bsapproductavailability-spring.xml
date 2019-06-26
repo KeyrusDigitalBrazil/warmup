@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultSapB2BFutureStockService" alias="futureStockService"/>
+	<bean id="defaultSapB2BFutureStockService" parent ="defaultB2BFutureStockService"
+	      class="de.hybris.platform.sap.b2bsapproductavailability.service.impl.DefaultSapB2BFutureStockService">
+	      <property name="sapProductAvailabilityService" ref="commerceStockService"/>
+	</bean>	
+	
+	<alias name="defaultSapB2BCustomerDeterminationService" alias="sapCustomerDeterminationService"/>
+	<bean id="defaultSapB2BCustomerDeterminationService" class="de.hybris.platform.sap.b2bsapproductavailability.service.impl.DefaultSapB2BCustomerDeterminationService" 
+	      parent="defaultSapCustomerDeterminationService">
+	    <property name="b2bCustomerService" ref="b2bCustomerService" />
+		<property name="b2bUnitService" ref="b2bUnitService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+  				
+</beans>

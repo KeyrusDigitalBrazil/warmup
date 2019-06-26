@@ -1,0 +1,51 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+"#% impex.setValidationMode(""import_relaxed"");"
+
+$catalogVersion=catalogversion(catalog(id[default=electronicsProductCatalog]),version[default=Staged])[unique=true,default=electronicsProductCatalog:Staged]
+$indexType=electronicsProductType
+
+
+# Canon Lover
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]     ; name                                       ; indexType[unique=true,default=$indexType] ; $catalogVersion[unique=true]
+                                           ; canonLoverElectronics ; Canon Lover Search Profile for Electronics ;                                           ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                         ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; canonLoverElectronics                            ; canonLoverElectronicsSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                      ; indexProperty[unique=true] ; operator(code) ; value ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; canonLoverElectronicsSearchConfiguration              ; canonLoverElectronicsSearchConfiguration_brandName_br ; brandName                  ; MATCH          ; Canon ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; canonLoverElectronicsSearchConfiguration              ; canonLoverElectronicsSearchConfiguration_inStock_br   ; inStockFlag                ; EQUAL          ; true  ; 1.2   ; MULTIPLICATIVE  ;                             
+
+
+# Camera Lenses Lover     
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]            ; name                                               ; indexType[unique=true,default=$indexType] ; $catalogVersion[unique=true]
+                                           ; cameraLensesLoverElectronics ; Camera Lenses Lover Search Profile for Electronics ;                                           ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                                ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; cameraLensesLoverElectronics                     ; cameraLensesLoverElectronicsSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                            ; indexProperty[unique=true] ; operator(code) ; value ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; cameraLensesLoverElectronicsSearchConfiguration       ; cameraLensesLoverElectronicsSearchConfiguration_category_br ; category                   ; MATCH          ; 588   ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; cameraLensesLoverElectronicsSearchConfiguration       ; cameraLensesLoverElectronicsSearchConfiguration_inStock_br  ; inStockFlag                ; EQUAL          ; true  ; 1.2   ; MULTIPLICATIVE  ;                             
+
+
+#Summer Sale campaign     
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]     ; name                                                ; indexType[unique=true,default=$indexType] ; $catalogVersion[unique=true]
+                                           ; summerSaleElectronics ; Summer Sale Campaign Search Profile for Electronics ;                                           ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                         ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; summerSaleElectronics                            ; summerSaleElectronicsSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                         ; indexProperty[unique=true] ; operator(code) ; value   ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; summerSaleElectronicsSearchConfiguration              ; summerSaleElectronicsSearchConfiguration_category_br     ; category                   ; MATCH          ; 588     ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; summerSaleElectronicsSearchConfiguration              ; summerSaleElectronicsSearchConfiguration_categoryName_br ; categoryName               ; MATCH          ; Webcams ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; summerSaleElectronicsSearchConfiguration              ; summerSaleElectronicsSearchConfiguration_inStockFlag_br  ; inStockFlag                ; EQUAL          ; true    ; 1.2   ; MULTIPLICATIVE  ;                             

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="ruleCompilerListenerDefinition" class="de.hybris.platform.ruleengineservices.compiler.impl.RuleCompilerListenerDefinition"
+		abstract="true">
+		<property name="priority" value="${ruleengineservices.compiler.listeners.priority.default}" />
+	</bean>
+
+	<alias alias="ruleCompilerListenersFactory" name="defaultRuleCompilerListenersFactory" />
+	<bean id="defaultRuleCompilerListenersFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerListenersFactory">
+		<property name="supportedTypes">
+			<util:list>
+				<value>de.hybris.platform.ruleengineservices.compiler.RuleCompilerListener</value>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias alias="ruleCompilerListener" name="defaultRuleCompilerListener" />
+	<bean id="defaultRuleCompilerListener" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerListener">
+		<property name="engineRuleDao" ref="engineRuleDao" />
+	</bean>
+
+	<bean id="defaultRuleCompilerListenerDefinition" parent="ruleCompilerListenerDefinition">
+		<property name="listener" ref="ruleCompilerListener" />
+	</bean>
+
+	<alias alias="ruleCompilationContextProvider" name="defaultRuleCompilationContextProvider" />
+	<bean id="defaultRuleCompilationContextProvider" class="de.hybris.platform.ruleengineservices.maintenance.impl.DefaultRuleCompilationContextProvider"/>
+
+	<alias alias="ruleCompilationContext" name="defaultRuleCompilationContext" />
+	<bean id="defaultRuleCompilationContext" class="de.hybris.platform.ruleengineservices.maintenance.impl.DefaultRuleCompilationContext" scope="prototype">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="currentTenant" ref="tenantFactory"/>
+		<property name="ruleCompilerService" ref="ruleCompilerService"/>
+		<property name="threadFactory" ref="tenantAwareThreadFactory"/>
+		<property name="ruleEngineSpliteratorStrategy" ref="ruleEngineSpliteratorStrategy"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="eventService" ref="eventService"/>
+		<property name="concurrentMapFactory" ref="initConcurrentMapFactory"/>
+		<property name="suspendResumeTaskManager" ref="suspendResumeTaskManager"/>
+	</bean>
+
+	<alias alias="ruleCompilerService" name="defaultRuleCompilerService" />
+	<bean id="defaultRuleCompilerService" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerService">
+		<property name="ruleCompilerListenersFactory" ref="ruleCompilerListenersFactory" />
+		<property name="ruleIrVariablesGeneratorFactory" ref="ruleIrVariablesGeneratorFactory" />
+		<property name="ruleCompilerContextFactory" ref="ruleCompilerContextFactory" />
+		<property name="ruleSourceCodeTranslatorFactory" ref="ruleSourceCodeTranslatorFactory" />
+		<property name="ruleIrProcessorFactory" ref="ruleIrProcessorFactory" />
+		<property name="ruleTargetCodeGeneratorFactory" ref="ruleTargetCodeGeneratorFactory" />
+		<property name="ruleCompilerResultFactory" ref="ruleCompilerResultFactory" />
+		<property name="modelService" ref="modelService" />
+		<property name="ruleCompilationContextProvider" ref="ruleCompilationContextProvider"/>
+	</bean>
+
+	<alias alias="ruleIrVariablesGeneratorFactory" name="defaultRuleIrVariablesGeneratorFactory" />
+	<bean id="defaultRuleIrVariablesGeneratorFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleIrVariablesGeneratorFactory" />
+
+	<alias alias="ruleCompilerContextFactory" name="defaultRuleCompilerContextFactory" />
+	<bean id="defaultRuleCompilerContextFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerContextFactory" >
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+		<property name="ruleActionsRegistry" ref="ruleActionsRegistry" />
+	</bean>
+
+	<alias alias="ruleSourceCodeTranslatorFactory" name="defaultRuleSourceCodeTranslatorFactory" />
+	<bean id="defaultRuleSourceCodeTranslatorFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleSourceCodeTranslatorFactory">
+		<property name="sourceRuleSourceCodeTranslator" ref="sourceRuleSourceCodeTranslator" />
+	</bean>
+
+	<alias alias="ruleCompilerProblemFactory" name="defaultRuleCompilerProblemFactory"/>
+	<bean id="defaultRuleCompilerProblemFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerProblemFactory">
+		<property name="l10nService" ref="l10nService"/>
+	</bean>
+	
+	<alias alias="ruleCompilerResultFactory" name="defaultRuleCompilerResultFactory"/>
+	<bean id="defaultRuleCompilerResultFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleCompilerResultFactory"/>
+	
+	<alias alias="sourceRuleSourceCodeTranslator" name="defaultSourceRuleSourceCodeTranslator" />
+	<bean id="defaultSourceRuleSourceCodeTranslator" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultSourceRuleSourceCodeTranslator">
+		<property name="ruleConditionsService" ref="ruleConditionsService" />
+		<property name="ruleActionsService" ref="ruleActionsService" />
+		<property name="ruleConditionsTranslator" ref="ruleConditionsTranslator" />
+		<property name="ruleActionsTranslator" ref="ruleActionsTranslator" />
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+		<property name="ruleParameterValueNormalizerStrategy" ref="ruleParameterValueNormalizerStrategy"/>
+	</bean>
+
+	<alias alias="ruleConditionsTranslator" name="defaultRuleConditionsTranslator" />
+	<bean id="defaultRuleConditionsTranslator" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleConditionsTranslator">
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+	</bean>
+
+	<alias alias="ruleActionsTranslator" name="defaultRuleActionsTranslator" />
+	<bean id="defaultRuleActionsTranslator" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleActionsTranslator">
+		<property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+	</bean>
+
+	<bean id="ruleIrProcessorDefinition" class="de.hybris.platform.ruleengineservices.compiler.impl.RuleIrProcessorDefinition"
+		abstract="true">
+		<property name="priority" value="${ruleengineservices.compiler.ruleirprocessors.priority.default}" />
+	</bean>
+
+	<alias alias="ruleIrProcessorFactory" name="defaultRuleIrProcessorFactory" />
+	<bean id="defaultRuleIrProcessorFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleIrProcessorFactory"/>
+
+	<alias alias="ruleTargetCodeGenerator" name="noOpRuleTargetCodeGenerator" />
+	<bean id="noOpRuleTargetCodeGenerator" class="de.hybris.platform.ruleengineservices.compiler.impl.NoOpRuleTargetCodeGenerator"/>
+
+	<alias alias="ruleTargetCodeGeneratorFactory" name="defaultRuleTargetCodeGeneratorFactory" />
+	<bean id="defaultRuleTargetCodeGeneratorFactory" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultRuleTargetCodeGeneratorFactory">
+		<property name="ruleTargetCodeGenerator" ref="ruleTargetCodeGenerator" />
+	</bean>
+
+	<alias alias="sourceRuleIrProcessor" name="defaultSourceRuleIrProcessor" />
+	<bean id="defaultSourceRuleIrProcessor" class="de.hybris.platform.ruleengineservices.compiler.impl.DefaultSourceRuleIrProcessor" />
+
+	<bean id="sourceRuleIrProcessorDefinition" parent="ruleIrProcessorDefinition">
+		<property name="ruleIrProcessor" ref="sourceRuleIrProcessor" />
+	</bean>
+
+</beans>

@@ -1,0 +1,90 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Sample data for configurable product with product variants option 2:
+#
+# Plain category structure. Variant combines base product's configurations with its own set (which has priority
+# in case of collisions). In case of collisions (when base product and variant both have category of the same
+# type) variant's version overrides base version completely.
+#
+# product "DSC-N1"
+
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='approved']
+$taxGroup=Europe1PriceFactory_PTG(code)[default=jp-vat-full]
+$lang=en
+
+INSERT_UPDATE Product;code[unique=true];variantType(code);$catalogVersion
+;358639;ElectronicsColorVariantProduct
+
+INSERT_UPDATE ElectronicsColorVariantProduct;code[unique=true];$baseProduct;ean;unit(code);color;$supercategories;approvalstatus(code)[default='approved'];$catalogVersion
+;358639_red;358639;4905524318111;pieces;Red;
+;358639_green;358639;4905524318111;pieces;Green;
+;358639_blue;358639;4905524318111;pieces;Blue;
+
+INSERT_UPDATE ConfigurationCategory;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;358639_engraving;configurations
+;358639_engraving_largeFont;configurations
+;358639_engraving_extraLargeFont;configurations
+;358639_engraving_smallFont;configurations
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, $catalogVersion);qualifier
+;358639_Engraved_Text;;;358639_engraving;358639_engravedText
+;358639_Font_Type;;;358639_engraving;358639_fontType
+;358639_Font_Size;;;358639_engraving;358639_fontSize
+;358639_LargeFont;;;358639_engraving_largeFont;358639_fontSize
+;358639_ExtraLargeFont;;;358639_engraving_extraLargeFont;358639_fontSize
+;358639_SmallFont;;;358639_engraving_smallFont;358639_fontSize
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;textFieldLabel[lang=$lang];textFieldDefaultValue[lang=$lang]
+;358639_Engraved_Text;;Engraved Text;
+;358639_Font_Type;;Font Type;Webdings
+;358639_Font_Size;;Font Size;14
+;358639_LargeFont;;Font Size;24
+;358639_ExtraLargeFont;;Font Size;48
+;358639_SmallFont;;Font Size;10
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;$supercategories[mode='append']
+;358639;;358639_engraving
+;358639_red;;358639_engraving_largeFont
+;358639_blue;;358639_engraving_smallFont
+;358639_green;;358639_engraving_extraLargeFont
+
+UPDATE Product;code[unique=true];$approved;$catalogVersion;$taxGroup
+;358639_red
+;358639_green
+;358639_blue
+
+INSERT_UPDATE PriceRow;productId[unique=true];unit(code[unique=true,default=pieces]);currency(isocode)[unique=true];price;minqtd;unitFactor;net
+;358639_red;pieces;USD;485;1;1;false
+;358639_red;pieces;JPY;41370;1;1;false
+;358639_green;pieces;USD;485;1;1;false
+;358639_green;pieces;JPY;41370;1;1;false
+;358639_blue;pieces;USD;485;1;1;false
+;358639_blue;pieces;JPY;41370;1;1;false
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;31;warehouse_e;notSpecified;1;0;0;0;358639_red;0
+;31;warehouse_e;notSpecified;1;0;0;0;358639_green;0
+;31;warehouse_e;notSpecified;1;0;0;0;358639_blue;0
+
+INSERT_UPDATE ProductTaxCode;productCode[unique=true];taxCode;taxArea[unique=true]
+;358639_red;P0000000;US
+;358639_green;P0000000;US
+;358639_blue;P0000000;US
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang]
+;358639_red;;DSC-N1 Red;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom.;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom. It also comes with built-in Pocket Album and Slideshow with Music features.<br/><br/>Features:<br/>- Carl Zeiss® Vario-Tessar® Lens <br/>- Clear Photo LCD Plus (3.0"" Hybrid, 230k dots) <br/>- 3x Optical Zoom, up to 15x Smart Zoom, 6x Precision Digital Zoom <br/>- Touch Screen Easy Operation <br/>- No Blur by High Sensitivity ISO800 <br/>- Pocket Album <br/>- Slide Show with Music <br/>- Free Spot AF by Touch Screen <br/>- Clear RAW NR (Noise Reduction) <br/>- Quick Operation (Start-up 1.5 sec, Shutter Time Lag 0.28 sec, Shutter Release Lag 0.01 sec) <br/>- Stamina Battery Life (approx 300 shots by CIPA standard) <br/>- Compact High Quality Aluminium Body <br/>- Real Imaging Processor <br/>- Paint on Image <br/>- 16:9 Mode for Wide Screen TV <br/>- Internal Memory 26MB <br/>- 100% LCD Field of view <br/>- MPEG VX Fine with Audio <br/>- Histogram Indication <br/>- AF Illuminator <br/>- USB 2.0 High Speed Transfer <br/>- Scene Selection Mode <br/>- Cyber-shot Station Compatible (optional) <br/>- PictBridge Compatible <br/>- 15 Menu Languages (English, French, German, Italian, Spanish, Portuguese, Dutch, Russian, Swedish, Norwegian, Danish, Finnish, Polish, Hungarian, Czech)
+;358639_green;;DSC-N1 Green;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom.;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom. It also comes with built-in Pocket Album and Slideshow with Music features.<br/><br/>Features:<br/>- Carl Zeiss® Vario-Tessar® Lens <br/>- Clear Photo LCD Plus (3.0"" Hybrid, 230k dots) <br/>- 3x Optical Zoom, up to 15x Smart Zoom, 6x Precision Digital Zoom <br/>- Touch Screen Easy Operation <br/>- No Blur by High Sensitivity ISO800 <br/>- Pocket Album <br/>- Slide Show with Music <br/>- Free Spot AF by Touch Screen <br/>- Clear RAW NR (Noise Reduction) <br/>- Quick Operation (Start-up 1.5 sec, Shutter Time Lag 0.28 sec, Shutter Release Lag 0.01 sec) <br/>- Stamina Battery Life (approx 300 shots by CIPA standard) <br/>- Compact High Quality Aluminium Body <br/>- Real Imaging Processor <br/>- Paint on Image <br/>- 16:9 Mode for Wide Screen TV <br/>- Internal Memory 26MB <br/>- 100% LCD Field of view <br/>- MPEG VX Fine with Audio <br/>- Histogram Indication <br/>- AF Illuminator <br/>- USB 2.0 High Speed Transfer <br/>- Scene Selection Mode <br/>- Cyber-shot Station Compatible (optional) <br/>- PictBridge Compatible <br/>- 15 Menu Languages (English, French, German, Italian, Spanish, Portuguese, Dutch, Russian, Swedish, Norwegian, Danish, Finnish, Polish, Hungarian, Czech)
+;358639_blue;;DSC-N1 Blue;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom.;The Cyber-shot N1 offers 8.1 effective Megapixels with high sensitivity for reduced blur, a massive 3.0"" Clear Photo LCD Plus screen with touch-screen operation and a ZEISS 3x Optical Zoom. It also comes with built-in Pocket Album and Slideshow with Music features.<br/><br/>Features:<br/>- Carl Zeiss® Vario-Tessar® Lens <br/>- Clear Photo LCD Plus (3.0"" Hybrid, 230k dots) <br/>- 3x Optical Zoom, up to 15x Smart Zoom, 6x Precision Digital Zoom <br/>- Touch Screen Easy Operation <br/>- No Blur by High Sensitivity ISO800 <br/>- Pocket Album <br/>- Slide Show with Music <br/>- Free Spot AF by Touch Screen <br/>- Clear RAW NR (Noise Reduction) <br/>- Quick Operation (Start-up 1.5 sec, Shutter Time Lag 0.28 sec, Shutter Release Lag 0.01 sec) <br/>- Stamina Battery Life (approx 300 shots by CIPA standard) <br/>- Compact High Quality Aluminium Body <br/>- Real Imaging Processor <br/>- Paint on Image <br/>- 16:9 Mode for Wide Screen TV <br/>- Internal Memory 26MB <br/>- 100% LCD Field of view <br/>- MPEG VX Fine with Audio <br/>- Histogram Indication <br/>- AF Illuminator <br/>- USB 2.0 High Speed Transfer <br/>- Scene Selection Mode <br/>- Cyber-shot Station Compatible (optional) <br/>- PictBridge Compatible <br/>- 15 Menu Languages (English, French, German, Italian, Spanish, Portuguese, Dutch, Russian, Swedish, Norwegian, Danish, Finnish, Polish, Hungarian, Czech)

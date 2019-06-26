@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Point Of Service -->
+	<alias name="defaultWarehousingPointOfServiceFacade" alias="warehousingPointOfServiceFacade"/>
+	<bean id="defaultWarehousingPointOfServiceFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.pointofservice.impl.DefaultWarehousingPointOfServiceFacade">
+		<property name="pointOfServiceConverter" ref="warehousingPointOfServiceConverter"/>
+		<property name="pointOfServiceGenericDao" ref="pointOfServiceGenericDao"/>
+		<property name="warehousesByPointOfServicePagedDao" ref="warehousesByPointOfServicePagedDao"/>
+		<property name="warehouseConverter" ref="warehousingWarehouseConverter"/>
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="addressReverseConverter" ref="warehousingAddressReverseConverter"/>
+	</bean>
+
+
+	<bean id="warehousingAddressReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.core.model.user.AddressModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="addressReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultPointOfServiceGenericDao" alias="pointOfServiceGenericDao"/>
+	<bean name="defaultPointOfServiceGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="PointOfService"/>
+	</bean>
+
+	<bean id="warehousingPointOfServiceConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.storelocator.data.PointOfServiceData"/>
+		<property name="populators">
+			<list>
+				<ref bean="warehousingPointOfServicePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+    <alias name="defaultWarehousingPointOfServicePopulator" alias="warehousingPointOfServicePopulator"/>
+    <bean id="defaultWarehousingPointOfServicePopulator" class="de.hybris.platform.warehousingfacades.pointofservice.converters.populator.WarehousingPointOfServicePopulator"
+          parent="pointOfServicePopulator">
+        <property name="warehouseCodes" >
+            <list value-type="java.util.ArrayList"/>
+        </property>
+    </bean>
+
+	<alias name="defaultWarehousesByPointOfServicePagedDao" alias="warehousesByPointOfServicePagedDao"/>
+	<bean name="defaultWarehousesByPointOfServicePagedDao"
+	      class="de.hybris.platform.warehousingfacades.search.dao.impl.WarehousesByPointOfServicePagedDao">
+		<constructor-arg value="Warehouse"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<!-- Warehouse -->
+	<alias name="defaultWarehousingWarehouseFacade" alias="warehousingWarehouseFacade"/>
+	<bean id="defaultWarehousingWarehouseFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.warehouse.impl.DefaultWarehousingWarehouseFacade">
+		<property name="warehouseConverter" ref="warehousingWarehouseConverter"/>
+		<property name="warehouseService" ref="warehouseService"/>
+	</bean>
+
+	<bean id="warehousingWarehouseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.storelocator.data.WarehouseData"/>
+		<property name="populators">
+			<list>
+				<ref bean="warehousingWarehousePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="warehousingWarehousePopulator"
+	      class="de.hybris.platform.warehousingfacades.warehouse.converters.populator.WarehousingWarehousePopulator">
+		<property name="consignmentConverter" ref="ordermanagementConsignmentConverter"/>
+		<property name="pointOfServiceConverter" ref="warehousingPointOfServiceConverter"/>
+		<property name="deliveryModeConverter" ref="deliveryModeConverter"/>
+		<property name="warehouseUrlConverter" ref="warehousingWarehouseUrlConverter"/>
+	</bean>
+
+	<bean id="warehousingWarehouseUrlConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.storelocator.data.WarehouseData"/>
+		<property name="populators">
+			<list>
+				<ref bean="warehousingWarehouseUrlPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="warehousingWarehouseUrlPopulator"
+	      class="de.hybris.platform.warehousingfacades.warehouse.converters.populator.WarehousingWarehouseUrlPopulator">
+		<property name="warehouseModelUrlResolver" ref="warehousingWarehouseModelUrlResolver"/>
+	</bean>
+
+	<bean id="warehousingWarehouseModelUrlResolver"
+	      class="de.hybris.platform.warehousingfacades.warehouse.converters.populator.WarehousingWarehouseUrlResolver">
+		<property name="threadContextService" ref="threadContextService"/>
+		<property name="pattern" value="/warehousingwebservices/warehouses/{code}"/>
+	</bean>
+	
+	<alias name="defaultAsnEntryModelConverter" alias="asnEntryModelConverter" />
+	<bean id="defaultAsnEntryModelConverter" class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnEntryModelPopulatingConverter">
+		<property name="modelService" ref="modelService"/>
+		<property name="populators">
+			<list>
+				<ref bean="asnEntryModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultAsnEntryModelPopulator" alias="asnEntryModelPopulator" />
+	<bean id="defaultAsnEntryModelPopulator"
+		class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnEntryModelPopulator">
+	</bean>
+
+	<alias name="defaultAsnModelConverter" alias="asnModelConverter" />
+	<bean id="defaultAsnModelConverter" class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnModelPopulatingConverter">
+		<property name="modelService" ref="modelService"/>
+		<property name="populators">
+			<list>
+				<ref bean="asnModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAsnModelPopulator" alias="asnModelPopulator" />
+	<bean id="defaultAsnModelPopulator" class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnModelPopulator">
+		<property name="asnEntryModelConverter" ref="asnEntryModelConverter" />
+		<property name="pointOfServiceService" ref="pointOfServiceService" />
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="guidKeyGenerator" ref="guidKeyGenerator" />
+		<property name="asnCommentService" ref="asnCommentService" />
+		<property name="warehouseSelectionForAsnStrategy" ref="warehouseSelectionForAsnStrategy" />
+	</bean>
+
+	<alias name="defaultAsnEntryDataConverter" alias="asnEntryDataConverter" />
+	<bean id="defaultAsnEntryDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.asn.data.AsnEntryData" />
+		<property name="populators">
+			<list>
+				<ref bean="asnEntryDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAsnEntryDataPopulator" alias="asnEntryDataPopulator" />
+	<bean id="defaultAsnEntryDataPopulator" class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnEntryDataPopulator"/>
+	
+	<alias name="defaultAsnDataConverter" alias="asnDataConverter" />
+	<bean id="defaultAsnDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.asn.data.AsnData" />
+		<property name="populators">
+				<list>
+				<ref bean="asnDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultAsnDataPopulator" alias="asnDataPopulator" />
+	<bean id="defaultAsnDataPopulator" class="de.hybris.platform.warehousingfacades.asn.converters.populator.AsnDataPopulator">
+		<property name="asnEntryDataConverter" ref="asnEntryDataConverter" />
+	</bean>
+
+	<!-- BaseStore -->
+	<alias name="defaultWarehousingBaseStoreFacade" alias="warehousingBaseStoreFacade"/>
+	<bean id="defaultWarehousingBaseStoreFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.basestore.impl.DefaultWarehousingBaseStoreFacade">
+		<property name="warehouseConverter" ref="warehousingWarehouseConverter"/>
+		<property name="pointOfServiceConverter" ref="warehousingPointOfServiceConverter"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="warehousesByBaseStorePagedDao" ref="warehousesByBaseStorePagedDao"/>
+		<property name="pointsOfServicePagedDao" ref="pointsOfServiceByBaseStorePagedDao"/>
+	</bean>
+
+	<alias name="defaultWarehousesByBaseStorePagedDao" alias="warehousesByBaseStorePagedDao"/>
+	<bean name="defaultWarehousesByBaseStorePagedDao"
+	      class="de.hybris.platform.warehousingfacades.search.dao.impl.WarehousesByBaseStorePagedDao">
+		<constructor-arg value="Warehouse"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultPointsOfSerciceByBaseStorePagedDao" alias="pointsOfServiceByBaseStorePagedDao"/>
+	<bean name="defaultPointsOfSerciceByBaseStorePagedDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="PointOfService"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<!-- Stock Level -->
+	<alias name="defaultWarehousingStockLevelFacade" alias="warehousingStockLevelFacade"/>
+	<bean id="defaultWarehousingStockLevelFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.stocklevel.impl.DefaultWarehousingStockLevelFacade">
+		<property name="stockLevelPagedGenericDao" ref="stockLevelPagedGenericDao" />
+		<property name="stockLevelConverter" ref="warehousingStockLevelConverter" />
+		<property name="warehouseService" ref="warehouseService" />
+		<property name="warehouseStockService" ref="warehouseStockService"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="stockLevelCommentService" ref="stockLevelCommentService" />
+		<property name="stockLevelSelectionStrategy" ref="stockLevelSelectionStrategy" />
+		<property name="reasonMapper">
+			<map key-type="de.hybris.platform.warehousing.enums.StockLevelAdjustmentReason" value-type="java.lang.Class">
+				<entry key="#{T(de.hybris.platform.warehousing.enums.StockLevelAdjustmentReason).INCREASE}" value="de.hybris.platform.warehousing.model.IncreaseEventModel" />
+				<entry key="#{T(de.hybris.platform.warehousing.enums.StockLevelAdjustmentReason).SHRINKAGE}" value="de.hybris.platform.warehousing.model.ShrinkageEventModel" />
+				<entry key="#{T(de.hybris.platform.warehousing.enums.StockLevelAdjustmentReason).WASTAGE}" value="de.hybris.platform.warehousing.model.WastageEventModel" />
+			</map>
+		</property>
+		<property name="guidKeyGenerator" ref="guidKeyGenerator" />
+	</bean>
+
+	<alias name="defaultStockLevelPagedGenericDao" alias="stockLevelPagedGenericDao"/>
+	<bean name="defaultStockLevelPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="StockLevel"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<bean id="warehousingStockLevelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.product.data.StockLevelData"/>
+		<property name="populators">
+			<list>
+				<ref bean="warehousingStockLevelPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="warehousingStockLevelPopulator" class="de.hybris.platform.warehousingfacades.stocklevel.converters.populator.WarehousingStockLevelPopulator">
+		<property name="warehouseConverter" ref="warehousingWarehouseConverter" />
+		<property name="warehouseStockService" ref="warehouseStockService"/>
+	</bean>
+
+	<!--orders -->
+	<alias name="warehousingConsignmentPopulator" alias="ordermanagementConsignmentPopulator"/>
+	<bean id="warehousingConsignmentPopulator" parent="defaultOrdermanagementConsignmentPopulator"
+		  class="de.hybris.platform.warehousingfacades.order.converters.populator.WarehousingConsignmentPopulator">
+		<property name="deliveryModeConverter" ref="deliveryModeConverter"/>
+		<property name="packagingInfoConverter" ref="ordermanagementPackagingInfoConverter"/>
+	</bean>
+
+	<alias name="warehousingPackagingInfoConverter" alias="ordermanagementPackagingInfoConverter"/>
+	<bean id="warehousingPackagingInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousingfacades.order.data.PackagingInfoData"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementPackagingInfoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="warehousingPackagingInfoPopulator" alias="ordermanagementPackagingInfoPopulator"/>
+	<bean id="warehousingPackagingInfoPopulator" class="de.hybris.platform.warehousingfacades.order.converters.populator.WarehousingPackagingInfoPopulator"/>
+
+	<alias name="warehousingReversePackagingInfoConverter" alias="ordermanagementReversePackagingInfoConverter"/>
+	<bean id="warehousingReversePackagingInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.warehousing.model.PackagingInfoModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="ordermanagementReversePackagingInfoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="warehousingReversePackagingInfoPopulator" alias="ordermanagementReversePackagingInfoPopulator"/>
+	<bean id="warehousingReversePackagingInfoPopulator" class="de.hybris.platform.warehousingfacades.order.converters.populator.WarehousingReversePackagingInfoPopulator"/>
+
+	<alias name="warehousingConsignmentEntryPopulator" alias="ordermanagementConsignmentEntryPopulator"/>
+	<bean id="warehousingConsignmentEntryPopulator" parent="defaultOrdermanagementConsignmentEntryPopulator" class="de.hybris.platform.warehousingfacades.order.converters.populator.WarehousingConsignmentEntryPopulator"/>
+
+	<alias name="warehousingOrderEntryPopulator" alias="ordermanagementOrderEntryPopulator"/>
+	<bean id="warehousingOrderEntryPopulator" parent="defaultOrdermanagementOrderEntryPopulator"
+		  class="de.hybris.platform.warehousingfacades.order.converters.populator.WarehousingOrderEntryPopulator">
+	</bean>
+
+	<alias name="defaultWarehousingConsignmentFacade" alias="warehousingConsignmentFacade"/>
+	<bean id="defaultWarehousingConsignmentFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.order.impl.DefaultWarehousingConsignmentFacade">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="consignmentGenericDao" ref="consignmentGenericDao"/>
+		<property name="consignmentPagedGenericDao" ref="consignmentPagedGenericDao"/>
+		<property name="consignmentEntryPagedDao" ref="consignmentEntryPagedDao"/>
+		<property name="consignmentSearchByStatusPagedDao" ref="consignmentSearchByStatusPagedDao"/>
+		<property name="consignmentConverter" ref="ordermanagementConsignmentConverter"/>
+		<property name="consignmentEntryConverter" ref="ordermanagementConsignmentEntryConverter"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="warehousingShippingService" ref="warehousingShippingService"/>
+        <property name="sourcingFilterProcessor" ref="sourcingFilterProcessor"/>
+        <property name="warehouseConverter" ref="warehousingWarehouseConverter"/>
+        <property name="packagingInfoConverter" ref="ordermanagementPackagingInfoConverter"/>
+        <property name="reversePackagingInfoConverter" ref="ordermanagementReversePackagingInfoConverter"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService" />
+        <property name="warehouseService" ref="warehouseService" />
+		<property name="warehouseStockService" ref="warehouseStockService"/>
+		<property name="reallocableConsignmentStatusList" ref="reallocableConsignmentStatusList"/>
+		<property name="printMediaService" ref="printMediaService"/>
+		<property name="warehousingConsignmentWorkflowService" ref="warehousingConsignmentWorkflowService"/>
+		<property name="paymentTransactionEntryConverter" ref="ordermanagementPaymentTransactionEntryConverter"/>
+		<property name="consignmentAmountCalculationStrategy" ref="consignmentAmountCalculationStrategy"/>
+		<property name="paymentService" ref="paymentService"/>
+	</bean>
+
+	<alias name="defaultConsignmentGenericDao" alias="consignmentGenericDao"/>
+	<bean name="defaultConsignmentGenericDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="Consignment"/>
+	</bean>
+
+	<alias name="defaultConsignmentSearchByStatusPagedDao" alias="consignmentSearchByStatusPagedDao"/>
+	<bean name="defaultConsignmentSearchByStatusPagedDao"
+	      class="de.hybris.platform.ordermanagementfacades.search.dao.impl.SearchByStatusPagedGenericDao">
+		<constructor-arg value="Consignment"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultConsignmentPagedGenericDao" alias="consignmentPagedGenericDao"/>
+	<bean name="defaultConsignmentPagedGenericDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="Consignment"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<alias name="defaultConsignmentEntryPagedDao" alias="consignmentEntryPagedDao"/>
+	<bean name="defaultConsignmentEntryPagedDao"
+	      class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="ConsignmentEntry"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+	<!--returns-->
+	<alias name="defaultWarehousingReturnFacade" alias="warehousingReturnFacade"/>
+	<bean id="defaultWarehousingReturnFacade" parent="omsBaseFacade"
+		  class="de.hybris.platform.warehousingfacades.returns.impl.DefaultWarehousingReturnFacade">
+		<property name="returnCallbackService" ref="returnCallbackService"/>
+		<property name="returnGenericDao" ref="returnGenericDao"/>
+	</bean>
+	
+	<!--advanced shipping notices-->
+	<alias name="defaultWarehousingAsnFacade" alias="warehousingAsnFacade"/>
+	<bean id="defaultWarehousingAsnFacade" parent="omsBaseFacade"
+	      class="de.hybris.platform.warehousingfacades.asn.impl.DefaultWarehousingAsnFacade">
+		<property name="asnService" ref="asnService" />
+		<property name="asnDataConverter" ref="asnDataConverter" />
+		<property name="asnModelConverter" ref="asnModelConverter"/>
+	</bean>
+
+	<!-- orders -->
+	<alias name="defaultWarehousingOrderFacade" alias="warehousingOrderFacade"/>
+	<bean id="defaultWarehousingOrderFacade" parent="omsBaseFacade"
+		  class="de.hybris.platform.warehousingfacades.order.impl.DefaultWarehousingOrderFacade">
+		<property name="orderOnHoldService" ref="orderOnHoldService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+        <property name="onHoldableOrderStatusList" ref="onHoldableOrderStatusList"/>
+    </bean>
+
+	<alias name="defaultReallocableConsignmentStatuses" alias="reallocableConsignmentStatuses"/>
+	<util:list id="defaultReallocableConsignmentStatuses" value-type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">
+		<value>READY</value>
+		<value>PAYMENT_NOT_CAPTURED</value>
+	</util:list>
+</beans>

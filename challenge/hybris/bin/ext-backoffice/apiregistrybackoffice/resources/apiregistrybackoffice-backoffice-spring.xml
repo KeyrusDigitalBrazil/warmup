@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="apiregistrybackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/apiregistrybackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+
+	<bean id="resetCredentialsHandler" class="de.hybris.platform.apiregistrybackoffice.widgets.ResetCredentialsHandler">
+		<property name="apiRegistrationService" ref="apiRegistrationService"/>
+		<property name="credentialService" ref="credentialService"/>
+		<property name="destinationService" ref="destinationService"/>
+		<property name="notificationService" ref="notificationService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<bean id="apiregistryResetCredentialsForm" factory-bean="apiregistryFormInitialsFactory" factory-method="getApiregistryResetCredentialsForm" scope="prototype"/>
+
+	<alias name="defaultApiregistryFormInitialsFactory" alias="apiregistryFormInitialsFactory" />
+	<bean id="defaultApiregistryFormInitialsFactory" class="de.hybris.platform.apiregistrybackoffice.widgets.DefaultApiregistryFormInitialsFactory" >
+	</bean>
+
+
+
+</beans>

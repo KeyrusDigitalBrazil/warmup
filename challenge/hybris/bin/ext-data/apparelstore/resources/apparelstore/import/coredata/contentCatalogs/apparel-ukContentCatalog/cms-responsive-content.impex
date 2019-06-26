@@ -1,0 +1,812 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Import the Responsive CMS content for the Apparel UK site
+#
+$contentCatalog=apparel-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+
+
+# Create ContentSlots which are standard slots shown in most of templates 
+# Standard slots are SiteLogo, HeaderLinks, MiniCart and NavigationBar (that all appear in the Header), and the Footer, etc.
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;SiteLogoSlot;Default Site Logo Slot;true
+;;HeaderLinksSlot;Header links;true
+;;TopHeaderSlot;Top Header;true
+;;BottomHeaderSlot;Bottom Header;true
+;;SearchBoxSlot;Search Box;true
+;;MiniCartSlot;Mini Cart;true
+;;NavigationBarSlot;Navigation Bar;true
+;;FooterSlot;Footer;true
+;;PlaceholderContentSlot;Placeholder for Addon tag files;true
+# slot in productList, productGrid, searchResultList, searchResultGrid templates
+;;ProductLeftRefinementsSlot;Refinements;true
+# slots in some templates
+;;TopContentSlot;Top Content;true
+;;SideContentSlot;Side Content;true
+;;BottomContentSlot;Bottom Content;true
+;;MiddleContentSlot;Middle Content Slot;true
+;;LeftContentSlot;Left Content Slot;true
+;;RightContentSlot;Right Content Slot;true
+;;CenterContentSlot;Center Content Slot;true
+;;CenterLeftContentSlot;Center Left Content Slot;true
+;;CenterRightContentSlot;Center Right Content Slot;true
+# this slot for backward compatibility, it not used in responsive
+;;HomepageNavLinkSlot;Default Homepage Link;true
+
+
+# Preview Image for use in the CMS Cockpit for special ContentPages
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true]
+;;ContentPageModel__function_preview;text/gif;ContentPageModel__function_preview.gif;$jarResourceCms/preview-images/ContentPageModel__function_preview.gif
+
+
+# For each template, we do the following steps:
+#
+#1. Create PageTemplates, which define the layout for pages
+## "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+#
+#2. Add Velocity templates that are in the CMS Cockpit. These give a better layout for editing pages
+## The FileLoaderValueTranslator loads a File into a String property. The templates could also be inserted in-line in this file.
+#
+#3. Create ContentSlotNames
+## Each PageTemplate has a number of ContentSlotNames, with a list of valid components for the slot.
+## There are a standard set of slots and a number of specific slots for each template.
+#
+#4. Create content slots which are specific slots for this template (standard slots are defined above)
+#
+#5. Create the relationship from ContentSlots to PageTemplates
+#
+#6. Create ContentPage use this template
+#
+###### LandingPage2Template start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;LandingPage2Template;Landing Page 2 Template;layout/landingLayout2Page;CategoryPage,ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;LandingPage2Template;$jarResourceCms/structure-view/structure_landingPage2Template.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='LandingPage2Template'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;Section1;;;wide
+;Section2A;;;narrow
+;Section2B;;;narrow
+;Section2C;;;wide
+;Section3;;;wide
+;Section4;;;narrow
+;Section5;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='LandingPage2Template'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-LandingPage2;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-LandingPage2;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-LandingPage2;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-LandingPage2;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-LandingPage2;SearchBox;;SearchBoxSlot;true
+;;MiniCart-LandingPage2;MiniCart;;MiniCartSlot;true
+;;NavigationBar-LandingPage2;NavigationBar;;NavigationBarSlot;true
+;;Footer-LandingPage2;Footer;;FooterSlot;true
+;;PlaceholderContentSlot-LandingPage2;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;homepage;Homepage;LandingPage2Template;homepage
+
+## this page is not responsive yet, the navigation node to this page was removed (we need think whether remove this page or revert back the link)
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;SurfCategoryPage;Surf Category Page;LandingPage2Template;false
+###### LandingPage2Template end ######
+
+
+###### ProductDetailsPageTemplate begin ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductDetailsPageTemplate;Product Details Page Template;product/productLayout1Page;ProductPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductDetailsPageTemplate;$jarResourceCms/structure-view/structure_productDetails1PageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductDetailsPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;VariantSelector;;ProductVariantSelectorComponent;narrow
+;AddToCart;;ProductAddToCartComponent;narrow
+;CrossSelling;;ProductReferencesComponent;narrow
+;UpSelling;;ProductReferencesComponent;wide
+;Tabs;;CMSTabParagraphContainer
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;wide
+;Section4;;;wide
+
+# The CrossSelling and UpSelling slots are designed for related products, cross-sells and up-sells.
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;AddToCartSlot;Add To Cart;true
+;;VariantSelectorSlot;Variant Selector;true
+;;TabsSlot;Tabs;true
+;;UpSellingSlot;Up Selling;true
+;;CrossSellingSlot;Cross Selling;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductDetailsPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ProductDetails;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ProductDetails;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-ProductDetails;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-ProductDetails;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-ProductDetails;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ProductDetails;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ProductDetails;NavigationBar;;NavigationBarSlot;true
+;;Footer-ProductDetails;Footer;;FooterSlot;true
+;;PlaceholderContent-ProductDetails;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;VariantSelector-ProductDetails;VariantSelector;;VariantSelectorSlot;true
+;;AddToCart-ProductDetails;AddToCart;;AddToCartSlot;true
+;;CrossSelling-ProductDetails;CrossSelling;;CrossSellingSlot;true
+;;UpSelling-ProductDetails;UpSelling;;UpSellingSlot;true
+;;Tabs-ProductDetails;Tabs;;TabsSlot;true
+
+INSERT_UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productDetails;Product Details;ProductDetailsPageTemplate;true;
+###### ProductDetailsPageTemplate end ######
+
+
+###### ProductListPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductListPageTemplate;Product List Page Template;category/productListPage;CategoryPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductListPageTemplate   ;$jarResourceCms/structure-view/structure_productListPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductListPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;Section1;;;wide
+;ProductLeftRefinements;;;narrow
+;ProductListSlot;;;wide
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;ProductListSlot;Product List Slot for Product List;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductListPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ProductListPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ProductListPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-ProductListPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-ProductListPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-ProductListPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ProductListPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ProductListPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ProductListPage;Footer;;FooterSlot;true
+;;PlaceholderContent-ProductListPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;ProductLeftRefinemnts-ProductListPage;ProductLeftRefinements;;ProductLeftRefinementsSlot;true
+;;ProductList-ProductListPage;ProductListSlot;;ProductListSlot;true
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productList;Product List;ProductListPageTemplate;false;
+###### ProductListPageTemplate end ######
+
+
+###### ProductGridPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductGridPageTemplate;Product Grid Page Template;category/productGridPage;CategoryPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductGridPageTemplate   ;$jarResourceCms/structure-view/structure_productGridPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductGridPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;Section1;;;wide
+;ProductLeftRefinements;;;narrow
+;ProductGridSlot;;;wide
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;ProductGridSlot;Product Grid;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductGridPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ProductGridPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ProductGridPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeaderSlot-ProductGridPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-ProductGridPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-ProductGridPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ProductGridPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ProductGridPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ProductGridPage;Footer;;FooterSlot;true
+;;PlaceholderContent-ProductGridPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;ProductLeftRefinemnts-ProductGridPage;ProductLeftRefinements;;ProductLeftRefinementsSlot;true
+;;ProductGrid-ProductGridPage;ProductGridSlot;;ProductGridSlot;true
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productGrid;Product Grid;ProductGridPageTemplate;true;
+;;BrandsCategoryPage;Brands Category Page;ProductGridPageTemplate;false;
+;;ShirtsCategoryPage;Shirts Category Page;ProductGridPageTemplate;false;
+;;StreetCategoryPage;Street Category Page;ProductGridPageTemplate;false;
+###### ProductGridPageTemplate end ######
+
+
+###### SearchResultsListPageTemplate start: currently we don't have page using this template ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;SearchResultsListPageTemplate;Search Results List Page Template;search/searchListPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;SearchResultsListPageTemplate ;$jarResourceCms/structure-view/structure_searchResultsListPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SearchResultsListPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;ProductLeftRefinements;;;narrow
+;SearchResultsListSlot;;;wide
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;SearchResultsListSlot;Search Result List;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SearchResultsListPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SearchResultsList;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-SearchResultsList;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-SearchResultsList;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-SearchResultsList;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-SearchResultsList;SearchBox;;SearchBoxSlot;true
+;;MiniCart-SearchResultsList;MiniCart;;MiniCartSlot;true
+;;NavigationBar-SearchResultsList;NavigationBar;;NavigationBarSlot;true
+;;Footer-SearchResultsList;Footer;;FooterSlot;true
+;;PlaceholderContent-SearchResultsList;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;ProductLeftRefinements-SearchResultsList;ProductLeftRefinements;;ProductLeftRefinementsSlot;true
+;;SearchResultsList-SearchResultsList;SearchResultsListSlot;;SearchResultsListSlot;true
+###### SearchResultsListPageTemplate end ######
+
+
+###### SearchResultsGridPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;SearchResultsGridPageTemplate;Search Results Grid Page Template;search/searchGridPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;SearchResultsGridPageTemplate ;$jarResourceCms/structure-view/structure_searchResultsGridPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SearchResultsGridPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;ProductLeftRefinements;;;narrow
+;SearchResultsGridSlot;;;wide
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;SearchResultsGridSlot;Search Result Grid;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SearchResultsGridPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SearchResultsGrid;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-SearchResultsGrid;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-SearchResultsGrid;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-SearchResultsGrid;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-SearchResultsGrid;SearchBox;;SearchBoxSlot;true
+;;MiniCart-SearchResultsGrid;MiniCart;;MiniCartSlot;true
+;;NavigationBar-SearchResultsGrid;NavigationBar;;NavigationBarSlot;true
+;;Footer-SearchResultsGrid;Footer;;FooterSlot;true
+;;PlaceholderContent-SearchResultsGrid;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;ProductLeftRefinements-SearchResultsGrid;ProductLeftRefinements;;ProductLeftRefinementsSlot;true
+;;SearchResultsGrid-SearchResultsGrid;SearchResultsGridSlot;;SearchResultsGridSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;search;Search Results Page;SearchResultsGridPageTemplate;search
+###### SearchResultsGridPageTemplate end ######
+
+
+###### SearchResultsEmptyPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;SearchResultsEmptyPageTemplate;Search Results Empty Page Template;search/searchEmptyPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;SearchResultsEmptyPageTemplate;$jarResourceCms/structure-view/structure_errorPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='SearchResultsEmptyPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;MiddleContent;;CMSParagraphComponent
+;BottomContent;;;wide
+;SideContent;;;narrow
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='SearchResultsEmptyPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-SearchResultsEmpty;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-SearchResultsEmpty;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-SearchResultsEmpty;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-SearchResultsEmpty;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-SearchResultsEmpty;SearchBox;;SearchBoxSlot;true
+;;MiniCart-SearchResultsEmpty;MiniCart;;MiniCartSlot;true
+;;NavigationBar-SearchResultsEmpty;NavigationBar;;NavigationBarSlot;true
+;;Footer-SearchResultsEmpty;Footer;;FooterSlot;true
+;;PlaceholderContent-SearchResultsEmpty;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;searchEmpty;Search Results Empty Page;SearchResultsEmptyPageTemplate;searchEmpty
+###### SearchResultsEmptyPageTemplate end ######
+
+
+###### CategoryPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;CategoryPageTemplate;Category Page Template;category/categoryPage;CategoryPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;CategoryPageTemplate;$jarResourceCms/structure-view/structure_categoryPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='CategoryPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;narrow
+;Section4;;;narrow
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='CategoryPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-CategoryPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-CategoryPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-CategoryPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-CategoryPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-CategoryPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-CategoryPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-CategoryPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-CategoryPage;Footer;;FooterSlot;true
+;;PlaceholderContent-CategoryPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;category;Default Category Page;CategoryPageTemplate;false;
+;;SunglassesCategoryPage;Sunglasses Category Page;CategoryPageTemplate;false;
+;;SnowCategoryPage;Snow Category Page;CategoryPageTemplate;false;
+###### CategoryPageTemplate end ######
+
+
+###### ContentPage1Template start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ContentPage1Template;Content Page 1 Template;layout/contentLayout1Page;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ContentPage1Template      ;$jarResourceCms/structure-view/structure_contentPage1Template.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ContentPage1Template'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;Section1;;;wide
+;Section2A;;;narrow
+;Section2B;;;wide
+;Section3;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ContentPage1Template'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ContentPage1;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ContentPage1;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-ContentPage1;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-ContentPage1;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-ContentPage1;SearchBox;;SearchBoxSlot;true
+;;NavigationBar-ContentPage1;NavigationBar;;NavigationBarSlot;true
+;;MiniCart-ContentPage1;MiniCart;;MiniCartSlot;true
+;;Footer-ContentPage1;Footer;;FooterSlot;true
+;;PlaceholderContent-ContentPage1;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false']
+;;faq;Frequently Asked Questions FAQ Page;ContentPage1Template;/faq
+;;orderExpired;Order Expired Page;ContentPage1Template;/orderExpired
+;;termsAndConditions;Terms and Conditions Page;ContentPage1Template;/termsAndConditions
+###### ContentPage1Template end ######
+
+
+###### AccountPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;AccountPageTemplate;Account Page Template;account/accountLayoutPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;AccountPageTemplate 		;$jarResourceCms/structure-view/structure_accountPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='AccountPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;TopContent;;;wide
+;SideContent;;;narrow
+;BodyContent;;;wide
+;BottomContent;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='AccountPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-AccountPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-AccountPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-AccountPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-AccountPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-AccountPage;SearchBox;;SearchBoxSlot;true
+;;NavigationBar-AccountPage;NavigationBar;;NavigationBarSlot;true
+;;MiniCart-AccountPage;MiniCart;;MiniCartSlot;true
+;;Footer-AccountPage;Footer;;FooterSlot;true
+;;PlaceholderContent-AccountPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;address-book;Address Book Page;AccountPageTemplate;address-book
+;;add-edit-address;Add Edit Address Page;AccountPageTemplate;add-edit-address
+;;payment-details;Payment Details Page;AccountPageTemplate;payment-details
+;;order;Order Details Page;AccountPageTemplate;order
+;;orders;Order History Page;AccountPageTemplate;orders
+;;updatePassword;Update Forgotten Password Page;AccountPageTemplate;updatePassword
+;;update-profile;Update Profile Page;AccountPageTemplate;update-profile
+;;update-email;Update Email Page;AccountPageTemplate;update-email
+;;savedCartDetailsPage;Saved Cart Details Page;AccountPageTemplate;savedCartDetailsPage
+;;saved-carts;Saved Carts Page;AccountPageTemplate;saved-carts
+;;consents;Consent Management Page;AccountPageTemplate;consents
+;;close-account;Close Account Page;AccountPageTemplate;close-account
+###### AccountPageTemplate end ######
+
+
+###### CartPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;CartPageTemplate;Cart Page Template;;ContentPage;false
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;CartPageTemplate 		    ;$jarResourceCms/structure-view/structure_cartPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='CartPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;TopContent;;;wide
+;CenterLeftContentSlot;;;narrow
+;CenterRightContentSlot;;;narrow
+;BottomContentSlot;;;wide
+;EmptyCartMiddleContent;;CMSParagraphComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;EmptyCartMiddleContentSlot;Empty CartMiddle Content Slot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='CartPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-CartPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-CartPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-CartPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-CartPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-CartPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-CartPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-CartPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-CartPage;Footer;;FooterSlot;true
+;;PlaceholderContent-CartPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;CenterRightContent-CartPage;CenterRightContentSlot;;CenterRightContentSlot;true
+;;CenterLeftContent-CartPage;CenterLeftContentSlot;;CenterLeftContentSlot;true
+;;BottomContent-CartPage;BottomContentSlot;;BottomContentSlot;true
+;;EmptyCartMiddleContent-CartPage;EmptyCartMiddleContent;;EmptyCartMiddleContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;cartPage;Cart Page;CartPageTemplate;cart
+###### CartPageTemplate end ######
+
+
+###### LoginPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;LoginPageTemplate;Login Page Template;;ContentPage;false
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;LoginPageTemplate         ;$jarResourceCms/structure-view/structure_loginPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='LoginPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;LeftContentSlot;;;wide
+;RightContentSlot;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='LoginPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-LoginPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-LoginPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-LoginPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-LoginPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-LoginPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-LoginPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-LoginPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-LoginPage;Footer;;FooterSlot;true
+;;PlaceholderContent-LoginPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;LeftContent-LoginPage;LeftContentSlot;;LeftContentSlot;true
+;;RightContent-LoginPage;RightContentSlot;;RightContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;login;Login Page;LoginPageTemplate;login
+###### LoginPageTemplate end ######
+
+
+###### CheckoutLoginPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;CheckoutLoginPageTemplate;Checkout Login Page Template;;ContentPage;false
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;CheckoutLoginPageTemplate ;$jarResourceCms/structure-view/structure_checkoutLoginPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='CheckoutLoginPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;TopContent;;;wide
+;BottomContent;;;wide
+;LeftContentSlot;;;wide
+;RightContentSlot;;;wide
+;CenterContentSlot;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='CheckoutLoginPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-CheckoutLoginPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-CheckoutLoginPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-CheckoutLoginPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-CheckoutLoginPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-CheckoutLoginPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-CheckoutLoginPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-CheckoutLoginPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-CheckoutLoginPage;Footer;;FooterSlot;true
+;;PlaceholderContent-CheckoutLoginPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;LeftContent-CheckoutLoginPage;LeftContentSlot;;LeftContentSlot;true
+;;RightContent-CheckoutLoginPage;RightContentSlot;;RightContentSlot;true
+;;CenterContent-CheckoutLoginPage;CenterContentSlot;;CenterContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;checkout-login;Checkout-Login Page;CheckoutLoginPageTemplate;checkout-login
+###### CheckoutLoginPageTemplate end ######
+
+
+###### MultiStepCheckoutSummaryPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;MultiStepCheckoutSummaryPageTemplate;Multi Step Checkout Summary Page Template;;ContentPage;false
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;MultiStepCheckoutSummaryPageTemplate	;$jarResourceCms/structure-view/structure_multiStepCheckoutSummaryPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='MultiStepCheckoutSummaryPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;SideContent;;;narrow
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='MultiStepCheckoutSummaryPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-MultiStepCheckoutSummaryPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-MultiStepCheckoutSummaryPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-MultiStepCheckoutSummaryPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-MultiStepCheckoutSummaryPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-MultiStepCheckoutSummaryPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-MultiStepCheckoutSummaryPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-MultiStepCheckoutSummaryPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-MultiStepCheckoutSummaryPage;Footer;;FooterSlot;true
+;;PlaceholderContent-MultiStepCheckoutSummaryPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;multiStepCheckoutSummaryPage;Multi Checkout Summary Page;MultiStepCheckoutSummaryPageTemplate;multiStepCheckoutSummary
+###### MultiStepCheckoutSummaryPageTemplate end ######
+
+
+###### OrderConfirmationPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;OrderConfirmationPageTemplate;Order Confirmation Page Template;checkout/checkoutConfirmationLayoutPage;ContentPage
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;OrderConfirmationPageTemplate	;$jarResourceCms/structure-view/structure_orderConfirmationPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='OrderConfirmationPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;SideContent;;;narrow
+;TopContent;;;wide
+;BodyContent
+;BottomContent
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='OrderConfirmationPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-OrderConfirmationPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-OrderConfirmationPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-OrderConfirmationPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-OrderConfirmationPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-OrderConfirmationPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-OrderConfirmationPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-OrderConfirmationPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-OrderConfirmationPage;Footer;;FooterSlot;true
+;;PlaceholderContent-OrderConfirmationPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;orderConfirmationPage;Order Confirmation Page;OrderConfirmationPageTemplate;orderConfirmation
+###### OrderConfirmationPageTemplate end ######
+
+
+###### StoreFinderPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;StoreFinderPageTemplate;Store Finder Page Template;storeFinder/storeFinderSearchPage;ContentPage;false;
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;StoreFinderPageTemplate	;$jarResourceCms/structure-view/structure_storefinderSearchTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='StoreFinderPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;TopContent;;;wide
+;MiddleContent;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='StoreFinderPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-StoreFinderPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-StoreFinderPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-StoreFinderPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-StoreFinderPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-StoreFinderPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-StoreFinderPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-StoreFinderPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-StoreFinderPage;Footer;;FooterSlot;true
+;;PlaceholderContent-StoreFinderPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+;;MiddleContent-StoreFinderPage;MiddleContent;;MiddleContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;storefinderPage;StoreFinder Page;StoreFinderPageTemplate;storefinder
+###### StoreFinderPageTemplate end ######
+
+
+###### ErrorPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ErrorPageTemplate;Error Page Template;;ContentPage;false
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ErrorPageTemplate			;$jarResourceCms/structure-view/structure_errorPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ErrorPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;SearchBoxComponent;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer;
+;PlaceholderContentSlot;;;
+;MiddleContent;;CMSParagraphComponent,SimpleResponsiveBannerComponent
+;BottomContent;;;wide
+;SideContent;;;narrow
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ErrorPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ErrorPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ErrorPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-ErrorPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-ErrorPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-ErrorPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ErrorPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ErrorPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ErrorPage;Footer;;FooterSlot;true
+;;PlaceholderContent-ErrorPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;notFound;Not Found Page;ErrorPageTemplate;notFound
+###### ErrorPageTemplate end ######
+
+
+###### QuickOrderPageTemplate start ######
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;QuickOrderPageTemplate;Quick Order Page Template;;ContentPage;false;
+
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;QuickOrderPageTemplate         ;$jarResourceCms/structure-view/structure_quickOrderPageTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='QuickOrderPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Footer;;;footer
+;PlaceholderContentSlot;;;
+;TopContent;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='QuickOrderPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-QuickOrderPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-QuickOrderPage;HeaderLinks;;HeaderLinksSlot;true
+;;TopHeader-QuickOrderPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeader-QuickOrderPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;SearchBox-QuickOrderPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-QuickOrderPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-QuickOrderPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-QuickOrderPage;Footer;;FooterSlot;true
+;;PlaceholderContent-QuickOrderPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)[default='ContentPageModel__function_preview']
+;;importCSVSavedCartPage;Import CSV as Saved Cart Page;QuickOrderPageTemplate;importCSVSavedCartPage
+;;quickOrderPage;Quick Order Page;QuickOrderPageTemplate;quickOrderPage
+###### QuickOrderPageTemplate end ######

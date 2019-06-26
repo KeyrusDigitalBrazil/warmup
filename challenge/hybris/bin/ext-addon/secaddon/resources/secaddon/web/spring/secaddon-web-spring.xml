@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/mvc
+            http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+           
+    <context:annotation-config/> 
+ 	<context:component-scan base-package="de.hybris.platform.secaddon"/>
+
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultSecaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="secaddon"/>
+	</bean>
+
+	<bean id="defaultSecaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultSecaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getSecaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultSecaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="SecaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getSecaddonBeforeViewHandler"/>
+	</bean>
+
+	<bean id="secaddonAngularScriptRendererMapping" parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="SECAngularScriptComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+    <mvc:interceptors>
+         <mvc:interceptor>
+            <mvc:mapping path="/my-account/*support-ticket*"/>
+            <bean class="de.hybris.platform.secaddon.interceptors.CustomerMappingInterceptor">
+                <property name="sessionService" ref="sessionService" />
+                <property name="storeSessionFacade" ref="storeSessionFacade" />
+                <property name="customerFacade" ref="customerFacade" />
+                <property name="customerMappingAdapter" ref="customerMappingAdapter" />
+            </bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>

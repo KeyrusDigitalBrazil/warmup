@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	
+<relations>
+		<relation code="Region2CitiesRelation" autocreate="true" generate="true" localized="false">
+			<description>This relation links a region (province) with one or more
+				cities.</description>
+			<sourceElement qualifier="region" type="Region" cardinality="one">
+				<modifiers read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="cities" type="City" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="City2DistrictsRelation" autocreate="true" generate="true" localized="false">
+			<description>This relation links a city with one or more districts.
+			</description>
+			<sourceElement qualifier="city" type="City" cardinality="one">
+				<modifiers read="true" write="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="districts" type="District" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers read="true" write="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<typegroup name="ChineseAddress">
+			<itemtype code="City" extends="C2LItem" jaloclass="de.hybris.platform.addressservices.jalo.City" autocreate="true"
+				generate="true">
+				<deployment table="Cities" typecode="9860" />
+				<attributes>
+					<attribute qualifier="isocode" type="java.lang.String" redeclare="true" generate="false">
+						<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			<itemtype code="District" extends="C2LItem" jaloclass="de.hybris.platform.addressservices.jalo.District"
+				autocreate="true" generate="true">
+				<deployment table="Districts" typecode="9861" />
+				<attributes>
+					<attribute qualifier="isocode" type="java.lang.String" redeclare="true" generate="false">
+						<modifiers read="true" write="true" search="true" optional="false" unique="true" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			<itemtype code="Address" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="city" type="City" generate="true">
+						<description>The city.</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" optional="true" />
+					</attribute>
+					<attribute qualifier="cityDistrict" type="District">
+						<description>District of the city.</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" optional="true" />
+					</attribute>
+					<attribute qualifier='fullname' type='java.lang.String'>
+						<description>The full name in delivery address</description>
+						<persistence type='property' />
+						<modifiers read='true' write='true' optional='true' />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

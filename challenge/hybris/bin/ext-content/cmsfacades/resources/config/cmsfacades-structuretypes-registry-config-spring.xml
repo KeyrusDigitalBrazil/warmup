@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	<!-- CMS Types -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" p:typecode="AbstractCMSComponent" p:populators-ref="defaultComponentTypePopulators" />
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" p:typecode="AbstractMediaContainerComponent" p:populators-ref="defaultComponentTypePopulators" />
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" p:typecode="AbstractPage" p:populators-ref="defaultPageComponentTypePopulators" />
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" p:typecode="AbstractRestriction" p:populators-ref="defaultRestrictionComponentTypePopulators" />
+	<!-- Custom Types -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" p:typecode="PreviewData" p:category="PREVIEW" p:populators-ref="defaultPreviewComponentTypePopulators" />
+
+
+	<!-- CMS Item -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSItem" p:qualifier="name">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="shortStringComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSItem" p:qualifier="uid">
+		<property name="populators">
+			<set>
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<!-- Page Data Attributes -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractPage" p:qualifier="uid">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="shortStringComponentTypeAttributePopulator" />
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractPage" p:qualifier="title">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractPage" p:qualifier="creationtime">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dateComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractPage" p:qualifier="modifiedtime">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dateComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Abstract CMS Component -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractCMSComponent" p:qualifier="creationtime">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dateComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="AbstractCMSComponent" p:qualifier="modifiedtime">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dateComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="nonEditableComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<!-- Preview Data Attributes -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="PreviewData" p:qualifier="previewCatalog">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="previewCatalogI18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="PreviewData" p:qualifier="language">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<bean class="de.hybris.platform.cmsfacades.types.populator.DependsOnComponentTypeAttributePopulator">
+					<property name="dependsOn" value="previewCatalog"/>
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="PreviewData" p:qualifier="time">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dateComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="PreviewData" p:qualifier="productCatalogVersions">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="productCatalogVersionsSelectorPopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="ImageMapComponent" p:qualifier="imageMapHTML">
+		<property name="populators">
+			<set>
+				<ref bean="longStringComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Paragraph Attributes -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSParagraphComponent" p:qualifier="content">
+		<property name="populators">
+			<set>
+				<ref bean="richTextComponentTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="linkName">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="linkTo">
+		<property name="populators">
+			<set>
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="cmsLinkComponentLinkToIdTypeAttributePopulator" />
+				<ref bean="cmsLinkComponentLinkToLabelTypeAttributePopulator" />
+				<ref bean="cmsLinkToSelectTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="cmsLinkToTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="contentPage">
+		<property name="populators">
+			<set>
+				<ref bean="cmsLinkContentPageLabelTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="url">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="category">
+		<property name="populators">
+			<set>
+				<ref bean="categoryTypeAttributePopulator" />
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="product">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSLinkComponent" p:qualifier="target">
+		<property name="populators">
+			<set>
+				<ref bean="booleanComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSTimeRestriction" p:qualifier="activeFrom">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSTimeRestriction" p:qualifier="activeUntil">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSCategoryRestriction" p:qualifier="categories">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSUserGroupRestriction" p:qualifier="userGroups">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+				<ref bean="userGroupIdComponentTypeAttributePopulator" />
+				<ref bean="userGroupLabelComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="NavigationComponent" p:qualifier="wrapAfter">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure"  p:typecode="CMSNavigationEntry" p:qualifier="item">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="ContentPage" p:qualifier="label">
+		<property name="populators">
+			<set>
+				<ref bean="requiredComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+</beans>

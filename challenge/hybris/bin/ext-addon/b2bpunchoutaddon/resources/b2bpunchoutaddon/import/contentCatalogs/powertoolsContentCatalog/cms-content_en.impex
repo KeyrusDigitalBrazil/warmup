@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$addonExtensionName=b2bpunchoutaddon
+$jarResourceImages=jar:de.hybris.platform.b2bpunchoutaddon.constants.B2bpunchoutaddonConstants&/b2bpunchoutaddon/import/contentCatalogs/$contentCatalog
+
+# Language
+$lang=en
+
+# CMS Footer Component
+UPDATE FooterNavigationComponent;$contentCV[unique=true];uid[unique=true];notice[lang=$lang]
+;;PunchOutFooterComponent;"© 2016 hybris software"
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];&logoRef
+;;punchOutSiteLogo;text/png;logo-hybris.png;$jarResourceImages/images/logo-hybris.png;punchOutSiteLogo
+
+# Site Logo Component
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];media(&logoRef)
+;;PunchOutSiteLogoComponent;punchOutSiteLogo

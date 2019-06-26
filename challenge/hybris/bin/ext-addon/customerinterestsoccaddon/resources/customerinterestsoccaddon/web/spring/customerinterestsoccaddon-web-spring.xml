@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+           
+    <context:component-scan base-package="de.hybris.platform.customerinterestsoccaddon.controllers"/>
+
+	<!-- Cache manager for addon -->
+
+	<alias name="defaultCustomerinterestsoccaddonCacheManager" alias="customerinterestsoccaddonCacheManager"/>
+	<bean id="defaultCustomerinterestsoccaddonCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="customerinterestsoccaddonEhcache"/>
+	</bean>
+
+	<alias name="defaultCustomerinterestsoccaddonEhcache" alias="customerinterestsoccaddonEhcache"/>
+	<bean id="defaultCustomerinterestsoccaddonEhcache" class="de.hybris.platform.webservicescommons.cache.TenantAwareEhCacheManagerFactoryBean">
+		<property name="cacheNamePrefix" value="customerinterestsoccaddonCache_"/>
+		<property name="configLocation" value="/WEB-INF/cache/addons/customerinterestsoccaddon/ehcache.xml"/>
+	</bean>
+
+	<bean depends-on="wsCacheManagerList" parent="listMergeDirective">
+		<property name="add" ref="customerinterestsoccaddonCacheManager"/>
+	</bean>
+	
+	<!-- Default Pagination field / fieldset mapping -->
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.core.servicelayer.data.PaginationData" />
+		<property name="destClass" value="de.hybris.platform.webservicescommons.dto.PaginationWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="pageSize" value="count"/>
+				<entry key="totalNumberOfResults" value="totalCount"/>
+				<entry key="currentPage" value="page"/>
+				<entry key="numberOfPages" value="totalPages"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commercefacades.product.data.ProductData" />
+		<property name="destClass" value="de.hybris.platform.customerinterestsoccaddon.dto.ProductInterestWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="code" value="code"/>
+				<entry key="name" value="name"/>
+				<entry key="url" value="url"/>
+				<entry key="stock" value="stock"/>
+				<entry key="futureStocks" value="futureStocks"/>
+				<entry key="manufacturer" value="manufacturer"/>
+				<entry key="price" value="price"/>
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commercefacades.product.data.FutureStockData" />
+		<property name="destClass" value="de.hybris.platform.customerinterestsoccaddon.dto.ProductInterestFutureStockWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="stock" value="stock"/>
+				<entry key="date" value="date"/>
+			</map>
+		</property>
+	</bean>
+	
+	
+	<!-- Field mapping -->
+ 	<bean parent="fieldSetLevelMapping" id="productInterestRelationWsDTOFieldSetLevelMapping">
+		<property name="dtoClass" value="de.hybris.platform.customerinterestsoccaddon.dto.ProductInterestRelationWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="product,productInterestEntry"/>
+				<entry key="DEFAULT" value="product,productInterestEntry"/>
+				<entry key="FULL" value="product,productInterestEntry"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping" id="productFutureStockWsDTOFieldSetLevelMapping">
+		<property name="dtoClass" value="de.hybris.platform.customerinterestsoccaddon.dto.ProductInterestFutureStockWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="stock(FULL),date"/>
+				<entry key="DEFAULT" value="stock(FULL),date"/>
+				<entry key="FULL" value="stock(FULL),date"/>
+			</map>
+		</property>
+	</bean>
+ 	
+	<bean parent="fieldSetLevelMapping" id="productInterestWsDTOFieldSetLevelMapping">
+		<property name="dtoClass" value="de.hybris.platform.customerinterestsoccaddon.dto.ProductInterestWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code,name,url,stock(FULL),futureStocks,manufacturer,price"/>
+				<entry key="DEFAULT" value="code,name,url,stock(FULL),futureStocks,manufacturer,price"/>
+				<entry key="FULL" value="code,name,url,stock(FULL),futureStocks,manufacturer,price"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="customerInterestsValidator" class="de.hybris.platform.customerinterestsoccaddon.validation.CustomerInterestsValidator">
+		<property name="productFacade" ref="productFacade"/>
+		<property name="productInterestFacade" ref="productInterestFacade"/>
+		<property name="notificationTypeList" ref="notificationTypeList"/>
+    </bean>	
+	
+	<util:list id="notificationTypeList" value-type="de.hybris.platform.notificationservices.enums.NotificationType">
+		<value>BACK_IN_STOCK</value>
+	</util:list>
+
+</beans>

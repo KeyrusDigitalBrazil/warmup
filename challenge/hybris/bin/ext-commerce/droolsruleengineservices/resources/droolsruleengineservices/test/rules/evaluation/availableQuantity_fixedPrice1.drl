@@ -1,0 +1,20 @@
+package de.hybris.platform.ruleengineservices.test
+
+import java.math.*;
+import de.hybris.platform.ruleengineservices.rao.*;
+import de.hybris.platform.ruleengineservices.rule.evaluation.*;
+
+global AddFixedPriceEntryDiscountRAOAction addFixedPriceEntryDiscountRAOAction;
+
+salience 10;
+
+rule "availableQuantity_fixedPrice1"
+@ruleCode("availableQuantity_fixedPrice1.drl")
+@moduleName("rules-module-junit")
+    when
+    	$orderEntry:OrderEntryRAO(product.getCode()=="1422222" || product.getCode()=="123456", quantity > 0)
+		$cart : CartRAO(entries contains $orderEntry)
+		$result : RuleEngineResultRAO()
+    then
+    	addFixedPriceEntryDiscountRAOAction.addFixedPriceEntryDiscount($orderEntry, new BigDecimal("50.00"), $result, kcontext);
+end

@@ -1,0 +1,119 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#% impex.setLocale( Locale.ENGLISH );
+$catalog = Default
+$version = Staged
+$catalogVersion = $catalog:$version
+$testSystem = ERP_CLASSIFICATION_3000
+$testSystemVersion = ERP_IMPORT
+$testClassificationSystemVersion = $testSystem:$testSystemVersion
+
+INSERT_UPDATE IntegrationObject; code[unique = true];
+; ProductIntegrationObject
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; ProductIntegrationObject ; Product        ; Product
+; ProductIntegrationObject ; Catalog        ; Catalog
+; ProductIntegrationObject ; CatalogVersion ; CatalogVersion
+; ProductIntegrationObject ; Category       ; Category
+; ProductIntegrationObject ; Currency       ; Currency
+; ProductIntegrationObject ; Media          ; Media
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; ProductIntegrationObject:Product        ; code            ; Product:code                 ;
+; ProductIntegrationObject:Product        ; catalogVersion  ; Product:catalogVersion       ; ProductIntegrationObject:CatalogVersion
+; ProductIntegrationObject:Product        ; name            ; Product:name                 ;
+; ProductIntegrationObject:Product        ; description     ; Product:description          ;
+; ProductIntegrationObject:Product        ; supercategories ; Product:supercategories      ; ProductIntegrationObject:Category
+; ProductIntegrationObject:Product        ; endLineNumber   ; Product:endLineNumber        ;
+; ProductIntegrationObject:Product        ; priceQuantity   ; Product:priceQuantity        ;
+
+; ProductIntegrationObject:Category       ; code            ; Category:code                ;
+; ProductIntegrationObject:Category       ; name            ; Category:name                ;
+; ProductIntegrationObject:Category       ; products        ; Category:products            ; ProductIntegrationObject:Product
+; ProductIntegrationObject:Category       ; thumbnails      ; Category:thumbnails          ; ProductIntegrationObject:Media
+
+; ProductIntegrationObject:Media          ; code            ; Media:code                   ;
+
+; ProductIntegrationObject:Catalog        ; id              ; Catalog:id                   ;
+; ProductIntegrationObject:Catalog        ; defaultCurrency ; Catalog:defaultCurrency      ; ProductIntegrationObject:Currency
+; ProductIntegrationObject:Catalog        ; urlPatterns     ; Catalog:urlPatterns          ;
+
+; ProductIntegrationObject:CatalogVersion ; catalog         ; CatalogVersion:catalog       ; ProductIntegrationObject:Catalog
+; ProductIntegrationObject:CatalogVersion ; version         ; CatalogVersion:version       ;
+; ProductIntegrationObject:CatalogVersion ; generatorInfo   ; CatalogVersion:generatorInfo ;
+
+INSERT_UPDATE IntegrationObject; code[unique = true];
+; MoreThanOneMatch
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; MoreThanOneMatch ; Product      ; Product
+; MoreThanOneMatch ; OtherProduct ; Product
+
+INSERT_UPDATE IntegrationObject; code[unique = true];
+; ClassAttributeAssignment
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; ClassAttributeAssignment ; ClassAttributeAssignment        ; ClassAttributeAssignment
+; ClassAttributeAssignment ; ClassificationAttributeTypeEnum ; ClassificationAttributeTypeEnum
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; ClassAttributeAssignment:ClassAttributeAssignment        ; attributeType ; ClassAttributeAssignment:attributeType ; ClassAttributeAssignment:ClassificationAttributeTypeEnum ; true
+; ClassAttributeAssignment:ClassificationAttributeTypeEnum ; code          ; ClassificationAttributeTypeEnum:code   ;                                                          ; true
+; ClassAttributeAssignment:ClassificationAttributeTypeEnum ; codex         ; ClassificationAttributeTypeEnum:code   ;                                                          ;
+
+
+# For ClassAttributeAssignment and EnumType test case
+INSERT_UPDATE ClassificationSystem; id[unique = true]; name[lang = en];
+; $testSystem ; $testSystem
+
+INSERT_UPDATE ClassificationSystemVersion; catalog(id)[unique = true]; version[unique = true]; active;
+; $testSystem ; $testSystemVersion ; true
+
+INSERT_UPDATE ClassificationClass; code[unique = true]; name[lang = en]; catalogVersion(catalog(id), version)
+; WEC_CDRAGON_CAR ; Dragon Car ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttribute; code[unique = true]; name[lang = en]; systemVersion(catalog(id), version)
+; WEC_DC_COLOR ; Dark Blue ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttributeValue; code[unique = true]; name[lang = en]; systemVersion(catalog(id), version)
+; WEC_DC_COLOR ; Dark Blue ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttributeUnit; code[unique = true]; unitType[unique = true]; systemVersion(catalog(id), version); symbol
+; WTT ; SAP-POWER ; $testClassificationSystemVersion ; aSymbol
+
+INSERT_UPDATE ClassAttributeAssignment; classificationClass(code)[unique = true]; classificationAttribute(code)[unique = true]; attributeType(code); unit(code)
+; WEC_CDRAGON_CAR ; WEC_DC_COLOR ; string ; WTT
+
+
+# For general product test case
+INSERT_UPDATE Language; isocode[unique = true]
+; fr
+; es
+
+INSERT_UPDATE Catalog; id[unique = true]; name[lang = en]; defaultCatalog; urlPatterns;
+; $catalog ; $catalog ; true ; url1,url2
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active;
+; $catalog ; $version ; true
+
+INSERT_UPDATE Media; code[unique = true]; catalogVersion(catalog(id), version)[default = $catalogVersion];
+; Media1 ;
+; Media2 ;
+
+INSERT_UPDATE Category; code[unique = true]; catalogVersion(catalog(id), version); name[lang = en]; name[lang = fr]; thumbnails(code)
+; testCategory ; $catalogVersion ; Test Category English ; Test Category France ; Media1,Media2
+
+INSERT_UPDATE Product; code[unique = true]; catalogVersion(catalog(id), version); name[lang = en]; name[lang = fr]; supercategories(code); endLineNumber; priceQuantity[numberformat=#.##]; description[lang = en]; description[lang = fr]
+; testProduct ; $catalogVersion ; en name for testProduct ; fr name for testProduct ; testCategory ; 1 ; 1.2 ; en description for testProduct ; fr description for testProduct
+
+INSERT_UPDATE Product; code[unique = true]; catalogVersion(catalog(id), version); name[lang = en]; supercategories(code); description[lang = es]; name[lang = es];
+; testProductEs ; $catalogVersion ; en name for testProduct ; testCategory ; es description for testProduct ; ;

@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+INSERT_UPDATE BackofficeRole;UID[unique=true]               ;groups(uid)    ;locname[lang=de]               ;locname[lang=en]               ;backOfficeLoginDisabled    ;authorities
+                            ;integrationadministratorrole   ;employeegroup  ;Integration Administrator-Role ;Integration Administrator Role ;FALSE                      ;integrationadministrator
+                            ;integrationagentrole           ;employeegroup  ;Integration Agent-Role         ;Integration Agent Role         ;FALSE                      ;integrationagent
+
+INSERT_UPDATE Employee;uid[unique=true]         ;name                       ;groups(uid)                    ;password
+                      ;IntegrationAdministrator ;Integration Administrator  ;integrationadministratorrole   ;1234
+                      ;IntegrationAgent         ;Integration Agent          ;integrationagentrole           ;1234
+
+INSERT_UPDATE BackofficeRole;UID[unique=true]               ;authorities[mode=append]
+                            ;backofficeadministratorrole    ;integrationadministrator
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID                             ; MemberOfGroups ; Password ; Target            ; read ; change ; create ; remove ; change_perm
+UserGroup ; integrationadministratorrole    ;                ;          ;                   ;      ;        ;        ;        ;
+
+# Access Rights for IntegrationAdministrator Users ;;;;;;;;;
+          ;                                 ;                ;          ; MonitoredRequest  ; +    ;        ;        ;
+
+$END_USERRIGHTS; ; ; ; ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID                     ; MemberOfGroups ; Password ; Target            ; read ; change ; create ; remove ; change_perm
+UserGroup ; integrationagentrole    ;                ;          ;                   ;      ;        ;        ;        ;
+
+# Access Rights for IntegrationAgent Users ;;;;;;;;;
+          ;                         ;                ;          ; MonitoredRequest  ; +    ;        ;        ;
+
+$END_USERRIGHTS; ; ; ; ;

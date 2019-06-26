@@ -1,0 +1,42 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=marketplaceContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;OrderConfirmationItemsComponent;Order Confirmation Items Info Component;/WEB-INF/views/addons/chineseaddressaddon/responsive/pages/account/accountOrderDetailItems.jsp;;OrderConfirmationItemsComponent
+
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;&componentRef
+;;AccountOrderDetailsItemsComponent;Account Order Details Items Info Component;/WEB-INF/views/addons/chineseaddressaddon/responsive/pages/account/accountOrderDetailItems.jsp;AccountOrderDetailsItemsComponent
+
+
+###### Account Address Book
+# Component
+INSERT_UPDATE ChineseAccountAddressBookComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ChineseAccountAddressBookComponent;Chinese Account Address Book Component;ChineseAccountAddressBookComponent
+
+INSERT_UPDATE ChineseAccountAddEditAddressComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ChineseAccountAddEditAddressComponent;Chinese Account Add Edit Address Component;ChineseAccountAddEditAddressComponent
+
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;BodyContent-address-book;Body Content Slot for Account Address Book;true;ChineseAccountAddressBookComponent;;;
+;;BodyContent-add-edit-address;Body Content Slot for Add Edit Address;true;ChineseAccountAddEditAddressComponent;;;
+
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-address-book;BodyContent;address-book;BodyContent-address-book;;;
+;;BodyContent-add-edit-address;BodyContent;add-edit-address;BodyContent-add-edit-address;;;
+

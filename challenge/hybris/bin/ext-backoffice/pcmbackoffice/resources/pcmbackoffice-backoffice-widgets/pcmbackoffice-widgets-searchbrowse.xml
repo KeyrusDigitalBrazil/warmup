@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<requires resource="pcmbackoffice-widgets-general.xml" />
+
+	<widget-extension widgetId="pcmbackoffice-contents">
+
+		<widget id="pcmbackoffice-item-selection-proxy" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+		        template="false" slotId="cockpitWidgetChildrenInvisible">
+			<setting key="expression" value="#root"/>
+			<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+		</widget>
+
+		<widget id="pcmbackoffice-collectionBrowser-view" widgetDefinitionId="com.hybris.cockpitng.flexiblelayout"
+		        slotId="views"  template="false">
+			<widget id="pcmbackoffice-collectionBrowser-filters" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+			        template="false" slotId="sidebar">
+				<widget id="pcmbackoffice-collectionBrowser-catalogFilterTree" widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree"
+				        slotId="centerSlot" title="pcm-catalog-borderLayout" template="false">
+					<widget id="pcmbackoffice-collectionBrowser-catalogFilterAdapter" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine.genericinitializer"
+					        slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="requiredTypeCode" type="String" value="Product"/>
+						<setting key="navigationNodeId" type="String" value="_y_et_root__catalogs"/>
+						<setting key="handlerBeanId" type="String"
+						         value="catalogTreeFilterAdvancedSolrSearchInitializer"/>
+						<virtual-sockets/>
+					</widget>
+					<widget id="pcmbackoffice-collectionBrowser-catalogSelector" widgetDefinitionId="com.hybris.backoffice.cockpitng.widgets.catalogSelector"
+					        slotId="toolbar" template="false">
+						<virtual-sockets/>
+					</widget>
+					<setting key="explorerTreeConfigCtx" type="String">pcmbackoffice-catalogFilterTree</setting>
+					<setting key="widgetMold" type="String">light</setting>
+					<setting key="showToolbar" type="Boolean">true</setting>
+					<setting key="showNestedToolbarWidget" type="Boolean">true</setting>
+					<setting key="showPrimaryActions" type="Boolean">false</setting>
+					<setting key="showSecondaryActions" type="Boolean">false</setting>
+					<setting key="refreshStrategies" type="String">explorerTreeRefreshStrategies</setting>
+					<setting key="minSearchInputLength" type="Integer">3</setting>
+					<setting key="actionsComponent" type="String">explorerTreeActions</setting>
+					<virtual-sockets/>
+				</widget>
+				<widget id="pcmbackoffice-refine-by" widgetDefinitionId="com.hybris.cockpitng.refineby"
+				        slotId="bottomSlot" template="false">
+					<setting key="maxInlineFacets" type="Integer">5</setting>
+					<virtual-sockets/>
+				</widget>
+
+				<setting key="northDisabled" type="Boolean" value="true"/>
+				<setting key="southDisabled" type="Boolean" value="false"/>
+				<setting key="southHeight" type="String" value="50%"/>
+				<setting key="eastDisabled" type="Boolean" value="true"/>
+				<setting key="westDisabled" type="Boolean" value="true"/>
+				<setting key="northCollapsible" type="Boolean" value="false"/>
+				<setting key="northSplittable" type="Boolean" value="false"/>
+				<setting key="widgetMold" type="String" value="light"/>
+				<setting key="widgetStyleClass" type="String" value="yw-pcmbackoffice-products-sidebar"/>
+			</widget>
+
+			<widget id="pcmbackoffice-collectionBrowser-display" widgetDefinitionId="com.hybris.cockpitng.flexiblelayout"
+			        slotId="contents" template="false">
+				<widget id="pcmbackoffice-collectionBrowser-summary" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+				        slotId="sidebar" template="false">
+					<widget id="pcmbackoffice-summary-view" widgetDefinitionId="com.hybris.cockpitng.summaryView" slotId="centerSlot" template="false">
+						<widget id="pcmbackoffice-summary-view-item-extractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+						        template="false" slotId="cockpitWidgetChildrenInvisible">
+							<setting key="expression" value="object"/>
+							<setting key="socketDataType_$T" type="String" value="java.lang.Object"/>
+						</widget>
+						<setting key="summaryViewConfigCtx" type="String">pcmbackoffice-summary-view</setting>
+						<setting key="syncOutputSocket" type="String">syncObject</setting>
+						<virtual-sockets>
+							<output id="syncObject" type="de.hybris.platform.core.model.ItemModel"/>
+						</virtual-sockets>
+					</widget>
+					<setting key="westDisabled" type="Boolean">true</setting>
+					<setting key="widgetStyleClass" type="String">yw-pcmbackoffice-light</setting>
+					<setting key="eastDisabled" type="Boolean">true</setting>
+					<virtual-sockets/>
+				</widget>
+				<widget id="pcmbackoffice-collectionBrowser-contents" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+				        slotId="contents" template="false">
+					<widget id="pcmbackoffice-collectionBrowser-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+					        slotId="headerSlot" template="false">
+						<widget id="pcmbackoffice-collectionBrowser-summaryToolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+						        slotId="toolbarAfterSlot" template="false">
+							<setting key="widgetStyleClass" type="String">yw-pcmbackoffice-toolbar-summary yw-pcmbackoffice-light</setting>
+							<setting key="toolbarActions" type="String">pcmbackoffice-actions-summary</setting>
+							<virtual-sockets>
+								<input id="toggleState" type="java.lang.String" visibility="default"/>
+								<output id="toggleSidebar" type="java.lang.String" visibility="default"/>
+							</virtual-sockets>
+						</widget>
+						<setting key="widgetStyleClass" type="String">yw-pcmbackoffice-collection-toolbar</setting>
+						<setting key="toolbarActions" type="String">pcmbackoffice-actions-toolbar</setting>
+						<virtual-sockets>
+							<input id="toggleState" type="java.lang.String" visibility="default"/>
+							<output id="toggle" type="java.lang.String" visibility="default"/>
+							<output id="breakpoint" type="java.lang.String"/>
+							<output id="selectView" type="java.lang.String" visibility="default"/>
+						</virtual-sockets>
+					</widget>
+					<widget id="pcmbackoffice-collectionBrowser-browser" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+					        slotId="centerSlot" template="false">
+						<widget id="pcmbackoffice-collectionBrowser-fulltextsearch" widgetDefinitionId="com.hybris.cockpitng.fulltextsearch"
+						        slotId="toolbarCenter" template="false">
+							<setting key="actionSlotComponentName" type="String">pcmbackoffice-listviewactions</setting>
+							<setting key="fulltextSearchConfigCtxCode" type="String">pcmbackoffice-fulltext-search</setting>
+							<virtual-sockets/>
+						</widget>
+						<widget id="pcmbackoffice-collectionBrowser-advancedsearchengine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+						        slotId="cockpitWidgetChildrenInvisible" template="false">
+							<virtual-sockets/>
+						</widget>
+						<widget id="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+						        slotId="cockpitWidgetChildrenInvisible" template="false">
+							<setting key="expression" type="String">(#root instanceof T(java.lang.Iterable)) ? #root.iterator().next() : #root</setting>
+							<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+							<virtual-sockets/>
+						</widget>
+						<setting key="pageSize" type="Integer">100</setting>
+						<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+						<setting key="widgetStyleClass" type="String">yw-pcmbackoffice-browser</setting>
+						<setting key="actionSlotComponentId" type="String">pcmbackoffice-listviewactions</setting>
+						<setting key="treeViewConfigCtx" type="String">pcmbackoffice-collection-browser-tree</setting>
+						<setting key="colConfigCtxCode" type="String">pcmbackoffice-listview</setting>
+						<setting key="collectionBrowserConfigCtx">pcmbackoffice-collection-browser</setting>
+						<setting key="gridViewConfigCtx">pcmbackoffice-grid-view</setting>
+						<setting key="listSubtitle" type="String">emptylist</setting>
+						<setting key="sendItemsOnSelect" type="Boolean">true</setting>
+						<setting key="hyperlinks" type="Boolean">true</setting>
+						<setting key="multiSelect" type="Boolean">true</setting>
+						<setting key="dragAndDropConfigCtx" type="String">dragItemsDnDComponent</setting>
+						<virtual-sockets>
+							<output id="selectedItemsToEdit" type="java.lang.Object"/>
+							<output id="com.hybris.cockpitng.action.clone.success" type="java.lang.Object"/>
+						</virtual-sockets>
+					</widget>
+					<setting key="westDisabled" type="Boolean">true</setting>
+					<setting key="northCollapsible" type="Boolean">false</setting>
+					<setting key="northDisabled" type="Boolean">false</setting>
+					<setting key="eastDisabled" type="Boolean">true</setting>
+					<setting key="northSplittable" type="Boolean">false</setting>
+					<virtual-sockets/>
+				</widget>
+				<setting key="sidebarBreakpoint" type="String">s</setting>
+				<setting key="sidebarCollapsible" type="Boolean">false</setting>
+				<setting key="sidebarPosition" type="String">right</setting>
+				<setting key="sidebarResponsive" type="Boolean">false</setting>
+				<setting key="sidebarState" type="String">closed</setting>
+				<virtual-sockets/>
+			</widget>
+
+			<setting key="sidebarPosition" type="String" value="left"/>
+			<setting key="overlapOnHover" type="Boolean" value="false"/>
+			<setting key="sidebarCollapsible" type="Boolean" value="false"/>
+		</widget>
+
+		<setting key="selectCollectionBrowser_eval" type="String">'pcmbackoffice-collectionBrowser-view'</setting>
+		<virtual-sockets>
+			<input id="selectCollectionBrowser" type="java.lang.Object"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<!-- Clone Action Selection -->
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist-eraser" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="com.hybris.cockpitng.action.clone.success"
+					   targetWidgetId="pcmbackoffice-selection-filter" inputId="input"/>
+	<!-- /Clone Action Selection -->
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" outputId="nodeSelected"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="reset"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" outputId="nodeSelected"
+					   targetWidgetId="pcmbackoffice-refine-by" inputId="reset"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-toolbar" outputId="selectView"
+	                   targetWidgetId="pcmbackoffice-contents" inputId="selectViews"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-selection-filter" inputId="input"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-toolbar" outputId="toggle"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-view" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-view" outputId="sidebarState"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-toolbar" inputId="toggleState"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-toolbar" outputId="breakpoint"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-view" inputId="responsiveBreakpoint"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-selection-filter" inputId="input"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-navigationhistory" inputId="historyInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorarea-summaryview" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-item-selection-proxy" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="selectItem"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="selectedItem"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-list-propextractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-list-propextractor" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="selectedItem"
+	                   targetWidgetId="pcmbackoffice-item-selection-proxy" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-summaryToolbar" outputId="toggleSidebar"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-display" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-display" outputId="sidebarState"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-summaryToolbar" inputId="toggleState"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-area" outputId="com.hybris.cockpitng.action.delete.success"
+	                   targetWidgetId="pcmbackoffice-state-prepare-collection-propextractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-prepare-collection-propextractor" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-state-holder-multiplexer-saver" inputId="element"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-holder-multiplexer-saver" outputId="remove"
+					   targetWidgetId="pcmbackoffice-state-holder-multiplexer-decider" inputId="element"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-holder-multiplexer-decider" outputId="single"
+					   targetWidgetId="pcmbackoffice-navigationhistory" inputId="doBack"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemovedByClick"
+					   targetWidgetId="pcmbackoffice-state-prepare-collection-propextractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-save-initial-propextractor" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-state-holder-multiplexer-saver" inputId="element"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-holder-multiplexer-saver" outputId="save"
+					   targetWidgetId="pcmbackoffice-state-save-null" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-state-holder-multiplexer-decider" outputId="multiple"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-state-save-initial-propextractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-selectedreference-propertyextractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-browser" inputId="selectItem"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogSelector" outputId="selection"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" inputId="setTreeContext"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-search-init" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="type"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" outputId="searchData"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" outputId="searchContextChanged"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="changeSearchContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" outputId="pageable"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-browser" inputId="pageable"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" outputId="nodeSelected"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-catalogFilterAdapter" inputId="nodeSelected"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogFilterAdapter" outputId="outContext"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="initContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" outputId="autosuggestions"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="autosuggestions"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" outputId="fullTextSearchData"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="fullTextSearchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" outputId="autosuggestionQuery"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="autosuggestionQuery"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-refine-by" outputId="searchData"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="searchData"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" outputId="fullTextSearchData"
+	                   targetWidgetId="pcmbackoffice-refine-by" inputId="fullTextSearchData"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogSelector" outputId="syncCatalogVersion"
+	                   targetWidgetId="synchronizationPopup" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-browser" outputId="focusedItem"
+	                   targetWidgetId="pcmbackoffice-summary-view" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="items"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-collection" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="selectItem"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemoved"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-browser" inputId="deselectItems"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-summary-view" outputId="focusAttribute"
+	                   targetWidgetId="pcmbackoffice-summary-view-item-extractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-summary-view-item-extractor" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-item-selection-proxy" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-summary-view" outputId="focusAttribute"
+	                   targetWidgetId="pcmbackoffice-editorArea-area" inputId="focus"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-summary-view" outputId="syncObject"
+					   targetWidgetId="synchronizationPopup" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" outputId="nodeSelected"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-browser" inputId="deselectAllItems"/>
+
+</widgets>

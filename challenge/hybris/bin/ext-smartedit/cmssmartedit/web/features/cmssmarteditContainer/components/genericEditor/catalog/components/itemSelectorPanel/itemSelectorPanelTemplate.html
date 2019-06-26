@@ -1,0 +1,51 @@
+<y-slider-panel data-slider-panel-show="ctrl._internalShowPanel"
+    data-slider-panel-hide="ctrl._internalHidePanel"
+    data-slider-panel-configuration="ctrl.sliderConfiguration"
+    class="se-item-selector-panel">
+    <content recompile-dom="ctrl.resetSelector"
+        class="se-item-selector-panel__content">
+        <!-- Show the dropdown only if there's more than one catalogs to choose from -->
+        <div data-ng-if="ctrl.catalogs.length > 1"
+            class="se-item-selector-panel__content__item">
+            <label class="control-label">{{'se.cms.catalogaware.panel.catalogs.label' | translate}}</label>
+            <y-select data-id="se-catalog-selector-dropdown"
+                data-ng-model="ctrl.catalogInfo.catalogId"
+                data-fetch-strategy="ctrl.catalogSelectorFetchStrategy"
+                data-item-template="ctrl.catalogItemTemplate"
+                data-on-change="ctrl._onCatalogSelectorChange"
+                data-reset="ctrl.resetCatalogSelector"
+                class="se-item-selector-panel__content__catalogs__yselect">
+            </y-select>
+            <label data-ng-if="ctrl.catalogs.length !== 1">{{ctrl.catalogInfo.name | l10n}}</label>
+        </div>
+
+        <div class="se-item-selector-panel__content__item">
+            <label class="control-label">{{'se.cms.catalogaware.panel.catalogsversion.label' | translate}}</label>
+            <y-select data-id="se-catalog-version-selector-dropdown"
+                data-ng-model="ctrl.catalogInfo.catalogVersion"
+                data-fetch-strategy="ctrl.catalogVersionSelectorFetchStrategy"
+                data-on-change="ctrl._onCatalogVersionSelectorChange"
+                data-search-enabled=false
+                data-reset="ctrl.resetCatalogVersionSelector"
+                class="se-item-selector-panel__content__catalog-version__yselect">
+            </y-select>
+        </div>
+
+        <!-- Show the multi-select-->
+        <div class="se-item-selector-panel__content__item"
+            data-ng-show="ctrl.catalogInfo.catalogVersion">
+            <label class="control-label">{{ctrl.catalogItemType}}</label>
+            <y-select id="se-items-selector-dropdown"
+                multi-select="'true'"
+                controls="'true'"
+                ng-model="ctrl._internalItemsSelected"
+                on-change="ctrl._onItemsSelectorChange"
+                fetch-strategy="ctrl._internalItemsFetchStrategy"
+                reset="ctrl.resetItemsListSelector"
+                item-template="ctrl.itemTemplate"
+                is-read-only="!ctrl._isItemSelectorEnabled()">
+            </y-select>
+        </div>
+
+    </content>
+</y-slider-panel>

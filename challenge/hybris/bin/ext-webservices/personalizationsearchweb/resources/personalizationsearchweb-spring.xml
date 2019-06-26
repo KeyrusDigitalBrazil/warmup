@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+	<!-- Query endpoints -->
+
+	<bean id="cxUpdateSearchProfileActionRank" class="de.hybris.platform.personalizationsearchweb.queries.CxUpdateSearchProfileActionRankExecutor"
+		parent="abstractRestQueryExecutor">
+		<property name="modelService" ref="modelService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="cxCustomizationService" ref="cxCustomizationService" />
+		<property name="cxVariationService" ref="cxVariationService" />
+	</bean>
+
+	<bean id="cxGetIndexTypesForSite" class="de.hybris.platform.personalizationsearchweb.queries.CxGetIndexTypesForSiteExecutor"
+		  parent="abstractRestQueryExecutor">
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="localViewExecutor" ref="localViewExecutor" />
+	</bean>
+
+	<!-- Converters & Populators -->
+
+	<alias name="defaultCxSearchProfileActionPopulator" alias="cxSearchProfileActionPopulator" />
+	<bean id="defaultCxSearchProfileActionPopulator" class="de.hybris.platform.personalizationsearchweb.populators.CxSearchProfileActionPopulator" />
+
+	<bean id="defaultCxSearchProfileActionConverter" parent="cxActionPopulatingConverter">
+		<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationsearch.model.CxSearchProfileActionModel" />
+		<property name="targetClass" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+		<property name="populators">
+			<map>
+				<entry key="BASE" value-ref="cxSearchProfileActionPopulators" />
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultCxSearchProfileActionPopulators" alias="cxSearchProfileActionPopulators" />
+	<bean id="defaultCxSearchProfileActionPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="cxSearchProfileActionPopulator" />
+				<ref bean="cxActionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCxSearchProfileActionReversePopulator" alias="cxSearchProfileActionReversePopulator" />
+	<bean id="defaultCxSearchProfileActionReversePopulator" class="de.hybris.platform.personalizationsearchweb.populators.CxSearchProfileActionReversePopulator" />
+
+	<bean id="defaultCxSearchProfileActionReverseConverter" parent="cxActionReversePopulatingConverter">
+		<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+		<property name="targetClass" value="de.hybris.platform.personalizationsearch.model.CxSearchProfileActionModel" />
+		<property name="populators">
+			<map>
+				<entry key="BASE" value-ref="cxSearchProfileActionReversePopulators" />
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultCxSearchProfileActionReversePopulators" alias="cxSearchProfileActionReversePopulators" />
+	<bean id="defaultCxSearchProfileActionReversePopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="cxSearchProfileActionReversePopulator" />
+				<ref bean="cxActionReversePopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Mapping -->
+
+	<bean id="cxSearchProfileActionDataSubclassMapping" parent="subclassMapping">
+		<property name="parentClass" value="de.hybris.platform.personalizationfacades.data.ActionData" />
+		<property name="subclassesSet" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+	</bean>
+
+	<bean id="cxSearchProfileActionDataFieldMapper" parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+		<property name="destClass" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+	</bean>
+
+	<bean id="cxSearchProfileActionFieldSetLevelMapping" parent="fieldSetLevelMapping">
+		<property name="dtoClass" value="de.hybris.platform.personalizationsearchweb.data.CxSearchProfileActionData" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code" />
+				<entry key="DEFAULT" value="code,searchProfileCode,searchProfileCatalog" />
+				<entry key="FULL" value="code,searchProfileCode,searchProfileCatalog" />
+			</map>
+		</property>
+	</bean>
+</beans>

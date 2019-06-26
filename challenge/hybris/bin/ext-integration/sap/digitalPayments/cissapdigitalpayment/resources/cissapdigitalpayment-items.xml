@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+	<enumtypes>
+		<enumtype code="CreditCardType" autocreate="false" generate="false">
+			<value code="DPAM"/>
+			<value code="DPDI"/>
+			<value code="DPDS"/>
+			<value code="DPJC"/>
+			<value code="DPMC"/>
+			<value code="DPVI"/>
+		</enumtype>
+		<enumtype code="SapDigitalPaymentAuthTypeEnum" autocreate="true" generate="true" dynamic="true">
+
+			<description>This enum type will be used for determining the SAP Digital payment authorization type</description>
+			<value code="DEFAULT"/>
+			<value code="DUMMY"/>
+			<value code="SPLIT"/>
+		</enumtype>
+	</enumtypes>
+	
+	<relations>
+		<relation autocreate="true" code="SAPDigitalPaymentConfig2BaseStore" generate="true" localized="false">
+			<sourceElement cardinality="many" qualifier="baseStores" type="BaseStore"/>
+			<targetElement cardinality="one" qualifier="sapDigitalPaymentConfiguration" type="SAPDigitalPaymentConfiguration"/>
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+	
+	<itemtype code="PaymentTransactionEntry" autocreate="false"
+		          generate="false">
+			<attributes>
+				<attribute qualifier="authByPaytSrvcPrvdr" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="authByAcquirer" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="authByDigitalPaytSrvc" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="authStatus" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="authStatusName" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>
+	</itemtype>	
+	
+	<itemtype code="SapDigitPayPollCardProcess" autocreate="true"
+			generate="true"
+			jaloclass="de.hybris.platform.cissapdigitalpayment.jalo.SapDigitPayPollCardProcess"
+			extends="BusinessProcess">
+			<attributes>
+				<attribute qualifier="sessionId" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="sessionCart" type="Cart">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="sessionUser" type="User">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="baseStore" type="BaseStore">
+					<persistence type="property"></persistence>
+				</attribute>
+				<attribute qualifier="pollTransStatus" type="java.lang.String">
+					<persistence type="property"></persistence>
+				</attribute>
+			</attributes>	
+	</itemtype>
+	
+		
+	<itemtype code="SAPDigitalPaymentClient" generate="true" autocreate="true"
+			  jaloclass="de.hybris.platform.cissapdigitalpayment.jalo.SAPDigitalPaymentClient">
+		<deployment table="SAPDigiPayClient" typecode="9338" />
+		<attributes>
+			<attribute qualifier="clientId" type="java.lang.String">
+				<description>Client Id</description>
+				<modifiers unique="true" optional="false" />
+				<persistence type="property" />
+			</attribute>
+			<attribute qualifier="clientSecret" type="java.lang.String">
+				<description>Client Secret</description>
+				<persistence type="property" />
+			</attribute>
+			<attribute qualifier="tokenUrl" type="java.lang.String">
+				<description>Token URL for client</description>
+				<modifiers optional="false"/>
+				<persistence type="property" />
+			</attribute>
+			<attribute qualifier="scope" type="StringSet">
+				<description>Set of client scopes</description>
+				<persistence type="property" />
+			</attribute>
+			<attribute qualifier="authorizedGrantTypes" type="StringSet">
+				<description>Set of grant types for client</description>
+				<persistence type="property" />
+			</attribute>
+		</attributes>
+	</itemtype>
+		
+	
+	<itemtype code="SAPDigitalPaymentConfiguration" generate="true" autocreate="true"
+				  jaloclass="de.hybris.platform.cissapdigitalpayment.jalo.SAPDigitalPaymentConfiguration">
+			<deployment table="SAPDigiPayConfig" typecode="9337" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<description>Sap Digital Payment configuration name</description>
+					<modifiers unique="true" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapDigitalpaymentClient" type="SAPDigitalPaymentClient">
+					<description>Sap Digital Payment client</description>
+					<modifiers unique="true" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="baseUrl" type="java.lang.String">
+					<description>Base URL for SAP Digital Payment</description>
+					<modifiers optional="false"/>
+					<persistence type="property" />
+				</attribute>
+                <attribute qualifier="paymentAuthType" type="SapDigitalPaymentAuthTypeEnum" >
+                    <description>Payment authentication type enum</description>
+                    <persistence type="property"/>
+                </attribute>
+				<attribute qualifier="companyCode" type="java.lang.String">
+					<description>Company Code - routing parameter for determining PSP</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="customerCountry" type="java.lang.String">
+					<description>Custom Country - routing parameter for determining PSP</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="paymentMethod" type="java.lang.String">
+					<description>Payment Method - routing parameter for determining PSP</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="customParam" type="java.lang.String">
+					<description>Custom parameter - routing parameter for determining PSP</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="maxRetry" type="java.lang.Integer">
+					<description>Maximum number of retries</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="retryInterval" type="java.lang.Integer">
+					<description>Retry interval in milliseconds</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="timeOut" type="java.lang.Integer">
+					<description>Timeout interval in millseconds</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="pollCardDelay" type="java.lang.Integer">
+					<description>Poll card delay in milliseconds</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	</itemtypes>
+</items>

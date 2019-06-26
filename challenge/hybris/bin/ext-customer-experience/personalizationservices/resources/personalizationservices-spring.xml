@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- System setup -->
+    <bean id="personalizationServicesSystemSetup" class="de.hybris.platform.personalizationservices.setup.PersonalizationServicesSystemSetup">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxDaoQueryBuilder" ref="cxDaoQueryBuilder"/>
+    </bean>
+
+    <alias name="emptyUpdateUserSegmentStrategy" alias="updateUserSegmentStrategy"/>
+    <bean id="emptyUpdateUserSegmentStrategy"
+          class="de.hybris.platform.personalizationservices.strategies.impl.EmptyUpdateUserSegmentStrategy">
+    </bean>
+
+    <bean id="cxAfterUserChangedListener" class="de.hybris.platform.personalizationservices.events.CxAfterUserChangedListener">
+        <property name="userService" ref="userService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="cxRecalculationService" ref="cxRecalculationService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxUserSegmentSessionService" ref="cxUserSegmentSessionService"/>
+    </bean>
+
+    <bean id="cxBaseConsentEventListener" class="de.hybris.platform.personalizationservices.events.consent.CxBaseConsentEventListener" abstract="true">
+        <property name="cxRecalculationService" ref="cxRecalculationService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxConsentService" ref="cxConsentService" />
+    </bean>
+
+    <bean id="cxConsentGivenEventListener" class="de.hybris.platform.personalizationservices.events.consent.CxConsentGivenEventListener" parent="cxBaseConsentEventListener">
+        <property name="userService" ref="userService" />
+        <property name="baseSiteService" ref="baseSiteService" />
+    </bean>
+    
+    <bean id="cxConsentWithdrawnEventListener" class="de.hybris.platform.personalizationservices.events.consent.CxConsentWithdrawnEventListener" parent="cxBaseConsentEventListener">
+        <property name="modelService" ref="modelService" />
+        <property name="cxUserSegmentService" ref="cxUserSegmentService" />
+        <property name="cxActionResultService" ref="cxActionResultService"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+    </bean>
+
+    <bean id="cxAnonymousConsentChangeEventListener" class="de.hybris.platform.personalizationservices.events.consent.CxAnonymousConsentChangeEventListener" parent="cxBaseConsentEventListener" >
+        <property name="userService" ref="userService" />
+        <property name="sessionService" ref="sessionService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="cxActionResultService" ref="cxActionResultService"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+    </bean>
+
+    <bean id="actionPropertySetter" class="de.hybris.platform.personalizationservices.action.property.ActionPropertySetter" autowire="constructor"/>
+
+    <bean id="actionTargetProvider" abstract="true" class="de.hybris.platform.personalizationservices.action.property.ActionTargetProvider"/>
+
+    <!-- Customer segments cleanup -->
+    <alias name="defaultCxSegmentRelationCleanupRemoveCleanupAction" alias="cxSegmentRelationCleanupRemoveCleanupAction"/>
+    <bean id="defaultCxSegmentRelationCleanupRemoveCleanupAction" class="de.hybris.platform.retention.impl.DefaultExtensibleRemoveCleanupAction" parent="abstractExtensibleRemoveCleanupAction">
+        <property name="itemCleanupHooks" ref="cxSegmentRelationCleanupHooks"/>
+    </bean>
+
+    <util:list id="cxSegmentRelationCleanupHooks" value-type="de.hybris.platform.retention.hook.ItemCleanupHook"/>
+
+    <!-- Dynamic attribute handlers -->
+
+    <alias name="defaultCxRankAssigmentStrategy" alias="cxRankAssigmentStrategy"/>
+    <bean id="defaultCxRankAssigmentStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.DefaultRankAssignmentStrategy"/>
+
+    <bean id="cxAbstractActionRankAttributeHandler"
+          class="de.hybris.platform.personalizationservices.dynamic.CxAbstractActionRankAttributeHandler"/>
+
+    <bean id="cxAbstractActionAffectedObjectKeyAttributeHandler"
+          class="de.hybris.platform.personalizationservices.dynamic.CxAbstractActionAffectedObjectKeyAttributeHandler"/>
+
+    <bean id="cxVariationRankAttributeHandler" class="de.hybris.platform.personalizationservices.dynamic.CxVariationRankAttributeHandler">
+        <property name="rankAssigmentStrategy" ref="cxRankAssigmentStrategy"/>
+    </bean>
+
+    <bean id="cxVariationActiveAttributeHandler" class="de.hybris.platform.personalizationservices.dynamic.CxVariationActiveAttributeHandler"/>
+
+    <bean id="cxCustomizationActiveAttributeHandler" class="de.hybris.platform.personalizationservices.dynamic.CxCustomizationActiveAttributeHandler">
+        <property name="timeService" ref="timeService"/>
+    </bean>
+
+    <bean id="cxCustomizationRankAttributeHandler" class="de.hybris.platform.personalizationservices.dynamic.CxCustomizationRankAttributeHandler">
+        <property name="rankAssigmentStrategy" ref="cxRankAssigmentStrategy"/>
+    </bean>
+
+
+    <!-- DAO -->
+    <alias name="defaultCxDaoStrategySelector" alias="cxDaoStrategySelector"/>
+    <bean id="defaultCxDaoStrategySelector" class="de.hybris.platform.personalizationservices.dao.impl.DefaultCxDaoStrategySelector"/>
+
+    <alias name="defaultCxDaoQueryBuilder" alias="cxDaoQueryBuilder"/>
+    <bean id="defaultCxDaoQueryBuilder" class="de.hybris.platform.personalizationservices.dao.impl.DefaultCxDaoQueryBuilder">
+        <property name="cxDaoStrategySelector" ref="cxDaoStrategySelector"/>
+    </bean>
+
+    <bean id="baseCxDao" abstract="true">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService" />
+        <property name="cxDaoQueryBuilder" ref="cxDaoQueryBuilder"/>
+    </bean>
+
+    <alias name="defaultCxActionDao" alias="cxActionDao"/>
+    <bean id="defaultCxActionDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.action.dao.impl.DefaultCxActionDao"/>
+
+    <alias name="defaultCxActionResultDao" alias="cxActionResultDao"/>
+    <bean id="defaultCxActionResultDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.action.dao.impl.DefaultCxActionResultDao"/>
+
+    <alias name="defaultCxCustomizationDao" alias="cxCustomizationDao"/>
+    <bean id="defaultCxCustomizationDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.customization.dao.impl.DefaultCxCustomizationDao"/>
+
+    <alias name="defaultCxCustomizationGroupDao" alias="cxCustomizationGroupDao"/>
+    <bean id="defaultCxCustomizationGroupDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.customization.dao.impl.DefaultCxCustomizationGroupDao"/>
+
+    <alias name="defaultCxSegmentDao" alias="cxSegmentDao"/>
+    <bean id="defaultCxSegmentDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.segment.dao.impl.DefaultCxSegmentDao"/>
+
+    <alias name="defaultCxUserToSegmentDao" alias="cxUserToSegmentDao"/>
+    <bean id="defaultCxUserToSegmentDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.segment.dao.impl.DefaultCxUserToSegmentDao"/>
+
+    <alias name="defaultCxVariationDao" alias="cxVariationDao"/>
+    <bean id="defaultCxVariationDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.variation.dao.impl.DefaultCxVariationDao"/>
+
+    <alias name="defaultCxTriggerDao" alias="cxTriggerDao"/>
+    <bean id="defaultCxTriggerDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.trigger.dao.impl.DefaultCxTriggerDao"/>
+
+    <alias name="defaultCxSegmentTriggerDao" alias="cxSegmentTriggerDao"/>
+    <bean id="defaultCxSegmentTriggerDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.trigger.dao.impl.DefaultCxSegmentTriggerDao"/>
+
+
+    <alias name="defaultCxPersonalizationBusinessProcessDao" alias="cxPersonalizationBusinessProcessDao"/>
+    <bean id="defaultCxPersonalizationBusinessProcessDao" parent="baseCxDao" class="de.hybris.platform.personalizationservices.process.dao.impl.DefaultCxPersonalizationBusinessProcessDao"/>
+
+    <!-- DAO strategies -->
+    <bean id="abstractCxDaoStrategy" abstract="true">
+        <property name="cxDaoQueryBuilder" ref="cxDaoQueryBuilder"/>
+    </bean>
+
+    <bean id="cxCustomizationCodeDaoStrategy" class="de.hybris.platform.personalizationservices.customization.dao.impl.CxCustomizationCodeDaoStrategy" parent="abstractCxDaoStrategy"/>
+
+    <bean id="cxCustomizationStatusesDaoStrategy" class="de.hybris.platform.personalizationservices.customization.dao.impl.CxCustomizationNameStatusesDaoStrategy" parent="abstractCxDaoStrategy"/>
+
+    <bean id="cxCustomizationNameStatusesDaoStrategy" class="de.hybris.platform.personalizationservices.customization.dao.impl.CxCustomizationNameStatusesDaoStrategy" parent="abstractCxDaoStrategy">
+        <property name="nameRequired" value="true"/>
+    </bean>
+
+
+    <bean id="cxSegmentCodeDaoStrategy" class="de.hybris.platform.personalizationservices.segment.dao.impl.CxSegmentCodeDaoStrategy" parent="abstractCxDaoStrategy"/>
+
+    <!-- Services -->
+
+    <alias name="defaultCxService" alias="cxService"/>
+    <bean id="defaultCxService" class="de.hybris.platform.personalizationservices.service.impl.DefaultCxService">
+        <property name="actionService" ref="actionService"/>
+        <property name="cxVariationService" ref="cxVariationService"/>
+        <property name="cxActionResultService" ref="cxActionResultService"/>
+        <property name="cxActionService" ref="cxActionService"/>
+        <property name="cxProcessService" ref="cxProcessService"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultCxActionResultService" alias="cxActionResultService"/>
+    <bean id="defaultCxActionResultService" class="de.hybris.platform.personalizationservices.action.impl.DefaultCxActionResultService">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="serializationService" ref="serializationService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="actionResultDao" ref="cxActionResultDao"/>
+        <property name="userService" ref="userService"/>
+        <property name="defaultSessionTokenService" ref="defaultSessionTokenService"/>
+    </bean>
+
+    <alias name="defaultCxActionService" alias="cxActionService"/>
+    <bean id="defaultCxActionService" class="de.hybris.platform.personalizationservices.action.impl.DefaultCxActionService">
+        <property name="modelService" ref="modelService"/>
+        <property name="cxActionDao" ref="cxActionDao"/>
+        <property name="actionPropertySetter" ref="actionPropertySetter"/>
+    </bean>
+
+    <alias name="defaultCxVariationService" alias="cxVariationService"/>
+    <bean id="defaultCxVariationService" class="de.hybris.platform.personalizationservices.variation.impl.DefaultCxVariationService">
+        <property name="modelService" ref="modelService"/>
+        <property name="cxVariationDao" ref="cxVariationDao"/>
+        <property name="cxTriggerService" ref="cxTriggerService"/>
+    </bean>
+
+    <alias name="defaultCxCustomizationService" alias="cxCustomizationService"/>
+    <bean id="defaultCxCustomizationService" class="de.hybris.platform.personalizationservices.customization.impl.DefaultCxCustomizationService">
+        <property name="modelService" ref="modelService"/>
+        <property name="cxCustomizationGroupDao" ref="cxCustomizationGroupDao"/>
+        <property name="cxCustomziationDao" ref="cxCustomizationDao"/>
+    </bean>
+
+    <alias name="defaultCxSegmentService" alias="cxSegmentService"/>
+    <bean id="defaultCxSegmentService" class="de.hybris.platform.personalizationservices.segment.impl.DefaultCxSegmentService">
+        <property name="updateUserSegmentStrategy" ref="updateUserSegmentStrategy"/>
+        <property name="cxSegmentDao" ref="cxSegmentDao"/>
+        <property name="cxUserToSegmentDao" ref="cxUserToSegmentDao"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>        
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxConsentService" ref="cxConsentService"/>
+        <property name="cxUserSegmentService" ref="cxUserSegmentService"/>
+        <property name="cxUserSegmentSessionService" ref="cxUserSegmentSessionService"/>
+        <property name="cxUserSegmentConversionHelper" ref="cxUserSegmentConversionHelper"/>
+    </bean>
+
+    <alias name="defaultCxUserSegmentService" alias="cxUserSegmentService"/>
+    <bean id="defaultCxUserSegmentService" class="de.hybris.platform.personalizationservices.segment.impl.DefaultCxUserSegmentService">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultCxUserSegmentSessionService" alias="cxUserSegmentSessionService"/>
+    <bean id="defaultCxUserSegmentSessionService" class="de.hybris.platform.personalizationservices.segment.impl.DefaultCxUserSegmentSessionService">
+        <property name="userService" ref="userService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxUserSegmentConversionHelper" ref="cxUserSegmentConversionHelper"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxUserSegmentService" ref="cxUserSegmentService"/>
+    </bean>
+
+    <alias name="defaultCxTriggerService" alias="cxTriggerService"/>
+    <bean id="defaultCxTriggerService" class="de.hybris.platform.personalizationservices.trigger.impl.DefaultCxTriggerService">
+        <property name="modelService" ref="modelService"/>
+        <property name="cxTriggerDao" ref="cxTriggerDao"/>
+    </bean>
+
+    <alias name="defaultCxRecalculationService" alias="cxRecalculationService"/>
+    <bean id="defaultCxRecalculationService" class="de.hybris.platform.personalizationservices.service.impl.DefaultCxRecalculationService">
+        <property name="cxService" ref="cxService"/>
+        <property name="userService" ref="userService"/>
+        <property name="segmentService" ref="cxSegmentService"/>
+    </bean>
+
+    <alias name="defaultCxConfigurationService" alias="cxConfigurationService"/>
+    <bean id="defaultCxConfigurationService" class="de.hybris.platform.personalizationservices.configuration.impl.DefaultCxConfigurationService">
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="cxConfigurationLookupStrategy" ref="cxConfigurationLookupStrategy"/>
+    </bean>
+
+    <bean id="cxConfigValidationInterceptor" class="de.hybris.platform.personalizationservices.configuration.impl.CxConfigValidationInterceptor"/>
+
+    <bean id="cxConfigValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxConfigValidationInterceptor"/>
+        <property name="typeCode" value="CxConfig"/>
+    </bean>
+
+    <alias name="defaultCxConfigurationLookupStrategy" alias="cxConfigurationLookupStrategy"/>
+    <bean id="defaultCxConfigurationLookupStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.DefaultCxConfigurationLookupStrategy">
+        <property name="baseSiteService" ref="baseSiteService"/>
+    </bean>
+
+
+    <alias name="defaultCxProcessService" alias="cxProcessService"/>
+    <bean id="defaultCxProcessService" class="de.hybris.platform.personalizationservices.process.impl.DefaultCxProcessService">
+        <property name="businessProcessService" ref="businessProcessService"/>
+        <property name="processSelectionStrategy" ref="processSelectionStrategy"/>
+        <property name="cxPersonalizationBusinessProcessDao" ref="cxPersonalizationBusinessProcessDao"/>
+        <property name="cxProcessKeyStrategy" ref="cxProcessKeyStrategy"/>
+    </bean>
+
+    <!-- Catalog lookup stratgies -->
+    <alias name="defaultCxCatalogService" alias="cxCatalogService"/>
+    <bean id="defaultCxCatalogService" class="de.hybris.platform.personalizationservices.service.impl.DefaultCxCatalogService">
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxCustomizationService" ref="cxCustomizationService"/>
+    </bean>
+
+    <bean id="cxAllCatalogsLookupStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.AllCatalogsLookupStrategy">
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+    </bean>
+
+
+    <alias name="defaultCxConsentService" alias="cxConsentService"/>
+    <bean id="defaultCxConsentService"
+          class="de.hybris.platform.personalizationservices.consent.impl.DefaultCxConsentService">
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="userService" ref="userService"/>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="commerceConsentService" ref="commerceConsentService"/>
+        <property name="sessionService" ref="sessionService"/>
+    </bean>
+
+    <!-- Synchronization -->
+    <bean id="addCxCustomizationsGroupToContentCatalogRootTypes" depends-on="contentCatalogSyncRootTypeCodes" parent="listMergeDirective">
+        <property name="add" value="CxCustomizationsGroup"/>
+    </bean>
+
+    <bean id="addCxCustomizationToContentCatalogRootTypes" depends-on="contentCatalogSyncRootTypeCodes" parent="listMergeDirective">
+        <property name="add" value="CxCustomization"/>
+    </bean>
+
+    <bean id="addCxVariationToContentCatalogRootTypes" depends-on="contentCatalogSyncRootTypeCodes" parent="listMergeDirective">
+        <property name="add" value="CxVariation"/>
+    </bean>
+
+    <bean id="addCxAbstractTriggerToContentCatalogRootTypes" depends-on="contentCatalogSyncRootTypeCodes" parent="listMergeDirective">
+        <property name="add" value="CxAbstractTrigger"/>
+    </bean>
+
+    <bean id="addCxAbstractActionToContentCatalogRootTypes" depends-on="contentCatalogSyncRootTypeCodes" parent="listMergeDirective">
+        <property name="add" value="CxAbstractAction"/>
+    </bean>
+
+    <bean id="cxDefaultSegmentTriggerStrategy" class="de.hybris.platform.personalizationservices.trigger.strategy.impl.DefaultSegmentTriggerStrategy">
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxSegmentTriggerDao" ref="cxSegmentTriggerDao"/>
+        <property name="cxSegmentService" ref="cxSegmentService"/>
+    </bean>
+
+    <bean id="cxSegmentTriggerValidationInterceptor" class="de.hybris.platform.personalizationservices.trigger.impl.CxSegmentTriggerValidationInterceptor"/>
+
+    <bean id="cxSegmentTriggerValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxSegmentTriggerValidationInterceptor"/>
+        <property name="typeCode" value="CxSegmentTrigger"/>
+    </bean>
+
+    <bean id="cxDefaultTriggerValidationInterceptor" class="de.hybris.platform.personalizationservices.trigger.impl.CxDefaultTriggerValidationInterceptor"/>
+
+    <bean id="cxDefaultTriggerValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxDefaultTriggerValidationInterceptor"/>
+        <property name="typeCode" value="CxDefaultTrigger"/>
+    </bean>
+
+    <bean id="cxExpressionTriggerValidationInterceptor" class="de.hybris.platform.personalizationservices.trigger.expression.impl.CxExpressionTriggerInterceptor">
+        <property name="cxExpressionTriggerService" ref="cxExpressionTriggerService"/>
+        <property name="cxSegmentDao" ref="cxSegmentDao"/>
+    </bean>
+
+    <bean id="cxExpressionTriggerValidationInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxExpressionTriggerValidationInterceptor"/>
+        <property name="typeCode" value="CxExpressionTrigger"/>
+    </bean>
+
+    <alias name="defaultCxExpressionTriggerService" alias="cxExpressionTriggerService"/>
+    <bean id="defaultCxExpressionTriggerService" class="de.hybris.platform.personalizationservices.trigger.expression.impl.DefaultCxExpressionTriggerService"/>
+
+    <bean id="cxExpressionTriggerStrategy" class="de.hybris.platform.personalizationservices.trigger.strategy.impl.ExpressionTriggerStrategy">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxExpressionTriggerService" ref="cxExpressionTriggerService"/>
+        <property name="cxSegmentService" ref="cxSegmentService"/>
+    </bean>
+
+    <bean id="cxDefaultTriggerStrategy" class="de.hybris.platform.personalizationservices.trigger.strategy.impl.CxDefaultTriggerStrategy">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultCxProcessKeyStrategy" alias="cxProcessKeyStrategy"/>
+    <bean id="defaultCxProcessKeyStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.DefaultCxProcessKeyStrategy">
+        <property name="userService" ref="userService"/>
+        <property name="defaultSessionTokenService" ref="defaultSessionTokenService"/>
+    </bean>
+
+    <bean id="cxSegmentRemoveInterceptor" class="de.hybris.platform.personalizationservices.segment.impl.CxSegmentRemoveInterceptor"/>
+
+    <bean id="cxSegmentRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="cxSegmentRemoveInterceptor"/>
+        <property name="typeCode" value="CxSegment"/>
+    </bean>
+
+    <!-- process engine actions -->
+    <bean id="defaultPersonalizationCalculationProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+        <property name="resource" value="classpath:/processes/defaultPersonalizationCalculationProcess.xml"/>
+    </bean>
+
+    <bean id="calculatePersonalizationForUserAction" class="de.hybris.platform.personalizationservices.process.CalculatePersonalizationForUserAction" parent="abstractAction">
+        <property name="cxService" ref="cxService"/>
+        <property name="cxProcessService" ref="cxProcessService"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+    </bean>
+
+    <bean id="updateUserSegmentsAction" class="de.hybris.platform.personalizationservices.process.UpdateUserSegmentsAction" parent="abstractAction">
+        <property name="cxSegmentService" ref="cxSegmentService"/>
+        <property name="cxProcessService" ref="cxProcessService"/>
+    </bean>
+
+    <alias name="propertyProcessSelectionStrategy" alias="processSelectionStrategy"/>
+    <bean id="propertyProcessSelectionStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.DefaultProcessSelectionStrategy">
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+    </bean>
+
+    <!-- cx process parameter strategies -->
+    <bean id="abstractCxProcessParameterStrategy" abstract="true">
+        <property name="processParameterHelper" ref="processParameterHelper"/>
+    </bean>
+
+    <alias name="defaultCxProcessParameterSegmentationStrategy" alias="cxProcessParameterSegmentationStrategy"/>
+    <bean id="defaultCxProcessParameterSegmentationStrategy" class="de.hybris.platform.personalizationservices.process.strategies.impl.CxProcessParameterSegmentationStrategy" parent="abstractCxProcessParameterStrategy">
+        <property name="userService" ref="userService"/>
+        <property name="cxSegmentService" ref="cxSegmentService"/>
+        <property name="cxUserSegmentSessionService" ref="cxUserSegmentSessionService"/>
+        <property name="cxUserSegmentService" ref="cxUserSegmentService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxUserSegmentConversionHelper" ref="cxUserSegmentConversionHelper"/>
+        <property name="supportedParameters" value="SEGMENTATION"/>
+    </bean>
+
+    <alias name="defaultCxProcessParameterBaseSiteStrategy" alias="cxProcessParameterBaseSiteStrategy"/>
+    <bean id="defaultCxProcessParameterBaseSiteStrategy" class="de.hybris.platform.personalizationservices.process.strategies.impl.CxProcessParameterBaseSiteStrategy" parent="abstractCxProcessParameterStrategy">
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="supportedParameters" value="BASE_SITE"/>
+    </bean>
+
+    <alias name="defaultCxProcessParameterSessionTokenStrategy" alias="cxProcessParameterSessionTokenStrategy"/>
+    <bean id="defaultCxProcessParameterSessionTokenStrategy" class="de.hybris.platform.personalizationservices.process.strategies.impl.CxProcessParameterSessionTokenStrategy" parent="abstractCxProcessParameterStrategy">
+        <property name="defaultSessionTokenService" ref="defaultSessionTokenService"/>
+        <property name="supportedParameters" value="SESSION_TOKEN"/>
+    </bean>
+
+    <alias name="defaultCxProcessParameterUserConsentsStrategy" alias="cxProcessParameterUserConsentsStrategy"/>
+    <bean id="defaultCxProcessParameterUserConsentsStrategy" class="de.hybris.platform.personalizationservices.process.strategies.impl.CxProcessParameterUserConsentsStrategy" parent="abstractCxProcessParameterStrategy">
+        <property name="sessionService" ref="sessionService"/>
+        <property name="supportedParameters" value="USER_CONSENTS"/>
+    </bean>
+
+    <bean id="BaseSiteConsentEventDataHandler" class="de.hybris.platform.personalizationservices.events.consent.BaseSiteConsentEventDataHandler" >
+        <property name="baseSiteService" ref="baseSiteService" />
+    </bean>
+
+    <bean id="baseSiteConsentEventDataProviderListMergeDirective" depends-on="anonymousConsentChangeEventDataProviders" parent="listMergeDirective">
+        <property name="add" ref="BaseSiteConsentEventDataHandler"/>
+    </bean>
+
+    <!-- cron jobs -->
+    <bean id="cleanupCxPersonalizationProcessJobsPerformable" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy" ref="cxPersonalizationProcessCleanupStrategy"/>
+    </bean>
+
+    <alias name="defaultcxPersonalizationProcessCleanupStrategy" alias="cxPersonalizationProcessCleanupStrategy"/>
+    <bean id="defaultcxPersonalizationProcessCleanupStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.CxPersonalizationProcessCleanupStrategy">
+        <property name="timeService" ref="timeService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="cxDefaultPersonalizationCalculationJob" class="de.hybris.platform.personalizationservices.cronjob.CxDefaultPersonalizationCalculationJob"
+          parent="abstractJobPerformable">
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxService" ref="cxService"/>
+        <property name="cxCatalogService" ref="cxCatalogService"/>
+    </bean>
+
+    <!-- Cleaning personalization results -->
+    <bean id="cxBeforeSessionCloseListener" class="de.hybris.platform.personalizationservices.events.CxBeforeSessionCloseListener"
+          parent="abstractEventListener">
+        <property name="taskService" ref="taskService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="userService" ref="userService"/>
+        <property name="defaultSessionTokenService" ref="defaultSessionTokenService"/>
+        <property name="cxConfigurationService" ref="cxConfigurationService"/>
+        <property name="cxUserSegmentSessionService" ref="cxUserSegmentSessionService"/>
+        <property name="anonymousUserTaskRunnerName" value="cleanCxSessionResultsTaskRunner"/>
+        <property name="registeredUserTaskRunnerName" value="cxRegisteredUserSessionCloseTaskRunner"/>
+    </bean>
+
+    <bean id="cleanCxSessionResultsTaskRunner" class="de.hybris.platform.personalizationservices.task.CleanCxSessionResultsTaskRunner">
+        <property name="actionResultDao" ref="cxActionResultDao"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean id="cxRegisteredUserSessionCloseTaskRunner" class="de.hybris.platform.personalizationservices.task.CxRegisteredUserSessionCloseTaskRunner">
+        <property name="modelService" ref="modelService"/>
+        <property name="userService" ref="userService"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxUserSegmentService" ref="cxUserSegmentService"/>
+        <property name="cxUserSegmentConversionHelper" ref="cxUserSegmentConversionHelper"/>
+    </bean>
+
+    <bean id="cxPresetPersonalizationCalculationTaskRunner" class="de.hybris.platform.personalizationservices.task.CxPresetPersonalizationCalculationTaskRunner">
+        <property name="cxService" ref="cxService"/>
+    </bean>
+
+    <bean id="cleanupCxResultsJobPerformable" parent="abstractGenericMaintenanceJobPerformable">
+        <property name="maintenanceCleanupStrategy" ref="cxResultsCleanupStrategy"/>
+    </bean>
+
+    <alias name="defaultCxResultsCleanupStrategy" alias="cxResultsCleanupStrategy"/>
+    <bean id="defaultCxResultsCleanupStrategy" class="de.hybris.platform.personalizationservices.strategies.impl.CxResultsCleanupStrategy">
+        <property name="timeService" ref="timeService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <!-- Converting CxUserToSegmentModel <-> UserToSegmentData -->
+    <!-- Converters -->
+    <alias name="defaultCxUserToSegmentConverter" alias="cxUserToSegmentConverter"/>
+    <bean id="defaultCxUserToSegmentConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.personalizationservices.data.UserToSegmentData"/>
+        <property name="populators">
+            <list>
+                <ref bean="cxUserToSegmentPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCxUserToSegmentReverseConverter" alias="cxUserToSegmentReverseConverter"/>
+    <bean id="defaultCxUserToSegmentReverseConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxUserToSegmentModel"/>
+        <property name="populators">
+            <list>
+                <ref bean="affinityCxUserToSegmentReversePopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Populators -->
+    <alias name="defaultCxUserToSegmentPopulator" alias="cxUserToSegmentPopulator"/>
+    <bean id="defaultCxUserToSegmentPopulator" class="de.hybris.platform.personalizationservices.segment.converters.populator.DefaultCxUserToSegmentPopulator"/>
+
+    <alias name="defaultAffinityCxUserToSegmentReversePopulator" alias="affinityCxUserToSegmentReversePopulator"/>
+    <bean id="defaultAffinityCxUserToSegmentReversePopulator" class="de.hybris.platform.personalizationservices.segment.converters.populator.AffinityCxUserToSegmentReversePopulator"/>
+
+    <alias name="defaultCxUserSegmentConversionHelper" alias="cxUserSegmentConversionHelper"/>
+    <bean id="defaultCxUserSegmentConversionHelper" class="de.hybris.platform.personalizationservices.segment.converters.CxUserSegmentConversionHelper">
+        <property name="cxSegmentDao" ref="cxSegmentDao"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cxUserToSegmentConverter" ref="cxUserToSegmentConverter"/>
+        <property name="cxUserToSegmentReverseConverter" ref="cxUserToSegmentReverseConverter"/>
+    </bean>
+
+    <!--  -->
+
+    <!-- Personal data cleanup -->
+    <bean id="personalizationCustomerCleanupHook" class="de.hybris.platform.personalizationservices.retention.impl.PersonalizationCustomerCleanupHook">
+        <property name="modelService" ref="modelService"/>
+        <property name="writeAuditGateway" ref="writeAuditGateway"/>
+    </bean>
+
+    <bean id="personalizationCustomerCleanupHookMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective">
+        <property name="add" ref="personalizationCustomerCleanupHook"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,105 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+"#% impex.setValidationMode(""import_relaxed"");"
+
+$catalogVersion=catalogversion(catalog(id[default=apparelProductCatalog]),version[default=Staged])[unique=true,default=apparelProductCatalog:Staged]
+$indexTypeDe=apparel-deProductType
+$indexTypeUk=apparel-ukProductType
+
+
+##################
+### apparel-de ###
+##################
+
+# Shorts Lover
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]    ; name                                       ; indexType[unique=true,default=$indexTypeDe] ; $catalogVersion[unique=true]
+                                           ; shortsLoverApparelDe ; Shorts Lover Search Profile for Apparel De ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                        ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; shortsLoverApparelDe                             ; shortsLoverApparelDeSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                        ; indexProperty[unique=true] ; operator(code) ; value  ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; shortsLoverApparelDeSearchConfiguration               ; shortsLoverApparelDeSearchConfiguration_categoryName_br ; categoryName               ; MATCH          ; Shorts ; 2     ; MULTIPLICATIVE  ;                             
+                          ; shortsLoverApparelDeSearchConfiguration               ; shortsLoverApparelDeSearchConfiguration_inStock_br      ; inStockFlag                ; EQUAL          ; true   ; 1.2   ; MULTIPLICATIVE  ;                             
+
+
+# Burton Lover            
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]    ; name                                       ; indexType[unique=true,default=$indexTypeDe] ; $catalogVersion[unique=true]
+                                           ; burtonLoverApparelDe ; Burton Lover Search Profile for Apparel De ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                        ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; burtonLoverApparelDe                             ; burtonLoverApparelDeSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                     ; indexProperty[unique=true] ; operator(code) ; value  ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; burtonLoverApparelDeSearchConfiguration               ; burtonLoverApparelDeSearchConfiguration_brandName_br ; brandName                  ; MATCH          ; Burton ; 2     ; MULTIPLICATIVE  ;                             
+                          ; burtonLoverApparelDeSearchConfiguration               ; burtonLoverApparelDeSearchConfiguration_inStock_br   ; inStockFlag                ; EQUAL          ; true   ; 1.2   ; MULTIPLICATIVE  ;                             
+
+INSERT_UPDATE AsPromotedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                          ; indexProperty[unique=true] ; facetType(code) ; priority ; topValuesProvider        ; $catalogVersion[unique=true]
+                              ; burtonLoverApparelDeSearchConfiguration               ; burtonLoverApparelDeSearchConfiguration_availableInStores ; availableInStores          ; MULTISELECT_AND ; 90       ;                          ;                             
+                              ; burtonLoverApparelDeSearchConfiguration               ; burtonLoverApparelDeSearchConfiguration_brand             ; brand                      ; MULTISELECT_AND ; 90       ; defaultTopValuesProvider ;                             
+
+
+#Winter Sale campaign         
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]   ; name                                               ; indexType[unique=true,default=$indexTypeDe] ; $catalogVersion[unique=true]
+                                           ; winterSaleApparelDe ; Winter Sale Campaign Search Profile for Apparel De ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                               ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; winterSaleApparelDe                              ; winterSaleApparelDeCampaignSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                                      ; indexProperty[unique=true] ; operator(code) ; value    ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; winterSaleApparelDeCampaignSearchConfiguration        ; winterSaleApparelDeCampaignSearchConfiguration_collectionName_snow_br ; collectionName             ; MATCH          ; Snow     ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; winterSaleApparelDeCampaignSearchConfiguration        ; winterSaleApparelDeCampaignSearchConfiguration_collectionName_ski_br  ; collectionName             ; MATCH          ; Ski Gear ; 1.6   ; MULTIPLICATIVE  ;                             
+                          ; winterSaleApparelDeCampaignSearchConfiguration        ; winterSaleApparelDeCampaignSearchConfiguration_inStock_br             ; inStockFlag                ; EQUAL          ; true     ; 1.2   ; MULTIPLICATIVE  ;                             
+
+                          
+##################        
+### apparel-uk ###        
+##################        
+
+# Shorts Lover            
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]    ; name                                       ; indexType[unique=true,default=$indexTypeUk] ; $catalogVersion[unique=true]
+                                           ; shortsLoverApparelUk ; Shorts Lover Search Profile for Apparel Uk ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                        ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; shortsLoverApparelUk                             ; shortsLoverApparelUkSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                        ; indexProperty[unique=true] ; operator(code) ; value  ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; shortsLoverApparelUkSearchConfiguration               ; shortsLoverApparelUkSearchConfiguration_categoryName_br ; categoryName               ; MATCH          ; Shorts ; 2     ; MULTIPLICATIVE  ;                             
+                          ; shortsLoverApparelUkSearchConfiguration               ; shortsLoverApparelUkSearchConfiguration_inStock_br      ; inStockFlag                ; EQUAL          ; true   ; 1.2   ; MULTIPLICATIVE  ;                             
+
+
+# Burton Lover            
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]    ; name                                       ; indexType[unique=true,default=$indexTypeUk] ; $catalogVersion[unique=true]
+                                           ; burtonLoverApparelUk ; Burton Lover Search Profile for Apparel Uk ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                        ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; burtonLoverApparelUk                             ; burtonLoverApparelUkSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                     ; indexProperty[unique=true] ; operator(code) ; value  ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; burtonLoverApparelUkSearchConfiguration               ; burtonLoverApparelUkSearchConfiguration_brandName_br ; brandName                  ; MATCH          ; Burton ; 2     ; MULTIPLICATIVE  ;                             
+                          ; burtonLoverApparelUkSearchConfiguration               ; burtonLoverApparelUkSearchConfiguration_inStock_br   ; inStockFlag                ; EQUAL          ; true   ; 1.2   ; MULTIPLICATIVE  ;                             
+
+INSERT_UPDATE AsPromotedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                          ; indexProperty[unique=true] ; facetType(code) ; priority ; topValuesProvider        ; $catalogVersion[unique=true]
+                              ; burtonLoverApparelUkSearchConfiguration               ; burtonLoverApparelUkSearchConfiguration_availableInStores ; availableInStores          ; MULTISELECT_AND ; 90       ;                          ;                             
+                              ; burtonLoverApparelUkSearchConfiguration               ; burtonLoverApparelUkSearchConfiguration_brand             ; brand                      ; MULTISELECT_AND ; 90       ; defaultTopValuesProvider ;                             
+
+
+#Winter Sale campaign         
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]   ; name                                               ; indexType[unique=true,default=$indexTypeUk] ; $catalogVersion[unique=true]
+                                           ; winterSaleApparelUk ; Winter Sale Campaign Search Profile for Apparel Uk ;                                             ;                             
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                               ; category(code,$catalogVersion)[unique=true] ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; facetsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; winterSaleApparelUk                              ; winterSaleApparelUkCampaignSearchConfiguration ;                                             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER             ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                                                      ; indexProperty[unique=true] ; operator(code) ; value    ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; winterSaleApparelUkCampaignSearchConfiguration        ; winterSaleApparelUkCampaignSearchConfiguration_collectionName_snow_br ; collectionName             ; MATCH          ; Snow     ; 1.5   ; MULTIPLICATIVE  ;                             
+                          ; winterSaleApparelUkCampaignSearchConfiguration        ; winterSaleApparelUkCampaignSearchConfiguration_collectionName_ski_br  ; collectionName             ; MATCH          ; Ski Gear ; 1.6   ; MULTIPLICATIVE  ;                             
+                          ; winterSaleApparelUkCampaignSearchConfiguration        ; winterSaleApparelUkCampaignSearchConfiguration_inStock_br             ; inStockFlag                ; EQUAL          ; true     ; 1.2   ; MULTIPLICATIVE  ;                             

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+
+	<!-- Explorer tree configuration -->
+	<context merge-by="module" component="explorer-tree" parent="auto" module="personalizationservicesbackoffice">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="cxnode">
+				<explorer-tree:navigation-node id="cxactions">
+					<explorer-tree:type-node code="CxPromotionAction" id="hmc.type_tree_cxpromotionaction"/>
+				</explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="CxPromotionActionResult">
+		<!-- Base configuration -->
+		<context component="base"  merge-by="type" parent="CxAbstractActionResult" type="CxPromotionActionResult" >
+			<y:base>
+				<y:labels>
+					<y:label>pk + ", " + promotionId</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		
+		<!-- Editor area configuration -->
+		<context component="editor-area"  merge-by="type" parent="CxAbstractActionResult" type="CxPromotionActionResult" >
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="promotionId"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="CxPromotionAction">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" parent="CxAbstractAction" type="CxPromotionAction" >
+			<y:base>
+				<y:labels>
+					<y:label>promotionId</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		
+		<!-- List view configuration -->
+		<context component="listview" merge-by="type" parent="CxAbstractAction" type="CxPromotionAction">
+			<list-view:list-view>
+				<list-view:column qualifier="promotionId"/>
+			</list-view:list-view>
+		</context>
+	
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" merge-by="type" parent="CxAbstractAction" type="CxPromotionAction">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong"/>
+					<advanced-search:field name="promotionId" selected="false"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+	
+		<!-- Editor area configuration -->
+		<context component="editor-area"  merge-by="type" parent="CxAbstractAction" type="CxPromotionAction" >
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="promotionId" position="1"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	
+	
+		<!--   Simple search configuration -->
+		<context component="simple-search" merge-by="type" parent="CxAbstractAction" type="CxPromotionAction">
+			<simple-search:simple-search >
+				<simple-search:field name="promotionId"/>
+			</simple-search:simple-search>
+		</context>
+
+		<context component="create-wizard-no-save" merge-by="type" parent="CxAbstractAction" type="CxPromotionAction">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newAction" type="ctx.TYPE_CODE" />
+					<wz:assign property="newAction.target" value="'cxPromotionActionPerformable'"/>					
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newAction"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="target" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+		
+		<context component="create-wizard" merge-by="component" parent="create-wizard-no-save" type="CxPromotionAction">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newAction" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		
+	</context>
+
+</config>

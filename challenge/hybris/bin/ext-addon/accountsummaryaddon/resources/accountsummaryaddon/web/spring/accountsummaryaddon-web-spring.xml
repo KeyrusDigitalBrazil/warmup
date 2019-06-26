@@ -1,0 +1,77 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        ">
+
+	<context:component-scan base-package="de.hybris.platform.accountsummaryaddon.controllers"
+		scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<bean id="webLazyInitOverrideBeanFactoryPostProcessor" parent="lazyInitOverrideBeanFactoryPostProcessor" />
+
+	<bean id="listMergeBeanPostProcessor" class="de.hybris.platform.commerceservices.spring.config.ListMergeDirectiveBeanPostProcessor" />
+
+	<bean id="accountsummaryBeforeViewHandler" class="de.hybris.platform.accountsummaryaddon.interceptors.AccountSummaryBeforeViewHandler"/>
+
+	<bean id="accountsummaryBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="accountsummaryBeforeViewHandler" />
+	</bean>
+
+	<bean id="accountSummaryMyCompanyBreadcrumbBuilder" class="de.hybris.platform.accountsummaryaddon.breadcrumb.impl.AccountSummaryMyCompanyBreadcrumbBuilder">
+		<property name="messageSource" ref="storefrontMessageSource" />
+		<property name="i18nService" ref="i18nService" />
+	</bean>
+
+	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="accountsummaryPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter" />
+				<ref bean="dynamicTenantActivationFilter" />
+				<ref bean="sessionFilter" />
+				<ref bean="accountsummarySecureMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="accountsummarySecureMediaFilter" class="de.hybris.platform.b2bdocumentsfilter.B2BDocumentsSecureMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="secureMediaToken" value="securemedias" /><!-- securemedias is default but you may overwrite it -->
+		<aop:scoped-proxy />
+	</bean>
+	
+	<alias name="defaultDateCriteriaValidator" alias="dateCriteriaValidator"/>
+	<bean id="defaultDateCriteriaValidator" class="de.hybris.platform.accountsummaryaddon.document.criteria.validator.impl.DateCriteriaValidator"/>
+	
+	<alias name="defaultAmountCriteriaValidator" alias="amountCriteriaValidator"/>
+	<bean id="defaultAmountCriteriaValidator" class="de.hybris.platform.accountsummaryaddon.document.criteria.validator.impl.AmountCriteriaValidator"/>
+	
+ 	<util:map id="validatorMapping" map-class="java.util.HashMap" 
+			key-type="java.lang.String" value-type="de.hybris.platform.accountsummaryaddon.document.criteria.validator.CriteriaValidator">
+		<entry key="dateRange" value-ref="dateCriteriaValidator" />
+		<entry key="dueDateRange" value-ref="dateCriteriaValidator" />
+		<entry key="amountRange" value-ref="amountCriteriaValidator" />
+		<entry key="openAmountRange" value-ref="amountCriteriaValidator" />
+	</util:map>
+</beans>

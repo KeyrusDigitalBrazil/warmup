@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Configuration Spring beans -->
+
+	<alias name="defaultSmartEditConfigurationFacade" alias="smarteditConfigurationFacade"/>
+	<bean id="defaultSmartEditConfigurationFacade" class="de.hybris.platform.smarteditwebservices.configuration.facade.impl.DefaultSmarteditConfigurationFacade">
+		<property name="smarteditConfigurationService" ref="smarteditConfigurationService"/>
+		<property name="configurationModelToDataConverter" ref="smarteditConfigurationModelToDataConverter"/>
+		<property name="configurationDataToModelConverter" ref="smarteditConfigurationDataToModelConverter"/>
+		<property name="createConfigurationValidator" ref="baseConfigurationValidator"/>
+		<property name="updateConfigurationValidator" ref="updateConfigurationValidator"/>
+		<property name="facadeValidationService" ref="facadeValidationService"/>
+	</bean>
+
+	<alias name="defaultSmartEditConfigurationService" alias="smarteditConfigurationService"/>
+	<bean id="defaultSmartEditConfigurationService" class="de.hybris.platform.smarteditwebservices.configuration.service.impl.DefaultSmarteditConfigurationService">
+		<property name="smarteditConfigurationDao" ref="smarteditConfigurationDao"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultSmartEditConfigurationDao" alias="smarteditConfigurationDao"/>
+	<bean name="defaultSmartEditConfigurationDao" class="de.hybris.platform.smarteditwebservices.configuration.dao.impl.DefaultSmarteditConfigurationDao" >
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<!-- Configuration Populators -->
+	<bean id="smarteditConfigurationModelToDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.smarteditwebservices.data.ConfigurationData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="smarteditConfigurationModelToDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="smarteditConfigurationDataToModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.smarteditwebservices.model.SmarteditConfigurationModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="smarteditConfigurationDataToModelPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="smarteditConfigurationDataToModelPopulator"
+		  class="de.hybris.platform.smarteditwebservices.configuration.populator.SmarteditConfigurationDataToModelPopulator"/>
+
+	<bean id="smarteditConfigurationModelToDataPopulator"
+		  class="de.hybris.platform.smarteditwebservices.configuration.populator.SmarteditConfigurationModelToDataPopulator"/>
+
+
+	<!-- Configuration Validators -->
+	<bean id="baseConfigurationValidator" class="de.hybris.platform.smarteditwebservices.configuration.validator.BaseConfigurationValidator"/>
+	<bean id="updateConfigurationValidator" class="de.hybris.platform.smarteditwebservices.configuration.validator.UpdateConfigurationValidator"/>
+
+
+	<!-- Internationalization (i18n) Facade -->
+	<alias alias="smarteditI18nFacade" name="defaultSmarteditI18nFacade" />
+	<bean id="defaultSmarteditI18nFacade" class="de.hybris.platform.smarteditwebservices.i18n.facade.impl.DefaultSmarteditI18nFacade">
+		<property name="l10nService" ref="l10nService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="smarteditLanguageConverter" ref="smarteditLanguageConverter" />
+		<property name="smarteditConfigurationFacade" ref="smarteditConfigurationFacade"/>
+		<property name="smarteditLanguageDataComparator" ref="smarteditLanguageDataComparator" />
+	</bean>
+	
+	<alias name="defaultSmarteditLanguageConverter" alias="smarteditLanguageConverter"/>
+
+	<bean id="defaultSmarteditLanguageConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.smarteditwebservices.data.SmarteditLanguageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="smarteditLanguagePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultSmarteditLanguagePopulator" alias="smarteditLanguagePopulator"/>
+	<bean id="defaultSmarteditLanguagePopulator" class="de.hybris.platform.smarteditwebservices.i18n.facade.populator.SmarteditLanguagePopulator" />
+	
+	<alias name="defaultSmarteditLanguageDataComparator" alias="smarteditLanguageDataComparator" />
+	<bean id="defaultSmarteditLanguageDataComparator" class="de.hybris.platform.smarteditwebservices.i18n.comparator.SmarteditLanguageDataIsoCodeComparator">
+		<property name="nullIsLess" value="true" />
+	</bean>
+
+
+	<!-- Authentication -->
+	<alias name="defaultSmarteditAuthenticatedUserDataConverter" alias="authenticatedUserDataConverter" />
+	<bean id="defaultSmarteditAuthenticatedUserDataConverter" parent="abstractPopulatingConverter"
+		  p:targetClass="de.hybris.platform.smarteditwebservices.data.SmarteditAuthenticatedUserData"
+		  p:populators-ref="authenticatedUserDataPopulatorList" />
+
+  <bean id="smarteditAuthenticatedUserDataPopulatorList" depends-on="authenticatedUserDataPopulatorList" parent="listMergeDirective">
+    <property name="fieldName" value="populators" />
+    <property name="add" ref="smarteditUserUidPopulator"/>
+  </bean>
+
+  <alias name="defaultSmarteditUserUidPopulator" alias="smarteditUserUidPopulator" />
+  <bean id="defaultSmarteditUserUidPopulator" class="de.hybris.platform.smarteditwebservices.oauth2.populator.UserUidPopulator" />
+
+</beans>

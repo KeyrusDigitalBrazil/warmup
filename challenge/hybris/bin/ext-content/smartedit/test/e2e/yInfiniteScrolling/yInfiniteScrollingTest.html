@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="../../../../../" />
+
+    <!--3rd prty libs-->
+    <script src="../../../web/webroot/static-resources/dist/smartedit/js/thirdparties.js"></script>
+    <script src="../../../web/webroot/static-resources/thirdparties/ckeditor/ckeditor.js"></script>
+
+    <!-- 3rd party css -->
+    <link rel="stylesheet"
+        href="../../../web/webroot/static-resources/dist/smartedit/css/outer-styling.css">
+
+    <script src="../../../web/webroot/static-resources/smarteditloader/js/smarteditloader.js"></script>
+    <script src="../../../web/webroot/static-resources/smarteditcontainer/js/smarteditcontainer.js"></script>
+
+    <script src="/test/e2e/yInfiniteScrolling/yInfiniteScrollingApp.js"></script>
+    <script src="/test/e2e/yInfiniteScrolling/backendMocks.js"></script>
+
+    <style>
+    body {
+        height: 250px;
+    }
+
+    .infContainer {
+        overflow-y: scroll;
+        max-height: 240px;
+        width: 600px;
+        border-style: solid;
+    }
+
+    .repeaterTemplate {
+        height: 40px;
+        border-style: solid;
+        border-color: green;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        text-align: center;
+    }
+    </style>
+</head>
+
+<body data-ng-app="yInfiniteScrollingApp"
+    data-ng-controller="defaultController as ctrl">
+
+    <input type="text"
+        name="srch-term"
+        ng-model="ctrl.searchTerm"
+        placeholder="Please enter text to filter">
+    <div class="infContainer">
+        <y-infinite-scrolling data-drop-down-container-class="infContainer"
+            data-page-size="ctrl.pageSize"
+            data-mask="ctrl.searchTerm"
+            data-fetch-page="ctrl.loadItems"
+            data-context="ctrl">
+            <div class="repeaterTemplate"
+                data-ng-repeat="item in ctrl.items">
+                {{item.id}} : {{item.name}}
+            </div>
+        </y-infinite-scrolling>
+    </div>
+
+</body>
+
+</html>

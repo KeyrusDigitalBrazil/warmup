@@ -1,0 +1,16 @@
+package de.hybris.platform.ruleengine.drools;
+
+import de.hybris.platform.ruleengine.test.Fibonacci
+
+rule "${rule_uuid}"
+@ruleCode("${rule_code}")
+@moduleName("${module_name}")
+dialect "mvel"
+salience 10
+when
+    f : Fibonacci ( value == -1 )
+           not ( Fibonacci ( sequence == 1 ) )
+then
+   inSert( new Fibonacci( f.sequence - 1 ) );
+           System.out.println( "recurse for " + f.getSequence() );
+end

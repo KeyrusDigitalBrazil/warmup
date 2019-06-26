@@ -1,0 +1,23 @@
+#******************************************#
+#************  OAuth CredentialS **********#
+#******************************************#
+INSERT_UPDATE OAuthClientDetails; clientId[unique = true]; oAuthUrl; scope
+; ommReturnSampleClientId ; https://test.sap.hana.ondemand.com/oauth2/api/v1/token
+INSERT_UPDATE ExposedOAuthCredential; id[unique = true]   ; oAuthClientDetails(clientId); password
+; ommReturnOauthCredential ; ommReturnSampleClientId ; samplePassword
+
+#**********************************#
+#************  Endpoints  *********#
+#**********************************#
+INSERT_UPDATE Endpoint; id[unique = true]; version[unique = true]; specUrl; name
+; SAPCpiOutboundReturnOrdersEndpoint             ; unknown ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-RETURN-ORDERS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP;v=1/";SAPCpiOutboundReturnOrdersEndpoint
+
+
+INSERT_UPDATE DestinationTarget; id[unique=true]
+; scpiOmmReturnOutboundDestination
+
+#**********************************************#
+#************  Consumed Destinations  *********#
+#**********************************************#
+INSERT_UPDATE ConsumedDestination; id[unique = true]; url; endpoint(id, version); credential(id); destinationTarget(id); additionalProperties
+; scpiReturnOrderDestination             ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-RETURN-ORDERS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP;v=1/SAPCpiOutboundReturnOrders" ; SAPCpiOutboundReturnOrdersEndpoint:unknown             ; ommReturnOauthCredential ; scpiOmmReturnOutboundDestination

@@ -1,0 +1,125 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# (Confidential Information). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$destination_target=kymaDefault
+
+$commerce_host=https://my.hybrisplatform.fqn[:port]
+
+# Import config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$commerce_host=$config-deployment.api.endpoint
+
+INSERT_UPDATE OpenIDClientDetails;clientId[unique=true];resourceIds;scope;authorizedGrantTypes;authorities;registeredRedirectUri;externalScopeClaimName;issuer;oAuthUrl;&id
+;kyma ;hybris;basic,email,profile,openid;refresh_token,authorization_code,implicit,client_credentials,password;ROLE_TRUSTED_CLIENT;"http://your.fqn.callbacker[:port]/callback";scope;$commerce_host;$commerce_host/authorizationserver/oauth/token;kyma
+
+INSERT_UPDATE OpenIDExternalScopes;code[unique=true];clientDetailsId(clientId)[allownull=true,forceWrite=true];permittedPrincipals(uid);scope
+;kyma_editor;kyma;hac_platform_configuration;hybris.tenant=ecopenid,hybris.product_create,hybris.product_update,hybris.product_delete,hybris.product_read_unpublished
+;kyma_reader;kyma;hac_platform_license;hybris.tenant=ecopenid,hybris.product_read_unpublished
+;kyma_admin;kyma;hac_editor;hybris.product_delete_all,hybris.product_read_unpublished
+
+INSERT_UPDATE ExposedOAuthCredential;id[unique=true];oAuthClientDetails(clientId)
+"#% afterEach:
+import de.hybris.platform.core.Registry;
+
+systemSetup = Registry.getApplicationContext().getBean(""kymaIntegrationSampleDataSystemSetup"");
+
+clientId = line.get(2);
+systemSetup.saveClientSecretForClientDetails(clientId, impex.getLastImportedItem());"
+;kymaCred;kyma
+
+INSERT_UPDATE Endpoint;id[unique=true];name;version[unique=true];description;specUrl;specData;extensionName
+"#%beforeEach:
+import de.hybris.platform.core.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+Logger LOG = LoggerFactory.getLogger(""ImpExImportReader"");
+extensionNames = Registry.getCurrentTenant().getTenantSpecificExtensionNames();
+
+extensionName = line.get(7);
+endpointId = line.get(1);
+    if(!StringUtils.isEmpty(extensionName) && !extensionNames.contains(extensionName))
+    {
+        LOG.info(""Endpoint [{}] was skipped because the extension [{}] containing the endpoint is not included in the setup"", endpointId, extensionName);
+        line.clear();
+    }
+"
+;ec-ycommercewebservices;EC OCC Commerce Webservices v2;v2;"EC OCC Commerce Webservices v2";$commerce_host/rest/v2/api-docs;;ycommercewebservices
+;ec-assistedservicewebservices;EC Assisted Service Module Webservices v2;v2;"EC Assisted Service Module Webservices v2";$commerce_host/assistedservicewebservices/v2/api-docs;;assistedservicewebservices
+;ec-all-events;EC Events v1;v1;"EC Events v1";"empty";;
+;kyma-events;Events Endpoint v1;v1;"EventsEndpoint";"empty";;
+;kyma-services;Metadata Services Endpoint v1;v1;"MetadataServicesEndpoint";"empty";;
+;ec-b2ctelcowebservices;B2C Telco Webservices v1;v1;"B2C Telco Webservices v1";$commerce_host/b2ctelcowebservices/v1/api-docs;;b2ctelcowebservices
+;ec-ordermanagementwebservices;Order Management Webservices v1;v1;"Order Management Webservices v1";$commerce_host/ordermanagementwebservices/api-docs;;ordermanagementwebservices
+;ec-warehousingwebservices;Warehousing Webservices v1;v1;"Warehousing Webservices v1";$commerce_host/warehousingwebservices/api-docs;;warehousingwebservices
+;ec-permissionswebservices;Permission Webservices v1;v1;"Permission Webservices v1";$commerce_host/permissionswebservices/api-docs;;permissionswebservices
+;ec-personalizationwebservices;Personalization Webservices v1;v1;"Personalization Webservices v1";$commerce_host/personalizationwebservices/api-docs;;personalizationwebservices
+;ec-previewwebservices;Preview Webservices v1;v1;"Preview Webservices v1";$commerce_host/previewwebservices/api-docs;;previewwebservices
+;ec-couponwebservices;Coupon Webservices v1;v1;"Coupon Webservices v1";$commerce_host/couponwebservices/api-docs;;couponwebservices
+;ec-sapymktrecommendationwebservices;SAP YMKT Recommendations Webservices v1 ;v1;"SAP YMKT Recommendations Webservices v1";$commerce_host/sapymktrecommendationwebservices/v1/api-docs;;sapymktrecommendationwebservices
+;ec-sapymktsegmentationwebservices;SAP YKMT Segmentation Webservices v1;v1;"SAP YKMT Segmentation Webservices v1";$commerce_host/sapymktsegmentationwebservices/v1/api-docs;;sapymktsegmentationwebservices
+;ec-adaptivesearchwebservices;Adaptive Search Webservices v1;v1;"Adaptive Search Webservices v1";$commerce_host/adaptivesearchwebservices/api-docs;;adaptivesearchwebservices
+;ec-cmssmarteditwebservices;CMS Smart Edit Webservices v1;v1;"CMS Smart Edit Webservices v1";$commerce_host/cmssmarteditwebservices/api-docs;;cmssmarteditwebservices
+;ec-smarteditwebservices;Smart Edit Webservices v1;v1;"Smart Edit Webservices v1";$commerce_host/smarteditwebservices/api-docs;;smarteditwebservices
+;ec-cmswebservices;CMS Webservices v1;v1;"CMS Webservices v1";$commerce_host/cmswebservices/api-docs;;cmswebservices
+;ec-adminapi;Platform Admin API v2;v2;"Platform Admin API v2";$commerce_host/adminapi/api-docs;;adminapi
+
+INSERT_UPDATE DestinationTarget;id[unique=true];destinationChannel(code)[default=KYMA]
+;$destination_target;
+
+
+INSERT_UPDATE ExposedDestination;id[unique=true];url;endpoint(id)[unique=true];additionalProperties(key,value)[map-delimiter=|];destinationTarget(id)[default=$destination_target];active[default=true];credential(id)
+"#%beforeEach:
+import  de.hybris.platform.servicelayer.search.FlexibleSearchQuery;
+import de.hybris.platform.core.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+Logger LOG = LoggerFactory.getLogger(""ImpExImportReader"");
+
+lineEndpoint = line.get(3);
+
+flexibleSearchService = Registry.getApplicationContext().getBean(""flexibleSearchService"");
+query = ""SELECT {PK} from {Endpoint} WHERE {id}='"" + lineEndpoint + ""'""  ;
+flexibleSearchQuery = new FlexibleSearchQuery(query);
+result = flexibleSearchService.search(flexibleSearchQuery).getResult();
+
+if(result.isEmpty())
+{
+    LOG.info(""ExposedDestination [{}] was skipped because the endpoint [{}] which belongs to the destination was skipped"", line.get(1), lineEndpoint);
+    line.clear();
+    break;
+}"
+;ec-assistedservicewebservices;$commerce_host/assistedservicewebservices;ec-assistedservicewebservices;;;;kymaCred
+;ec-ycommercewebservices;$commerce_host/rest/v2;ec-ycommercewebservices;;;;kymaCred
+;ec-all-events;"empty";ec-all-events;;;;
+;ec-b2ctelcowebservices;$commerce_host/b2ctelcowebservices;ec-b2ctelcowebservices;;;;kymaCred
+;ec-ordermanagementwebservices;$commerce_host/ordermanagementwebservices;ec-ordermanagementwebservices;;;;kymaCred
+;ec-warehousingwebservices;$commerce_host/warehousingwebservices;ec-warehousingwebservices;;;;kymaCred
+;ec-permissionswebservices;$commerce_host/permissionswebservices;ec-permissionswebservices;;;;kymaCred
+;ec-personalizationwebservices;$commerce_host/personalizationwebservices;ec-personalizationwebservices;;;;kymaCred
+;ec-previewwebservices;$commerce_host/previewwebservices;ec-previewwebservices;;;;kymaCred
+;ec-couponwebservices;$commerce_host/couponwebservices;ec-couponwebservices;;;;kymaCred
+;ec-sapymktrecommendationwebservices;$commerce_host/sapymktrecommendationwebservices/v1;ec-sapymktrecommendationwebservices;;;;kymaCred
+;ec-sapymktsegmentationwebservices;$commerce_host/sapymktsegmentationwebservices/v1;ec-sapymktsegmentationwebservices;;;;kymaCred
+;ec-adaptivesearchwebservices;$commerce_host/adaptivesearchwebservices;ec-adaptivesearchwebservices;;;;kymaCred
+;ec-cmssmarteditwebservices;$commerce_host/cmssmarteditwebservices;ec-cmssmarteditwebservices;;;;kymaCred
+;ec-smarteditwebservices;$commerce_host/smarteditwebservices;ec-smarteditwebservices;;;;kymaCred
+;ec-cmswebservices;$commerce_host/cmswebservices;ec-cmswebservices;;;;kymaCred
+;ec-adminapi;$commerce_host/adminapi;ec-adminapi;;;;kymaCred
+
+
+INSERT_UPDATE ConsumedCertificateCredential;id[unique=true]
+;kyma-cert
+
+INSERT_UPDATE ConsumedDestination;id[unique=true];url;endpoint(id)[unique=true];additionalProperties(key,value)[map-delimiter=|];destinationTarget(id)[default=$destination_target];active[default=true];credential(id)
+;kyma-events;https://my.event.url;kyma-events;;;;kyma-cert
+;kyma-services;https://my.service.url;kyma-services;;;;kyma-cert

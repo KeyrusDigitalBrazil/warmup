@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Contributors -->
+	<alias name="sapOmsOrderEntryContributor" alias="sapOrderEntryContributor" />
+	<bean id="sapOmsOrderEntryContributor"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsOrderEntryContributor" parent="defaultSapOrderEntryContributor" >
+		<property name="sapVendorService" ref="sapVendorService" />
+	</bean>
+	
+	<alias name="sapOmsSalesConditionsContributor" alias="sapSalesConditionsContributor" />
+	<bean id="sapOmsSalesConditionsContributor"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsSalesConditionsContributor"
+		parent="defaultSapSalesConditionsContributor" />
+
+	<alias name="sapOmsOrderContributor" alias="sapOrderContributor" />
+	<bean id="sapOmsOrderContributor"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsOrderContributor" parent="defaultSapOrderContributor"/>
+
+	<alias name="sapOmsOrderCancelRequestContributor" alias="sapOrderCancelRequestContributor" />
+	<bean id="sapOmsOrderCancelRequestContributor"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsOrderCancelRequestContributor" parent="defaultSapOrderCancelRequestContributor">
+		<property name="sapPlantLogSysOrgService" ref="sapPlantLogSysOrgService" />
+	</bean>
+
+	<alias name="sapOmsVendorContributor" alias="sapPartnerContributor" />
+	<bean id="sapOmsVendorContributor"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsVendorContributor"
+		parent="defaultSapPartnerContributor">
+		<property name="sapVendorService" ref="sapVendorService" />
+	</bean>
+
+	<!-- Helpers -->
+	<alias name="sapOmsDataHubInboundHelper" alias="sapDataHubInboundHelper" />
+	<bean id="sapOmsDataHubInboundHelper"
+		class="de.hybris.platform.sap.saporderexchangeoms.datahub.inbound.impl.SapOmsDataHubInboundHelper"
+		parent="sapAbstractDataHubOrderInboundHelper" />
+
+	<alias name="sapOmsDataHubInboundOrderHelper" alias="sapDataHubInboundOrderHelper" />
+	<bean id="sapOmsDataHubInboundOrderHelper"
+		class="de.hybris.platform.sap.saporderexchangeoms.datahub.inbound.impl.SapOmsDataHubInboundOrderHelper"
+		parent="defaultSapDataHubInboundOrderHelper" />
+
+	<alias name="sapOmsDataHubInboundStockLevelHelper" alias="sapDataHubInboundStockLevelHelper" />
+	<bean id="sapOmsDataHubInboundStockLevelHelper"
+		  class="de.hybris.platform.sap.saporderexchangeoms.datahub.inbound.impl.SapOmsDataHubInboundStockLevelHelper">
+		<property name="modelService" ref="modelService"/>
+		<property name="inventoryEventService" ref="inventoryEventService"/>
+		<property name="commerceStockLevelCalculationStrategy" ref="commerceStockLevelCalculationStrategy"/>
+	</bean>
+
+	<!-- Services -->
+	<alias name="sapOmsSetCancelledStrategy" alias="setCancellledStrategy" />
+	<bean id="sapOmsSetCancelledStrategy"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsSetCancelledStrategy">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="sapOmsOrderCancelService" alias="sapOrderexchangeOrderCancelService" />
+	<bean id="sapOmsOrderCancelService"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsOrderCancelService"
+		parent="sapOrderexchangeDefaultOrderCancelService" />
+
+	<alias name="sapOmsOrderCancelStateMappingStrategy" alias="orderCancelStateMappingStrategy" />
+	<bean id="sapOmsOrderCancelStateMappingStrategy"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsOrderCancelStateMappingStrategy"
+		scope="prototype" />
+
+	<alias alias="orderCancelCallbackService" name="sapOmsOrderCancelCallbackService" />
+	<bean id="sapOmsOrderCancelCallbackService"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsOrderCancelCallbackService"
+		scope="tenant" parent="defaultOrderCancelService" />
+
+	<alias alias="sapConsignmentCancellationService" name="sapOmsConsignmentCancellationService" />
+	<bean id="sapOmsConsignmentCancellationService"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsConsignmentCancellationService"
+		parent="defaultConsignmentCancellationService" />
+
+	<alias alias="omsWarehouseResponseExecutor" name="sapOmsWarehouseResponseExecutor" />
+	<bean id="sapOmsWarehouseResponseExecutor"
+		class="de.hybris.platform.sap.saporderexchangeoms.cancellation.SapOmsWarehouseResponseExecutor"
+		scope="prototype">
+		<property name="modelService" ref="modelService" />
+		<property name="orderCancelRecordsHandler" ref="orderCancelRecordsHandler" />
+		<property name="completeCancelStatusChangeStrategy" ref="setCancellledStrategy" />
+		<property name="partialCancelStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="warehouseDenialStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="warehouseErrorStatusChangeStrategy" ref="restorePreviousOrderStatusStrategy" />
+		<property name="omsOrderCancelService" ref="omsOrderCancelService" />
+		<property name="paymentServiceAdapter" ref="OmsOrderCancelPaymentServiceAdapter" />
+		<property name="notificationServiceAdapter" ref="OmsOrderCancelNotificationServiceAdapter" />
+		<property name="consignmentCancellationService" ref="consignmentCancellationService" />
+		<property name="sapConsignmentCancellationService" ref="sapConsignmentCancellationService" />
+	</bean>
+
+	<alias name="sapOmsVendorService" alias="sapVendorService" />
+	<bean id="sapOmsVendorService"
+		class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsVendorService" />
+   
+    <alias name="sapOmsSendOrderToDataHubHelper" alias="sapOrderexchangeSendOrderToDataHubHelper" />
+	<bean id="sapOmsSendOrderToDataHubHelper" class="de.hybris.platform.sap.saporderexchangeoms.outbound.impl.SapOmsSendOrderToDataHubHelper"
+		parent="sapOrderexchangeDefaultSendOrderToDataHubHelper">
+	    <property name="sapS4HanaFeed" value="${saporderexchangeoms.orderoutbound.datahub.s4hana.feed}"></property>	
+	</bean>
+
+
+	<alias name="sapOmsSendOrderToDataHubAction" alias="sapOmsSendOrderAction" />
+	<bean id="sapOmsSendOrderToDataHubAction" class="de.hybris.platform.sap.saporderexchangeoms.actions.SapOmsSendOrderToDataHubAction"
+		  parent="abstractAction">
+		<property name="sendOrderToDataHubHelper" ref="sapOrderexchangeSendOrderToDataHubHelper"></property>
+		<property name="retryDelay" value="${saporderexchange.orderoutbound.retryDelay}"></property>
+		<property name="maxRetries" value="${saporderexchange.orderoutbound.maxRetries}"></property>
+		<property name="modelService" ref="modelService"/>
+		<property name="orderHistoryService" ref="orderHistoryService"/>
+		<property name="orderService" ref="orderService"/>
+		<property name="sapPlantLogSysOrgService" ref="sapPlantLogSysOrgService" />
+		<property name="timeService" ref="timeService" />
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+</beans>

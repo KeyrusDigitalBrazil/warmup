@@ -1,0 +1,76 @@
+<div id="editConfigurationsBody"
+    class="ySEConfigBody">
+    <form name="form.configurationForm"
+        novalidate
+        data-ng-submit="editor.submit(form.configurationForm)">
+        <button class="y-add-btn y-se-add-key-value__button"
+            type="button"
+            data-ng-click="editor.addEntry(); ">
+            <span class="hyicon hyicon-add "></span>
+            <span class="y-add-btn__text">{{'se.general.configuration.add.button' | translate}}</span>
+        </button>
+
+        <label for=""
+            class="control-label y-se-add-key-value__label">{{'se.configurationform.label.keyvalue' | translate}}</label>
+
+        <div class="ySECfgEntity form-group"
+            data-ng-repeat="entry in editor.filterConfiguration() "
+            data-ng-mouseenter="mouseenter() "
+            data-ng-mouseout="mouseout() ">
+
+            <div class="ySECfgEntity__data">
+
+                <div class="ySECfgEntity__key">
+                    <input type="text "
+                        data-ng-class="{'has-error':entry.errors.keys.length>0}"
+                        name="{{entry.key}}_key"
+                        placeholder="{{'se.configurationform.header.key.name' | translate}}"
+                        data-ng-model="entry.key"
+                        data-ng-required="true"
+                        data-ng-disabled="!entry.isNew"
+                        class="form-control ySECfgEntity__input"
+                        title="{{entry.key}}" />
+                    <span id="{{entry.key}}_error_{{$index}}"
+                        data-ng-if="entry.errors.keys"
+                        data-ng-repeat="error in entry.errors.keys"
+                        class="error-input help-block">
+                        {{error.message|translate}}
+                    </span>
+                </div>
+                <div class="ySECfgEntity__value">
+                    <textarea data-ng-class="{'has-error':entry.errors.values.length>0}"
+                        name="{{entry.key}}_value"
+                        ng-attr-placeholder="{{'se.configurationform.header.value.name' | translate}}"
+                        data-ng-model="entry.value"
+                        data-ng-required="true"
+                        class="form-control ySECfgEntity__textarea"
+                        data-ng-change="editor._validateUserInput(entry)"></textarea>
+                    <div data-ng-if="entry.requiresUserCheck">
+                        <input id="{{entry.key}}_absoluteUrl_check_{{$index}}"
+                            type="checkbox"
+                            data-ng-model="entry.isCheckedByUser" />
+                        <span id="{{entry.key}}_absoluteUrl_msg_{{$index}}"
+                            class="ng-class:{'warning-check-msg':true, 'not-checked':entry.hasErrors && !entry.isCheckedByUser}">{{'se.configurationform.absoluteurl.check' | translate}}</span>
+                    </div>
+
+                    <span id="{{entry.key}}_error_{{$index}}"
+                        data-ng-if="entry.errors.values"
+                        data-ng-repeat="error in entry.errors.values"
+                        class="error-input help-block">
+                        {{error.message|translate}}
+                    </span>
+                </div>
+
+            </div>
+
+            <button type="button"
+                id="{{entry.key}}_removeButton_{{$index}}"
+                class="btn btn-subordinate ySECfgEntity__remove-button"
+                data-ng-click="editor.removeEntry(entry, form.configurationForm);">
+                <span class="hyicon hyicon-remove"
+                    aria-hidden="true">
+                </span>
+            </button>
+        </div>
+    </form>
+</div>

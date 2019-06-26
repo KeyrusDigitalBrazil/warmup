@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+        xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+	<!-- couponbackoffice UI configuration should be provided here -->
+
+	<!--<context component="component-code" module="couponbackoffice">-->
+		<!--Please check documentation for code snippets for specific components-->
+	<!--</context>-->
+	
+	<context merge-by="module" parent="auto" component="explorer-tree">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:navigation-node id="hmc_treenode_marketing">
+			   <explorer-tree:navigation-node id="hmc_treenode_coupon_management">
+					<explorer-tree:type-node id="hmc_typenode_coupons" code="AbstractCoupon"/>
+					<explorer-tree:type-node id="hmc_typenode_coupon_code_generation_config" code="CodeGenerationConfiguration"/>
+					<explorer-tree:type-node id="hmc_type_tree_coupon_redemption" code="CouponRedemption"/>
+			   </explorer-tree:navigation-node>
+ 			   <explorer-tree:type-node id="hmc_type_tree_voucher" merge-mode="remove"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+       <context merge-by="module" parent="auto" component="explorer-tree" principal="marketingmanagerrole">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:navigation-node id="hmc_treenode_marketing">
+			   <explorer-tree:navigation-node id="hmc_treenode_coupon_management">
+					<explorer-tree:type-node id="hmc_typenode_coupons" code="AbstractCoupon"/>
+					<explorer-tree:type-node id="hmc_typenode_coupon_code_generation_config" code="CodeGenerationConfiguration"/>
+					<explorer-tree:type-node id="hmc_type_tree_coupon_redemption" code="CouponRedemption"/>
+			   </explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+
+	<context merge-by="module" type="AbstractOrder" component="editor-area">
+		<context merge-by="module" type="AbstractOrder" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:customTab name="hmc.tab.abstractorder.coupons" spring-bean="couponsTabEditorAreaRenderer"/>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+
+	<context merge-by="module" type="Cart" component="editor-area">
+		<context merge-by="module" type="AbstractOrder" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="hmc.tab.abstractorder.vouchers" merge-mode="remove"/>
+				<editorArea:customTab name="hmc.tab.abstractorder.coupons" spring-bean="couponsTabEditorAreaRenderer"/>
+			</editorArea:editorArea>
+		</context>
+	</context>
+	
+	<context type="AbstractCoupon">
+
+		<context merge-by="type" parent="GenericItem" component="listviewactions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+						<y:parameter>
+							<y:name>targetComponent</y:name>
+							<y:value>editorArea</y:value>
+						</y:parameter>
+						<y:parameter>
+							<y:name>initializeEntity</y:name>
+							<y:value>true</y:value>
+						</y:parameter>
+					</y:action>
+				</y:group>
+			</y:actions>
+		</context>
+	
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="couponId" />
+				<list-view:column qualifier="name" />
+				<list-view:column qualifier="startDate" />
+				<list-view:column qualifier="endDate" />
+				<list-view:column qualifier="active" />
+				<list-view:column qualifier="itemtype" />
+			</list-view:list-view>
+		</context>
+		
+		<context merge-by="type" parent="GenericItem" component="simple-search">
+			<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+				<simple-search:field xmlns="http://www.hybris.com/cockpitng/config/simplesearch" name="couponId"/>
+				<simple-search:field xmlns="http://www.hybris.com/cockpitng/config/simplesearch" name="name"/>
+			</simple-search:simple-search>
+		</context>
+	
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="couponId"/>
+					<advanced-search:field name="name"/>
+					<advanced-search:field name="startDate" editor="com.hybris.cockpitng.editor.defaultdate"/>
+					<advanced-search:field name="endDate" editor="com.hybris.cockpitng.editor.defaultdate"/>
+					<advanced-search:field name="active" editor="com.hybris.cockpitng.editor.defaultboolean"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+			
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>(name?:'')+' ['+couponId+']'</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context component="editorAreaDynamicForms" merge-by="type">
+			<df:dynamicForms xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms">
+				<df:attribute id="disabledCouponId" triggeredOn="active" qualifier="couponId" disabledIf="active" />
+				<df:attribute id="disabledCodeGenerationConfiguration" triggeredOn="active" qualifier="codeGenerationConfiguration" disabledIf="active" />
+			</df:dynamicForms>
+		</context>
+   	</context>
+   	
+
+	<context type="SingleCodeCoupon">
+
+		<context merge-by="type" parent="AbstractCoupon" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="maxTotalRedemptions"/>
+					<advanced-search:field name="maxRedemptionsPerCustomer"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+			
+		<context merge-by="type" parent="AbstractCoupon" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea" xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+      			<editorArea:essentials>
+        			<editorArea:essentialSection description="hmc.text.singlecodecoupon.common" name="text.couponcode.label">
+          				  <editorArea:attribute qualifier="couponId"/>
+          				  <editorArea:attribute qualifier="name"/>
+					</editorArea:essentialSection>
+	 			</editorArea:essentials>
+      			<editorArea:tab name="tab.configuration.coupon">
+        			<editorArea:section name="sec.configuration.coupon.validity" position="0">
+				          <editorArea:attribute qualifier="maxRedemptionsPerCustomer"/>
+				          <editorArea:attribute qualifier="maxTotalRedemptions"/>
+				          <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="startDate">
+							  <editorArea:editor-parameter>
+								  <name>dateFormat</name>
+								  <value>MMM dd, yyyy h:mm a</value>
+							  </editorArea:editor-parameter>
+						  </editorArea:attribute>
+				          <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="endDate">
+							  <editorArea:editor-parameter>
+								  <name>dateFormat</name>
+								  <value>MMM dd, yyyy h:mm a</value>
+							  </editorArea:editor-parameter>
+						  </editorArea:attribute>
+				          <editorArea:attribute qualifier="active"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+	
+	<context type="MultiCodeCoupon">
+	
+		<context merge-by="type" parent="AbstractCoupon" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea" xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+      			<editorArea:essentials>
+        			<editorArea:essentialSection description="hmc.text.multicodecoupon.common" name="text.couponcode.label">
+				          <editorArea:attribute qualifier="couponId"/>
+				          <editorArea:attribute qualifier="name"/>
+				          <editorArea:attribute qualifier="codeGenerationConfiguration"/>
+					</editorArea:essentialSection>			
+        		</editorArea:essentials>
+      			<editorArea:tab name="tab.configuration.coupon">
+        			<editorArea:section name="sec.configuration.coupon.validity" position="0">
+				          <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="startDate">
+							  <editorArea:editor-parameter>
+								  <name>dateFormat</name>
+								  <value>MMM dd, yyyy h:mm a</value>
+							  </editorArea:editor-parameter>
+						  </editorArea:attribute>
+				          <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="endDate">
+							  <editorArea:editor-parameter>
+								  <name>dateFormat</name>
+								  <value>MMM dd, yyyy h:mm a</value>
+							  </editorArea:editor-parameter>
+						  </editorArea:attribute>
+				          <editorArea:attribute qualifier="active"/>
+					</editorArea:section>
+					<editorArea:section  name="text.generatedcouponcode.label" position="1">
+          				 <editorArea:attribute xmlns="http://www.hybris.com/cockpitng/component/editorArea" qualifier="generatedCodes" editor="de.hybris.platform.coupon.backoffice.cockpitng.editor.defaultinseteditor" readonly="true">
+								<editorArea:editor-parameter>
+									<editorArea:name>editor</editorArea:name>
+									<editorArea:value>com.hybris.cockpitng.editor.couponcodelisteditor</editorArea:value>
+								</editorArea:editor-parameter>
+								<editorArea:editor-parameter>
+									<editorArea:name>insetBean</editorArea:name>
+									<editorArea:value>multiCodeCouponGeneratorInset</editorArea:value>
+								</editorArea:editor-parameter>
+								<editorArea:editor-parameter>
+									<editorArea:name>insertMode</editorArea:name>
+									<editorArea:value>after</editorArea:value>
+								</editorArea:editor-parameter>
+								<editorArea:editor-parameter>
+									<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+									<editorArea:value>true</editorArea:value>
+								</editorArea:editor-parameter>
+							</editorArea:attribute>
+        			</editorArea:section>  
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+					<editorArea:section name="hmc_typenode_coupon_code_generation_config">
+						<editorArea:attribute qualifier="alphabet" readonly="true"/>
+						<editorArea:attribute qualifier="signature" readonly="true"/>
+						<editorArea:attribute qualifier="couponCodeNumber" readonly="true"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="codeGenerationConfiguration" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+        <context type="MultiCodeCoupon" component="editorAreaDynamicForms" merge-by="type">
+			<df:dynamicForms xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms">
+				<df:attribute id="disabledMultiCodeCouponCodeGenerationConfiguration" triggeredOn="generatedCodes" qualifier="codeGenerationConfiguration" disabledIf="!generatedCodes.isEmpty()" />
+				<df:attribute id="disabledGeneratedCodes" triggeredOn="active" qualifier="generatedCodes" disabledIf="generatedCodes.isEmpty()" />
+				<df:attribute id="disabledPrefixNotEmptyGeneratedCodes" triggeredOn="generatedCodes" qualifier="prefix" disabledIf="!generatedCodes.isEmpty()" />
+				<df:attribute id="disabledPrefixActive" triggeredOn="active" qualifier="prefix" disabledIf="active" />
+			</df:dynamicForms>
+		</context>
+	</context>
+	
+	<context type="CodeGenerationConfiguration">
+
+		<context merge-by="type" parent="GenericItem" component="listviewactions"/>
+
+	   	<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" refresh-after-object-creation="true">
+				<list-view:column qualifier="name"/>
+				<list-view:column qualifier="codeSeparator"/>
+				<list-view:column qualifier="couponPartCount"/>
+				<list-view:column qualifier="couponPartLength"/>
+			</list-view:list-view>
+		</context>
+		
+		<context merge-by="type" parent="GenericItem" component="simple-search">
+			<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+				<simple-search:field name="name"/>
+			</simple-search:simple-search>
+		</context>
+		
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="name"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+			
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>name</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		
+	   <context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential" description="hmc.text.codegenerationconfiguration.common">
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+					<editorArea:tab name="tab.configuration.code.generation">
+						<editorArea:section name="sec.configuration.code.generation" position="0">
+							<editorArea:attribute qualifier="name"/>
+							<editorArea:attribute qualifier="codeSeparator"/>
+							<editorArea:attribute qualifier="couponPartCount"/>
+							<editorArea:attribute qualifier="couponPartLength"/>
+						</editorArea:section>
+					</editorArea:tab>
+			</editorArea:editorArea>
+	   </context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="CodeGenerationConfigurationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="codeGenerationConfigurationPrepare">
+					<wz:initialize property="newCodeGenerationConfiguration" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCodeGenerationConfiguration">
+							<wz:property qualifier="name" type="java.lang.String" />
+							<wz:property qualifier="codeSeparator" type="java.lang.String" />
+							<wz:property qualifier="couponPartCount" type="java.lang.Integer" />
+							<wz:property qualifier="couponPartLength" type="java.lang.Integer" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done visible="!#empty(newCodeGenerationConfiguration.name)">
+							<wz:save property="newCodeGenerationConfiguration"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+   </context>
+   
+   <context type="CouponRedemption">
+	   	<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="couponCode"/>
+				<list-view:column qualifier="coupon"/>
+				<list-view:column qualifier="order"/>
+				<list-view:column qualifier="user"/>
+			</list-view:list-view>
+		</context>
+		
+		<context merge-by="type" parent="GenericItem" component="simple-search">
+			<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+				<simple-search:field name="couponCode"/>
+			</simple-search:simple-search>
+		</context>
+			
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="couponCode"/>
+					<advanced-search:field name="coupon" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+				    <advanced-search:field name="order" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+				    <advanced-search:field name="user" editor="com.hybris.cockpitng.editor.defaultreferenceeditor"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+   </context>
+   	
+</config>

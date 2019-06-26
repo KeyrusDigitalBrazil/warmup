@@ -1,0 +1,28 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; InboundQuoteEntry ; INBOUND
+ 
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique=true]; code[unique = true]; type(code) 
+; InboundQuoteEntry	; Quote         	; Quote 
+; InboundQuoteEntry	; Unit          	; Unit 
+; InboundQuoteEntry	; QuoteEntry    	; QuoteEntry 
+; InboundQuoteEntry	; Comment       	; Comment 
+ 
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]; autoCreate 
+; InboundQuoteEntry:Quote         	; version        	; Quote:version         	;                                 	;  ;
+; InboundQuoteEntry:Quote         	; code           	; Quote:code            	;                                 	;  ;
+; InboundQuoteEntry:Quote         	; externalQuoteId	; Quote:externalQuoteId 	;                                 	;  ;
+; InboundQuoteEntry:Unit          	; code           	; Unit:code             	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; quantity       	; QuoteEntry:quantity   	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; unit           	; QuoteEntry:unit       	; InboundQuoteEntry:Unit          	;  ;
+; InboundQuoteEntry:QuoteEntry    	; order          	; QuoteEntry:order      	; InboundQuoteEntry:Quote         	;  ;
+; InboundQuoteEntry:QuoteEntry    	; entryNumber    	; QuoteEntry:entryNumber	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; rank    			; QuoteEntry:rank	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; totalPrice     	; QuoteEntry:totalPrice 	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; basePrice     	; QuoteEntry:basePrice 	;                                 	;  ;
+; InboundQuoteEntry:QuoteEntry    	; entryDiscount     	; QuoteEntry:entryDiscount 	;                                ; 	;  
+; InboundQuoteEntry:QuoteEntry    	; externalQuoteEntryId  ; QuoteEntry:externalQuoteEntryId 	;                       ; 	; 
+; InboundQuoteEntry:QuoteEntry         	; comments               	; QuoteEntry:comments               	; InboundQuoteEntry:Comment    	;  ; true
+; InboundQuoteEntry:Comment    	; code           	; Comment:code      	;                            	;  ; true
+; InboundQuoteEntry:Comment    	; text           	; Comment:text      	;                            	;  ; true
+; InboundQuoteEntry:Comment    	; commentAuthorEmail           	; Comment:commentAuthorEmail      	;         	;  ; true
+; InboundQuoteEntry:QuoteEntry    	; itemId       	; QuoteEntry:itemId   	;                                 	;  ;

@@ -1,0 +1,45 @@
+<div>
+    <personalizationsmartedit-scroll-zone data-scroll-zone-id="'segmentview'"
+        data-scroll-zone-visible="ctrl.scrollZoneVisible"
+        data-get-element-to-scroll="ctrl.getElementToScroll()"></personalizationsmartedit-scroll-zone>
+    <div class="form-group">
+        <personalizationsmartedit-segment-expression-as-html data-segment-expression="ctrl.expression[0]"></personalizationsmartedit-segment-expression-as-html>
+    </div>
+    <div class="form-group">
+        <label class="personalization-modal__label"
+            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.segments"></label>
+        <ui-select class="form-control"
+            ng-model="ctrl.singleSegment"
+            theme="select2"
+            ng-keyup="ctrl.segmentSearchInputKeypress($event, $select.search)"
+            on-select="ctrl.segmentSelectedEvent($item, $select.items)"
+            reset-search-input="false">
+            <ui-select-match placeholder="{{ 'personalization.modal.customizationvariationmanagement.targetgrouptab.segments.placeholder' | translate}}">
+                <span>{{'personalization.modal.customizationvariationmanagement.targetgrouptab.segments.placeholder' | translate}}</span>
+            </ui-select-match>
+            <ui-select-choices repeat="item in ctrl.segments"
+                position="down"
+                personalization-infinite-scroll="ctrl.addMoreSegmentItems()"
+                personalization-infinite-scroll-distance="2">
+                <div ng-bind="item.code"
+                    class="perso__item-name"></div>
+                <div class="perso-wrap-ellipsis perso__wrapper-description"
+                    data-ng-bind="item.description"
+                    title="{{item.description}}"></div>
+            </ui-select-choices>
+        </ui-select>
+    </div>
+
+    <div ui-tree="ctrl.treeOptions"
+        id="tree-root">
+        <div ui-tree-nodes
+            ng-model="ctrl.expression"
+            data-nodrop-enabled="true">
+            <div ng-repeat="node in ctrl.expression"
+                data-collapsed="false"
+                ui-tree-node
+                ng-include="'personalizationsmarteditSegmentNodeTemplate.html'"></div>
+        </div>
+    </div>
+
+</div>

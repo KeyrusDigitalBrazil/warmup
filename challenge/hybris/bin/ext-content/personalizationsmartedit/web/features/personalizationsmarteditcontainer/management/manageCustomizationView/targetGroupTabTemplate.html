@@ -1,0 +1,156 @@
+<div class="pe-customization-modal">
+    <div class="pe-customization-modal__title">
+        <div class="pe-customization-modal__title-header">
+            <div class="pe-customization-modal__title-header-name perso-wrap-ellipsis"
+                data-ng-bind="$ctrl.customization.name"
+                title={{$ctrl.customization.name}}></div>
+            <div>
+                <span class="pe-customization-modal__title-header-badge badge"
+                    data-ng-class="{'perso__status--enabled':'badge-success', 'perso__status--disabled':'', 'perso__status--ignore':''}[$ctrl.getActivityStateForCustomization($ctrl.customization)]">
+                    {{'personalization.modal.customizationvariationmanagement.targetgrouptab.customization.' + $ctrl.customization.status | lowercase | translate}}
+                </span>
+            </div>
+        </div>
+        <div class="pe-customization-modal__title-subarea">
+            <div data-ng-if="$ctrl.customization.status === $ctrl.PERSONALIZATION_MODEL_STATUS_CODES.ENABLED"
+                class="pe-customization-modal__title-dates">
+                <span data-ng-if='!$ctrl.customization.enabledStartDate && $ctrl.customization.enabledEndDate'>...</span>
+                <span data-ng-bind="$ctrl.customization.enabledStartDate"></span>
+                <span data-ng-if='$ctrl.customization.enabledStartDate || $ctrl.customization.enabledEndDate'> - </span>
+                <span data-ng-bind="$ctrl.customization.enabledEndDate"></span>
+                <span data-ng-if="$ctrl.personalizationsmarteditDateUtils.isDateInThePast($ctrl.customization.enabledEndDate)"
+                    class="section-help help-inline help-inline--section help-inline--tooltip">
+                    <span class="hyicon hyicon-msgwarning hyicon-msgwarning--dates help-icon-inline"></span>
+                    <span class="pe-help-block--inline help-block-inline help-block-inline--text"
+                        data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.datetooltip"></span>
+                </span>
+                <span data-ng-if='$ctrl.customization.enabledStartDate && !$ctrl.customization.enabledEndDate'>...</span>
+            </div>
+        </div>
+    </div>
+    <div class="pe-customization-modal__y-add-btn">
+        <button class="y-add-btn"
+            type="button"
+            data-ng-click="$ctrl.addVariationAction()">
+            <span class="hyicon hyicon-add"></span>
+            <span data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.addtargetgroup.button"></span>
+        </button>
+    </div>
+    <ul data-ng-show='filteredVariations.length > 0'
+        class="pe-customization-modal__list-group">
+        <li class="pe-customization-modal__list-group__item"
+            data-ng-repeat="variation in $ctrl.customization.variations | filter:$ctrl.personalizationsmarteditUtils.isItemVisible as filteredVariations">
+            <div class="pe-customization-modal__list-group__item-col1">
+                <a class="pe-customization-modal__list-group__item-link"
+                    data-ng-bind="variation.name"
+                    data-ng-click="$ctrl.editVariationAction(variation)"></a>
+                <span data-ng-class="$ctrl.getActivityStateForVariation($ctrl.customization, variation)"
+                    data-ng-bind="$ctrl.getEnablementTextForVariation(variation)"></span>
+                <div data-ng-show="$ctrl.personalizationsmarteditTriggerService.isDefault(variation.triggers)">
+                    <span class="pe-customization-modal__title-label-segments"
+                        data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.segments.colon"></span>
+                    <span data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.default"></span>
+                </div>
+                <div data-ng-show="!$ctrl.personalizationsmarteditTriggerService.isDefault(variation.triggers)">
+                    <div>
+                        <span class="pe-customization-modal__title-label-segments"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.segments.colon"></span>
+                        <personalizationsmartedit-segment-expression-as-html data-segment-expression="variation.triggers"></personalizationsmartedit-segment-expression-as-html>
+                    </div>
+                </div>
+            </div>
+            <div data-uib-dropdown
+                class="pe-customization-modal__dropdown">
+                <button type="button"
+                    data-uib-dropdown-toggle
+                    class="dropdown-toggle btn btn-link"
+                    id="dropdownMenu1"
+                    aria-haspopup="true"
+                    aria-expanded="true">
+                    <span class="hyicon hyicon-more"></span>
+                </button>
+                <ul data-uib-dropdown-menu
+                    aria-labelledby="dropdownMenu1"
+                    role="menu">
+                    <li>
+                        <a data-ng-click="$ctrl.editVariationAction(variation)"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.options.edit" />
+                    </li>
+                    <li>
+                        <a data-ng-click="$ctrl.toogleVariationActive(variation)"
+                            data-ng-bind="$ctrl.getActivityActionTextForVariation(variation)" />
+                    </li>
+                    <li data-ng-class="$first ? 'disabled' : '' ">
+                        <a data-ng-click="$ctrl.setVariationRank(variation, -1, $event, $first)"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.options.moveup" />
+                    </li>
+                    <li data-ng-class="$last ? 'disabled' : '' ">
+                        <a data-ng-click="$ctrl.setVariationRank(variation, 1, $event, $last)"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.options.movedown" />
+                    </li>
+                    <li role="separator"
+                        class="divider"></li>
+                    <li>
+                        <a data-ng-click="$ctrl.removeVariationClick(variation)"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.options.remove" />
+                    </li>
+                </ul>
+            </div>
+        </li>
+    </ul>
+
+    <y-slider-panel data-slider-panel-show="$ctrl.showSliderPanel"
+        data-slider-panel-hide="$ctrl.hideSliderPanel"
+        data-slider-panel-configuration="$ctrl.sliderPanelConfiguration"
+        class="pe-customization-modal__sliderpanel">
+        <content>
+            <div class="pe-customization-modal__sliderpanel__btn-layout">
+                <button class="btn btn-link pe-customization-modal__sliderpanel__btn-link"
+                    data-ng-init="$ctrl.isFullscreen=false"
+                    data-ng-click="$ctrl.toggleSliderFullscreen(); $ctrl.isFullscreen=!$ctrl.isFullscreen">
+                    <div>
+                        <div data-ng-if="!$ctrl.isFullscreen">
+                            <span class="hyicon hyicon-maximize"></span>
+                            <span data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.fullscreen.open"></span>
+                        </div>
+                        <div data-ng-if="$ctrl.isFullscreen">
+                            <span class="hyicon hyicon-minimize"></span>
+                            <span data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.fullscreen.close"></span>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <form>
+                <div class="form-group">
+                    <label for="targetgroup-name"
+                        class="control-label required"
+                        data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.targetgroupname"></label>
+                    <input type="text"
+                        class="form-control"
+                        placeholder="{{'personalization.modal.customizationvariationmanagement.targetgrouptab.targetgroupname.placeholder' | translate}}"
+                        name="variationname_key"
+                        data-ng-model="$ctrl.edit.name"
+                        id="targetgroup-name">
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <input type="checkbox"
+                            id="targetgroup-isDefault-001"
+                            data-ng-model="$ctrl.edit.isDefault"
+                            data-ng-change="$ctrl.confirmDefaultTrigger($ctrl.edit.isDefault);" />
+                        <label for="targetgroup-isDefault-001"
+                            data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.variation.default"></label>
+                    </div>
+                </div>
+
+                <div data-ng-show="$ctrl.edit.showExpression">
+
+                    <multiple-triggers></multiple-triggers>
+
+                </div>
+            </form>
+
+        </content>
+    </y-slider-panel>
+
+</div>

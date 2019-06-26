@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="excel/backoffice-excel-spring.xml"/>
+
+    <alias name="platformBackofficeAuthenticationProvider" alias="backofficeAuthenticationProvider"/>
+    <bean id="platformBackofficeAuthenticationProvider"
+          class="com.hybris.backoffice.spring.security.BackofficeAuthenticationProvider">
+        <property name="userDetailsService" ref="backofficeUserDetailsService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultBackofficeUserDetailsService" alias="backofficeUserDetailsService"/>
+    <bean id="defaultBackofficeUserDetailsService"
+          class="com.hybris.backoffice.spring.security.BackofficeUserDetailsService">
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="activateCatalogVersions" value="true"/>
+        <property name="availableCatalogVersionsTag" ref="availableCatalogVersionsTag"/>
+    </bean>
+
+    <alias name="defaultBackofficeRememberMeService" alias="backofficeRememberMeService"/>
+    <bean id="defaultBackofficeRememberMeService" class="com.hybris.backoffice.spring.security.BackofficeRememberMeService">
+        <property name="key" value="backoffice"/>
+        <property name="cookieName" value="LoginToken"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <!-- avoiding hard reference to tenant-scoped 'coreUserDetailsService' -->
+        <lookup-method name="lookupUserDetailsService" bean="backofficeUserDetailsService"/>
+    </bean>
+
+    <alias name="defaultBackofficeRoleDao" alias="backofficeRoleDao"/>
+    <bean id="defaultBackofficeRoleDao" class="com.hybris.backoffice.daos.impl.DefaultBackofficeRoleDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultBackofficeValidationDao" alias="backofficeValidationDao"/>
+    <bean id="defaultBackofficeValidationDao" class="com.hybris.backoffice.daos.impl.DefaultBackofficeValidationDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultBackofficeJobsDao" alias="backofficeJobsDao"/>
+    <bean id="defaultBackofficeJobsDao" class="com.hybris.backoffice.daos.impl.DefaultBackofficeJobsDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultBackofficeConfigurationDao" alias="backofficeConfigurationDao"/>
+    <bean id="defaultBackofficeConfigurationDao"
+          class="com.hybris.backoffice.daos.impl.DefaultBackofficeConfigurationDao">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+
+    <alias name="defaultBackofficeEventSender" alias="backofficeEventSender"/>
+    <bean id="defaultBackofficeEventSender" class="com.hybris.backoffice.events.DefaultBackofficeEventSender"/>
+
+	<!-- deprecated since 6.7 -->
+    <alias name="defaultBackofficeEventListener" alias="backofficeEventListener"/>
+    <bean id="defaultBackofficeEventListener" class="com.hybris.backoffice.events.BackofficeEventListener"
+          parent="abstractEventListener">
+        <lookup-method name="getBackofficeEventSender" bean="backofficeEventSender"/>
+    </bean>
+
+    <alias name="defaultBackofficeAfterCronJobFinishedEventListener"
+           alias="backofficeAfterCronJobFinishedEventListener"/>
+    <bean id="defaultBackofficeAfterCronJobFinishedEventListener"
+          class="com.hybris.backoffice.events.AfterCronJobFinishedEventListener"
+          parent="abstractBackofficeCronJobEventListener">
+    </bean>
+
+    <alias name="defaultBackofficeBeforeCronJobStartEventListener" alias="backofficeBeforeCronJobStartEventListener"/>
+    <bean id="defaultBackofficeBeforeCronJobStartEventListener"
+          class="com.hybris.backoffice.events.BeforeCronJobStartEventListener"
+          parent="abstractBackofficeCronJobEventListener">
+    </bean>
+
+    <bean id="abstractBackofficeCronJobEventListener"
+          class="com.hybris.backoffice.events.AbstractBackofficeCronJobEventListener" parent="abstractEventListener"
+          abstract="true">
+        <property name="typeService" ref="typeService"/>
+        <property name="eventService" ref="eventService"/>
+        <property name="processesIncludes" ref="backofficeCronJobHistoryIncludes"/>
+    </bean>
+
+    <alias name="defaultBackofficeProcessEventListener" alias="backofficeProcessEventListener"/>
+    <bean id="defaultBackofficeProcessEventListener" class="com.hybris.backoffice.events.processes.ProcessEventListener"
+          parent="abstractEventListener">
+        <lookup-method name="getBackofficeEventSender" bean="backofficeEventSender"/>
+    </bean>
+
+    <!-- deprecate -->
+    <alias name="defaultBackofficeSyncEventListener" alias="backofficeSyncEventListener"/>
+    <bean id="defaultBackofficeSyncEventListener" class="com.hybris.backoffice.events.sync.SyncEventListener"
+          parent="abstractEventListener">
+        <lookup-method name="getBackofficeEventSender" bean="backofficeEventSender"/>
+    </bean>
+
+    <alias name="defaultAfterInitializationEndBackofficeListener" alias="afterInitializationEndBackofficeListener"/>
+    <bean id="defaultAfterInitializationEndBackofficeListener"
+          class="com.hybris.backoffice.events.AfterInitializationEndBackofficeListener" lazy-init="false"
+          parent="abstractEventListener"/>
+
+    <alias name="defaultBackofficeCronJobHistoryIncludes" alias="backofficeCronJobHistoryIncludes"/>
+    <util:map id="defaultBackofficeCronJobHistoryIncludes" key-type="java.lang.String"
+              value-type="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+        <entry key="syncProcesses">
+            <bean class="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+                <property name="jobTypeCode" value="#{T(de.hybris.platform.catalog.model.SyncItemJobModel)._TYPECODE}"/>
+            </bean>
+        </entry>
+        <entry key="excelImportProcesses">
+            <bean class="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+                <property name="jobTypeCode" value="#{T(com.hybris.backoffice.model.ExcelImportJobModel)._TYPECODE}"/>
+            </bean>
+        </entry>
+        <entry key="auditReportGeneratorProcess">
+            <bean class="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+                <property name="cronJobTypeCode" value="#{T(de.hybris.platform.auditreport.model.CreateAuditReportCronJobModel)._TYPECODE}"/>
+            </bean>
+        </entry>
+
+    </util:map>
+
+
+    <alias name="defaultAuditReportKeyGenerator" alias="auditReportKeyGenerator"/>
+    <bean id="defaultAuditReportKeyGenerator"
+          class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="type" value="uuid" />
+    </bean>
+
+    <alias name="defaultCoreWorkflowFacade" alias="coreWorkflowFacade"/>
+    <bean id="defaultCoreWorkflowFacade" class="com.hybris.backoffice.workflow.impl.DefaultCoreWorkflowFacade">
+        <property name="workflowAttachmentService" ref="workflowAttachmentService"/>
+        <property name="workflowProcessingService" ref="workflowProcessingService"/>
+        <property name="workflowService" ref="newestWorkflowService"/>
+        <property name="workflowTemplateService" ref="workflowTemplateService"/>
+    </bean>
+
+    <alias name="defaultBackofficeConfigurationSystemSetup" alias="backofficeConfigurationSystemSetup" />
+    <bean id="defaultBackofficeConfigurationSystemSetup" class="com.hybris.backoffice.setup.BackofficeConfigurationSystemSetup" >
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+
+    <alias name="defaultBackofficeVariantsService" alias="backofficeVariantsService" />
+    <bean id="defaultBackofficeVariantsService" class="com.hybris.backoffice.variants.DefaultBackofficeVariantsService" parent="variantsService">
+        <property name="modelService" ref="modelService"/>
+        <property name="variantService" ref="variantsService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <alias name="defaultCatalogVersionAfterSaveListener" alias="catalogVersionAfterSaveListener"/>
+    <bean name="defaultCatalogVersionAfterSaveListener" class="com.hybris.backoffice.listeners.CatalogVersionAfterSaveListener">
+	    <property name="availableCatalogVersionsTag" ref="availableCatalogVersionsTag"/>
+	</bean>
+
+    <alias name="defaultAvailableCatalogVersionsTag" alias="availableCatalogVersionsTag"/>
+    <bean id="defaultAvailableCatalogVersionsTag" class="com.hybris.backoffice.catalogversioneventhandling.impl.DefaultAvailableCatalogVersionsTag" init-method="refresh"/>
+
+</beans>

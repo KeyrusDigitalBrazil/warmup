@@ -1,0 +1,105 @@
+<div class="pe-customize-panel-list">
+    <div data-ng-class="$last && customization.collapsed && ctrl.isCustomizationFromCurrentCatalog(customization) ? 'pe-customize-panel-list__item-last':''"
+        data-ng-repeat="customization in ctrl.customizationsList track by $index"
+        data-ng-init="ctrl.initCustomization(customization)">
+        <div class="pe-customize-panel-list__row-layout"
+            data-ng-class="ctrl.getSelectedCustomizationClass(customization)">
+            <div class="pe-customize-panel-list__icon-layout pe-customize-panel-list__icon-divider"
+                data-ng-click="ctrl.customizationRowClick(customization);">
+                <a class="pe-customize-panel-list__btn-link btn btn-link"
+                    title="{{customization.collapsed ? 'personalization.commons.icon.title.expand' : 'personalization.commons.icon.title.collapse' | translate}}">
+                    <span data-ng-class="customization.collapsed ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'"
+                        class="perso__chevron-down-icon glyphicon"></span>
+                </a>
+            </div>
+            <div class="pe-customize-panel-list__row"
+                data-ng-click="ctrl.customizationRowClick(customization,true);">
+                <div class="pe-customize-panel-list__col-lg">
+                    <div class="perso-wrap-ellipsis pe-customize-panel-list__parent-layout perso-tree__primary-data"
+                        data-ng-bind="customization.name"
+                        title={{customization.name}}></div>
+                </div>
+                <div class="pe-customize-panel-list__col-md"></div>
+                <div class="pe-customize-panel-list__col-md">
+                    <div class="perso-tree__status"
+                        data-ng-class="ctrl.getActivityStateForCustomization(customization)"
+                        data-ng-bind="ctrl.getEnablementTextForCustomization(customization)"></div>
+                    <div class="perso-tree__dates-layout"
+                        data-ng-if="ctrl.isEnabled(customization)"
+                        data-ng-bind="ctrl.getDatesForCustomization(customization)"></div>
+                </div>
+                <div class="pe-customize-panel-list__col-sm">
+                    <span data-ng-if="!ctrl.isCustomizationFromCurrentCatalog(customization)"
+                        class="perso__globe-icon hyicon hyicon-globe"
+                        data-uib-tooltip="{{customization.catalogVersionNameL10N}}"
+                        data-tooltip-placement="auto top"></span>
+                </div>
+            </div>
+            <div class="pe-customize-panel-list__col-xs pe-customize-panel-list__dropdown">
+                <div data-ng-if="ctrl.isCustomizationFromCurrentCatalog(customization)"
+                    class="dropdown"
+                    data-ng-init="ctrl.clearAllSubMenu();">
+                    <button type="button"
+                        class="pe-customize-panel-list__btn-link btn btn-link customization-rank-{{customization.rank}}-dropdown-toggle"
+                        data-ng-click="ctrl.customizationSubMenuAction(customization)">
+                        <span class="perso__more-icon hyicon hyicon-more"></span>
+                    </button>
+                    <ul data-ng-if="customization.subMenu"
+                        class="pull-right dropdown-menu pe-customize-panel-list__dropdown-menu"
+                        role="menu">
+                        <li>
+                            <a class="pe-customize-panel-list__dropdown-menu__item cutomization-rank-{{customization.rank}}-edit-button"
+                                data-ng-click="ctrl.clearAllSubMenu(); ctrl.editCustomizationAction(customization);"
+                                data-translate="personalization.toolbar.pagecustomizations.customization.options.edit "></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--end customization row-->
+        <div data-uib-collapse="customization.collapsed">
+            <div class="pe-customize-panel-list__row-layout"
+                data-ng-repeat="variation in customization.variations | statusNotDeleted"
+                data-ng-class="ctrl.getSelectedVariationClass(variation)"
+                data-ng-click="ctrl.clearAllSubMenu(); ctrl.variationClick(customization, variation);">
+                <div class="pe-customize-panel-list__icon-layout">
+                    <div class="pe-customize-panel-list__btn-link btn btn-link"></div>
+                </div>
+                <div class="pe-customize-panel-list__row">
+                    <div class="pe-customize-panel-list__col-lg">
+                        <div class="perso-wrap-ellipsis pe-customize-panel-list__child-layout"
+                            data-ng-bind="variation.name"
+                            title={{variation.name}}></div>
+                    </div>
+                    <div class="pe-customize-panel-list__col-md">
+                        <div class="pe-customize-panel-list__components-layout">
+                            <div data-ng-show="variation.numberOfAffectedComponents >= 0"
+                                class="pe-customize-panel-list__number-layout">{{variation.numberOfAffectedComponents}}</div>
+                            <div data-ng-hide="variation.numberOfAffectedComponents >= 0"
+                                class="pe-customize-panel-list__number-layout">#</div>
+                            <div class="perso-wrap-ellipsis"
+                                data-translate="personalization.toolbar.pagecustomizations.variation.numberofaffectedcomponents.label"
+                                title="{{'personalization.toolbar.pagecustomizations.variation.numberofaffectedcomponents.label' | translate}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pe-customize-panel-list__col-md perso-tree__status"
+                        data-ng-class="ctrl.getActivityStateForVariation(customization, variation)"
+                        data-ng-bind="ctrl.getEnablementTextForVariation(variation)"></div>
+                    <div class="pe-customize-panel-list__col-sm">
+                        <span class="pe-customize-panel-list__cc-icon hyicon hyicon-commerce"
+                            data-ng-class="{'pe-customize-panel-list__cc-icon--hidden': !ctrl.hasCommerceActions(variation)}"
+                            data-uib-tooltip-html="ctrl.getCommerceCustomizationTooltip(variation)"
+                            data-tooltip-placement="auto top"></span>
+                    </div>
+                </div>
+                <div class="pe-customize-panel-list__col-xs pe-customize-panel-list__dropdown"></div>
+            </div>
+        </div>
+    </div>
+    <!--end data repeat-->
+    <div class="pe-spinner--outer"
+        data-ng-show="ctrl.requestProcessing">
+        <div data-ng-include="'waitDialog.html'"></div>
+    </div>
+</div>

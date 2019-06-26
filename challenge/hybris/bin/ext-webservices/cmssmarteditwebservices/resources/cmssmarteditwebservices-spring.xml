@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<import resource="config/cmssmarteditwebservices-field-mapping-spring.xml" />
+	<import resource="config/cmssmarteditwebservices-products-spring.xml" />
+	
+	
+	<!-- Prototype DTOs and ObjectFactory beans -->
+	
+	<alias name="cmsSeComponentTypeAttributeData" alias="componentTypeAttributeData" />
+	<bean id="cmsSeComponentTypeAttributeData" class="de.hybris.platform.cmsfacades.data.ComponentTypeAttributeData" scope="prototype">
+		<property name="editable" value="true" />		
+	</bean>
+	
+	<alias name="defaultCmsSeClonePageDataPrototype" alias="cmsSeClonePageDataPrototype" />
+	<bean id="defaultCmsSeClonePageDataPrototype" class="de.hybris.platform.cmsfacades.data.ClonePageData" scope="prototype" />
+	<alias name="defaultCmsSeClonePageDataFactory" alias="cmsClonePageDataFactory" />
+	<bean id="defaultCmsSeClonePageDataFactory" class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+		<property name="targetBeanName" value="cmsSeClonePageDataPrototype" />
+	</bean>
+
+	<!-- Catalog beans -->
+	<alias name="defaultCmsSeCatalogFacade" alias="cmsSeCatalogFacade" />
+	<bean id="defaultCmsSeCatalogFacade" class="de.hybris.platform.cmssmarteditwebservices.catalogs.impl.DefaultCatalogFacade">
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="entryToCatalogDataConverter" ref="cmsSeEntryToCatalogDataConverter" />
+		<property name="entryToContentCatalogDataConverter" ref="cmsSeEntryToContentCatalogDataConverter" />
+		<property name="contentCatalogLevelComparator" ref="cmsContentCatalogLevelComparator" />
+	</bean>
+	
+	<alias name="defaultCmsContentCatalogLevelComparator" alias="cmsContentCatalogLevelComparator" />
+	<bean id="defaultCmsContentCatalogLevelComparator" class="de.hybris.platform.cmssmarteditwebservices.catalogs.impl.ContentCatalogLevelComparator">
+		<property name="cmsCatalogLevelService" ref="cmsCatalogLevelService" />
+	</bean>
+	
+	<alias name="defaultCmsSeEntryToCatalogDataConverter" alias="cmsSeEntryToCatalogDataConverter" />
+	<bean id="defaultCmsSeEntryToCatalogDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CatalogData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeEntryToCatalogDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCmsSeEntryToContentCatalogDataConverter" alias="cmsSeEntryToContentCatalogDataConverter" />
+	<bean id="defaultCmsSeEntryToContentCatalogDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CatalogData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeEntryToContentCatalogDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="abstractCmsSeEntryToCatalogDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.catalogs.populator.EntryToCatalogDataPopulator" abstract="true">
+		<property name="catalogModelToDataPopulator" ref="basicCmsCatalogModelToDataPopulator" />
+		<property name="catalogVersionDataComparator" ref="cmsSeCatalogVersionDataComparator" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+	
+	<alias name="defaultCmsSeEntryToCatalogDataPopulator" alias="cmsSeEntryToCatalogDataPopulator" />
+	<bean id="defaultCmsSeEntryToCatalogDataPopulator" parent="abstractCmsSeEntryToCatalogDataPopulator">
+		<property name="catalogVersionDataConverter" ref="cmsSeCatalogVersionDataConverter" />
+	</bean>
+	
+	<alias name="defaultCmsSeEntryToContentCatalogDataPopulator" alias="cmsSeEntryToContentCatalogDataPopulator" />
+	<bean id="defaultCmsSeEntryToContentCatalogDataPopulator" parent="abstractCmsSeEntryToCatalogDataPopulator"
+			class="de.hybris.platform.cmssmarteditwebservices.catalogs.populator.EntryToContentCatalogDataPopulator">
+		<property name="catalogVersionDataConverter" ref="cmsSeContentCatalogVersionDataConverter" />
+		<property name="homePageDataConverter" ref="cmsSeHomePageDataConverter" />
+	</bean>
+	
+	<alias name="defaultCmsSeCatalogVersionDataComparator" alias="cmsSeCatalogVersionDataComparator" />
+	<bean id="defaultCmsSeCatalogVersionDataComparator" class="de.hybris.platform.cmssmarteditwebservices.catalogs.impl.CatalogVersionDataComparator" />
+	
+	<alias name="defaultCmsSeHomePageDataPopulator" alias="cmsSeHomePageDataPopulator" />
+	<bean id="defaultCmsSeHomePageDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.catalogs.populator.HomePageDataPopulator">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+		<property name="cmsCatalogVersionService" ref="cmsCatalogVersionService" />
+		<property name="abstractPageDataConverter" ref="cmsSeAbstractPageDataConverter" />
+	</bean>
+	
+	<alias name="defaultCmsSeAbstractPageDataPopulator" alias="cmsSeAbstractPageDataPopulator" />
+	<bean id="defaultCmsSeAbstractPageDataPopulator" class="de.hybris.platform.cmssmarteditwebservices.catalogs.populator.AbstractPageDataPopulator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultCmsSeAbstractPageDataConverter" alias="cmsSeAbstractPageDataConverter" />
+	<bean id="defaultCmsSeAbstractPageDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.AbstractPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeAbstractPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCmsSeHomePageDataConverter" alias="cmsSeHomePageDataConverter" />
+	<bean id="defaultCmsSeHomePageDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.HomePageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSeHomePageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsSeCatalogVersionDataConverter" alias="cmsSeCatalogVersionDataConverter" />
+	<bean id="defaultCmsSeCatalogVersionDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CatalogVersionData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsCatalogVersionModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCmsSeContentCatalogVersionDataConverter" alias="cmsSeContentCatalogVersionDataConverter" />
+	<bean id="defaultCmsSeContentCatalogVersionDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CatalogVersionData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsCatalogVersionModelPopulator" />
+				<ref bean="cmsContentCatalogVersionModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>

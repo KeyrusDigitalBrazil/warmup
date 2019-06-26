@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	
+	<relations>
+		<relation code="ScimUserGroupToUserGroupRelation" localized="false">
+			<deployment table="Scim2GroupRel" typecode="9363"/>
+			<sourceElement qualifier="scimUserGroups" type="ScimUserGroup" cardinality="many">
+			</sourceElement>
+			<targetElement qualifier="userGroups" type="UserGroup" cardinality="many" >
+				<modifiers optional="false"/>
+			</targetElement>
+		</relation>
+	</relations>
+	
+	
+	<itemtypes>
+	
+		<itemtype code="User" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="scimUserId" type="java.lang.String" >
+					<description>Attribute to hold scim user id for users.</description>
+					<persistence type="property" />
+					<modifiers optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ScimUserGroup" >
+			<deployment table="ScimUserGroup" typecode="9355"/>
+			<attributes>
+				<attribute qualifier="scimUserGroup" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="userType" type="Type">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	</itemtypes>
+</items>

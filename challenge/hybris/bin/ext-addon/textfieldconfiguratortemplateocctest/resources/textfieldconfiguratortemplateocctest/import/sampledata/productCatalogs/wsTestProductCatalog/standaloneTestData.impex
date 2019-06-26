@@ -1,0 +1,119 @@
+$defaultCurrency=EUR
+$lang=en
+$defaultLanguage=en
+$deliveryCountries=US
+$catalog-id=wsTestProductCatalog
+$catalog-version=Online
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$storeClassification=textfieldTestClassification
+$systemVersion=1.0
+$approved=approvalstatus(code)[default='approved']
+$storeUid=wsTest
+$net=false
+
+#################################################################################
+# Store and sites
+#################################################################################
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode)
+;$storeUid;$catalog-id;$defaultCurrency;$net;km;$defaultCurrency;$lang;$lang
+
+#################################################################################
+# Catalog
+#################################################################################
+INSERT_UPDATE Catalog;id[unique=true];defaultcatalog
+;$catalog-id;true
+
+# Product versions for product catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;languages(isoCode);readPrincipals(uid);defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;$lang;employeegroup;EUR
+
+#################################################################################
+# Language, Currency and Units
+#################################################################################
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Currency;isocode[unique=true]
+;EUR
+;USD
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;;;;;;;;;;;;;;;;;
+;pieces;PCE;PCE;PCE;1;;;;;;;;;;;;;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true]
+;pieces;pieces
+;pieces;PCE
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];;
+;dr;Dr.;dr.;;
+;prof;Prof.;prof.;;
+
+#################################################################################
+# Configuration category
+#################################################################################
+
+INSERT_UPDATE configurationcategory;$catalogversion[unique=true];code[unique=true];name[lang=$lang]
+;;TextFieldConfiguration;CPQ Configurable Category
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogversion;textFieldLabel[lang=$lang];textFieldDefaultValue[lang=$lang];configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, $catalogversion);qualifier
+;AK_CAMERA_KIT_Engraved_Text;;Engraved Text;;;TextFieldConfiguration;AK_CAMERA_KIT_Engraved_Text
+;AK_CAMERA_KIT_Font_Type;;Font Type;Webdings;;TextFieldConfiguration;AK_CAMERA_KIT_Font_Type
+;AK_CAMERA_KIT_Font_Size;;Font Size;14;;TextFieldConfiguration;AK_CAMERA_KIT_Font_Size
+
+
+#################################################################################
+# Basestore, Basesite
+#################################################################################
+INSERT_UPDATE BaseStore;uid[unique=true];currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode;paymentProvider;checkoutFlowGroup;cmsSites(uid);
+;wsTest;$defaultCurrency;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;order-process;Mockup;defaultCheckoutGroup;wsTest;
+
+INSERT_UPDATE CMSSite;uid[unique=true];stores(uid);channel(code);
+;wsTest;wsTest;B2C;
+
+
+#################################################################################
+# Classification System
+#################################################################################
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=en];;;;;;
+;$storeClassification;$storeClassification;;;;;;
+
+INSERT_UPDATE ClassificationSystemversion;catalog(id)[unique=true];version[unique=true];active;writeprincipals(uid);languages(isocode);inclPacking[virtual=true,default=true];inclDuty[virtual=true,default=true];inclFreight[virtual=true,default=true];inclAssurance[virtual=true,default=true]
+;$storeClassification;$systemVersion;true;;en;;;;
+
+
+#################################################################################
+# Products
+#################################################################################
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=en];description[lang=en];summary[lang=en];$prices;$approved
+;AK_CAMERA_KIT;TextFieldConfiguration;Sony;;;;PCE;;AK_CAMERA_KIT;This is an example for the cloud engine service;AK_CAMERA_KIT product;1 PCE = 10 EUR N;
+
+
+#################################################################################
+# Availability
+#################################################################################
+# Vendor
+INSERT_UPDATE Vendor;code[unique=true];name
+;default;Default Vendor
+
+# Warehouse
+INSERT_UPDATE Warehouse;code[unique=true];name;baseStores(uid);vendor(code)[default=default];default[default=true]
+;default;Default Warehouse;wsTest;
+;pw_warehouse_s;;wsTest;
+
+INSERT_UPDATE StockLevel;productCode[unique=true];warehouse(code)[unique=true,default=default];available;inStockStatus(code);maxPreOrder[default=1];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;AK_CAMERA_KIT;pw_warehouse_s;222;forceInStock;

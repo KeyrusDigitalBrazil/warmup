@@ -1,0 +1,107 @@
+$catalog = Default
+$version = Staged
+$catalogVersion = $catalog:$version
+$testCronExpressKey = 2 2 2 1/1 * ? *
+
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; GetIntegrationTestGroup1 ; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; GetIntegrationTestGroup1 ; Product            	; Product
+; GetIntegrationTestGroup1 ; Category           	; Category
+; GetIntegrationTestGroup1 ; Catalog            	; Catalog
+; GetIntegrationTestGroup1 ; CatalogVersion     	; CatalogVersion
+; GetIntegrationTestGroup1 ; PriceRow           	; PriceRow
+; GetIntegrationTestGroup1 ; Unit               	; Unit
+; GetIntegrationTestGroup1 ; ArticleApprovalStatus	; ArticleApprovalStatus
+
+; GetIntegrationTestGroup1 ; Trigger            ; Trigger
+; GetIntegrationTestGroup1 ; ImpExImportCronJob ; ImpExImportCronJob
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; GetIntegrationTestGroup1:Product            		; code            	; Product:code                	;
+; GetIntegrationTestGroup1:Product            		; catalogVersion  	; Product:catalogVersion      	; GetIntegrationTestGroup1:CatalogVersion
+; GetIntegrationTestGroup1:Product            		; name            	; Product:name                	;
+; GetIntegrationTestGroup1:Product            		; supercategories	; Product:supercategories     	; GetIntegrationTestGroup1:Category
+; GetIntegrationTestGroup1:Product            		; pricerow			; Product:ownEurope1Prices    	; GetIntegrationTestGroup1:PriceRow
+; GetIntegrationTestGroup1:Product            		; unit				; Product:unit                	; GetIntegrationTestGroup1:Unit
+; GetIntegrationTestGroup1:ArticleApprovalStatus 	; code				; ArticleApprovalStatus:code	;
+; GetIntegrationTestGroup1:Product            		; approvalStatus  	; Product:approvalStatus      	; GetIntegrationTestGroup1:ArticleApprovalStatus
+
+; GetIntegrationTestGroup1:Catalog            ; id              ; Catalog:id                  ;
+
+; GetIntegrationTestGroup1:CatalogVersion     ; catalog         ; CatalogVersion:catalog      ; GetIntegrationTestGroup1:Catalog
+; GetIntegrationTestGroup1:CatalogVersion     ; version         ; CatalogVersion:version      ;
+; GetIntegrationTestGroup1:CatalogVersion     ; active          ; CatalogVersion:active       ;
+
+; GetIntegrationTestGroup1:Category           ; code            ; Category:code               ;                                             ; true
+; GetIntegrationTestGroup1:Category           ; name            ; Category:name               ;
+; GetIntegrationTestGroup1:Category           ; products        ; Category:products           ; GetIntegrationTestGroup1:Product
+
+; GetIntegrationTestGroup1:ImpExImportCronJob ; code            ; ImpExImportCronJob:code     ;
+; GetIntegrationTestGroup1:ImpExImportCronJob ; triggers        ; ImpExImportCronJob:triggers ; GetIntegrationTestGroup1:Trigger
+
+; GetIntegrationTestGroup1:Trigger            ; cronExpression  ; Trigger:cronExpression      ;                                             ; false
+; GetIntegrationTestGroup1:Trigger            ; day             ; Trigger:day                 ;                                             ; false
+; GetIntegrationTestGroup1:Trigger            ; cronJob         ; Trigger:cronJob             ; GetIntegrationTestGroup1:ImpExImportCronJob ; true
+
+; GetIntegrationTestGroup1:Unit                   ; code                      ; Unit:code                        ;
+; GetIntegrationTestGroup1:Unit                   ; name                      ; Unit:name                        ;
+; GetIntegrationTestGroup1:Unit                   ; unitType                  ; Unit:unitType                    ;
+
+; GetIntegrationTestGroup1:PriceRow               ; price                     ; PriceRow:price                    ;                                   ; true
+; GetIntegrationTestGroup1:PriceRow               ; unit                      ; PriceRow:unit                     ; GetIntegrationTestGroup1:Unit
+
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; GetIntegrationTestGroup2 ; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; GetIntegrationTestGroup2 ; Product        ; Product
+; GetIntegrationTestGroup2 ; Category       ; Category
+; GetIntegrationTestGroup2 ; Catalog        ; Catalog
+; GetIntegrationTestGroup2 ; CatalogVersion ; CatalogVersion
+; GetIntegrationTestGroup2 ; Unit           ; Unit
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; GetIntegrationTestGroup2:Product        ; code            ; Product:code            ;
+; GetIntegrationTestGroup2:Product        ; catalogVersion  ; Product:catalogVersion  ; GetIntegrationTestGroup2:CatalogVersion
+; GetIntegrationTestGroup2:Product        ; name            ; Product:name            ;
+; GetIntegrationTestGroup2:Product        ; supercategories ; Product:supercategories ; GetIntegrationTestGroup2:Category
+; GetIntegrationTestGroup2:Category       ; code            ; Category:code           ;                                          ; true
+; GetIntegrationTestGroup2:Product        ; contentUnit     ; Product:contentUnit     ; GetIntegrationTestGroup2:Unit ; true
+
+; GetIntegrationTestGroup2:Catalog        ; id              ; Catalog:id              ;
+
+; GetIntegrationTestGroup2:CatalogVersion ; catalog         ; CatalogVersion:catalog  ; GetIntegrationTestGroup2:Catalog
+; GetIntegrationTestGroup2:CatalogVersion ; version         ; CatalogVersion:version  ;
+; GetIntegrationTestGroup2:CatalogVersion ; active          ; CatalogVersion:active   ;
+
+; GetIntegrationTestGroup2:Unit           ; code            ; Unit:code               ;
+
+INSERT_UPDATE Catalog; id[unique = true]; name[lang = en]; defaultCatalog;
+; $catalog ; $catalog ; true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active;
+; $catalog ; $version ; true
+
+INSERT_UPDATE Language; isocode[unique = true]
+; fr
+
+INSERT_UPDATE Unit; code[unique = true]; name
+; pieces ; Pieces
+
+INSERT_UPDATE Category; code[unique = true]; catalogVersion(catalog(id), version); name[lang = en]
+; testCategory|with|pipes ; $catalogVersion ; en name for testCategory
+; testCategory2 ; $catalogVersion ; en name for testCategory2
+
+INSERT_UPDATE Product; code[unique = true]; catalogVersion(catalog(id), version); name[lang = en]; name[lang = fr]; supercategories(code); contentUnit(code)
+; testProduct001|with|pipes ; $catalogVersion ; en name for testProduct001 ; fr name for testProduct001 ; testCategory|with|pipes,testCategory2 ; pieces
+
+INSERT_UPDATE ImpExImportJob; code[unique = true]
+; test-ImpExImportJob
+
+INSERT_UPDATE ImpExImportCronJob; code[unique = true]; job(code)
+; A-Test-ImpExImportCronJob ; test-ImpExImportJob
+
+INSERT_UPDATE Trigger; cronExpression[unique = true]; cronJob(code)[unique = true]; day
+; $testCronExpressKey ; A-Test-ImpExImportCronJob ; 101

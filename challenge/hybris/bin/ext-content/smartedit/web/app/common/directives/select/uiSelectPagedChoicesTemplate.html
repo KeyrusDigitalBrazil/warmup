@@ -1,0 +1,34 @@
+<ul tabindex="-1"
+    class="ui-select-choices ui-select-choices-content select2-results ui-select-choices__infinite-scrolling">
+    <li class="ui-select-choices-group"
+        data-ng-class="{'select2-result-with-children': $select.choiceGrouped($group) }">
+        <div data-ng-show="$select.choiceGrouped($group)"
+            class="ui-select-choices-group-label select2-result-label"
+            data-ng-bind="$group.name">
+        </div>
+        <y-infinite-scrolling data-ng-if="$select.open"
+            data-drop-down-class=""
+            data-page-size="10"
+            data-mask="$select.search"
+            data-fetch-page="ySelect.fetchStrategy.fetchPage"
+            data-context="ySelect">
+            <ul role="listbox"
+                id="ui-select-choices-{{ $select.generatedId }}"
+                data-ng-class="{'select2-result-sub': $select.choiceGrouped($group), 'select2-result-single': !$select.choiceGrouped($group) }">
+                <div data-ng-if="ySelect.resultsHeaderTemplate"
+                    data-compile-html="ySelect.resultsHeaderTemplate"></div>
+                <div data-ng-if="ySelect.resultsHeaderTemplateUrl"
+                    data-ng-include="ySelect.resultsHeaderTemplateUrl"></div>
+                <li class="y-infinite-scrolling__listbox-header"
+                    data-ng-show="ySelect.showResultHeader()">{{ ySelect.resultsHeaderLabel | translate }}</li>
+                <li role="option"
+                    data-ng-attr-id="ui-select-choices-row-{{ $select.generatedId }}-{{$index}}"
+                    class="ui-select-choices-row"
+                    data-ng-class="{'select2-highlighted': $select.isActive(this), 'select2-disabled': $select.isDisabled(this)}">
+                    <div class="select2-result-label ui-select-choices-row-inner">
+                    </div>
+                </li>
+            </ul>
+        </y-infinite-scrolling>
+    </li>
+</ul>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+           <alias name="sapOrderexchangeDefaultOmsSendReturnOrderToDataHubAction" alias="sapOrderexchangeSendOmsReturnOrderToBackEndAction" />
+	<bean id="sapOrderexchangeDefaultOmsSendReturnOrderToDataHubAction" class="com.sap.hybris.sapomsreturnprocess.actions.SendOmsReturnOrderToDataHubAction"
+		parent="abstractAction">
+		<property name="sendReturnOrderToDataHubHelper" ref="sapOmsOrderexchangeSendReturnOrderToDataHubHelper"></property>
+		<property name="modelService" ref="modelService"></property>
+		<property name="sapPlantLogSysOrgService" ref="sapPlantLogSysOrgService" />
+		<property name="keyGeneratorLookup" ref="keyGeneratorLookups"/>
+		<property name="returnSourcingContext" ref="sapDefaultReturnRequestSouricngContext"/>
+		
+		
+	</bean>
+	<alias name="defaultOmsOrderexchangeSendReturnOrderToDataHubHelper"
+		alias="sapOmsOrderexchangeSendReturnOrderToDataHubHelper" />
+	<bean id="defaultOmsOrderexchangeSendReturnOrderToDataHubHelper"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultSendReturnOrderToDataHubHelper"
+		parent="sapAbstractSendToDataHubHelper">
+		<property name="rawItemBuilder" ref="defaultOmsSapRawHybrisReturnOrderBuilder"></property>
+		<property name="rawItemType"
+			value="${saporderexchange.orderoutbound.datahub.rawOrderItemType}"></property>
+		<property name="feed" value="${returnsexchange.returnorder.outbound.datahub.feed}"></property>
+	</bean>
+	
+	<alias name="defaultOmsOrderexchangeSendCancelReturnOrderToDataHubHelper"
+		alias="sapOmsOrderexchangeSendCancelReturnOrderToDataHubHelper" />
+	<bean id="defaultOmsOrderexchangeSendCancelReturnOrderToDataHubHelper"
+		class="de.hybris.platform.sap.orderexchange.outbound.impl.AbstractSendToDataHubHelper">
+		<property name="rawItemBuilder" ref="defaultOmsSapRawHybrisCancelReturnOrderBuilder"></property>
+		<property name="rawItemType"
+			value="${saporderexchange.orderoutbound.datahub.rawOrderItemType}"></property>
+		<property name="feed" value="${returnsexchange.returnorder.outbound.datahub.feed}"></property>
+		<property name="dataHubOutboundService" ref="dataHubOutboundService"></property>
+	</bean>
+ 
+    
+    <bean id="defaultOmsBackendConfimationCheckAction" class="com.sap.hybris.sapomsreturnprocess.actions.SapReturnOrderBackendConfimationChecker" parent="abstractAction"/>
+    
+    <bean id="backendsConfirmationCheckActionForCancel" class="com.sap.hybris.sapomsreturnprocess.actions.SapReturnOrderBackendConfimationForCancelChecker" parent="abstractAction"/>
+    
+    <bean id="defaultGoodsReceiptStatusCheckAction" class="com.sap.hybris.sapomsreturnprocess.actions.SapGoodsReceiptStatusChecker" parent="abstractAction"/>
+    
+    
+    <bean id="cancelReturnRequestToSAPAction" class="com.sap.hybris.sapomsreturnprocess.actions.CancelReturnRequestToSAPAction" parent="sapOrderexchangeSendOmsReturnOrderToBackEndAction">
+    	<property name="sendCancelReturnOrderToDatahubHelper" ref="sapOmsOrderexchangeSendCancelReturnOrderToDataHubHelper"></property>
+    </bean>
+    
+    <alias name="omsInventoryUpdateAction" alias="omsInventoryUpdateAction"/>
+    <bean id="omsInventoryUpdateAction" class="com.sap.hybris.sapomsreturnprocess.actions.OmsInventoryUpdateAction" parent="abstractAction">
+        <property name="restockConfigService" ref="restockConfigService"/>
+        <property name="restockWarehouseSelectionStrategy" ref="restockWarehouseSelectionStrategy"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="warehouseStockService" ref="warehouseStockService"/>
+    </bean>
+</beans>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+<import resource="/ysapomsreturnprocess/process/oms-return-process-spring.xml" />
+	<bean id="sapReturnProcessDefinitionResource"
+		class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource"
+			value="classpath:/ysapomsreturnprocess/process/sap-oms-return-process.xml" />
+	</bean>
+	<bean id="defaultOmsReturnRequestCodeGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="${keygen.returnorder.code.xs1}" />
+		<property name="digits" value="${keygen.returnorder.code.digits}" />
+		<property name="start" value="${keygen.returnorder.code.start.xs1}" />
+		<property name="type" value="${keygen.returnorder.code.type}" />
+	</bean>
+
+	<bean id="defaultOmsReturnRequestCodeGeneratorXS2"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="${keygen.returnorder.code.xs2}" />
+		<property name="digits" value="${keygen.returnorder.code.digits}" />
+		<property name="start" value="${keygen.returnorder.code.start.xs2}" />
+		<property name="type" value="${keygen.returnorder.code.type}" />
+	</bean>
+	<bean id="keyGeneratorLookups" class="com.sap.hybris.sapomsreturnprocess.returns.keygenerator.KeyGeneratorLookup">
+		<property name="keyGeneratorFactories">
+			<map>
+				<entry key="${keygen.returnorder.code.xs1}" value-ref="defaultOmsReturnRequestCodeGenerator" />
+				<entry key="${keygen.returnorder.code.xs2}" value-ref="defaultOmsReturnRequestCodeGeneratorXS2" />
+			</map>
+		</property>
+	</bean>
+	
+   
+    <bean id="sapDefaultReturnRequestSouricngContext" class="com.sap.hybris.sapomsreturnprocess.returns.strategy.ReturnSourcingContext">
+		<property name="returnOrderStrategy" ref="defaultSplittingReturnStrategy" />
+
+	</bean>
+	
+	<bean id="defaultSplittingReturnStrategy"
+		class="com.sap.hybris.sapomsreturnprocess.returns.strategy.impl.DefaultReturnOrderSplittingStrategy">
+		
+	</bean>
+	<alias name="defaultOmsSapRawHybrisReturnOrderBuilder" alias="defaultOmsSapRawHybrisReturnOrderBuilder"/>
+	<bean id="defaultOmsSapRawHybrisReturnOrderBuilder"
+		class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultRawHybrisOrderBuilder"
+		parent="sapAbstractRawItemBuilder">
+		<property name="contributors">
+			<list>
+				<ref bean="returnOrderSalesConditionsContributor"></ref>
+				<ref bean="precedingDocContributor"></ref>
+				<ref bean="omsReturnOrderContributor"></ref>
+				<ref bean="returnOrderEntryContributor"></ref>
+				<ref bean="returnOrderPartnerContributor"></ref>
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultOmsSapRawHybrisCancelReturnOrderBuilder" alias="defaultOmsSapRawHybrisCancelReturnOrderBuilder"/>
+	<bean id="defaultOmsSapRawHybrisCancelReturnOrderBuilder"
+		class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultRawHybrisOrderBuilder"
+		parent="sapAbstractRawItemBuilder">
+		<property name="contributors">
+			<list>
+				<ref bean="precedingDocContributor"></ref>
+				<ref bean="omsReturnOrderContributor"></ref>
+				<ref bean="cancelReturnOrderEntryContributor"></ref>
+				<ref bean="returnOrderPartnerContributor"></ref>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultOmsReturnOrderContributor" alias="omsReturnOrderContributor" />
+	<bean id="defaultOmsReturnOrderContributor"
+		class="com.sap.hybris.sapomsreturnprocess.outbound.impl.OmsDefaultReturnOrderContributor">
+	</bean>
+	<alias name="defaultSapDataHubOmsInboundReturnOrderHelper" alias="sapDataHubInboundReturnOrderHelper" />
+	<bean id="defaultSapDataHubOmsInboundReturnOrderHelper"
+		class="com.sap.hybris.sapomsreturnprocess.inbound.impl.DefaultDataHubOmsInboundOrderHelper">
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+     <alias alias="returnActionAdapter" name="omsCancelReturnActionAdapter"/>
+    <bean id="omsCancelReturnActionAdapter" class="com.sap.hybris.sapomsreturnprocess.adapter.impl.SapOmsReturnActionAdapter">
+        <property name="businessProcessService" ref="businessProcessService"/>
+    </bean>
+			
+</beans>

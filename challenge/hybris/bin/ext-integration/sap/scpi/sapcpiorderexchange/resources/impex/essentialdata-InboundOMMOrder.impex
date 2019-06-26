@@ -1,0 +1,36 @@
+#***********************************************
+#************* Inbound SAP OMM Order ***********
+#***********************************************
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; InboundOMMOrder ; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique=true]; code[unique = true]; type(code)
+; InboundOMMOrder ; Order ; Order
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; InboundOMMOrder:Order ; code               ; Order:code               ; ; true
+; InboundOMMOrder:Order ; versionID          ; Order:versionID          ; ; true
+; InboundOMMOrder:Order ; sapRejectionReason ; Order:sapRejectionReason ; ;
+; InboundOMMOrder:Order ; sapGoodsIssueDate  ; Order:sapGoodsIssueDate  ; ;
+; InboundOMMOrder:Order ; sapPlantCode       ; Order:sapPlantCode       ; ;
+
+
+
+#*****************************************************
+#************* Inbound SAP OMM Order Entry ***********
+#*****************************************************
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; InboundOMMOrderEntry ; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique=true]; code[unique = true]; type(code)
+; InboundOMMOrderEntry ; Order      ; Order
+; InboundOMMOrderEntry ; OrderEntry ; OrderEntry
+
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; InboundOMMOrderEntry:OrderEntry ; entryNumber       ; OrderEntry:entryNumber       ;                            ; true
+; InboundOMMOrderEntry:OrderEntry ; namedDeliveryDate ; OrderEntry:namedDeliveryDate ;                            ;
+; InboundOMMOrderEntry:OrderEntry ; order             ; OrderEntry:order             ; InboundOMMOrderEntry:Order ; true
+
+; InboundOMMOrderEntry:Order      ; code              ; Order:code                   ;                            ; true
+; InboundOMMOrderEntry:Order      ; versionID         ; Order:versionID              ;                            ; true

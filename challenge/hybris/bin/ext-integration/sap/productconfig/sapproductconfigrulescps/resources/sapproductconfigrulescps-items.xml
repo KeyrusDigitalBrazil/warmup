@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<!-- ATTENTION: This is just an example file. You have to edit it according to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+
+	<relations>
+		<relation code="ProductConfig2CharacteristicValueRulesResults" localized="false" generate="true" autocreate="true">
+			<sourceElement type="ProductConfiguration" cardinality="one" qualifier="productConfiguration">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="CharacteristicValueRulesResult" cardinality="many" collectiontype="list"
+				qualifier="characteristicValueRulesResults">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+		<relation code="CharacteristicValueRulesResult2DiscountMessageRulesResults" localized="false" generate="true" autocreate="true">
+			<sourceElement type="CharacteristicValueRulesResult" cardinality="one" qualifier="csticValueRulesResult">
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement type="DiscountMessageRulesResult" cardinality="many" collectiontype="list"
+				qualifier="messageRulesResults">
+				<modifiers read="true" write="true" search="true" optional="true" partof="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+
+	<itemtypes>
+
+		<itemtype code="AbstractRuleEngineRule" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="validUntilDate" type="java.util.Date">
+					<modifiers optional="true" />
+					<persistence type="property" />
+					<description>Valid Until</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CharacteristicValueRulesResult" autocreate="true" generate="true">
+			<description>Characteristic Value specific rules results.</description>
+			<deployment table="CsticValueRulesResult" typecode="9913" />
+			<attributes>
+				<attribute qualifier="characteristic" type="java.lang.String">
+					<description>Characteristic Id.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="value" type="java.lang.String">
+					<description>Characteristic Value Id.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="discountValue" type="java.math.BigDecimal">
+					<description>Discount value associated with characteristic value.</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="DiscountMessageRulesResult" autocreate="true" generate="true">
+			<description>Discount Messages belonging to a Rules Result.</description>
+			<deployment table="MessageRulesResult" typecode="9914" />
+			<attributes>
+				<attribute qualifier="message" type="java.lang.String">
+					<description>Discount Message</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="endDate" type="java.util.Date">
+					<description>End Date of Discount Validity</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<enum class="de.hybris.platform.acceleratorfacades.cart.action.CartEntryAction">
+		<value>CPQ_COPY</value>
+	</enum>
+
+	<enum class="de.hybris.platform.sap.productconfig.frontend.util.impl.ErrorType">
+		<value>ERROR</value>
+		<value>MANDATORY_FIELD</value>
+		<value>CONFLICT</value>
+	</enum>
+
+	<enum class="de.hybris.platform.sap.productconfig.frontend.CPQOverviewActionType">
+		<value>TOGGLE_IMAGE_GALLERY</value>
+		<value>GO_TO_CART</value>
+		<value>APPLY_FILTER</value>
+	</enum>
+
+	<enum class="de.hybris.platform.sap.productconfig.frontend.OverviewMode">
+		<value>CONFIGURATION_OVERVIEW</value>
+		<value>VARIANT_OVERVIEW</value>
+		<value>VARIANT_OVERVIEW_FROM_CART_BOUND_CONFIG</value>		
+		<value>QUOTATION_OVERVIEW</value>
+		<value>QUOTATION_VARIANT_OVERVIEW</value>
+		<value>ORDER_OVERVIEW</value>
+		<value>ORDER_VARIANT_OVERVIEW</value>		
+		<value>SAVED_CART_OVERVIEW</value>
+		<value>SAVED_CART_VARIANT_OVERVIEW</value>		
+	</enum>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.util.impl.ErrorMessage">
+		<property name="path" type="String" />
+		<property name="code" type="String" />
+		<property name="message" type="String" />
+		<property name="args" type="java.lang.Object[]" />
+		<property name="type" type="de.hybris.platform.sap.productconfig.frontend.util.impl.ErrorType" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.OverviewUiData">
+		<property name="sourceDocumentId" type="String" />
+		<property name="configId" type="String" />
+		<property name="productCode" type="String" />
+		<property name="quantity" type="long" />
+		<property name="cartEntryNumber" type="Integer" />
+		<property name="abstractOrderCode" type="String" />
+		<property name="abstractOrderEntryNumber" type="Integer" />
+		<property name="overviewMode" type="de.hybris.platform.sap.productconfig.frontend.OverviewMode" />
+		<property name="cpqAction" type="de.hybris.platform.sap.productconfig.frontend.CPQOverviewActionType" />
+		<property name="groups" type="java.util.List&lt;de.hybris.platform.sap.productconfig.facades.overview.CharacteristicGroup&gt;" />
+		<property name="pricing" type="de.hybris.platform.sap.productconfig.facades.PricingData" />
+		<property name="csticFilterList" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.FilterData&gt;" />
+		<property name="groupFilterList" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.FilterData&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.FilterData">
+		<property name="key" type="String" />
+		<property name="description" type="String" />
+		<property name="selected" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.UiStatus">
+		<property name="specificationTreeCollapsed" type="boolean" />
+		<property name="quantity" type="long" />
+		<property name="priceSummaryCollapsed" type="boolean" />
+		<property name="hideImageGallery" type="boolean" />
+		<property name="groupIdToDisplay" type="String" />
+		<property name="lastNoneConflictGroupId" type="String" />
+		<property name="userInputToRemember" type="java.util.Map&lt;String,org.springframework.validation.FieldError&gt;" />
+		<property name="userInputToRestore" type="java.util.Map&lt;String,org.springframework.validation.FieldError&gt;" />
+		<property name="groups" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiGroupStatus&gt;" />
+		<property name="numberOfConflictsToDisplay" type="int" />
+		<property name="csticFilterList" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.FilterData&gt;" />
+		<property name="maxGroupFilterList" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.FilterData&gt;" />
+		<property name="firstErrorCsticId" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.UiGroupStatus">
+		<property name="id" type="String" />
+		<property name="collapsed" type="boolean" />
+		<property name="collapsedInSpecificationTree" type="boolean" />
+		<property name="visited" type="boolean" />
+		<property name="subGroups" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiGroupStatus&gt;" />
+		<property name="cstics" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiCsticStatus&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.UiCsticStatus">
+		<property name="id" type="String" />
+		<property name="showFullLongText" type="boolean" />
+		<property name="promoMessages"
+				  type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiPromoMessageStatus&gt;"/>
+		<property name="csticValuess" type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiCsticValueStatus&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.UiCsticValueStatus">
+		<property name="id" type="String" />
+		<property name="promoMessages"
+				  type="java.util.List&lt;de.hybris.platform.sap.productconfig.frontend.UiPromoMessageStatus&gt;"/>
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.frontend.UiPromoMessageStatus">
+		<property name="id" type="String"/>
+		<property name="showExtendedMessage" type="boolean"/>
+	</bean>
+</beans>
+

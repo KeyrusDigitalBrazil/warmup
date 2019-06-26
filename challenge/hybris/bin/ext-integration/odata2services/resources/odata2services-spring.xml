@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="odata2services-persistence-spring.xml" />
+
+	<alias name="defaultODataContextGenerator" alias="oDataContextGenerator" />
+	<bean name="defaultODataContextGenerator"
+		  class="de.hybris.platform.odata2services.odata.impl.DefaultODataContextGenerator">
+		<property name="serviceFactory" ref="oDataServiceFactory" />
+		<property name="entityExtractors">
+			<list>
+				<ref bean="getODataRequestEntityExtractor" />
+				<ref bean="postODataRequestEntityExtractor" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultGetODataRequestEntityExtractor" alias="getODataRequestEntityExtractor" />
+	<bean id="defaultGetODataRequestEntityExtractor"
+		  class="de.hybris.platform.odata2services.odata.impl.GetODataRequestEntityExtractor" />
+
+	<alias name="defaultPostODataRequestEntityExtractor" alias="postODataRequestEntityExtractor" />
+	<bean id="defaultPostODataRequestEntityExtractor"
+		  class="de.hybris.platform.odata2services.odata.impl.PostODataRequestEntityExtractor" />
+
+	<alias name="defaultSchemaGenerator" alias="oDataSchemaGenerator" />
+	<bean id="defaultSchemaGenerator" class="de.hybris.platform.odata2services.odata.schema.DefaultSchemaGenerator">
+		<property name="entityContainerGenerator" ref="oDataEntityContainerGenerator" />
+		<property name="associationListGeneratorRegistry" ref="oDataAssociationListGeneratorRegistry" />
+		<property name="entityTypesGenerator" ref="oDataEntityTypeListGenerator" />
+	</bean>
+
+	<alias name="defaultEntityTypeListGenerator" alias="oDataEntityTypeListGenerator" />
+	<bean id="defaultEntityTypeListGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.EntityTypeListGenerator">
+		<property name="entityTypeGenerators">
+			<list>
+				<ref bean="oDataComposedEntityTypeGenerator" />
+				<ref bean="oDataPrimitiveEntityTypeGenerator" />
+				<ref bean="oDataLocalizedEntityTypeGenerator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultEntityContainerGenerator" alias="oDataEntityContainerGenerator" />
+	<bean id="defaultEntityContainerGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.entity.DefaultEntityContainerGenerator">
+		<property name="entitySetGenerator" ref="oDataEntitySetGenerator" />
+		<property name="associationSetGenerator" ref="oDataAssociationSetGenerator" />
+	</bean>
+
+	<alias name="defaultLocalizedEntityTypeGenerator" alias="oDataLocalizedEntityTypeGenerator" />
+	<bean id="defaultLocalizedEntityTypeGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.LocalizedEntityTypeGenerator">
+		<property name="keyGenerator" ref="oDataLocalizedKeyGenerator" />
+		<property name="propertiesGenerator" ref="oDataLocalizedPropertyListGenerator" />
+	</bean>
+
+	<alias name="defaultPrimitiveEntityTypeGenerator" alias="oDataPrimitiveEntityTypeGenerator" />
+	<bean id="defaultPrimitiveEntityTypeGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.PrimitiveEntityTypeGenerator">
+		<property name="primitiveCollectionMemberEntityTypeGenerator" ref="oDataPrimitiveCollectionMemberEntityTypeGenerator" />
+	</bean>
+
+	<alias name="defaultPrimitiveCollectionMemberEntityTypeGenerator" alias="oDataPrimitiveCollectionMemberEntityTypeGenerator" />
+	<bean id="defaultPrimitiveCollectionMemberEntityTypeGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.PrimitiveCollectionMemberEntityTypeGenerator">
+	</bean>
+
+	<alias name="defaultComposedEntityTypeGenerator" alias="oDataComposedEntityTypeGenerator" />
+	<bean id="defaultComposedEntityTypeGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.ComposedEntityTypeGenerator">
+		<property name="propertiesGenerator" ref="oDataPropertyListGenerator" />
+		<property name="keyGenerator" ref="oDataKeyGenerator" />
+		<property name="registry" ref="oDataNavigationPropertyListGeneratorRegistry" />
+	</bean>
+
+	<alias name="defaultServiceFactory" alias="oDataServiceFactory" />
+	<bean id="defaultServiceFactory" class="de.hybris.platform.odata2services.odata.impl.DefaultServiceFactory">
+		<property name="edmProviderFactory" ref="oDataEdmProviderFactory" />
+		<property name="processorFactory" ref="oDataProcessorFactory" />
+	</bean>
+
+	<alias name="defaultEdmProviderFactory" alias="oDataEdmProviderFactory" />
+	<bean id="defaultEdmProviderFactory" class="de.hybris.platform.odata2services.odata.impl.DefaultEdmProviderFactory">
+		<property name="integrationObjectService" ref="integrationObjectService" />
+		<property name="schemaGenerator" ref="oDataSchemaGenerator" />
+	</bean>
+
+	<alias name="defaultKeyGenerator" alias="oDataKeyGenerator" />
+	<bean id="defaultKeyGenerator" class="de.hybris.platform.odata2services.odata.schema.IntegrationKeyGenerator" />
+
+	<alias name="localizedKeyGenerator" alias="oDataLocalizedKeyGenerator" />
+	<bean id="localizedKeyGenerator" class="de.hybris.platform.odata2services.odata.schema.LocalizedKeyGenerator" />
+
+	<alias name="defaultNavigationPropertyGenerator" alias="oDataNavigationPropertyGenerator" />
+	<bean id="defaultNavigationPropertyGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.navigation.NavigationPropertyGenerator">
+		<property name="associationGeneratorRegistry" ref="oDataAssociationGeneratorRegistry" />
+		<property name="attributeListGenerator" ref="oDataAttributeListGenerator" />
+	</bean>
+
+	<alias name="defaultNavigationPropertyListGenerator" alias="oDataNavigationPropertyListGenerator" />
+	<bean id="defaultNavigationPropertyListGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.navigation.NavigationPropertyListGenerator">
+		<property name="navigationPropertyGenerator" ref="oDataNavigationPropertyGenerator" />
+	</bean>
+
+	<alias name="defaultLocalizedNavigationPropertyListGenerator" alias="oDataLocalizedNavigationPropertyListGenerator" />
+	<bean id="defaultLocalizedNavigationPropertyListGenerator" class="de.hybris.platform.odata2services.odata.schema.navigation.LocalizedAttributeNavigationPropertyListGenerator" />
+
+	<alias name="defaultNavigationPropertyListGeneratorRegistry" alias="oDataNavigationPropertyListGeneratorRegistry" />
+	<bean name="defaultNavigationPropertyListGeneratorRegistry" class="de.hybris.platform.odata2services.odata.schema.navigation.NavigationPropertyListGeneratorRegistry">
+		<property name="generators">
+			<list>
+				<ref bean="oDataNavigationPropertyListGenerator" />
+				<ref bean="oDataLocalizedNavigationPropertyListGenerator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultOneToOneAssociationGenerator" alias="oDataOneToOneAssociationGenerator" />
+	<bean id="defaultOneToOneAssociationGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.association.OneToOneAssociationGenerator" />
+
+	<alias name="defaultCollectionAssociationGenerator" alias="oDataCollectionAssociationGenerator" />
+	<bean name="defaultCollectionAssociationGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.association.CollectionAssociationGenerator" />
+
+	<alias name="defaultLocalizedAttributeAssociationListGenerator" alias="oDataLocalizedAttributeAssociationListGenerator" />
+	<bean name="defaultLocalizedAttributeAssociationListGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.association.LocalizedAttributeAssociationListGenerator" />
+
+	<alias name="defaultAssociationListGenerator" alias="oDataAssociationListGenerator" />
+	<bean name="defaultAssociationListGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.association.AssociationListGenerator">
+		<property name="associationGeneratorRegistry" ref="oDataAssociationGeneratorRegistry" />
+	</bean>
+
+	<alias name="defaultAssociationGeneratorRegistry" alias="oDataAssociationGeneratorRegistry" />
+	<bean name="defaultAssociationGeneratorRegistry"
+		  class="de.hybris.platform.odata2services.odata.schema.association.AssociationGeneratorRegistry">
+		<property name="associationGenerators">
+			<list>
+				<ref bean="oDataOneToOneAssociationGenerator" />
+				<ref bean="oDataCollectionAssociationGenerator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAssociationListGeneratorRegistry" alias="oDataAssociationListGeneratorRegistry" />
+	<bean name="defaultAssociationListGeneratorRegistry"
+		  class="de.hybris.platform.odata2services.odata.schema.association.AssociationListGeneratorRegistry">
+		<property name="associationListGenerators">
+			<list>
+				<ref bean="oDataAssociationListGenerator" />
+				<ref bean="oDataLocalizedAttributeAssociationListGenerator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAssociationSetGenerator" alias="oDataAssociationSetGenerator" />
+	<bean id="defaultAssociationSetGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.association.AssociationSetGenerator">
+		<property name="nameGenerator" ref="oDataEntitySetNameGenerator" />
+	</bean>
+
+	<alias name="defaultEntitySetGenerator" alias="oDataEntitySetGenerator" />
+	<bean id="defaultEntitySetGenerator" class="de.hybris.platform.odata2services.odata.schema.entity.EntitySetGenerator">
+		<property name="nameGenerator" ref="oDataEntitySetNameGenerator" />
+	</bean>
+
+	<alias name="defaultPluralizingEntitySetNameGenerator" alias="oDataEntitySetNameGenerator" />
+	<bean id="defaultPluralizingEntitySetNameGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.entity.PluralizingEntitySetNameGenerator" />
+
+	<alias name="defaultAbstractPropertyListGenerator" alias="oDataAbstractPropertyListGenerator" />
+	<bean id="defaultAbstractPropertyListGenerator" class="de.hybris.platform.odata2services.odata.schema.property.AbstractPropertyListGenerator"
+		  abstract="true">
+		<property name="propertyGenerator" ref="oDataPropertyGenerator" />
+	</bean>
+
+	<alias name="defaultPropertyListGenerator" alias="oDataPropertyListGenerator" />
+	<bean id="defaultPropertyListGenerator" class="de.hybris.platform.odata2services.odata.schema.property.PrimitivePropertyListGenerator" parent="oDataAbstractPropertyListGenerator">
+		<property name="integrationKeyPropertyGenerator" ref="oDataIntegrationKeyPropertyGenerator" />
+	</bean>
+
+	<alias name="defaultLocalizedPropertyListGenerator" alias="oDataLocalizedPropertyListGenerator" />
+	<bean id="defaultLocalizedPropertyListGenerator" class="de.hybris.platform.odata2services.odata.schema.property.LocalizedPropertyListGenerator" parent="oDataAbstractPropertyListGenerator">
+	</bean>
+
+	<alias name="defaultSimplePropertyGenerator" alias="oDataPropertyGenerator" />
+	<bean id="defaultSimplePropertyGenerator" class="de.hybris.platform.odata2services.odata.schema.property.PropertyGenerator">
+		<property name="attributeListGenerator" ref="oDataAttributeListGenerator" />
+	</bean>
+
+	<alias name="defaultAttributeListGenerator" alias="oDataAttributeListGenerator" />
+	<bean id="defaultAttributeListGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.attribute.AttributeAnnotationListGenerator">
+		<property name="annotationGenerators">
+			<list>
+				<ref bean="oDataUniqueAttributeGenerator" />
+				<ref bean="oDataLanguageDependentAttributeGenerator" />
+				<ref bean="oDataNullableAttributeGenerator" />
+				<ref bean="oDataPartOfAttributeGenerator" />
+				<ref bean="oDataAutoCreateAnnotationGenerator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultNullableAttributeGenerator" alias="oDataNullableAttributeGenerator" />
+	<bean id="defaultNullableAttributeGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.attribute.NullableAttributeGenerator" />
+
+	<alias name="defaultUniqueAttributeGenerator" alias="oDataUniqueAttributeGenerator" />
+	<bean id="defaultUniqueAttributeGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.attribute.UniqueAttributeGenerator" />
+
+	<alias name="defaultPartOfAttributeGenerator"  alias="oDataPartOfAttributeGenerator" />
+	<bean id="defaultPartOfAttributeGenerator" class="de.hybris.platform.odata2services.odata.schema.attribute.PartOfGenerator" />
+
+	<alias name="defaultAutoCreateAnnotationGenerator" alias="oDataAutoCreateAnnotationGenerator" />
+	<bean id="defaultAutoCreateAnnotationGenerator" class="de.hybris.platform.odata2services.odata.schema.attribute.AutoCreateAnnotationGenerator">
+
+	</bean>
+	<alias name="defaultLanguageDependentAttributeGenerator" alias="oDataLanguageDependentAttributeGenerator" />
+	<bean id="defaultLanguageDependentAttributeGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.attribute.LanguageDependentAttributeGenerator" />
+
+	<alias name="defaultIntegrationKeyPropertyGenerator" alias="oDataIntegrationKeyPropertyGenerator" />
+	<bean id="defaultIntegrationKeyPropertyGenerator"
+		  class="de.hybris.platform.odata2services.odata.schema.property.IntegrationKeyPropertyGenerator">
+		<property name="aliasGenerator" ref="oDataAliasAnnotationGenerator" />
+	</bean>
+
+	<alias name="defaultEdmxProviderValidator" alias="oDataEdmxProviderValidator" />
+	<bean id="defaultEdmxProviderValidator" class="de.hybris.platform.odata2services.odata.EdmxProviderValidator" />
+
+	<alias name="defaultAliasAnnotationGenerator" alias="oDataAliasAnnotationGenerator" />
+	<bean id="defaultAliasAnnotationGenerator" class="de.hybris.platform.odata2services.odata.schema.attribute.AliasAnnotationGenerator">
+		<property name="integrationKeyMetadataGenerator" ref="integrationKeyMetadataGenerator" />
+	</bean>
+
+	<alias name="defaultInboundRequestService" alias="oDataInboundRequestService" />
+	<bean id="defaultInboundRequestService"
+		  class="de.hybris.platform.odata2services.odata.monitoring.impl.DefaultInboundRequestService">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultJsonIntegrationKeyExtractor" alias="oDataJsonIntegrationKeyExtractor" />
+	<bean id="defaultJsonIntegrationKeyExtractor"
+		  class="de.hybris.platform.odata2services.odata.monitoring.impl.JsonIntegrationKeyExtractor" />
+
+	<alias name="defaultXmlIntegrationKeyExtractor" alias="oDataXmlIntegrationKeyExtractor" />
+	<bean id="defaultXmlIntegrationKeyExtractor"
+		  class="de.hybris.platform.odata2services.odata.monitoring.impl.XmlIntegrationKeyExtractor" />
+
+	<alias name="defaultOData2ServicesConfiguration" alias="oDataServicesConfiguration" />
+	<bean id="defaultOData2ServicesConfiguration" class="de.hybris.platform.odata2services.config.DefaultOData2ServicesConfiguration">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias name="defaultODataRequestEntityExtractor" alias="oDataRequestEntityExtractor"/>
+	<bean id="defaultODataRequestEntityExtractor" class="de.hybris.platform.odata2services.odata.monitoring.impl.DefaultRequestBatchEntityExtractor">
+		<property name="configuration" ref="oDataServicesConfiguration" />
+	</bean>
+
+	<alias name="defaultODataResponseEntityExtractor" alias="oDataResponseEntityExtractor" />
+	<bean id="defaultODataResponseEntityExtractor"
+		  class="de.hybris.platform.odata2services.odata.monitoring.impl.DefaultResponseEntityExtractor">
+		<property name="integrationKeyExtractors">
+			<list>
+				<ref bean="oDataJsonIntegrationKeyExtractor" />
+				<ref bean="oDataXmlIntegrationKeyExtractor" />
+			</list>
+		</property>
+		<property name="errorParsers">
+			<list>
+				<ref bean="xmlMonitoredRequestErrorParser" />
+				<ref bean="jsonMonitoredRequestErrorParser" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultBinaryOperatorToSqlOperatorConverter" alias="oDataBinaryOperatorToSqlOperatorConverter" />
+	<bean id="defaultBinaryOperatorToSqlOperatorConverter" class="de.hybris.platform.odata2services.filter.BinaryOperatorToSqlOperatorConverter" />
+
+	<alias name="defaultExpressionVisitorFactory" alias="oDataExpressionVisitorFactory" />
+	<bean id="defaultExpressionVisitorFactory" class="de.hybris.platform.odata2services.filter.impl.DefaultExpressionVisitorFactory">
+		<property name="itemLookupStrategy" ref="oDataItemLookupStrategy" />
+		<property name="itemLookupRequestFactory" ref="oDataItemLookupRequestFactory" />
+		<property name="integrationKeyConverter" ref="oDataIntegrationKeyToODataEntryGenerator" />
+		<property name="entitySetNameGenerator" ref="oDataEntitySetNameGenerator" />
+		<property name="operatorConverter" ref="oDataBinaryOperatorToSqlOperatorConverter" />
+	</bean>
+</beans>

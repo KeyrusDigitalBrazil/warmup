@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+    <import resource="configuration-strategy.xml"/>
+
+  	<bean id="cPQSalesDocumentERPHook" class="de.hybris.platform.sap.sapproductconfigsombol.hook.CPQSalesDocumentERPHook"  scope="sapSession">
+		<property name="productConfigurationStrategy" ref="sapOrdermgmtProductConfigurationStrategy" />
+		<property name="cPQSalesDocumentImpl" ref="cPQSalesDocumentImpl" />
+	</bean>
+	
+	<bean id="cPQSalesDocumentERPHookMergeDirective" depends-on="salesDocumentERPHooks" parent="listMergeDirective"  scope="sapSession">
+		<property name="add" ref="cPQSalesDocumentERPHook" />
+	</bean>
+	
+	<bean id="cPQSalesDocumentHook" class="de.hybris.platform.sap.sapproductconfigsombol.hook.CPQSalesDocumentHook"  scope="sapSession">
+		<property name="productConfigurationService" ref="sapProductConfigConfigurationService" />
+		<property name="cPQSalesDocumentImpl" ref="cPQSalesDocumentImpl" />
+	</bean>
+	
+	<bean id="cPQSalesDocumentHookMergeDirective" depends-on="salesDocumentHooks" parent="listMergeDirective" scope="sapSession">
+		<property name="add" ref="cPQSalesDocumentHook" />
+	</bean>
+	
+	<bean id="cPQSalesDocumentImpl" scope="sapSession" class="de.hybris.platform.sap.sapproductconfigsombol.transaction.salesdocument.businessobject.impl.CPQSalesDocumentImpl"></bean>
+	
+			
+</beans>

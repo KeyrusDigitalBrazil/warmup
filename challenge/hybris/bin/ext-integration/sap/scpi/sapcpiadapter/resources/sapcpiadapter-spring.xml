@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath:/sapcpiadapter-charon-spring.xml"/>
+
+	<!-- SAP CPI Outbound Request Decorator -->
+	<alias name="sapCpiDefaultOutboundRequestDecorator" alias="sapCpiOutboundRequestDecorator" />
+	<bean id="sapCpiDefaultOutboundRequestDecorator" class="de.hybris.platform.sap.sapcpiadapter.decorator.impl.SapCpiOutboundRequestDecorator">
+		<property name="integrationRestTemplateFactory" ref="integrationRestTemplateFactory" />
+	</bean>
+
+	<!-- SAP CPI Outbound Service Facade -->
+	<alias name="sapCpiDefaultOutboundServiceFacade" alias="sapCpiOutboundServiceFacade" />
+	<bean id="sapCpiDefaultOutboundServiceFacade" parent="outboundServiceFacade">
+		<property name="outboundRequestDecorators">
+			<bean parent="outboundRequestDecoratorList" class="org.springframework.beans.factory.config.ListFactoryBean">
+				<property name="sourceList">
+					<list merge="true">
+						<ref bean="sapCpiOutboundRequestDecorator" />
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!-- SAP CPI Outbound Service -->
+	<alias name="sapCpiDefaultOutboundService" alias="sapCpiOutboundService" />
+	<bean id="sapCpiDefaultOutboundService" class="de.hybris.platform.sap.sapcpiadapter.service.impl.SapCpiOutboundServiceImpl">
+		<property name="outboundServiceFacade" ref="sapCpiOutboundServiceFacade" />
+	</bean>
+
+</beans>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+[y] hybris Platform
+
+Copyright (c) 2018 SAP SE or an SAP affiliate company.
+All rights reserved.
+
+This software is the confidential and proprietary information of SAP
+("Confidential Information"). You shall not disclose such Confidential
+Information and shall use it only in accordance with the terms of the
+license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Validators -->
+    <alias name="defaultOrderCancelRequestValidator" alias="orderCancelRequestValidator"/>
+    <bean id="defaultOrderCancelRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="entries"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="userId"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCancelEntryValidator" alias="cancelEntryValidator"/>
+    <bean id="defaultCancelEntryValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldIntegerValidator">
+                    <property name="fieldPath" value="orderEntryNumber"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="cancelQuantity"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="cancelReason"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCancelReturnRequestValidator" alias="cancelReturnRequestValidator"/>
+    <bean id="defaultCancelReturnRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="code"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="cancelReason"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultReturnRequestValidator" alias="returnRequestValidator"/>
+    <bean id="defaultReturnRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="order"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="returnEntries"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultReturnEntryValidator" alias="returnEntryValidator"/>
+    <bean id="defaultReturnEntryValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldGreaterThanZeroValidator">
+                    <property name="fieldPath" value="expectedQuantity"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="action"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="refundAmount"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="refundReason"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultOrderRequestValidator" alias="orderRequestValidator"/>
+    <bean id="defaultOrderRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="externalOrderCode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="siteUid"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="storeUid"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="currencyIsocode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="languageIsocode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryModeCode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="user"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryAddress"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="paymentTransactions"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="entries"/>
+                </bean>
+                <ref bean="deliveryAddressInOrderRequestValidator"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <alias name="defaultOrderEntryRequestValidator" alias="orderEntryRequestValidator"/>
+    <bean id="defaultOrderEntryRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="productCode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldIntegerValidator">
+                    <property name="fieldPath" value="entryNumber"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="unitCode"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldGreaterThanZeroValidator">
+                    <property name="fieldPath" value="quantity"/>
+                </bean>
+                <ref bean="pointOfServiceInOrderEntryRequestValidator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultPointOfServiceInOrderEntryRequestValidator" alias="pointOfServiceInOrderEntryRequestValidator"/>
+    <bean id="defaultPointOfServiceInOrderEntryRequestValidator"
+          class="de.hybris.platform.ordermanagementwebservices.validators.PointOfServiceValidator">
+        <property name="pointOfServiceService" ref="pointOfServiceService"/>
+        <property name="fieldPath" value="deliveryPointOfService"/>
+    </bean>
+
+
+    <alias name="defaultDeliveryAddressInOrderRequestValidator" alias="deliveryAddressInOrderRequestValidator"/>
+    <bean id="defaultDeliveryAddressInOrderRequestValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryAddress.firstName"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryAddress.lastName"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryAddress.line1"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyValidator">
+                    <property name="fieldPath" value="deliveryAddress.town"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyOrTooLongValidator">
+                    <property name="fieldPath" value="deliveryAddress.postalCode"/>
+                    <property name="maxLength" value="10"/>
+                </bean>
+                <bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyOrTooLongValidator">
+                    <property name="fieldPath" value="deliveryAddress.country.isocode"/>
+                    <property name="maxLength" value="2"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultRefundReasonValidator" alias="refundReasonValidator"/>
+    <bean id="defaultRefundReasonValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.EnumValueValidator">
+                    <constructor-arg name="enumClass" value="RefundReason"/>
+                    <property name="enumerationService" ref="enumerationService"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultReturnActionValidator" alias="returnActionValidator"/>
+    <bean id="defaultReturnActionValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.EnumValueValidator">
+                    <constructor-arg name="enumClass" value="ReturnAction"/>
+                    <property name="enumerationService" ref="enumerationService"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCancelReasonValidator" alias="cancelReasonValidator"/>
+    <bean id="defaultCancelReasonValidator"
+          class="de.hybris.platform.webservicescommons.validators.CompositeValidator">
+        <property name="validators">
+            <list>
+                <bean class="de.hybris.platform.webservicescommons.validators.EnumValueValidator">
+                    <constructor-arg name="enumClass" value="CancelReason"/>
+                    <property name="enumerationService" ref="enumerationService"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultPriceValidator" alias="priceValidator"/>
+    <bean id="defaultPriceValidator"
+          class="de.hybris.platform.ordermanagementwebservices.validators.PriceValidator">
+    </bean>
+
+</beans>

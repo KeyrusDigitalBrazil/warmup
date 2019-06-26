@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="textFieldConfigurationsPopulator" class="de.hybris.platform.textfieldconfiguratortemplatefacades.populators.TextFieldConfigurationsPopulator" />
+	<bean id="textFieldConfiguratorEnum" class="de.hybris.platform.catalog.enums.ConfiguratorType" factory-method="valueOf">
+		<constructor-arg value="TEXTFIELD"/>
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryProductInfoConverter"/>
+		<property name="add" ref="textFieldConfigurationsPopulator"/>
+	</bean>
+
+	<bean id="textFieldConfigurationHandlerRegistrar" parent="mapMergeDirective" depends-on="productConfigurationHandlers">
+		<property name="key" value="TEXTFIELD" />
+		<property name="value" ref="textFieldConfigurationHandler" />
+	</bean>
+
+	<bean id="textFieldConfigurationHandler" class="de.hybris.platform.textfieldconfiguratortemplateservices.order.hook.TextFieldConfigurationHandler"/>
+
+
+</beans>

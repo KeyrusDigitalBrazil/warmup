@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="httpURLConnectionService" class="com.hybris.ymkt.common.http.HttpURLConnectionService" />
+
+	<bean id="ODataConvertEdmService" class="com.hybris.ymkt.common.odata.ODataConvertEdmService" />
+
+	<bean id="ODataService" class="com.hybris.ymkt.common.odata.ODataService" abstract="true">
+		<property name="httpURLConnectionService" ref="httpURLConnectionService" />
+		<property name="ODataConvertEdmService" ref="ODataConvertEdmService" />
+		<property name="user" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.user')}" />
+		<property name="password" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.password')}" />
+		<property name="proxy" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.proxy')}" />
+		<property name="sapClient" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.sap-client')}" />
+	</bean>
+
+	<bean id="ODataService_API_MKT_PRODUCT_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/API_MKT_PRODUCT_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_API_MKT_PRODCAT_HIERARCHY_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/API_MKT_PRODCAT_HIERARCHY_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_API_MKT_TARGET_GROUP_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/API_MKT_TARGET_GROUP_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_BUSINESS_DOCUMENT_IMP_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_BUSINESS_DOCUMENT_IMP_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_INITIATIVE_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_INITIATIVE_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_IMPORT_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_IMPORT_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_IMPORT_MESSAGES_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_IMPORT_MESSAGES_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_OFFER_DISCOVERY_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_OFFER_DISCOVERY_SRV'}" />
+	</bean>
+
+	<bean id="ODataService_CUAN_PRODUCT_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/CUAN_PRODUCT_SRV/'}" />
+	</bean>
+
+	<bean id="ODataService_PROD_RECO_RUNTIME_SRV" parent="ODataService">
+		<property name="rootUrl" value="#{configurationService.configuration.getProperty('sapymktcommon.odata.url.root') + '/sap/opu/odata/sap/PROD_RECO_RUNTIME_SRV'}" />
+	</bean>
+
+	<bean id="ymktConsentService" class="com.hybris.ymkt.common.consent.impl.DefaultYmktConsentService" />
+
+	<bean id="userContextService" class="com.hybris.ymkt.common.user.UserContextService">
+		<property name="userService" ref="userService" />
+		<property name="ymktConsentService" ref="ymktConsentService" />
+		<property name="anonymousUserOrigin" value="#{configurationService.configuration.getProperty('sapymktcommon.user.origin.anonymous')}"/>
+	</bean>
+
+	<bean id="ymktSapOutboundIdFilter" class="com.hybris.ymkt.common.filter.SapOutboundIdFilter">
+		<property name="sessionService" ref="sessionService" />
+		<property name="trackingURLKeys" value="#{configurationService.configuration.getProperty('sapymktcommon.tracking.url.keys')}"/>
+	</bean>
+
+	<bean id="ymktPersonalizationPiwikStrategyFilter" class="com.hybris.ymkt.common.filter.YmktPersonalizationPiwikStrategyFilter">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="ymktSapOutboundIdPrepareInterceptor" class="com.hybris.ymkt.common.interceptor.SapOutboundIdPrepareInterceptor">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<bean id="ymktSapOutboundIdPrepareMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ymktSapOutboundIdPrepareInterceptor"/>
+		<property name="typeCode" value="AbstractOrder"/>
+	</bean>
+
+	<bean id="ymktProductURLService" class="com.hybris.ymkt.common.product.ProductURLService">
+		<property name="productService" ref="productService"/>
+		<property name="imagePrefix" value="#{configurationService.configuration.getProperty('sapymktcommon.product.imagePrefix')}" />
+		<property name="navPrefix" value="#{configurationService.configuration.getProperty('sapymktcommon.product.navPrefix')}" />
+		<property name="navSuffix" value="#{configurationService.configuration.getProperty('sapymktcommon.product.navSuffix')}" />
+	</bean>
+
+</beans>

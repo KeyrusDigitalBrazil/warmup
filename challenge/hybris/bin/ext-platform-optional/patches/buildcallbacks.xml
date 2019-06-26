@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="patches_buildcallbacks">
+
+	<!-- 
+	    Called whenever 'ant ear' is used. this callback can be used to modify the content of the ear file
+	
+	     ${ear.path}: 			path to ear
+	 -->
+	<macrodef name="patches_before_ear">
+		<sequential>
+
+			<!-- you can do anything before the EAR file is being packed -->
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="patches_before_build">
+		<sequential>
+			<patches_groovynature_before_build extname="patches" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="patches_after_compile_core">
+		<sequential>
+			<patches_groovynature_compile_core extname="patches" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="patches_groovynature_before_build">
+		<attribute name="extname"/>
+		<sequential>
+			<!-- defines native file extension used by the nature of the extension -->
+			<property name="ext.@{extname}.native.file.extension" value="groovy"/>
+			<!-- defines test source folder for groovy tests -->
+			<property name="ext.@{extname}.additional.testsrc.dir" value="groovytestsrc"/>
+			<outofdate>
+				<sourcefiles>
+					<fileset dir="${ext.@{extname}.path}">
+						<include name="${ext.@{extname}.additional.testsrc.dir}/**"/>
+					</fileset>
+				</sourcefiles>
+				<targetfiles path="${HYBRIS_TEMP_DIR}/touch/${extname}_testsrctouch"/>
+				<sequential>
+					<touch mkdirs="true">
+						<fileset dir="${ext.@{extname}.path}/${ext.@{extname}.additional.testsrc.dir}"/>
+					</touch>
+				</sequential>
+			</outofdate>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="patches_groovynature_compile_core">
+		<attribute name="extname"/>
+		<sequential>
+			<if>
+				<isset property="ext.@{extname}.coremodule.available"/>
+				<then>
+					<if>
+						<istrue value="${ext.@{extname}.extension.coremodule.sourceavailable}"/>
+						<then>
+							<groovy_compile srcdir="${ext.@{extname}.path}/groovytestsrc"
+								destdir="${ext.@{extname}.path}/classes"
+								extname="@{extname}"/>
+						</then>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="patches_groovynature_compile_web">
+		<attribute name="extname"/>
+		<sequential>
+			<if>
+				<isset property="ext.@{extname}.webmodule.available"/>
+				<then>
+					<if>
+						<istrue value="${ext.@{extname}.extension.webmodule.sourceavailable}"/>
+						<then>
+							<groovy_compile srcdir="${ext.@{extname}.path}/web/groovytestsrc"
+								destdir="${ext.@{extname}.path}/web/webroot/WEB-INF/classes"
+								extname="@{extname}"/>
+						</then>
+					</if>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

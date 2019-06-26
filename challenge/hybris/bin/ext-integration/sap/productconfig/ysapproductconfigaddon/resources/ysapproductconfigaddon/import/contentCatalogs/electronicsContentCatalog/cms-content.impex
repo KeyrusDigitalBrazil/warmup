@@ -1,0 +1,292 @@
+# Import the CMS content for the Product Configuration Component
+#
+
+### Staged Catalog ###
+# Set Macros used by the impex script
+$contentCatalog=electronicsContentCatalog
+$productCatalog=electronicsProductCatalog
+$contentCV=catalogVersion(catalog(id[default=$contentCatalog]),version[default='Staged'])
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])
+$jarResource=jar:de.hybris.platform.sap.productconfig.frontend.constants.SapproductconfigaddonConstants&/ysapproductconfigaddon/import/cockpits/cmscockpit
+
+
+
+################################################
+### Product Configuration component Group    ###
+################################################
+
+INSERT_UPDATE ComponentTypeGroup;code[unique=true]
+;productconfiguration
+;productconfigurationOverview
+
+################################################
+### Product Configuration Form               ###
+################################################
+
+# CMS ProductConfigurationForm Components
+INSERT_UPDATE ProductConfigurationFormComponent;$contentCV[unique=true];uid[unique=true];name;groupStartLevel;&componentRef
+;;ProductConfigurationForm;Product Configuration Form;0;ProductConfigurationForm
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationFormComponent
+
+################################################
+### Product Configuration Add Config To Cart ###
+################################################
+# CMS Product Add Config To Cart Components
+INSERT_UPDATE ProductAddConfigToCartComponent;$contentCV[unique=true];uid[unique=true];name;showOnlyForLongConfigurations;&componentRef
+;;ProductAddConfigToCart;Add Configuration To Cart;FALSE;ProductAddConfigToCart
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductAddConfigToCartComponent
+
+################################################
+### Product Configuration Title Summary      ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationTitleSummaryComponent;$contentCV[unique=true];uid[unique=true];name;showSummary;&componentRef
+;;ProductConfigurationTitleSummary;Product Configuration Title and Summary;TRUE;ProductConfigurationTitleSummary
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationTitleSummaryComponent
+
+################################################
+### Product Configuration Image              ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationImageComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationImage;Product Configuration Image;ProductConfigurationImage
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationImageComponent
+
+################################################
+### Product Configuration Price Summary      ###
+################################################
+
+# CMS ProductConfiguration Components
+INSERT_UPDATE ProductConfigurationPriceSummaryComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationPriceSummary;Product Configuration Price Summary;ProductConfigurationPriceSummary
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationPriceSummaryComponent
+
+
+################################################
+### Product Configuration MENU               ###
+################################################
+
+# CMS Product Config Menu Components
+INSERT_UPDATE ProductConfigurationMenuComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationMenu;Product Configuration Menu;ProductConfigurationMenu
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationMenuComponent
+
+################################################
+### Product Configuration Previous & Next    ###
+################################################
+# CMS ProductConfigurationPrevNext Components
+INSERT_UPDATE ProductConfigurationPrevNextComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationPrevNext;Product Configuration Previous & Next Group;ProductConfigurationPrevNext
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationPrevNextComponent
+
+################################################
+### Product Configuration Variant List       ###
+################################################
+# CMS ProductConfigurationPrevNext Components
+INSERT_UPDATE ProductConfigurationVariantListComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationVariantList;Product Configuration Variant List;ProductConfigurationVariantList
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfiguration;ProductConfigurationVariantListComponent
+
+
+################################################
+### Product Configuration Overview Page      ###
+################################################
+
+# CMS ProductConfigurationOverview Components
+INSERT_UPDATE ProductConfigurationOverviewComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationOverview;Product Configuration Overview;ProductConfigurationOverview
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfigurationOverview;ProductConfigurationOverviewComponent
+
+# CMS ProductConfiguration Overview Title Component
+INSERT_UPDATE ProductConfigurationOverviewTitleComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationOverviewTitle;Product Configuration Overview Title;ProductConfigurationOverviewTitle
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfigurationOverview;ProductConfigurationOverviewTitleComponent
+
+# CMS ProductConfiguration Filter Component
+INSERT_UPDATE ProductConfigurationFilterComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ProductConfigurationFilter;Product Configuration Filter;ProductConfigurationFilter
+
+# Add component type to group
+INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
+;productconfigurationOverview;ProductConfigurationFilterComponent
+
+################################################
+### Page Type / Page Template Definition     ###
+################################################
+
+# define page template
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductConfigurationTemplate;Product Configuration Template;configuration/configurationPage;ProductConfigPage
+
+# define velocity template, which is used CMS  Cockpit view
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductConfigurationTemplate;$jarResource/structure-view/structure_productConfigurationPageTemplate.vm
+
+# assign content slots to page template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductConfigurationTemplate'];validComponentTypes(code);compTypeGroup(code)
+;TopHeaderSlot;;;wide
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;narrow
+;Section4;;;narrow
+;Footer;;;footer
+;ConfigHeader;;ProductConfigurationImageComponent;wide
+;ConfigTitle;;ProductConfigurationTitleSummaryComponent;narrow
+;ConfigContent;;ProductConfigurationFormComponent,ProductConfigurationPrevNextComponent;narrow
+;ConfigSidebar;;ProductConfigurationPriceSummaryComponent,ProductAddConfigToCartComponent,ProductReferencesComponent,ProductConfigurationMenuComponent;narrow
+;ConfigBottombarSlot;;ProductConfigurationPriceSummaryComponent,ProductAddConfigToCartComponent,ProductConfigurationVariantListComponent;narrow
+
+# define slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;ConfigHeaderSlot;Product Configuration Header Slot;true
+;;ConfigTitleSlot;Product Configuration Title Slot;true
+;;ConfigContentSlot;Product Configuration Content Slot;true
+;;ConfigSidebarSlot;Product Configuration Side Bar Slot;true
+;;ConfigBottombarSlot;Product Configuration Bottom Bar Slot;true
+
+# bind slots to the template
+INSERT_UPDATE ContentSlotForTemplate;$contentCV;uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductConfigurationTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;TopHeaderSlot-ConfigPage;TopHeaderSlot;;TopHeaderSlot;true
+;;SiteLogo-ConfigPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ConfigPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-ConfigPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ConfigPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ConfigPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ConfigPage;Footer;;FooterSlot;true
+;;ConfigHeader-ConfigPage;ConfigHeader;;ConfigHeaderSlot;true
+;;ConfigTitle-ConfigPage;ConfigTitle;;ConfigTitleSlot;true
+;;ConfigContent-ConfigPage;ConfigContent;;ConfigContentSlot;true
+;;ConfigSidebar-ConfigPage;ConfigSidebar;;ConfigSidebarSlot;true
+;;ConfigBottombar-ConfigPage;ConfigBottombar;;ConfigBottombarSlot;true
+
+# Default Product Config Page
+INSERT_UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productConfig;Product Configuration;ProductConfigurationTemplate;true
+
+# texts
+UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];title[lang=en]
+;;productConfig;Product Configuration;
+
+UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];title[lang=de]
+;;productConfig;Produkt Konfiguration;
+
+# Bind Component to Slot
+INSERT_UPDATE ElementsForSlot;source($contentCV,uid)[unique=true];target(&componentRef)[unique=true];
+;ConfigHeaderSlot;ProductConfigurationImage
+;ConfigTitleSlot;ProductConfigurationTitleSummary
+;ConfigSidebarSlot;ProductConfigurationMenu
+;ConfigContentSlot;ProductConfigurationForm
+;ConfigContentSlot;ProductConfigurationPrevNext
+;ConfigBottombarSlot;ProductConfigurationPriceSummary
+;ConfigBottombarSlot;ProductConfigurationVariantList
+
+# Add base product attribute to solr index for variant search
+$solrIndexedType=electronicsProductType
+
+INSERT_UPDATE 	SolrIndexedProperty	;solrIndexedType(identifier)[unique=true]	;name[unique=true]	;type(code)	;facet;visible		;currency[default=false]	;localized[default=false]	;multiValue[default=false]	;useForSpellchecking[default=false]	;useForAutocomplete[default=false]	;fieldValueProvider									
+												;$solrIndexedType									;baseProduct     	   ;string		;true	;false		;false    						;false    						;false    						;false    									;false    									;sapProductConfigDefaultBaseValueResolver	
+
+
+
+################################################
+### Overview  / Page Template Definition     ###
+################################################
+# define page template
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;ProductConfigurationOverviewTemplate;Product Configuration Overview Template;configuration/configurationOverviewPage;ProductConfigOverviewPage
+
+# define velocity template, which is used CMS  Cockpit view
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ProductConfigurationOverviewTemplate;$jarResource/structure-view/structure_configOverviewPageTemplate.vm
+
+
+# assign content slots to page template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ProductConfigurationOverviewTemplate'];validComponentTypes(code);compTypeGroup(code)
+;TopHeaderSlot;;;wide
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section2;;;wide
+;Section3;;;narrow
+;Section4;;;narrow
+;Footer;;;footer
+;ConfigOverviewHeader;;ProductConfigurationImageComponent,ProductConfigurationTitleSummaryComponent;wide
+;ConfigOverviewTitle;;ProductConfigurationFilterComponent,ProductConfigurationTitleSummaryComponent;narrow
+;ConfigOverviewContent;;ProductConfigurationOverviewComponent;narrow
+;ConfigOverviewSidebar;;ProductConfigurationFilterComponent;narrow
+;ConfigOverviewBottombarSlot;;ProductConfigurationPriceSummaryComponent,ProductAddConfigToCartComponent;narrow
+
+# define slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;ConfigOverviewHeaderSlot;Configuration Overview Header Slot;true
+;;ConfigOverviewTitleSlot;Configuration Overview Title Slot;true
+;;ConfigOverviewContentSlot;Configuration Overview Content Slot;true
+;;ConfigOverviewSidebarSlot;Configuration Overview Side Bar Slot;true
+;;ConfigOverviewBottombarSlot;Configuration Overview Bottom Bar Slot;true
+
+# bind slots to the template
+INSERT_UPDATE ContentSlotForTemplate;$contentCV;uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ProductConfigurationOverviewTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;TopHeaderSlot-ConfigOverviewPage;TopHeaderSlot;;TopHeaderSlot;true
+;;SiteLogo-ConfigOverviewPage;SiteLogo;;SiteLogoSlot;true
+;;HeaderLinks-ConfigOverviewPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-ConfigOverviewPage;SearchBox;;SearchBoxSlot;true
+;;MiniCart-ConfigOverviewPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-ConfigOverviewPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-ConfigOverviewPage;Footer;;FooterSlot;true
+;;ConfigOverviewHeader-ConfigOverviewPage;ConfigOverviewHeader;;ConfigOverviewHeaderSlot;true
+;;ConfigOverviewTitle-ConfigOverviewPage;ConfigOverviewTitle;;ConfigOverviewTitleSlot;true
+;;ConfigOverviewContent-ConfigOverviewPage;ConfigOverviewContent;;ConfigOverviewContentSlot;true
+;;ConfigOverviewSidebar-ConfigOverviewPage;ConfigOverviewSidebar;;ConfigOverviewSidebarSlot;true
+;;ConfigOverviewBottombar-ConfigOverviewPage;ConfigOverviewBottombar;;ConfigOverviewBottombarSlot;true
+
+# Default Product Config Overview Page
+INSERT_UPDATE ProductConfigPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;productConfigOverview;Product Configuration Overview;ProductConfigurationOverviewTemplate;true
+
+INSERT_UPDATE ElementsForSlot;source($contentCV,uid)[unique=true];target(&componentRef)[unique=true];
+;ConfigOverviewTitleSlot;ProductConfigurationOverviewTitle
+;ConfigOverviewHeaderSlot;ProductConfigurationTitleSummary
+;ConfigOverviewHeaderSlot;ProductConfigurationImage
+;ConfigOverviewSidebarSlot;ProductConfigurationFilter
+;ConfigOverviewContentSlot;ProductConfigurationOverview
+;ConfigOverviewBottombarSlot;ProductConfigurationPriceSummary

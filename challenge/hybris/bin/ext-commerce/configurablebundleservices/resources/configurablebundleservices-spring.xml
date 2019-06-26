@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config/>
+
+	<bean id="configurableBundleServicesSystemSetup" class="de.hybris.platform.configurablebundleservices.setup.ConfigurableBundleServicesSystemSetup" parent="commerceServicesSystemSetup" />
+
+	<alias alias="bundleRuleDao" name="abstractBundleRuleDao"/>
+	<bean id="abstractBundleRuleDao" abstract="true" class="de.hybris.platform.configurablebundleservices.daos.impl.AbstractBundleRuleDao" parent="abstractItemDao" >
+	</bean> 
+
+	<alias alias="disableProductBundleRuleDao" name="defaultDisableProductBundleRuleDao"/>
+	<bean id="defaultDisableProductBundleRuleDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultDisableProductBundleRuleDao" parent="bundleRuleDao" >
+	</bean> 	
+
+	<alias alias="changeProductPriceBundleRuleDao" name="defaultChangeProductPriceBundleRuleDao"/>
+	<bean id="defaultChangeProductPriceBundleRuleDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultChangeProductPriceBundleRuleDao" parent="bundleRuleDao" />
+
+	<alias alias="bundleTemplateDao" name="defaultBundleTemplateDao"/>
+	<bean id="defaultBundleTemplateDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultBundleTemplateDao" parent="abstractItemDao" >
+	</bean> 
+
+	<alias alias="orderEntryDao" name="abstractOrderEntryDao"/>
+	<bean id="abstractOrderEntryDao" abstract="true" class="de.hybris.platform.configurablebundleservices.daos.impl.AbstractOrderEntryDao" parent="abstractItemDao" >
+		<property name="typeService" ref="typeService" />
+	</bean> 
+
+	<alias alias="bundleCartEntryDao" name="defaultBundleCartEntryDao"/>
+	<bean id="defaultBundleCartEntryDao" class="de.hybris.platform.configurablebundleservices.daos.impl.DefaultCartEntryDao" parent="orderEntryDao" >
+	</bean> 
+
+	<alias alias="bundleTemplateService" name="defaultBundleTemplateService"/>
+	<bean id="defaultBundleTemplateService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleTemplateService" >
+		<property name="bundleTemplateDao" ref="bundleTemplateDao" />
+		<property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+		<property name="modelService" ref="modelService" />
+		<property name="entryGroupService" ref="entryGroupService" />
+	</bean>
+
+	<bean id="defaultBundleCommerceRuleService" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommerceRuleService" >
+		<property name="changeProductPriceBundleRuleDao" ref="changeProductPriceBundleRuleDao" />
+		<property name="disableProductBundleRuleDao" ref="disableProductBundleRuleDao" />
+		<property name="bundleTemplateService" ref="bundleTemplateService" />
+		<property name="cartEntryDao" ref="bundleCartEntryDao" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="modelService" ref="modelService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService"/>
+		<property name="entryGroupService" ref="entryGroupService"/>
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<alias alias="bundleRuleService" name="defaultBundleCommerceRuleService"/>
+
+	<bean id="pickExactlyNSelectionValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.PickExactlyNBundleSelectionCriteriaValidateInterceptor" />
+	<bean id="pickExactlyNSelectionValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="pickExactlyNSelectionValidator"/>
+		<property name="typeCode" value="PickExactlyNBundleSelectionCriteria"/>
+	</bean>
+	
+	<bean id="pickNToMSelectionValidator" class="de.hybris.platform.configurablebundleservices.interceptor.impl.PickNToMBundleSelectionCriteriaValidateInterceptor" />
+	
+	<bean id="pickNToMSelectionValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="pickNToMSelectionValidator"/>
+		<property name="typeCode" value="PickNToMBundleSelectionCriteria"/>
+	</bean>
+	<bean id="bundleTemplatePrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplatePrepareInterceptor" />
+	
+	<bean id="bundleTemplatePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplatePrepareInterceptor"/>
+		<property name="typeCode" value="BundleTemplate"/>
+	</bean>
+
+	<bean id="bundleTemplateRemoveInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplateRemoveInterceptor" />
+	<bean id="bundleTemplateRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplateRemoveInterceptor"/>
+		<property name="typeCode" value="BundleTemplate"/>
+	</bean>
+
+	<bean id="bundleSelectionCriteriaIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+		<property name="key" value="${keygen.bundle_selection_criteria.code.name}"/>
+		<property name="digits" value="${keygen.bundle_selection_criteria.code.digits}"/>
+		<property name="start" value="${keygen.bundle_selection_criteria.code.start}"/>
+		<property name="type" value="${keygen.bundle_selection_criteria.code.type}"/>
+		<property name="template" value="${keygen.bundle_selection_criteria.code.template}"/>
+	</bean>
+
+	<bean id="bundleSelectionCriteriaIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleSelectionCriteriaIDPrepareInterceptor" >
+		<property name="bundleSelectionCriteriaIDGenerator" ref="bundleSelectionCriteriaIDGenerator"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleSelectionCriteriaIDPrepareInterceptor"/>
+		<property name="typeCode" value="BundleSelectionCriteria"/>
+	</bean>
+
+	<bean id="abstractBundleRuleIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+		<property name="key" value="${keygen.abstract_bundle_rule.code.name}"/>
+		<property name="digits" value="${keygen.abstract_bundle_rule.code.digits}"/>
+		<property name="start" value="${keygen.abstract_bundle_rule.code.start}"/>
+		<property name="type" value="${keygen.abstract_bundle_rule.code.type}"/>
+		<property name="template" value="${keygen.abstract_bundle_rule.code.template}"/>
+	</bean>
+
+	<bean id="abstractBundleRuleIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.AbstractBundleRuleIDPrepareInterceptor" >
+		<property name="abstractBundleRuleIDGenerator" ref="abstractBundleRuleIDGenerator"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="abstractBundleRuleIDPrepareInterceptor"/>
+		<property name="typeCode" value="AbstractBundleRule"/>
+	</bean>
+
+	<bean id="bundleTemplateStatusIDGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" >
+		<property name="key" value="${keygen.bundle_template_status.code.name}"/>
+		<property name="digits" value="${keygen.bundle_template_status.code.digits}"/>
+		<property name="start" value="${keygen.bundle_template_status.code.start}"/>
+		<property name="type" value="${keygen.bundle_template_status.code.type}"/>
+		<property name="template" value="${keygen.bundle_template_status.code.template}"/>
+	</bean>
+
+	<bean id="bundleTemplateStatusIDPrepareInterceptor" class="de.hybris.platform.configurablebundleservices.interceptor.impl.BundleTemplateStatusIDPrepareInterceptor" >
+		<property name="bundleTemplateStatusIDGenerator" ref="bundleTemplateStatusIDGenerator"/>
+	</bean>
+
+	<bean class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping" >
+		<property name="interceptor" ref="bundleTemplateStatusIDPrepareInterceptor"/>
+		<property name="typeCode" value="BundleTemplateStatus"/>
+	</bean>
+
+	<alias alias="orderEntryRemoveableChecker" name="bundleCommerceOrderEntryRemoveableChecker"/>
+	<bean id="bundleCommerceOrderEntryRemoveableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleCommerceOrderEntryRemoveableChecker" >
+		<property name="bundleTemplateService" ref="bundleTemplateService" />
+	</bean>
+
+	<alias alias="bundleOrderEntryModifiableChecker" name="defaultBundleOrderEntryModifiableChecker"/>
+		<bean id="defaultBundleOrderEntryModifiableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleOrderEntryModifiableChecker" >
+	</bean>
+
+	<alias alias="abstractBundleComponentEditableChecker" name="defaultAbstractBundleComponentEditableChecker"/>
+	<bean id="defaultAbstractBundleComponentEditableChecker" abstract="true" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultAbstractBundleComponentEditableChecker" >
+		<property name="orderEntryDao" ref="orderEntryDao"/>
+	</bean> 
+
+	<alias alias="cartBundleComponentEditableChecker" name="defaultCartBundleComponentEditableChecker"/>
+	<bean id="defaultCartBundleComponentEditableChecker" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultCartBundleComponentEditableChecker" parent="abstractBundleComponentEditableChecker" >
+	    <property name="orderEntryDao" ref="bundleCartEntryDao"/>
+		<property name="entryGroupService" ref="entryGroupService"/>
+	</bean> 
+	
+	<bean id="productBundleTemplatesValueProvider" class="de.hybris.platform.configurablebundleservices.search.solrfacetsearch.provider.impl.ProductBundleTemplatesValueProvider" parent="abstractPropertyFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+	</bean>
+
+	<alias alias="bundleCommerceCloneSavedCartMethodHook" name="defaultBundleCommerceCloneSavedCartMethodHook" />
+	<bean id="defaultBundleCommerceCloneSavedCartMethodHook" class="de.hybris.platform.configurablebundleservices.bundle.impl.DefaultBundleCommerceCloneSavedCartMethodHook" >
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="configurableBundlesCommerceCloneSavedCartMethodHooksListMergeDirective" depends-on="commerceCloneSavedCartMethodHooks" parent="listMergeDirective" >
+		<property name="add" ref="bundleCommerceCloneSavedCartMethodHook" />
+	</bean>
+
+	<bean id="springContextProvider" class="de.hybris.platform.configurablebundleservices.constraints.SpringContextProvider" />
+
+    <bean id="bundleCartValidator" class="de.hybris.platform.configurablebundleservices.order.BundleCartValidator">
+        <property name="bundleTemplateService" ref="bundleTemplateService"/>
+        <property name="modelService" ref="modelService"/>
+		<property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+    </bean>
+
+	<alias alias="bundleCartHookHelper" name="defaultBundleCartHookHelper" />
+	<bean id="defaultBundleCartHookHelper" class="de.hybris.platform.configurablebundleservices.order.hook.BundleCartHookHelper">
+		<property name="entryGroupService" ref="entryGroupService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="bundleAddToCartMethodHook" class="de.hybris.platform.configurablebundleservices.order.hook.BundleAddToCartMethodHook">
+		<property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker"/>
+		<property name="l10NService" ref="l10nService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="bundleRuleService" ref="bundleRuleService"/>
+		<property name="bundleCartHookHelper" ref="bundleCartHookHelper"/>
+		<property name="bundleCartValidator" ref="bundleCartValidator"/>
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+		<property name="entryGroupService" ref="entryGroupService"/>
+    </bean>
+
+	<bean id="bundleAddToCartMethodHookMergeDirective" depends-on="commerceAddToCartMethodHooks" parent="listMergeDirective">
+		<property name="add" ref="bundleAddToCartMethodHook"/>
+	</bean>
+
+	<bean id="bundleSelectionCriteriaAddToCartMethodHook" class="de.hybris.platform.configurablebundleservices.order.hook.BundleSelectionCriteriaAddToCartMethodHook">
+		<property name="l10NService" ref="l10nService"/>
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+	</bean>
+
+	<bean id="bundleSelectionCriteriaAddToCartMethodHookMergeDirective" depends-on="commerceAddToCartMethodHooks" parent="listMergeDirective">
+		<property name="add" ref="bundleSelectionCriteriaAddToCartMethodHook"/>
+	</bean>
+
+	<bean id="bundleUpdateCartEntryHook" class="de.hybris.platform.configurablebundleservices.order.hook.BundleUpdateCartEntryHook">
+		<property name="bundleCartHookHelper" ref="bundleCartHookHelper"/>
+		<property name="bundleCartValidator" ref="bundleCartValidator"/>
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+		<property name="entryGroupService" ref="entryGroupService"/>
+		<property name="bundleComponentEditableChecker" ref="cartBundleComponentEditableChecker" />
+		<property name="commerceCartCalculationStrategy" ref="commerceCartCalculationStrategy"/>
+	</bean>
+
+	<bean id="bundleUpdateCartEntryHookMergeDirective" depends-on="commerceUpdateCartEntryMethodHooks" parent="listMergeDirective">
+		<property name="add" ref="bundleUpdateCartEntryHook"/>
+	</bean>
+
+	<bean id="entryMergeFilterBundleTemplate" class="de.hybris.platform.configurablebundleservices.order.impl.EntryMergeFilterBundleTemplate">
+		<property name="bundleTemplateService" ref="bundleTemplateService" />
+	</bean>
+	
+	<bean id="entryMergeFilterBundleTemplateMergeDirective" depends-on="commerceCartEntryMergeFilters" parent="listMergeDirective">
+		<property name="add" ref="entryMergeFilterBundleTemplate"/>
+	</bean>
+
+	<alias alias="currentFactoryFindPricingStrategy" name="bundleCurrentFactoryFindPricingStrategy"/>
+	<bean id="bundleCurrentFactoryFindPricingStrategy"
+		class="de.hybris.platform.configurablebundleservices.bundle.impl.BundleCurrentFactoryFindPricingStrategy"
+		parent="abstractBusinessService" >
+		<property name="bundleRuleService" ref="bundleRuleService" />
+		<property name="bundleTemplateService" ref="bundleTemplateService"/>
+	</bean>
+
+	<alias name="bundleCommerceAddToCartStrategy" alias="commerceAddToCartStrategy"/>
+	<bean id="bundleCommerceAddToCartStrategy"
+		class="de.hybris.platform.commerceservices.order.impl.BundleCommerceAddToCartStrategy"
+		parent="defaultCommerceAddToCartStrategy"/>
+
+	<alias name="defaultBundleRemoveEntryGroupMethodHook" alias="bundleRemoveEntryGroupMethodHook"/>
+	<bean id="defaultBundleRemoveEntryGroupMethodHook" class="de.hybris.platform.configurablebundleservices.order.hook.BundleRemoveEntryGroupMethodHook">
+		<property name="entryGroupService" ref="entryGroupService"/>
+	</bean>
+
+	<bean id="commerceRemoveEntryGroupBundleMergeDirective" depends-on="commerceRemoveEntryGroupMethodHooks" parent="listMergeDirective" >
+		<property name="add" ref="bundleRemoveEntryGroupMethodHook" />
+	</bean>
+
+	<bean id="bundleCartValidationHook" class="de.hybris.platform.commerceservices.strategies.hooks.BundleCartValidationHook">
+		<property name="entryGroupService" ref="entryGroupService"/>
+	</bean>
+
+	<bean id="bundleValidationHookListMergeDirective" depends-on="cartValidationHooks" parent="listMergeDirective" >
+		<property name="add" ref="bundleCartValidationHook" />
+	</bean>
+
+</beans>

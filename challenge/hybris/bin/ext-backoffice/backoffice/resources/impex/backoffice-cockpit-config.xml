@@ -1,0 +1,1321 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications"
+        xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+        xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+        xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms"
+		xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser"
+		xmlns:dnd="http://www.hybris.com/cockpitng/component/dragAndDrop"
+		xmlns:ysl="http://www.hybris.com/cockpitng/config/simplelist"
+		xmlns:lv="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:ful="http://www.hybris.com/cockpitng/config/fulltextsearch"
+		xmlns:sv="http://www.hybris.com/cockpitng/component/summaryview"
+		xmlns:ql="http://www.hybris.com/cockpitng/component/quick-list"
+		xmlns:vc="http://www.hybris.com/cockpitng/component/valuechooser"
+		xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+
+    <context type="com.hybris.cockpitng.util.Range" component="base">
+        <y:base>
+            <y:labels beanId="rangeLabelProvider"/>
+        </y:base>
+    </context>
+
+    <context component="collaborationDragAndDropComponent">
+        <dnd:drag-and-drop strategy="collaborationViewDnD" />
+    </context>
+
+	<context component="dragItemsDnDComponent" type="Item">
+		<dnd:drag-and-drop strategy="dragItemsDnD" />
+	</context>
+
+    <context component="simple-list" type="java.lang.String">
+        <ysl:simple-list>
+            <ysl:name field="#root"/>
+            <ysl:description field="class.canonicalName"/>
+        </ysl:simple-list>
+    </context>
+
+    <context type="java.lang.Object" component="listview">
+        <lv:list-view>
+            <lv:column label="hmc.value" qualifier="toString()"/>
+        </lv:list-view>
+    </context>
+
+	<context type="java.util.Collection" component="base" >
+		<y:base>
+			<y:labels beanId="collectionLabelProvider"/>
+		</y:base>
+	</context>
+	<context type="java.util.Map" component="base">
+		<y:base>
+			<y:labels beanId="mapLabelProvider"/>
+		</y:base>
+	</context>
+	<context type="java.util.Locale" component="base">
+		<y:base>
+			<y:labels beanId="localeLabelProvider"/>
+		</y:base>
+	</context>
+	<context type="java.util.Date" component="base">
+		<y:base>
+			<y:labels beanId="dateLabelProvider"/>
+		</y:base>
+	</context>
+	<context type="java.lang.Double" component="base">
+		<y:base>
+			<y:labels beanId="javaLangDoubleLabelProvider"/>
+		</y:base>
+	</context>
+
+	<context type="PriceRow" component="base">
+		<y:base>
+			<y:labels beanId="priceRowLabelProvider"/>
+		</y:base>
+	</context>
+
+	<context type="CronJobHistory" component="base" merge-by="type">
+		<y:base>
+			<y:labels>
+				<y:label>cronJob!=null ? @labelService.getObjectLabel(cronJob):T(org.zkoss.util.resource.Labels).getLabel('processes.title.default')</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+	<context type="DataAttribute" component="base" merge-by="type">
+		<y:base>
+			<y:labels>
+				<y:label></y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="com.hybris.cockpitng.validation.model.ValidationInfo" component="base">
+		<y:base>
+			<y:labels>
+					<y:label>getValidationMessage()</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="CommentType" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>name</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="Component" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>name</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context component="notification-area" source="syncPopup" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="syncCannotRun" level="FAILURE">
+				<na:message>user.notification.sync.cannot.run</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+    <context component="systembar-actions-left">
+        <y:actions>
+        </y:actions>
+    </context>
+
+	<context component="systembar-actions-right" authority="backofficeworkflowadmin,backofficeworkflowuser">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.labeledtoggle" property="$_numberOfWorkflowActions">
+					<y:parameter>
+						<y:name>toggleCondition</y:name>
+						<y:value>"opened".equals(#root)</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>iconOnly</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>labelExpression</y:name>
+						<y:value>#root != null and #root > 0 ? #root : null</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>iconUri</y:name>
+						<y:value>/widgetClasspathResource/widgets/workflows/images/icon_collaboration.svg</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>outputSocket</y:name>
+						<y:value>collaborationToggleSidebar</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>toggleInput</y:name>
+						<y:value>collaborationToggleState</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionStyleClass</y:name>
+						<y:value>yw-collaboration-center-toggle z-toolbarbutton</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionName</y:name>
+						<y:value>label.collaborationCenter</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="collaboration-center-header-toolbar-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.message">
+					<y:parameter>
+						<y:name>message</y:name>
+						<y:value>"collaboration.label"</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>socket</y:name>
+						<y:value>selectView</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionName</y:name>
+						<y:value>label.collaborationCenter.overview</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionStyleClass</y:name>
+						<y:value>yw-collaboration-center-header-toolbar-action</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="collaboration-center-title-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.message">
+					<y:parameter>
+						<y:name>message</y:name>
+						<y:value>"dummy"</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionName</y:name>
+						<y:value>label.collaborationCenter.title</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionStyleClass</y:name>
+						<y:value>yw-collaboration-center-title</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="taskEdit-quickList-header-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.message" property="$_selectedAction">
+					<y:parameter>
+						<y:name>message</y:name>
+						<y:value>#root</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>socket</y:name>
+						<y:value>selectedAction</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionStyleClass</y:name>
+            			<y:value>yw-collaboration-center-task-quicklist-header-title</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="collaborationCenter-quickList-threedots-actions" type="Product">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:three-dots-group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.bulkedit" property="$_items">
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.enumeration" property="$_items">
+					<y:parameter>
+						<y:name>qualifier</y:name>
+						<y:value>approvalStatus</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionName</y:name>
+						<y:value>bulk.inlineapproval</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>menu</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="$_items">
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.excel.export" property="typeCode">
+					<y:parameter>
+						<y:name>selectedObjects</y:name>
+						<y:value>$_items</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>textOnly</y:value>
+					</y:parameter>
+					<y:parameter>
+						<y:name>actionName</y:name>
+						<y:value>label.export.all</y:value>
+					</y:parameter>
+				</y:action>
+			</y:three-dots-group>
+		</y:actions>
+	</context>
+
+	<context type="WorkflowItemAttachment" component="workflowDetails-attachments-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.addworkflowattachment" property="$_selectedWorkflow"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="WorkflowItemAttachment" component="workflowDetails-attachments">
+		<cb:collection-browser>
+			<cb:available-molds default-mold="list-view">
+				<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+			</cb:available-molds>
+		</cb:collection-browser>
+	</context>
+
+	<context component="taskEdit-quickList-toolbar-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.cockpitng.action.workflowactiondecisionaction" property="$_selectedAction">
+					<y:parameter>
+						<y:name>socket</y:name>
+						<y:value>selectedAction</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="taskEdit-item-toolbar-actions" type="Product">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="$_selectedItem"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="$_selectedItem"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="taskEdit-item-toolbar-actions" type="Category">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.delete" property="$_selectedItem"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="$_selectedItem"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="taskEdit-quickList" type="Product">
+		<ql:quick-list display-preview="true" display-default-image="true" default-image="cng/img/default/grid_view_default_preview.png">
+			<ql:attribute qualifier="catalogVersion"/>
+			<ql:attribute qualifier="code"/>
+			<ql:attribute qualifier="name"/>
+		</ql:quick-list>
+	</context>
+
+    <context type="WorkflowAction" component="workflowOverview-collectionbrowser">
+		<cb:collection-browser>
+			<cb:available-molds default-mold="list-view">
+				<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+			</cb:available-molds>
+		</cb:collection-browser>
+	</context>
+
+	<context type="Workflow" component="workflowOverview-collectionbrowser" >
+		<cb:collection-browser>
+			<cb:available-molds default-mold="list-view">
+				<cb:mold spring-bean="listViewCollectionBrowserMoldStrategy"/>
+			</cb:available-molds>
+		</cb:collection-browser>
+	</context>
+
+	<context component="workflow-status-filter">
+		<vc:value-chooser>
+			<vc:option id="planned" label="workflows.status.planned" selected="true">
+				<vc:value id="planned" expression="PLANNED"/>
+			</vc:option>
+			<vc:option id="running" label="workflows.status.running" selected="true">
+				<vc:value id="running" expression="RUNNING"/>
+			</vc:option>
+			<vc:option id="finished" label="workflows.status.finished">
+				<vc:value id="finished" expression="FINISHED"/>
+			</vc:option>
+			<vc:option id="terminated" label="workflows.status.terminated">
+				<vc:value id="terminated" expression="TERMINATED"/>
+			</vc:option>
+		</vc:value-chooser>
+	</context>
+
+    <context merge-by="type" type="WorkflowAction" component="workflowOverview-browser-listview">
+		<lv:list-view>
+			<lv:column position="10" qualifier="name"/>
+			<lv:column position="20" qualifier="principalAssigned" hflex="1"/>
+			<lv:column position="30" qualifier="workflow.name" label="item.workflowname.label"/>
+			<lv:column position="40" qualifier="modifiedtime" label="item.modifiedtime.label"/>
+			<lv:column position="50" qualifier="#root.attachmentItems.?[#this != null]"
+					   spring-bean="countingRenderer" label="product.attachments.column.label" />
+			<lv:column position="60" qualifier="" spring-bean="workflowActionMenuContainerRenderer" label=" " width="45px"/>
+		</lv:list-view>
+    </context>
+	<context merge-by="type" type="WorkflowAction" component="workflowDetails-browser-listview">
+		<lv:list-view>
+			<lv:column position="10" qualifier="name"/>
+			<lv:column position="20" qualifier="principalAssigned" hflex="1"/>
+			<lv:column position="30" qualifier="status"/>
+			<lv:column position="40" qualifier="modifiedtime" label="item.modifiedtime.label"/>
+			<lv:column position="50" qualifier="#root.attachmentItems.?[#this != null]"
+					   spring-bean="countingRenderer" label="product.attachments.column.label"/>
+		</lv:list-view>
+    </context>
+
+	<context merge-by="type" type="WorkflowItemAttachment" component="workflowDetails-browser-listview">
+		<lv:list-view>
+			<lv:column position="1" qualifier="item" label="" spring-bean="previewListCellRenderer" auto-extract="true"/>
+			<lv:column position="2" qualifier="item!=null ? item:T(org.zkoss.util.resource.Labels).getLabel('collaboration.workflowdetails.attachments.itemremoved')" label="collaboration.workflowdetails.attachments.attachment" hflex="1"/>
+			<lv:column position="3" qualifier="@labelService.getShortObjectLabel(typeOfItem)" label="collaboration.workflowdetails.attachments.type"/>
+			<lv:column position="4" qualifier="comments" spring-bean="countingRenderer" label="collaboration.workflowdetails.attachments.comments"/>
+			<lv:column position="5" qualifier="" spring-bean="workflowAttachmentMenuContainerRenderer" width="45px" label=" "/>
+		</lv:list-view>
+	</context>
+
+	<context merge-by="type" type="Workflow" component="workflowOverview-browser-listview">
+		<lv:list-view>
+			<lv:column position="10" qualifier="name" link="true" link-value="#root" spring-bean="detailedWorkflowNameRenderer"/>
+			<lv:column position="20" qualifier="status" spring-bean="workflowStatusRenderer"/>
+			<lv:column position="30" qualifier="description" hflex="1"/>
+			<lv:column position="40" qualifier="modifiedtime" label="item.modifiedtime.label"/>
+			<lv:column position="50" qualifier="attachments" spring-bean="countingRenderer" label="product.attachments.column.label"/>
+			<lv:column position="60" qualifier="" label="" spring-bean="workflowOverviewMenuContainerRenderer" width="45px"/>
+		</lv:list-view>
+	</context>
+
+    <context type="WorkflowAction" component="workflowOverview-tasks-fulltext-search">
+        <ful:fulltext-search>
+            <ful:field-list>
+                <ful:field name="code"/>
+                <ful:field name="name"/>
+                <ful:field name="principalAssigned"/>
+                <ful:field name="activated"/>
+                <ful:field name="workflow"/>
+            </ful:field-list>
+            <ful:preferred-search-strategy>flexible</ful:preferred-search-strategy>
+            <ful:operator>OR</ful:operator>
+        </ful:fulltext-search>
+    </context>
+
+	<context type="WorkflowAction" component="workflowDetails-tasks-fulltext-search">
+        <ful:fulltext-search>
+            <ful:field-list>
+                <ful:field name="code"/>
+                <ful:field name="name"/>
+                <ful:field name="principalAssigned"/>
+                <ful:field name="activated"/>
+                <ful:field name="status"/>
+            </ful:field-list>
+            <ful:preferred-search-strategy>flexible</ful:preferred-search-strategy>
+            <ful:operator>OR</ful:operator>
+        </ful:fulltext-search>
+    </context>
+
+	<context type="Workflow" component="workflowOverview-collectionbrowser-workflows-actions">
+		<y:actions>
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+					<y:parameter>
+						<y:name>TYPE_CODE</y:name>
+						<y:value>com.hybris.backoffice.workflow.wizard.CollaborationWorkflowWizardForm</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="Workflow" component="workflowDetails-editorArea" module="platformbackoffice">
+		<ea:editorArea>
+			<ea:tab name="workflowDetails">
+				<ea:section name="collaboration.workflow.details.workflow.details.section.label">
+						<ea:attribute qualifier="name"
+											  editor="com.hybris.cockpitng.editor.instanteditor(com.hybris.cockpitng.editor.localized)"
+											  readonly="true"
+											  label="collaboration.workflow.details.workflow.name.label"/>
+						<ea:attribute qualifier="startTime"
+											  editor="com.hybris.cockpitng.editor.decoratededitor(com.hybris.cockpitng.editor.instanteditor(com.hybris.cockpitng.editor.defaultdate), {workflowStartedTimeEditorRenderer})"
+											  readonly="true"
+											  label="collaboration.workflow.details.workflow.started.label">
+							<ea:editor-parameter>
+								<ea:name>noValueLabelKey</ea:name>
+								<ea:value>collaboration.workflow.details.workflow.notstarted.label</ea:value>
+							</ea:editor-parameter>
+							<ea:editor-parameter>
+								<ea:name>noValueLabelStyle</ea:name>
+								<ea:value>yw-workflow-detailed-novalue</ea:value>
+							</ea:editor-parameter>
+						</ea:attribute>
+						<ea:attribute qualifier="modifiedtime"
+											  editor="com.hybris.cockpitng.editor.instanteditor(com.hybris.cockpitng.editor.defaultdate)"
+											  readonly="true"
+											  label="collaboration.workflow.details.workflow.lastupdate.label"/>
+				</ea:section>
+				<ea:section name="collaboration.workflow.details.description.section.label">
+					<ea:attribute qualifier="description"
+											  editor="com.hybris.cockpitng.editor.instanteditor(com.hybris.cockpitng.editor.localized)"
+											  readonly="true"
+											  label="">
+						<ea:editor-parameter>
+							<ea:name>noValueLabelKey</ea:name>
+							<ea:value>collaboration.workflow.details.description.novalue.label</ea:value>
+						</ea:editor-parameter>
+						<ea:editor-parameter>
+							<ea:name>noValueLabelStyle</ea:name>
+							<ea:value>yw-workflow-detailed-novalue</ea:value>
+						</ea:editor-parameter>
+					</ea:attribute>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+
+	<context component="workflowDetails-summaryView" type="Workflow" module="platformbackoffice">
+        <sv:summary-view display-thumbnail="false" display-title="false">
+            <sv:section>
+            	<sv:custom-attribute label="collaboration.workflow.details.summary.status.label" spring-bean="workflowDetailsSummaryStatusRenderer"/>
+            	<sv:custom-attribute label="collaboration.workflow.details.summary.currenttasks.label" spring-bean="workflowDetailsSummaryCurrentTasksRenderer"/>
+            </sv:section>
+            <sv:section name="summaryview.section.info">
+            	<sv:custom-attribute label="collaboration.workflow.details.summary.attachments.label" spring-bean="workflowDetailsSummaryAttachementsRenderer"/>
+            	<sv:custom-attribute label="collaboration.workflow.details.summary.flow.label" spring-bean="workflowDetailsSummaryFlowRenderer"/>
+            </sv:section>
+        </sv:summary-view>
+    </context>
+
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendWarningSingle" merge-by="source" parent="dragAndDropWarningMultiple">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="WARNING">
+				<na:message>collaboration.dnd.single.warning</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="true" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendWarningMultiple" merge-by="source" parent="dragAndDropWarningMultiple">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="WARNING">
+				<na:message>collaboration.dnd.multiple.warning</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="false" label="#root.size()"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendSuccessSingle" merge-by="source" parent="dragAndDropSuccessSingle">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="SUCCESS">
+				<na:message>collaboration.dnd.single.success</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="true" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendFailureSingle" merge-by="source" parent="dragAndDropFailureSingle">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="FAILURE">
+				<na:message>collaboration.dnd.single.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="true" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendSuccessMultiple" merge-by="source" parent="dragAndDropMultiple">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="SUCCESS">
+				<na:message>collaboration.dnd.multiple.success</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="false" label="#root.size()"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<context component="notification-area" source="dragAndDropItemToWorkflowAppendFailureMultiple" merge-by="source" parent="dragAndDropMultiple">
+		<na:notification-area>
+			<na:notifications eventType="UpdateObject" level="FAILURE">
+				<na:message>collaboration.dnd.multiple.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="false" label="#root.size()"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+    <context component="notification-area" source="collaboration-workflow" merge-by="source">
+        <na:notification-area>
+			<na:notifications eventType="WorkflowCreatedAndStarted" level="SUCCESS">
+				<na:message>collaboration.workflow.createdandstarted</na:message>
+				<na:references>
+					<na:reference placeholder="0" link="true" label="#root.workflow">
+						<na:context parameter="triggerContext" value="#root.referencedObjects[0].destination" evaluate="true"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowStarted" level="SUCCESS">
+				<na:message>collaboration.workflow.started</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root.workflow" link="true">
+						<na:context parameter="triggerContext" value="#root.referencedObjects[0].destination" evaluate="true"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+            <na:notifications eventType="WorkflowStarted" level="FAILURE" destination="GLOBAL">
+                <na:message>collaboration.workflow.notstarted</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root.workflow" link="true">
+						<na:context parameter="triggerContext" value="#root.referencedObjects[0].destination" evaluate="true"/>
+					</na:reference>
+				</na:references>
+            </na:notifications>
+			<na:notifications eventType="WorkflowWithoutAttachments" level="FAILURE">
+				<na:message>collaboration.workflow.without.attachments</na:message>
+			</na:notifications>
+			<na:notifications eventType="WorkflowCreated" level="SUCCESS">
+				<na:message>collaboration.workflow.created</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root.workflow" link="true">
+						<na:context parameter="triggerContext" value="#root.referencedObjects[0].destination" evaluate="true"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+            <na:notifications eventType="WorkflowCreated" level="FAILURE">
+                <na:message>collaboration.workflow.cannotcreated</na:message>
+            </na:notifications>
+			<na:notifications eventType="WorkflowDeleted" level="SUCCESS">
+				<na:message>collaboration.workflow.deleted</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root" link="false"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowDeleted" level="FAILURE">
+				<na:message>collaboration.workflow.cannotdeleted</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root" link="false"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowTerminated" level="SUCCESS">
+				<na:message>collaboration.workflow.terminated</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root.workflow" link="true">
+						<na:context parameter="triggerContext" value="#root.referencedObjects[0].destination" evaluate="true"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowTerminated" level="FAILURE">
+				<na:message>collaboration.workflow.cannotterminated</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root.workflow" link="false"/>
+				</na:references>
+			</na:notifications>
+            <na:notifications eventType="AdHocWorkflowInCorrectAssignee" level="FAILURE">
+                <na:message>collaboration.workflow.incorrectassignee</na:message>
+            </na:notifications>
+			<na:notifications eventType="WorkflowAttachmentDeleted" level="SUCCESS">
+				<na:message>collaboration.workflow.attachment.deleted</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root" link="false"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowAttachmentDeleted" level="FAILURE">
+				<na:message>collaboration.workflow.attachment.cannotdeleted</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root" link="false"/>
+				</na:references>
+			</na:notifications>
+        </na:notification-area>
+    </context>
+
+	<context component="notification-area" source="workflowOverview-tasks-collectionbrowser" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="WorkflowDecision" level="SUCCESS">
+				<na:message>collaboration.task.decision.taken</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowDecision" level="FAILURE">
+				<na:message>collaboration.task.decision.failed</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" label="#root.getMessage()" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+					<na:reference placeholder="1" index="1" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowTerminated" level="FAILURE">
+				<na:message>collaboration.task.decision.terminated</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" label="#root.getMessage()" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+					<na:reference placeholder="1" index="1" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="collaborationCenter-taskEdit-decision" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="WorkflowDecision" level="SUCCESS">
+				<na:message>collaboration.task.decision.taken</na:message>
+				<na:references>
+					<na:reference placeholder="0" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowDecision" level="FAILURE">
+				<na:message>collaboration.task.decision.failed</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" label="#root.getMessage()" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+					<na:reference placeholder="1" index="1" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="WorkflowTerminated" level="FAILURE">
+				<na:message>collaboration.task.decision.terminated</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" label="#root.getMessage()" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+					<na:reference placeholder="1" index="1" label="#root" link="false">
+						<na:context parameter="triggerContext" value="workflowDetails"/>
+					</na:reference>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="item-comments" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="WrongItemCommentsSettings" level="FAILURE">
+				<na:message>com.hybris.cockiptng.itemcomments.wrong.settings</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area">
+		<na:notification-area>
+			<na:notifications eventType="WIMFailure" level="WARNING">
+				<na:message>user.notification.wim.wimfailure.warning</na:message>
+			</na:notifications>
+			<na:notifications eventType="BookmarkObjectAccess" level="WARNING">
+				<na:message>user.notification.bookmark.editor.access.violation.info</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<!--EXCEL START -->
+	<context type="GenericItem" component="excel-import-wizard">
+		<wz:flow id="excelImportWizard" title="excel.import.wizard.title" show-breadcrumb="false">
+			<wz:prepare id="excelImportWizardPrepare">
+				<wz:initialize property="excelForm" template-bean="excelImportWizardForm"/>
+			</wz:prepare>
+			<wz:step id="step1" label="">
+				<wz:content>
+					<wz:property qualifier="excelForm.excelFile" type="com.hybris.cockpitng.editor.defaultfileupload.FileUploadResult" editor="com.hybris.cockpitng.editor.dndfileupload"  validate="false">
+						<wz:editor-parameter>
+							<wz:name>accept</wz:name>
+							<wz:value>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>singleLineMode</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="excelForm.zipFile" type="com.hybris.cockpitng.editor.defaultfileupload.FileUploadResult" editor="com.hybris.cockpitng.editor.dndfileupload"  validate="false">
+						<wz:editor-parameter>
+							<wz:name>accept</wz:name>
+							<wz:value>application/zip</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>singleLineMode</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:custom label="excel.import.wizard.button.label" handler="excelImportHandler" visible="excelForm.excelFile!=null"/>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="">
+				<wz:content id="step2.content">
+					<wz:custom-view lang="zul">
+						<wz:renderer spring-bean="excelImportValidationResultRenderer"/>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:back/>
+					<wz:cancel/>
+					<wz:custom label="excel.import.ignore.wizard.button.label" handler="excelWithoutValidationImportHandler" visible="!excelHasValidationErrors"/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	<context type="GenericItem" component="excel-export-wizard">
+		<wz:flow id="excelExportWizard" title="excel.export.wizard.title" show-breadcrumb="false" size="large">
+			<wz:prepare id="excelExportWizardPrepare">
+				<wz:initialize property="excelForm" template-bean="excelExportWizardForm"/>
+				<wz:initialize property="excelForm.attributesForm" template-bean="attributesForm"/>
+				<wz:assign property="excelForm.pageable" value="ctx.excelExportData"/>
+				<wz:assign property="excelForm.typeCode" value="ctx.TYPE_CODE"/>
+			</wz:prepare>
+			<wz:step id="step1" label="excel.export.wizard.attributes.label" sublabel="excel.export.wizard.attributes.sublabel">
+				<wz:content id="step1.content">
+					<wz:custom-view lang="zul">
+						<wz:renderer spring-bean="excelExportRenderer"/>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:next/>
+					<wz:custom label="excel.export.wizard.button.label" handler="excelExportHandler" visible="excelForm.attributesForm.hasSelectedAttributes()">
+						<wz:parameter>
+							<wz:name>excelIncludeClassification</wz:name>
+							<wz:value>false</wz:value>
+						</wz:parameter>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	<context type="Product" component="excel-export-wizard" parent="GenericItem" merge-by="type">
+		<wz:flow id="excelExportWizard" title="excel.export.wizard.title" show-breadcrumb="true">
+			<wz:prepare id="excelExportWizardPrepare">
+				<wz:initialize property="excelForm.classificationAttributesForm" template-bean="attributesForm"/>
+			</wz:prepare>
+			<wz:step id="step2" label="excel.export.wizard.classification.label" sublabel="excel.export.wizard.classification.sublabel">
+				<wz:content id="step2.content">
+					<wz:custom-view lang="zul">
+						<wz:renderer spring-bean="excelClassificationExportRenderer">
+							<wz:parameter>
+								<wz:name>itemsToExport</wz:name>
+								<wz:value>excelForm.getPageable().getAllResults()</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>classificationAttributesFormModelKey</wz:name>
+								<wz:value>excelForm.classificationAttributesForm</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>emptyAttributesMessageKey</wz:name>
+								<wz:value>attributechooser.excel.no.intersection</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>retrieveMode</wz:name>
+								<wz:value>ITEMS_INTERSECTION</wz:value>
+							</wz:parameter>
+						</wz:renderer>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:custom label="excel.export.wizard.button.label" handler="excelExportHandler" visible="excelForm.attributesForm.hasSelectedAttributes()"/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	<context type="Product" component="excel-template-wizard" parent="excel-export-wizard" merge-by="component">
+		<wz:flow id="excelExportWizard" title="excel.export.wizard.classification.label" show-breadcrumb="false" size="large" merge-mode="merge">
+			<wz:prepare id="excelExportWizardPrepare" merge-mode="merge">
+				<wz:assign property="excelForm.exportTemplate" value="ctx.template"/>
+			</wz:prepare>
+			<wz:step id="step1" label="" merge-mode="REMOVE"/>
+			<wz:step id="step2" label="excel.export.wizard.classification.label" sublabel="excel.export.wizard.classification.sublabel" merge-mode="merge">
+				<wz:content>
+					<wz:custom-view lang="zul" merge-mode="REPLACE">
+						<wz:renderer spring-bean="excelClassificationExportRenderer">
+							<wz:parameter>
+								<wz:name>itemsToExport</wz:name>
+								<wz:value>excelForm.getPageable().getAllResults()</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>classificationAttributesFormModelKey</wz:name>
+								<wz:value>excelForm.classificationAttributesForm</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>emptyAttributesMessageKey</wz:name>
+								<wz:value>attributechooser.excel.no.union</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>retrieveMode</wz:name>
+								<wz:value>ALL</wz:value>
+							</wz:parameter>
+						</wz:renderer>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation id="step2.navigation" merge-mode="REPLACE">
+					<wz:cancel/>
+					<wz:custom label="excel.export.wizard.button.label" handler="excelExportHandler"/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context component="notification-area" source="excelImport" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="excelMissingExcelFile" level="FAILURE">
+				<na:message>excel.notify.missing.file.failure</na:message>
+			</na:notifications>
+			<na:notifications eventType="excelMissingExcelFormInModel" level="FAILURE">
+				<na:message>excel.notify.missing.form.failure</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+	<!--EXCEL END-->
+
+    <context type="com.hybris.backoffice.workflow.wizard.CollaborationWorkflowWizardForm" component="create-wizard">
+        <wz:flow id="collaborationWorkflowWizard" title="collaboration.workflowwizard.title">
+            <wz:prepare id="collaborationWorkflowWizardPrepare">
+                <wz:initialize property="workflowForm" template-bean="collaborationWorkflowWizardForm"/>
+                <wz:assign property="workflowForm.attachments" value="ctx.attachments"/>
+                <wz:assign property="attachmentType" value="ctx.attachmentType"/>
+                <wz:assign property="requireAssignee" value="false"/>
+            </wz:prepare>
+            <wz:step id="step1" label="collaboration.workflowwizard.step.essentials.label" sublabel="collaboration.workflowwizard.step.essentials.sublabel">
+                <wz:info label="collaboration.workflowwizard.step.essentials.info" position="top"/>
+                <wz:content id="step1.content">
+                    <wz:property qualifier="workflowForm.workflowTemplate" type="Reference(WorkflowTemplate)">
+                        <wz:editor-parameter>
+                            <wz:name>availableValuesProvider</wz:name>
+                            <wz:value>workflowTemplateReferenceSearchFacade</wz:value>
+                        </wz:editor-parameter>
+                    </wz:property>
+					<wz:custom-view lang="zul">
+						<wz:renderer spring-bean="workflowShowFlowViewRenderer"/>
+					</wz:custom-view>
+                    <wz:property qualifier="workflowForm.name" type="Localized(java.lang.String)"/>
+                    <wz:property qualifier="workflowForm.assignee" type="Reference(Principal)">
+                    	<wz:editor-parameter>
+                            <wz:name>availableValuesProvider</wz:name>
+                            <wz:value>workflowAssigneeReferenceSearchFacade</wz:value>
+                        </wz:editor-parameter>
+                    </wz:property>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:next visible="workflowForm.workflowTemplate!=null and (!requireAssignee or workflowForm.assignee!=null)"/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step2" label="collaboration.workflowwizard.step.attachments.label" sublabel="collaboration.workflowwizard.step.attachments.sublabel">
+                <wz:info label="collaboration.workflowwizard.step.attachments.info" position="top"/>
+                <wz:content id="step2.content">
+                    <wz:property qualifier="attachmentType" type="Reference(ComposedType)" validate="false">
+                        <wz:editor-parameter>
+                            <wz:name>availableValuesProvider</wz:name>
+                            <wz:value>workflowAttachmentTypeReferenceSearchFacade</wz:value>
+                        </wz:editor-parameter>
+                    </wz:property>
+                    <wz:property qualifier="workflowForm.attachments"
+                                 type="MultiReference-LIST(Item)">
+                        <wz:editor-parameter>
+                            <wz:name>isNestedObjectCreationDisabled</wz:name>
+                            <wz:value>false</wz:value>
+                        </wz:editor-parameter>
+                        <wz:editor-parameter>
+                            <wz:name>createOnly</wz:name>
+                            <wz:value>false</wz:value>
+                        </wz:editor-parameter>
+                        <wz:editor-parameter>
+                            <wz:name>listConfigContext</wz:name>
+                            <wz:value>configurationsListView</wz:value>
+                        </wz:editor-parameter>
+                        <wz:editor-parameter>
+                            <wz:name>pageSize</wz:name>
+                            <wz:value>5</wz:value>
+                        </wz:editor-parameter>
+                        <wz:editor-parameter>
+                            <wz:name>configurableFlowConfigCtx</wz:name>
+                            <wz:value>create-wizard-workflow-wizard</wz:value>
+                        </wz:editor-parameter>
+                    </wz:property>
+                </wz:content>
+                <wz:navigation id="step2.navigation">
+                    <wz:back/>
+                    <wz:cancel/>
+					<wz:custom handler="collaborationWorkflowWizardHandler" label="collaboration.workflowwizard.btn.done"/>
+					<wz:next/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step3" label="collaboration.workflowwizard.step.optional.label" sublabel="collaboration.workflowwizard.step.optional.sublabel">
+                <wz:content id="step3.content">
+                    <wz:property qualifier="workflowForm.description" editor="com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.defaulttext)" type="Localized(java.lang.String)">
+                        <wz:editor-parameter>
+                            <wz:name>rows</wz:name>
+                            <wz:value>14</wz:value>
+                        </wz:editor-parameter>
+                    </wz:property>
+                </wz:content>
+                <wz:navigation id="step3.navigation">
+                    <wz:back/>
+                    <wz:cancel/>
+					<wz:custom handler="collaborationWorkflowWizardHandler" label="collaboration.workflowwizard.btn.done"/>
+					<wz:next/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step4" label="collaboration.workflowwizard.step.start.label" sublabel="collaboration.workflowwizard.step.start.sublabel">
+                <wz:info label="collaboration.workflowwizard.step.start.info" position="top"/>
+                <wz:content id="step4.content">
+                </wz:content>
+                <wz:navigation id="step4.navigation">
+                    <wz:back/>
+                    <wz:cancel/>
+                    <wz:custom handler="collaborationWorkflowWizardHandler" label="collaboration.workflowwizard.btn.start">
+                        <wz:parameter>
+                            <wz:name>startWorkflow</wz:name>
+                            <wz:value>true</wz:value>
+                        </wz:parameter>
+                    </wz:custom>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+	<context type="Workflow" component="workflowEditorAreaDynamicForms">
+		<df:dynamicForms>
+			<df:attribute id="workflowDynamicName" qualifier="name" computedValue="@labelService.getObjectLabel(#root)"/>
+		</df:dynamicForms>
+	</context>
+
+    <context type="com.hybris.backoffice.workflow.wizard.CollaborationWorkflowWizardForm" component="configurableFlowDynamicForms">
+		<df:dynamicForms modelProperty="workflowForm">
+			<df:attribute id="hideAssignee" qualifier="workflowForm.assignee" modelProperty="*" visibleIf="context.requireAssignee = (context.workflowForm.workflowTemplate!=null &amp;&amp; context.workflowForm.workflowTemplate.equals(spring.getBean('workflowTemplateService').getAdhocWorkflowTemplate()));context.requireAssignee"
+                          triggeredOn="workflowForm.workflowTemplate">
+                <df:scriptingConfig visibleIfLanguage="Groovy"/>
+            </df:attribute>
+			<df:attribute id="dynamicAttachmentType" disabledIf="attachmentType==null" paramName="restrictToType" computedValue="attachmentType?.code" modelProperty="*" qualifier="workflowForm.attachments" triggeredOn="attachmentType"/>
+			<df:attribute id="dynamicAttachmentTypeReset" disabledIf="workflowForm.attachments !=null and workflowForm.attachments.size()>0" modelProperty="*" qualifier="attachmentType" triggeredOn="workflowForm.attachments"/>
+			<df:attribute id="setNameFromTemplate" qualifier="name" computedValue="workflowTemplate!=null ?workflowTemplate.name:name" triggeredOn="workflowTemplate"/>
+			<df:attribute id="setDescriptionFromTemplate" qualifier="description" computedValue="workflowTemplate!=null ?workflowTemplate.description:description" triggeredOn="workflowTemplate"/>
+			<df:attribute id="resetAssignee" qualifier="assignee" computedValue="null" triggeredOn="workflowTemplate"/>
+			<df:attribute id="initWorkflowTemplate" qualifier="workflowForm.workflowTemplate" disabledIf="if(context.ctx.workflowTemplate!=null &amp;&amp; context.workflowForm.workflowTemplate==null) context.setValue('workflowForm.workflowTemplate',context.ctx.workflowTemplate); context.ctx.workflowTemplate!=null" modelProperty="*" triggeredOn="ctx.workflowTemplate">
+				<df:scriptingConfig disabledIfLanguage="Groovy"/>
+			</df:attribute>
+		</df:dynamicForms>
+	</context>
+
+	<context component="task-status-filter">
+		<vc:value-chooser>
+			<vc:option id="inprogress" label="workflow.action.in_progress" selected="true">
+				<vc:value id="inprogress" expression="IN_PROGRESS" type="de.hybris.platform.workflow.enums.WorkflowActionStatus" factory-method="valueOf"/>
+				<vc:value id="paused" expression="PAUSED" type="de.hybris.platform.workflow.enums.WorkflowActionStatus" factory-method="valueOf"/>
+			</vc:option>
+			<vc:option id="completed" label="workflow.action.completed">
+				<vc:value id="completed" expression="COMPLETED" type="de.hybris.platform.workflow.enums.WorkflowActionStatus" factory-method="valueOf"/>
+			</vc:option>
+			<vc:option id="terminated" label="workflow.action.terminated">
+				<vc:value id="terminated" expression="TERMINATED" type="de.hybris.platform.workflow.enums.WorkflowActionStatus" factory-method="valueOf"/>
+			</vc:option>
+		</vc:value-chooser>
+	</context>
+
+	<context component="workflowDetailsActions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="com.hybris.backoffice.widgets.actions.startWorkflow" property="$_selectedWorkflow"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.terminateWorkflow" property="$_selectedWorkflow"/>
+				<y:action action-id="com.hybris.backoffice.widgets.actions.deleteWorkflow" property="$_selectedWorkflow"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="notification-area" source="configurableFlow" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="AuditReportGenerationInvoked" level="SUCCESS">
+				<na:message>user.notification.actions.createauditreport.generation.invoked.success</na:message>
+			</na:notifications>
+			<na:notifications eventType="AuditReportGenerationInvoked" level="FAILURE">
+				<na:message>user.notification.actions.createauditreport.generation.invoked.failure</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="mediaReferenceHandler" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="createMediaReference" level="FAILURE" destination="GLOBAL">
+				<na:message>user.notification.create.media.reference.failure</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" link="false" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context type="AuditReportTemplate" component="base" parent="RendererTemplate">
+		<y:base>
+			<y:labels>
+				<y:label>description?:code</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context component="notification-area" source="bulkEdit" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="missingForm" level="FAILURE" destination="TOPMOST">
+				<na:message>bulkedit.missing.form</na:message>
+			</na:notifications>
+			<na:notifications eventType="missingAttributes" level="FAILURE" destination="TOPMOST">
+				<na:message>bulkedit.missing.attributes</na:message>
+			</na:notifications>
+			<na:notifications eventType="validationError" level="FAILURE" destination="TOPMOST">
+				<na:message>bulkedit.validation.error</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" link="false" message="@labelService.getObjectLabel(#root)"/>
+					<na:reference placeholder="1" index="1" link="false" message="root.isEmpty() ? '':@labelService.getObjectLabel(#root.iterator().next())"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="excelExport" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="missingForm" level="FAILURE" destination="TOPMOST">
+				<na:message>excel.export.missing.form</na:message>
+			</na:notifications>
+			<na:notifications eventType="missingAttributes" level="FAILURE" destination="TOPMOST">
+				<na:message>excel.export.missing.attributes</na:message>
+			</na:notifications>
+			<na:notifications eventType="cannotGenerateWorkbook" level="FAILURE" destination="TOPMOST">
+				<na:message>excel.export.cannot.generate.workbook</na:message>
+			</na:notifications>
+			<na:notifications eventType="attributesMaxCountExceeded" level="FAILURE" destination="TOPMOST">
+				<na:message>excel.export.attributes.count.exceeded</na:message>
+				<na:references>
+					<na:reference placeholder="0" index="0" link="false" message="#root"/>
+					<na:reference placeholder="1" index="1" link="false" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context type="GenericItem" component="bulk-edit-wizard">
+		<wz:flow id="bulkEditWizard" title="bulkedit.wizard.title" size="large">
+			<wz:prepare id="initbulkedit">
+				<wz:initialize property="bulkEditForm" template-bean="bulkEditForm"/>
+				<wz:initialize property="bulkEditForm.attributesForm" template-bean="attributesForm"/>
+				<wz:initialize property="bulkEditForm.templateObject" type="ctx.TYPE_CODE"/>
+				<wz:assign property="bulkEditForm.itemsToEdit" value="ctx.bulkEditItems"/>
+				<wz:assign property="bulkEditForm.templateObject" value="bulkEditForm.templateObject==null ? ctx.templateObject:bulkEditForm.templateObject"/>
+			</wz:prepare>
+			<wz:step id="step1" label="bulkedit.wizard.step.select.attributes" sublabel="bulkedit.wizard.step.select.sublabel">
+				<wz:content id="step1.content">
+					<wz:custom-view id="attributesSelector" lang="zul">
+						<wz:renderer spring-bean="bulkEditAttributesSelectorRenderer">
+							<wz:parameter>
+								<wz:name>bulkEditFormModelKey</wz:name>
+								<wz:value>bulkEditForm</wz:value>
+							</wz:parameter>
+							<wz:parameter>
+								<wz:name>excludedQualifiers</wz:name>
+								<wz:value>modifiedtime</wz:value>
+							</wz:parameter>
+						</wz:renderer>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation>
+					<wz:cancel/>
+					<wz:next visible="bulkEditForm.attributesForm.chosenAttributes?.size()>0"/>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="bulkedit.wizard.step.change.attributes" sublabel="bulkedit.wizard.step.change.sublabel">
+				<wz:content id="step2.content">
+					<wz:custom-view id="attributesEdit" lang="zul">
+						<wz:renderer spring-bean="bulkEditRenderer">
+							<wz:parameter>
+								<wz:name>bulkEditFormModelKey</wz:name>
+								<wz:value>bulkEditForm</wz:value>
+							</wz:parameter>
+						</wz:renderer>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation>
+					<wz:back/>
+					<wz:cancel/>
+					<wz:custom label="bulkedit.wizard.button.update" handler="bulkEditHandler">
+						<wz:parameter>
+							<wz:name>bulkEditFormModelKey</wz:name>
+							<wz:value>bulkEditForm</wz:value>
+						</wz:parameter>
+						<wz:parameter>
+							<wz:name>validate</wz:name>
+							<wz:value>wholeObject</wz:value>
+						</wz:parameter>
+					</wz:custom>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step3" label="bulkedit.wizard.step.validation.label" sublabel="bulkedit.wizard.step.validation.sublabel">
+				<wz:content id="step3.content">
+					<wz:custom-view id="validation" lang="zul">
+						<wz:renderer spring-bean="bulkEditValidationRenderer">
+							<wz:parameter>
+								<wz:name>bulkEditFormModelKey</wz:name>
+								<wz:value>bulkEditForm</wz:value>
+							</wz:parameter>
+						</wz:renderer>
+					</wz:custom-view>
+				</wz:content>
+				<wz:navigation>
+					<wz:back/>
+					<wz:cancel/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+    <context type="Product" merge-by="type" component="bulk-edit-wizard">
+        <wz:flow id="bulkEditWizard" title="bulkedit.wizard.title" size="large">
+			  <wz:step id="step1" label="bulkedit.wizard.step.select.attributes" sublabel="bulkedit.wizard.step.select.sublabel">
+                <wz:content id="step1.content">
+                    <wz:custom-view  id="attributesSelector" lang="zul" merge-mode="replace">
+                        <wz:renderer spring-bean="bulkEditAttributesSelectorRenderer">
+                            <wz:parameter>
+                                <wz:name>bulkEditFormModelKey</wz:name>
+                                <wz:value>bulkEditForm</wz:value>
+                            </wz:parameter>
+							<wz:parameter>
+								<wz:name>excludedQualifiers</wz:name>
+								<wz:value>code,modifiedtime</wz:value>
+							</wz:parameter>
+                        </wz:renderer>
+                    </wz:custom-view>
+                </wz:content>
+                <wz:navigation>
+					<wz:cancel/>
+                    <wz:next visible="bulkEditForm.attributesForm.chosenAttributes?.size()>0"/>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step2" label="bulkedit.wizard.step.change.attributes" sublabel="bulkedit.wizard.step.change.sublabel">
+                <wz:content id="step2.content">
+                    <wz:custom-view id="attributesEdit" lang="zul" merge-mode="replace">
+                        <wz:renderer spring-bean="bulkEditRenderer" >
+                            <wz:parameter>
+                                <wz:name>bulkEditFormModelKey</wz:name>
+                                <wz:value>bulkEditForm</wz:value>
+                            </wz:parameter>
+							<wz:parameter>
+                                <wz:name>editor:description</wz:name>
+                                <wz:value>com.hybris.cockpitng.editor.localized(com.hybris.cockpitng.editor.wysiwyg)</wz:value>
+                            </wz:parameter>
+                        </wz:renderer>
+                    </wz:custom-view>
+                </wz:content>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+	<context component="dev-toolbar-actions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.actions.devtools.reseteverything">
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>iconOnly</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.cockpitng.actions.devtools.reloadlabels">
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>iconOnly</y:value>
+					</y:parameter>
+				</y:action>
+				<y:action action-id="com.hybris.cockpitng.actions.devtools.redeploy">
+					<y:parameter>
+						<y:name>viewMode</y:name>
+						<y:value>iconOnly</y:value>
+					</y:parameter>
+				</y:action>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="notification-area" source="explorerTree" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="FilterExceededTraversedItemsLimit" level="FAILURE">
+				<na:message>general.search.items.count.exceeded</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+
+	<context component="notification-area" source="editor-rendering-failure" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="General" level="FAILURE">
+				<na:message>general.editor.rendering.failed.unexpected</na:message>
+				<na:references>
+					<na:reference placeholder="0" message="#root"/>
+					<na:reference placeholder="1" message="#root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+</config>

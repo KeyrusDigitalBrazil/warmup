@@ -1,0 +1,51 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$contentCatalog=testCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append];
+;$regulargroup;customergroup;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;customer1@hybris.com;customergroup;;Miljenko Calhoun 
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;segment1;
+;segment2;
+
+INSERT_UPDATE CxUserToSegment;segment(code)[unique=true];user(uid)[unique=true];affinity;
+;segment1;customer1@hybris.com;1;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+;default;
+
+#Cx Customizations
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='default']
+;customization1;customization1;;
+;customization2;customization2;;
+;otherC;otherC;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];active[default=true];customization(code,$contentCV);
+;variation1;variation1;;;customization1;
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCV[unique=true];variation(code,$contentCV)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger1;;variation1;segment1;
+
+
+INSERT_UPDATE CxMapperScript;scriptType(code);active;code[unique=true];version[unique=true];content;group;
+;GROOVY;true;yprofilemapperscript1;0;"result = new de.hybris.platform.personalizationintegration.mapping.SegmentMappingData(); result.setCode('segment2'); return [result];";yprofile;

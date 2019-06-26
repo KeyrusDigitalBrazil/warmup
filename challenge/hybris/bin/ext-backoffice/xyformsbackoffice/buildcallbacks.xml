@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="xyformsbackoffice_buildcallbacks">
+	
+	<property name="xyformsbackoffice_web_fragment_file" value="${ext.xyformsbackoffice.path}/resources/web-fragment.xml"/>
+	<property name="xyformsbackoffice_web_fragment_dest_jar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_xyformsbackoffice.jar"/>
+
+	<macrodef name="xyformsbackoffice_after_clean">
+		<sequential>
+			<xyformsbackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+			
+	<macrodef name="xyformsbackoffice_after_build">
+		<sequential>
+			<xyformsbackoffice_remove_web_fragment/>
+			<xyformsbackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsbackoffice_remove_web_fragment">
+		<sequential>
+			<delete file="${xyformsbackoffice_web_fragment_dest_jar}" failonerror="false" verbose="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${xyformsbackoffice_web_fragment_file}"/>
+				<then>
+					<sequential>
+						<jar destfile="${xyformsbackoffice_web_fragment_dest_jar}">
+							<metainf file="${xyformsbackoffice_web_fragment_file}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+</project>

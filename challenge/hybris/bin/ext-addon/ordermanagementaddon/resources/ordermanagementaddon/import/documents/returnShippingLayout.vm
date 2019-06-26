@@ -1,0 +1,106 @@
+##messageSource=classpath:/ordermanagementaddon/messages/document-returnshippinglabel_$lang.properties
+<html>
+<head>
+	<style type='text/css'>@media screen, print {
+		table {
+			width: 96%;
+			margin: 25px 10px 0;
+            font-family: "Open Sans", sans-serif;
+            color: #151c22;
+		}
+
+		th {
+			padding: 5px 5px 5px 15px;
+			font-weight: bold;
+			text-align: left;
+		}
+
+		td {
+			padding: 5px 0 5px 15px;
+		}
+
+		td.title {
+            vertical-align: top;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        td.headline{
+            font-size: 27px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+		
+		div.pick-slip-border{
+            border-top: 1px solid #e5e9ed;
+        }
+
+        .sitelogo>img{
+            max-width: 250px;
+        }
+
+        body>table{
+            max-width: 1200px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+	}</style>
+</head>
+<body>
+<table>
+    <tr>
+        <td colspan="2" class="sitelogo">
+			${ctx.cmsSlotContents.SiteLogo}
+        </td>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.TopContent}</a>
+        </td>
+    </tr>
+    <tr>
+		<table>
+			<tr>
+				<td colspan="2" class="headline">Mock Priority Mail</td>
+			</tr>
+			<tr>
+				<td colspan="2"><strong>$!{ctx.messages.date}</strong> ${ctx.date}</td>
+			</tr>
+			<tr>
+				<td class="title">From</td>
+				<td colspan=3>
+					$!{ctx.escapeHtml($ctx.order.deliveryAddress.firstname)} $!{ctx.escapeHtml($ctx.order.deliveryAddress.lastname)}<br/>
+					$!{ctx.escapeHtml($ctx.order.deliveryAddress.streetname)} $!{ctx.escapeHtml($ctx.order.deliveryAddress.streetNumber)}<br/>
+					$!{ctx.escapeHtml($ctx.order.deliveryAddress.town)}, $!{ctx.escapeHtml($ctx.order.deliveryAddress.region.name)} $!{ctx.escapeHtml($ctx.order.deliveryAddress.postalcode)}<br/>
+					$!{ctx.escapeHtml($ctx.order.deliveryAddress.country.name)}
+				</td>
+			</tr>
+			<tr>
+				<td class="title">Ship To</td>
+				<td colspan="3">
+					$!{ctx.escapeHtml($ctx.address.firstname)} $!{ctx.escapeHtml($ctx.address.lastname)}<br/>
+					$!{ctx.escapeHtml($ctx.address.line1)} $!{ctx.escapeHtml($ctx.address.line2)}<br/>
+					$!{ctx.escapeHtml($ctx.address.town)}, $!{ctx.escapeHtml($ctx.address.region)} $!{ctx.escapeHtml($ctx.address.postalcode)}<br/>
+					$!{ctx.escapeHtml($ctx.address.country.name)}
+				</td>
+			</tr>
+			<tr>
+				<td colspan=4>
+					<p style="text-align:center;">
+                        <img src="${ctx.mediaBaseUrl}$!{ctx.getBarcodeMediaImageURL($ctx.order)}" /></td>
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="4"><div class="pick-slip-border"></div></td>
+			</tr>
+		</table>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.BottomContent}</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

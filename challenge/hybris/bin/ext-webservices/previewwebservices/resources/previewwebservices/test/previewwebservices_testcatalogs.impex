@@ -1,0 +1,78 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog = testContentCatalog
+$contentCatalogRegion = $contentCatalog-region
+$contentCatalogLocal = $contentCatalog-local
+
+$productCatalog = testProductCatalog
+$languages = en
+$defaultLanguage = en
+$storeUid = testStore
+$siteUid = testSite
+$siteUid2 = testSite2
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalog]), CatalogVersion.version[default = Staged])[default = $contentCatalog:Staged]
+$contentCVRegion = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalogRegion]), CatalogVersion.version[default = Staged])[default = $contentCatalogRegion:Staged]
+$contentCVRegionOnline = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalogRegion]), CatalogVersion.version[default = Online])[default = $contentCatalogRegion:Online]
+$contentCVLocal = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalogLocal]), CatalogVersion.version[default = Staged])[default = $contentCatalogLocal:Staged]
+$itemContentCV = itemCatalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalog]), CatalogVersion.version[default = Staged])[default = $contentCatalog:Staged]
+
+
+# Content catalog for CMS contents
+INSERT_UPDATE ContentCatalog;id[unique=true];supercatalog(id)
+; $contentCatalog ;
+; $contentCatalogRegion ; $contentCatalog
+; $contentCatalogLocal ; $contentCatalogRegion
+
+INSERT_UPDATE Catalog; id[unique = true]
+; $productCatalog
+
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active; languages(isoCode)
+; $contentCatalog ; Staged ; false ; $languages
+; $contentCatalogRegion ; Staged ; false ; $languages
+; $contentCatalogLocal ; Staged ; false ; $languages
+; $contentCatalog ; Online ; true  ; $languages
+; $contentCatalogRegion ; Online ; true  ; $languages
+; $contentCatalogLocal ; Online ; true  ; $languages
+; $productCatalog ; Staged ; false ; $languages
+; $productCatalog ; Online ; true  ; $languages
+
+INSERT_UPDATE BaseStore; uid[unique = true]; catalogs(id);
+; $storeUid ; $productCatalog ;
+
+INSERT_UPDATE CMSSite; uid[unique = true]; stores(uid); contentCatalogs(id); defaultCatalog(id); urlPatterns; active;
+; $siteUid ; $storeUid ; $contentCatalog ; $productCatalog ; (?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=$siteUid)(|\&.*)$,(?i)^https?://$siteUid\.[^/]+(|/.*|\?.*)$   ; true
+; $siteUid-region ; $storeUid ; $contentCatalog,$contentCatalogRegion ; $productCatalog ; (?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=$siteUid-region)(|\&.*)$,(?i)^https?://$siteUid-region\.[^/]+(|/.*|\?.*)$   ; true
+; $siteUid-local ; $storeUid ; $contentCatalog,$contentCatalogRegion,$contentCatalogLocal ; $productCatalog ; (?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=$siteUid-local)(|\&.*)$,(?i)^https?://$siteUid-local\.[^/]+(|/.*|\?.*)$   ; true
+; $siteUid2 ; $storeUid ; $contentCatalog ; $productCatalog ; (?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=$siteUid2)(|\&.*)$,(?i)^https?://$siteUid2\.[^/]+(|/.*|\?.*)$ ; true
+
+
+# Pages
+INSERT_UPDATE PageTemplate; $contentCV[unique = true]; uid[unique = true]; name; frontendTemplateName; restrictedPageTypes(code); active[default = true]
+; ; LandingPage2Template ; Landing Page 2 Template ; layout/landingLayout2Page ; CategoryPage,ContentPage
+
+
+INSERT_UPDATE ContentPage; $contentCV[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage ; Homepage Global ; LandingPage2Template ; homepage
+
+INSERT_UPDATE ContentPage; $contentCVRegion[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage-region ; Homepage Region ; LandingPage2Template ; homepage
+
+INSERT_UPDATE ContentPage; $contentCVRegionOnline[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage-region ; Homepage Region ; LandingPage2Template ; homepage
+
+INSERT_UPDATE ContentPage; $contentCVLocal[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage-local ; Homepage Local ; LandingPage2Template ; homepage
+
+
+INSERT_UPDATE CMSVersion; $itemContentCV[unique = true]; uid[unique = true]; itemUid; label
+; ; homepage-version ; homepage ; Homepage Version

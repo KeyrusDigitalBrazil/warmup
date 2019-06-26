@@ -1,0 +1,106 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#-----------------------------------------------------------
+"#% impex.setLocale( new Locale( ""en"" , """" ) );"
+"#%
+	Map facetTypeMapping = new HashMap();
+	facetTypeMapping.put(""Refine"", ""REFINE"");
+	facetTypeMapping.put(""MultiSelectAnd"", ""MULTISELECT_AND"");
+	facetTypeMapping.put(""MultiSelectOr"", ""MULTISELECT_OR"");
+	
+	Map stringBoostOperatorMapping = new HashMap();
+	stringBoostOperatorMapping.put(""EQUAL_TO"", ""MATCH"");
+	stringBoostOperatorMapping.put(""CONTAINS"", ""MATCH"");
+	
+	Map boostOperatorMapping = new HashMap();
+	boostOperatorMapping.put(""GREATER_THAN"", ""GREATER_THAN"");
+	boostOperatorMapping.put(""GREATER_THAN_OR_EQUAL_TO"", ""GREATER_THAN_OR_EQUAL"");
+	boostOperatorMapping.put(""LESS_THAN"", ""LESS_THAN"");
+	boostOperatorMapping.put(""LESS_THAN_OR_EQUAL_TO"", ""LESS_THAN_OR_EQUAL"");
+	boostOperatorMapping.put(""EQUAL_TO"", ""EQUAL"");
+	  
+	mapFacetType(facetType) {
+		return facetTypeMapping.get(facetType);
+	}
+	
+	mapBoostOperator(boostOperator, type) {
+		if (type.equals(""string"") || type.equals(""text"")) {
+			return stringBoostOperatorMapping.get(boostOperator);
+		} else {
+			return boostOperatorMapping.get(boostOperator);
+		}
+	}
+	
+	resolveFacetsMergeMode(facets) {
+		if (facets != null && !facets.isEmpty()) {
+			return ""REPLACE"";
+		} else {
+			return ""ADD_AFTER"";
+		}
+	}
+	
+	resolveBoostRulesMergeMode(boostRules) {
+		if (boostRules != null && !boostRules.isEmpty()) {
+			return ""REPLACE"";
+		} else {
+			return ""ADD"";
+		}
+	}
+"
+#-----------------------------------------------------------
+
+$indexType=electronicsProductType
+$catalogId=electronicsProductCatalog
+$version=Online
+$searchProfile=commercesearch-electronics
+
+$catalogVersion=catalogVersion(catalog(id[default=$catalogId]),version[default=$version])
+
+insert AsCategoryAwareSearchProfile;&searchProfile;code;name;indexType;$catalogVersion
+;searchProfile;$searchProfile;$searchProfile;$indexType;
+
+
+### Search Configurations ###
+
+insert AsCategoryAwareSearchConfiguration;&searchConfiguration;searchProfile(code,$catalogVersion)[default=$searchProfile];$catalogVersion;facetsMergeMode(code[default='ADD_AFTER']);boostRulesMergeMode(code[default='ADD']);boostItemsMergeMode(code[default='ADD_AFTER'])
+"#% impex.includeExternalDataMedia( ""GlobalSearchConfiguration.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+insert AsCategoryAwareSearchConfiguration;&searchConfiguration;category(code,$catalogVersion);;;searchProfile(code,$catalogVersion)[default=$searchProfile];$catalogVersion;facetsMergeMode(code[default='ADD_AFTER']);boostRulesMergeMode(code[default='ADD']);boostItemsMergeMode(code[default='ADD_AFTER'])
+"#% beforeEach: line.put(7, resolveFacetsMergeMode(line.get(3))); line.put(8, resolveBoostRulesMergeMode(line.get(4)));"
+"#% impex.includeExternalDataMedia( ""CategorySearchConfiguration.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+
+### Facets ###
+
+insert AsFacet;&facet;indexProperty;priority;facetType(code);valuesSortProvider;valuesDisplayNameProvider;topValuesProvider;searchConfiguration(&searchConfiguration);$catalogVersion
+"#% beforeEach: line.put(4, mapFacetType(line.get(4)));"
+"#% impex.includeExternalDataMedia( ""Facet.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+insert AsExcludedFacet;&excludedFacet;indexProperty;priority;facetType(code);valuesSortProvider;valuesDisplayNameProvider;topValuesProvider;searchConfiguration(&searchConfiguration);$catalogVersion
+"#% beforeEach: line.put(4, mapFacetType(line.get(4)));"
+"#% impex.includeExternalDataMedia( ""ExcludedFacet.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+
+### Boost Rules ###
+
+insert AsBoostRule;&boostRule;indexProperty;;operator(code);value;boost;searchConfiguration(&searchConfiguration);$catalogVersion;boostType(code[default='ADDITIVE'])
+"#% beforeEach: line.put(4, mapBoostOperator(line.get(4), line.get(3)));"
+"#% impex.includeExternalDataMedia( ""BoostRule.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+
+### Boost Items ###
+
+insert_update AsCategoryAwareSearchConfiguration;;;category(code,$catalogVersion)[unique=true];searchProfile(code[default='$searchProfile'],$catalogVersion)[unique=true];$catalogVersion[unique=true];boostItemsMergeMode(code[default='REPLACE'])
+"#% impex.includeExternalDataMedia( ""PromotedItem.csv"" , ""UTF-8"", ';',  1 , -1 );"
+
+insert AsPromotedItem;&promotedItem;item(Product.code,Product.$catalogVersion);searchConfiguration(AsCategoryAwareSearchConfiguration.searchProfile(code[default='$searchProfile'],$catalogVersion),AsCategoryAwareSearchConfiguration.category(code,$catalogVersion));$catalogVersion
+"#% impex.includeExternalDataMedia( ""PromotedItem.csv"" , ""UTF-8"", ';',  1 , -1 );"
+

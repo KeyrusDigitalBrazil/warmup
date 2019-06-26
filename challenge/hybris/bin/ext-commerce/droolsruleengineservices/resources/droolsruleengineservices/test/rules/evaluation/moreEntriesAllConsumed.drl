@@ -1,0 +1,33 @@
+package de.hybris.platform.ruleengineservices.test
+
+import java.math.*;
+import de.hybris.platform.ruleengineservices.rao.*;
+import de.hybris.platform.ruleengineservices.rrd.*;
+import de.hybris.platform.ruleengineservices.rule.evaluation.*;
+import java.util.ArrayList;
+import java.util.Map;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleOrderEntryFixedPriceAction;
+
+salience 10;
+
+rule "moreEntriesAllConsumed"
+@ruleCode("moreEntriesAllConsumed.drl")
+@moduleName("rules-module-junit")
+dialect "mvel" 
+
+    when
+        $entries : ArrayList(size > 0) from collect( OrderEntryRAO(product.getCode()=="1422222" || product.getCode()=="123456" || product.getCode()=="654321" , quantity > 0) )
+		$config : RuleConfigurationRRD(ruleCode == "moreEntriesAllConsumed.drl")
+		$groupExecution := RuleGroupExecutionRRD(code == $config.ruleGroupCode)
+		$result : RuleEngineResultRAO()
+		eval($groupExecution.allowedToExecute($config))
+    then
+        Map variables = [
+      		"de.hybris.platform.ruleengineservices.rao.OrderEntryRAO" : $entries,
+      		"de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO" : $result
+   		];
+		ruleOrderEntryFixedPriceAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["value":["USD":new BigDecimal(50)]]);
+		$groupExecution.trackRuleGroupExecution($config);
+end

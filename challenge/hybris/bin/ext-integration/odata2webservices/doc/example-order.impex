@@ -1,0 +1,14 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]
+; Order
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; Order ; Order      ; Order
+; Order ; OrderEntry ; OrderEntry
+; Order ; Product    ; Product
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; Order:Order      ; code     ; Order:code          ;                  ; true
+; Order:Order      ; entries  ; Order:entries       ; Order:OrderEntry ;
+; Order:OrderEntry ; product  ; OrderEntry:product  ; Order:Product    ;
+; Order:OrderEntry ; quantity ; OrderEntry:quantity ;
+## OrderEntry doesn't have a key, it cannot be uploaded to SCPI

@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<context:annotation-config/>
+
+	<alias name="defaultAddressValuesProvider" alias="addressValuesProvider"/>
+	<bean id="defaultAddressValuesProvider" class="de.hybris.platform.platformbackoffice.editorsearchfacade.AddressValuesProvider">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="platformbackofficeService" depends-on="fixedBeanResolver"
+	      class="de.hybris.platform.platformbackoffice.services.PlatformbackofficeService" lazy-init="false"/>
+
+	<bean id="platformbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator"
+	      scope="singleton"
+	      init-method="init" lazy-init="false">
+		<property name="location" value="/platformbackoffice-backoffice-labels/"/>
+		<property name="name" value="labels"/>
+	</bean>
+
+	<alias name="defultBackofficeImpExImportWizardHandler" alias="backofficeImpExImportWizardHandler"/>
+	<bean id="defultBackofficeImpExImportWizardHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.impex.ImpExImportWizardHandler">
+		<property name="importService" ref="importService"/>
+	</bean>
+
+	<alias name="defaultBackofficeImpExExportWizardHandler" alias="backofficeImpExExportWizardHandler"/>
+	<bean id="defaultBackofficeImpExExportWizardHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.impex.ImpExExportWizardHandler">
+		<property name="exportService" ref="exportService"/>
+	</bean>
+
+	<alias name="defaultBackofficeStartSyncWizardHandler" alias="backofficeStartSyncWizardHandler"/>
+	<bean id="defaultBackofficeStartSyncWizardHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.catalogsynchronization.StartSyncWizardHandler">
+		<property name="catalogSynchronizationService" ref="catalogSynchronizationService"/>
+	</bean>
+
+	<alias name="defultBackofficeSaveAdvancedSearchQueryWizardHandler" alias="backofficeSaveAdvancedSearchQueryWizardHandler" />
+	<bean id="defultBackofficeSaveAdvancedSearchQueryWizardHandler" class="de.hybris.platform.platformbackoffice.widgets.savedqueries.SaveAdvancedSearchQueryWizardHandler">
+		<property name="backofficeSavedQueriesService" ref="backofficeSavedQueriesService" />
+		<property name="userService" ref="userService" />
+		<property name="cockpitEventQueue" ref="cockpitEventQueue" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<alias name="defaultBackofficeSaveAdvancedSearchQueryForm" alias="backofficeSaveAdvancedSearchQueryForm"/>
+	<bean id="defaultBackofficeSaveAdvancedSearchQueryForm" scope="prototype"
+	      class="de.hybris.platform.platformbackoffice.widgets.savedqueries.SaveAdvancedSearchQueryForm"/>
+
+	<alias name="defaultBackofficeRepairProcessWizardHandler" alias="backofficeRepairProcessWizardHandler"/>
+	<bean id="defaultBackofficeRepairProcessWizardHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.processengine.RepairProcessWizardHandler">
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+	<alias name="defaultBackofficeCreateWorkflowAttachmentHandler" alias="backofficeCreateWorkflowAttachmentHandler"/>
+	<bean id="defaultBackofficeCreateWorkflowAttachmentHandler" class="de.hybris.platform.platformbackoffice.widgets.workflow.CreateWorkflowAttachmentHandler">
+		<property name="notificationService" ref="notificationService"/>
+	</bean>
+
+	<alias name="defaultBackofficeCreateWorkflowWizardHandler" alias="backofficeCreateWorkflowWizardHandler"/>
+	<bean id="defaultBackofficeCreateWorkflowWizardHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.workflow.CreateWorkflowWizardHandler">
+		<property name="workflowService" ref="newestWorkflowService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+	</bean>
+
+	<!-- Label Providers -->
+	<alias name="backofficeFeatureValueLabelProvider" alias="featureValueLabelProvider"/>
+	<bean id="backofficeFeatureValueLabelProvider"
+	      class="de.hybris.platform.platformbackoffice.labelproviders.FeatureValueLabelProvider">
+		<property name="labelService" ref="labelService"/>
+	</bean>
+
+	<alias name="defaultAddressLabelProvider" alias="addressLabelProvider"/>
+	<bean id="defaultAddressLabelProvider" class="de.hybris.platform.platformbackoffice.labelproviders.AddressLabelProvider"/>
+
+	<alias name="defaultSavedValuesLabelProvider" alias="savedValuesLabelProvider"/>
+	<bean id="defaultSavedValuesLabelProvider"
+	      class="de.hybris.platform.platformbackoffice.labelproviders.SavedValuesLabelProvider">
+		<property name="cockpitLocaleService" ref="cockpitLocaleService"/>
+		<property name="labelService" ref="labelService"/>
+	</bean>
+
+	<alias name="defaultTaxValueLabelProvider" alias="taxValueLabelProvider"/>
+	<bean id="defaultTaxValueLabelProvider" class="de.hybris.platform.platformbackoffice.labelproviders.TaxValueLabelProvider">
+		<property name="taxValueRenderer" ref="taxValueParser"/>
+	</bean>
+
+	<alias name="defaultDiscountValueLabelProvider" alias="discountValueLabelProvider"/>
+	<bean id="defaultDiscountValueLabelProvider"
+	      class="de.hybris.platform.platformbackoffice.labelproviders.DiscountValueLabelProvider">
+		<property name="discountValueRenderer" ref="discountValueParser"/>
+	</bean>
+
+	<alias name="defaultWorkflowItemAttachmentLabelProvider" alias="workflowItemAttachmentLabelProvider"/>
+	<bean id="defaultWorkflowItemAttachmentLabelProvider"
+	      class="de.hybris.platform.platformbackoffice.labelproviders.WorkflowItemAttachmentLabelProvider">
+		<property name="modelService" ref="modelService"/>
+		<property name="labelService" ref="labelService"/>
+	</bean>
+
+	<!-- Label Providers -->
+
+	<!-- Property Accessors -->
+	<cng:list-extender bean="evaluationContextFactory" property="additionalPropertyAccessors">
+		<cng:add value-type="org.springframework.expression.PropertyAccessor">
+			<ref bean="classificationPropertyAccessor"/>
+			<ref bean="jaloPropertyNotVisibleInModelAccessor"/>
+			<ref bean="viewResultItemPropertyAccessor"/>
+			<ref bean="localizedModelPropertyAccessor"/>
+			<bean class="de.hybris.platform.platformbackoffice.variant.VariantAttributePropertyAccessor">
+				<property name="variantsService" ref="variantsService"/>
+				<property name="cockpitLocaleService" ref="cockpitLocaleService"/>
+				<property name="typeFacade" ref="typeFacade"/>
+				<property name="cockpitUserService" ref="cockpitUserService"/>
+				<property name="backofficeVariantsService" ref="backofficeVariantsService"/>
+			</bean>
+			<ref bean="savedValuesPropertyAccessor"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultClassificationPropertyAccessor" alias="classificationPropertyAccessor"/>
+	<bean id="defaultClassificationPropertyAccessor"
+	      class="de.hybris.platform.platformbackoffice.classification.ClassificationPropertyAccessor">
+		<property name="classificationService" ref="classificationService"/>
+	</bean>
+
+	<alias name="defaultJaloPropertyNotVisibleInModelAccessor" alias="jaloPropertyNotVisibleInModelAccessor"/>
+	<bean id="defaultJaloPropertyNotVisibleInModelAccessor"
+	      class="de.hybris.platform.platformbackoffice.accessors.JaloPropertyNotVisibleInModelAccessor">
+		<property name="modelService" ref="modelService"/>
+		<property name="objectFacade" ref="objectFacade"/>
+		<property name="typeFacade" ref="typeFacade"/>
+		<property name="permissionFacade" ref="permissionFacade"/>
+		<property name="supportedJaloAttributes">
+			<map>
+				<entry key="allDocuments">
+					<set>
+						<value>de.hybris.platform.core.model.ItemModel</value>
+					</set>
+				</entry>
+				<entry key="synchronizedCopies">
+					<set>
+						<value>de.hybris.platform.core.model.ItemModel</value>
+					</set>
+				</entry>
+				<entry key="synchronizationSources">
+					<set>
+						<value>de.hybris.platform.core.model.ItemModel</value>
+					</set>
+				</entry>
+				<entry key="andConnectionTemplate">
+					<set>
+						<value>de.hybris.platform.core.model.link.LinkModel</value>
+					</set>
+				</entry>
+				<entry key="assignedCockpitItemTemplates">
+					<!-- Remove this entry when cockpit-core extension is no longer part of the commerce suite -->
+					<set>
+						<value>de.hybris.platform.core.model.ItemModel</value>
+					</set>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultViewResultItemPropertyAccessor" alias="viewResultItemPropertyAccessor"/>
+	<bean id="defaultViewResultItemPropertyAccessor"
+	      class="de.hybris.platform.platformbackoffice.accessors.ViewResultItemPropertyAccessor"></bean>
+
+	<alias name="defaultLocalizedModelPropertyAccessor" alias="localizedModelPropertyAccessor"/>
+	<bean id="defaultLocalizedModelPropertyAccessor"
+	      class="de.hybris.platform.platformbackoffice.accessors.LocalizedModelPropertyAccessor">
+		<property name="cockpitLocaleService" ref="cockpitLocaleService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeFacade" ref="typeFacade"/>
+		<property name="cockpitUserService" ref="cockpitUserService"/>
+	</bean>
+
+	<alias name="defaultSavedValuesPropertyAccessor" alias="savedValuesPropertyAccessor"/>
+	<bean id="defaultSavedValuesPropertyAccessor"
+	      class="de.hybris.platform.platformbackoffice.accessors.SavedValuesPropertyAccessor">
+		<property name="itemModificationHistoryService" ref="itemModificationHistoryService"/>
+		<property name="objectFacade" ref="objectFacade"/>
+	</bean>
+	<!-- Property Accessors -->
+
+	<!-- Rendreres -->
+	<alias name="backofficeEditorAreaRenderer" alias="editorAreaRenderer"/>
+	<bean id="backofficeEditorAreaRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.BackofficeEditorAreaRenderer"
+	      parent="defaultEditorAreaRenderer">
+		<property name="jaloPersistanceHandler" ref="jaloPersistanceHandler"/>
+	</bean>
+
+	<alias name="defaultJaloPersistanceHandler" alias="jaloPersistanceHandler"/>
+	<bean id="defaultJaloPersistanceHandler"
+	      class="de.hybris.platform.platformbackoffice.accessors.JaloPersistanceHandler">
+		<property name="modelService" ref="modelService"/>
+		<property name="itemModificationHistoryService" ref="itemModificationHistoryService"/>
+		<property name="typeFacade" ref="typeFacade"/>
+	</bean>
+
+	<alias name="defaultClassificationTabEditorAreaRenderer" alias="classificationTabEditorAreaRenderer"/>
+	<bean id="defaultClassificationTabEditorAreaRenderer"
+	      class="de.hybris.platform.platformbackoffice.classification.ClassificationTabEditorAreaRenderer"
+	      parent="abstractEditorAreaComponentRenderer">
+		<property name="classificationService" ref="classificationService"/>
+		<property name="permissionFacade" ref="permissionFacade"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="objectFacade" ref="objectFacade"/>
+		<property name="classificationClassComparator">
+			<bean class="de.hybris.platform.platformbackoffice.classification.comparator.ClassificationClassComparator"/>
+		</property>
+		<property name="featureComparator">
+			<bean class="de.hybris.platform.platformbackoffice.classification.comparator.FeatureComparator"/>
+		</property>
+		<property name="featurePeristanceHandler">
+			<bean class="de.hybris.platform.platformbackoffice.classification.FeaturePeristanceHandler">
+				<property name="classificationService" ref="classificationService"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="genericMediaItemUploadPanelRenderer" alias="mediaItemUploadRenderer"/>
+	<bean id="genericMediaItemUploadPanelRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.GenericMediaItemUploadPanelRenderer"
+	      scope="prototype" parent="abstractEditorAreaComponentRenderer">
+		<property name="attributeDescriptionIconRenderer" ref="attributeDescriptionIconRenderer"/>
+		<property name="objectFacade" ref="objectFacade"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaStorageConfigService" ref="mediaStorageConfigService"/>
+		<property name="cockpitLocaleService" ref="cockpitLocaleService"/>
+		<property name="cockpitUserService" ref="cockpitUserService"/>
+		<property name="labelService" ref="labelService"/>
+		<property name="permissionFacade" ref="permissionFacade"/>
+		<property name="propertyValueService" ref="propertyValueService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="cockpitProperties" ref="cockpitProperties"/>
+		<property name="permissionFacadeStrategy" ref="defaultPermissionFacadeStrategy"/>
+		<property name="objectPreviewService" ref="objectPreviewService"/>
+		<property name="widgetRenderingUtils" ref="widgetRenderingUtils"/>
+	</bean>
+
+	<alias name="defaultSelectiveSyncAttributesOverviewRenderer" alias="selectiveSyncAttributesOverviewRenderer"/>
+	<bean id="defaultSelectiveSyncAttributesOverviewRenderer"
+		  class="com.hybris.backoffice.widgets.selectivesync.renderer.SelectiveSyncAttributesOverviewRenderer"
+		  parent="abstractEditorAreaComponentRenderer" scope="prototype"/>
+
+	<alias name="defaultSavedValuesEntryRenderer" alias="savedValuesEntryRenderer"/>
+	<bean id="defaultSavedValuesEntryRenderer"
+		  class="de.hybris.platform.platformbackoffice.renderers.SavedValueEntryRenderer"
+		  parent="abstractEditorAreaComponentRenderer">
+		<property name="typeFacade" ref="typeFacade"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultSavedValuesEntrySectionRenderer" alias="savedValuesEntrySectionRenderer"/>
+	<bean id="defaultSavedValuesEntrySectionRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.SavedValueEntrySectionRenderer"
+	      parent="savedValuesEntryRenderer">
+	</bean>
+
+	<alias name="defaultUserPasswordPanelRenderer" alias="userPasswordPanelRenderer"/>
+	<bean id="defaultUserPasswordPanelRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.UserPasswordPanelRenderer">
+		<property name="userService" ref="userService"/>
+		<property name="permissionFacade" ref="permissionFacade"/>
+		<property name="passwordPolicyService" ref="passwordPolicyService"/>
+	</bean>
+
+	<alias name="defaultVariantAttributesSectionRenderer" alias="variantAttributesSectionRenderer"/>
+	<bean id="defaultVariantAttributesSectionRenderer"
+	      class="de.hybris.platform.platformbackoffice.variant.VariantAttributesSectionRenderer"
+	      parent="abstractEditorAreaComponentRenderer">
+		<property name="objectValueService" ref="objectValueService"/>
+		<property name="objectFacade" ref="objectFacade"/>
+		<property name="typeFacade" ref="typeFacade"/>
+	</bean>
+
+	<alias name="defaultWorfklowActionDecisionSectionRenderer" alias="worfklowActionDecisionSectionRenderer"/>
+	<bean id="defaultWorfklowActionDecisionSectionRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.WorkflowDecisionActionSectionRenderer"
+		  parent="abstractWorkflowActionDecisionRenderer">
+		<property name="objectPreviewService" ref="objectPreviewService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="objectFacade" ref="objectFacade"/>
+		<property name="workflowProcessingService" ref="workflowProcessingService"/>
+		<property name="labelService" ref="labelService"/>
+	</bean>
+
+	<alias name="defaultGenerateOutputDocumentSectionRenderer" alias="generateOutputDocumentSectionRenderer"/>
+	<bean id="defaultGenerateOutputDocumentSectionRenderer" class="de.hybris.platform.platformbackoffice.renderers.GenerateOutputDocumentPanelRenderer" parent="defaultEditorAreaPanelRenderer" scope="prototype">
+		<property name="objectFacade" ref="objectFacade" />
+		<property name="modelService" ref="modelService" />
+		<property name="cockpitProperties" ref="cockpitProperties"/>
+		<property name="eventPublisher" ref="eventPublisher" />
+		<property name="notificationService" ref="notificationService"/>
+ 	</bean>
+
+	<alias name="defaultDownloadMediaCellRenderer" alias="downloadMediaCellRenderer"/>
+	<bean id="defaultDownloadMediaCellRenderer" class="de.hybris.platform.platformbackoffice.renderers.DownloadMediaCellRenderer">
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+	<alias name="defaultCustomSyncResultRenderer" alias="customSyncResultRenderer" />
+	<bean id="defaultCustomSyncResultRenderer"
+	      class="de.hybris.platform.platformbackoffice.widgets.catalogsynchronization.CustomSyncResultRenderer">
+		<property name="permissionFacade" ref="permissionFacade"/>
+	</bean>
+	<!-- Renderers -->
+
+	<alias name="classificationAwareEditorAreaConfigurationFallbackStrategy"
+	       alias="editorAreaConfigurationFallbackStrategy"/>
+	<bean id="classificationAwareEditorAreaConfigurationFallbackStrategy"
+	      class="de.hybris.platform.platformbackoffice.classification.config.ClassificationAwareEditorAreaConfigFallbackStrategy"
+	      parent="abstractCockpitConfigurationFallbackStrategy">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<bean class="com.hybris.cockpitng.core.config.util.CockpitConfigurationServiceExtender" lazy-init="false">
+		<property name="fallbackStrategies">
+			<map>
+				<entry key="com.hybris.cockpitng.core.config.impl.jaxb.editorarea.EditorArea">
+					<list>
+						<ref bean="editorAreaConfigurationFallbackStrategy"/>
+					</list>
+				</entry>
+			</map>
+		</property>
+		<property name="configurationService" ref="cockpitConfigurationService"/>
+	</bean>
+
+	<!-- Editors -->
+	<cng:map-extender bean="editorRegistry" property="defaultEditorMapping">
+		<cng:put key-type="java.lang.String" value-type="java.lang.String">
+			<entry key="de.hybris.platform.core.PK" value="com.hybris.cockpitng.editor.onpremise.pk"/>
+			<entry key="de.hybris.platform.core.HybrisEnumValue" value="com.hybris.cockpitng.editor.defaultenum"/>
+			<entry key="^ClassificationEnum\((.*)\)$" value="com.hybris.cockpitng.editor.defaultenum"/>
+			<entry key="Feature" value="com.hybris.cockpitng.editor.feature"/>
+			<entry key="de.hybris.platform.util.TaxValue"
+			       value="de.hybris.platform.platformbackoffice.editors.taxdiscountvalueeditor.TaxDiscountValueEditor"/>
+			<entry key="de.hybris.platform.util.DiscountValue"
+			       value="de.hybris.platform.platformbackoffice.editors.taxdiscountvalueeditor.TaxDiscountValueEditor"/>
+			<entry key="^FeatureValue\((.*)\)$" value="com.hybris.cockpitng.editor.featurevalue"/>
+			<entry key="de.hybris.platform.util.StandardDateRange"
+			       value="com.hybris.cockpitng.editor.standardDateRange"/>
+			<entry key="com.hybris.cockpitng.editor.numberwithclassificationunit"
+			       value="com.hybris.cockpitng.editor.numberwithclassificationunit"/>
+			<entry key="Undefined" value="com.hybris.cockpitng.editor.undefinedtype"/>
+		</cng:put>
+	</cng:map-extender>
+
+	<alias name="platformEnumValueResolver" alias="enumValueResolver"/>
+	<bean id="platformEnumValueResolver"
+	      class="de.hybris.platform.platformbackoffice.editors.yenum.PlatformEnumValueResolver">
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="classificationSystemService" ref="classificationSystemService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="platformEnumValueFilterResolver" alias="enumValueFilter" />
+	<bean id="platformEnumValueFilterResolver" class="de.hybris.platform.platformbackoffice.editors.yenum.PlatformEnumValueFilterResolver" />
+
+	<alias name="defaultMoveMediaToFolderEditor" alias="moveMediaToFolderEditor"/>
+	<bean id="defaultMoveMediaToFolderEditor"
+	      class="de.hybris.platform.platformbackoffice.editors.movemediatofoldereditor.MoveMediaToFolderEditor"/>
+
+
+	<alias name="defaultPlatformBackofficeExceptionTranslationStrategiesExtender"
+	       alias="platformBackofficeExceptionTranslationStrategiesExtender"/>
+	<cng:list-extender id="defaultPlatformBackofficeExceptionTranslationStrategiesExtender" property="exceptionHandlers"
+					   bean="exceptionTranslationService">
+		<cng:add value-type="com.hybris.cockpitng.service.ExceptionTranslationHandler">
+			<bean class="de.hybris.platform.platformbackoffice.services.handlers.ModelSavingExceptionTranslationHandler"/>
+			<bean class="de.hybris.platform.platformbackoffice.services.handlers.ModelRemovalExceptionTranslationHandler"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultItemJSONMapperExtender" alias="itemJSONMapperExtender"/>
+	<cng:list-extender id="defaultItemJSONMapperExtender" parent="abstractJSONMapperExtender" abstract="false">
+		<cng:add value-type="com.hybris.cockpitng.json.ObjectMapperConfiguration">
+
+			<bean class="de.hybris.platform.platformbackoffice.data.json.ItemObjectMapperConfiguration">
+				<property name="typeFacade" ref="typeFacade"/>
+				<property name="modelService" ref="modelService"/>
+			</bean>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultBackofficeSavedQueriesService" alias="backofficeSavedQueriesService"/>
+	<bean id="defaultBackofficeSavedQueriesService"
+	      class="de.hybris.platform.platformbackoffice.services.impl.BackofficeSavedQueriesServiceImpl">
+		<property name="backofficeSavedQueryDAO" ref="backofficeSavedQueryDAO"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeFacade" ref="typeFacade"/>
+		<property name="savedQueryValueConverters">
+			<list value-type="de.hybris.platform.platformbackoffice.services.converters.BackofficeSavedQueryValueConverter">
+				<bean class="de.hybris.platform.platformbackoffice.services.converters.impl.HybrisItemTypeValueConverter">
+					<property name="modelService" ref="modelService"/>
+				</bean>
+				<bean class="de.hybris.platform.platformbackoffice.services.converters.impl.HybrisEnumValueConverter">
+					<property name="enumerationService" ref="enumerationService"/>
+				</bean>
+				<bean class="de.hybris.platform.platformbackoffice.services.converters.impl.AtomicValueConverter"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultValidationPreviewResolutionStrategy" alias="validationPreviewResolutionStrategy"/>
+	<bean id="defaultValidationPreviewResolutionStrategy"
+	      class="de.hybris.platform.platformbackoffice.widgets.collectionbrowser.mold.impl.listview.renderer.DefaultTypeStaticPreviewResolutionStrategy">
+		<property name="typeToImageMapping">
+			<map>
+				<entry key="DynamicConstraint" value="icon_constraints_dynamic_constraints.png"/>
+				<entry key="TypeConstraint" value="icon_constraints_type_constraints.png"/>
+				<entry key="AttributeConstraint" value="icon_constraints_attribute_constraints.png"/>
+			</map>
+		</property>
+		<property name="typeService" ref="typeService"/>
+		<property name="urlPrefix" value="cng/static/validation/"/>
+		<property name="extensionsToMime" ref="extensionsToMime"/>
+		<property name="typeFacade" ref="typeFacade"/>
+	</bean>
+
+	<cng:list-extender property="urlResolutionStrategies" bean="backofficeObjectPreviewService">
+		<cng:add>
+			<ref bean="validationPreviewResolutionStrategy"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultValidationPojoOnlyAdvancedSearchInitHandler"
+	       alias="validationPojoOnlyAdvancedSearchInitHandler"/>
+	<bean id="defaultValidationPojoOnlyAdvancedSearchInitHandler"
+	      class="de.hybris.platform.platformbackoffice.widgets.validation.adapter.POJOValidationAdvancedSearchInitializer"/>
+
+	<alias name="defaultAbstractCollectorChartHandler" alias="abstractCollectorChartHandler"/>
+	<bean id="defaultAbstractCollectorChartHandler"
+	      class="de.hybris.platform.platformbackoffice.charts.AbstractCollectorChartHandler" abstract="true">
+		<property name="statisticsMetadataService" ref="defaultStatisticsService"/>
+		<property name="monitoringFacade" ref="defaultStatMonitoringFacade"/>
+		<property name="statisticsDataService" ref="defaultStatisticsData"/>
+	</bean>
+
+	<alias name="defaultLinearCollectorChartHandler" alias="linearCollectorChartHandler"/>
+	<bean id="defaultLinearCollectorChartHandler"
+	      class="de.hybris.platform.platformbackoffice.charts.DefaultLinearCollectorChartHandler"
+	      parent="abstractCollectorChartHandler"/>
+
+	<cng:list-extender bean="moduleConfigurationContextStrategy" property="initialModules">
+		<cng:add>
+			<value>platformbackoffice</value>
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultSummaryViewOnlineStatusRenderer" alias="summaryViewOnlineStatusRenderer"/>
+	<bean id="defaultSummaryViewOnlineStatusRenderer"
+	      parent="abstractSummaryViewItemWithIconRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.DefaultSummaryViewOnlineStatusRenderer">
+		<property name="attributeLabelResolver">
+			<bean class="com.hybris.cockpitng.widgets.summaryview.ConstantAttributeLabelResolver">
+				<property name="labelKey" value="summaryview.field.onlinestatus"/>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultSummaryViewApprovalStatusRenderer" alias="summaryViewApprovalStatusRenderer"/>
+	<bean id="defaultSummaryViewApprovalStatusRenderer"
+	      parent="abstractSummaryViewItemWithIconRenderer"
+	      class="de.hybris.platform.platformbackoffice.renderers.DefaultSummaryViewApprovalStatusRenderer">
+	</bean>
+
+	<alias name="defaultEntryGroupLabelProvider" alias="entryGroupLabelProvider"/>
+	<bean id="defaultEntryGroupLabelProvider"
+		  class="de.hybris.platform.platformbackoffice.labelproviders.EntryGroupLabelProvider"
+		  lazy-init="false"/>
+
+	<alias name="backofficeClassificationService" alias="classificationLabelService"/>
+	<bean name="backofficeClassificationService" class="de.hybris.platform.platformbackoffice.services.impl.ClassificationLabelServiceImpl">
+		<property name="classificationAttributeAssignmentService" ref="classificationAttributeAssignmentService"/>
+	</bean>
+
+	<cng:property-extender bean="defaultFieldQueryFieldRenderer" property="classificationLabelService">
+		<ref bean="backofficeClassificationService"/>
+	</cng:property-extender>
+
+</beans>

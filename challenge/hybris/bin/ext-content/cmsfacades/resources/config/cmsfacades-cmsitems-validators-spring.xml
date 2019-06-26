@@ -1,0 +1,477 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- Configuration -->
+	
+	<!-- TYPE VALIDATION -->
+	<util:map id="cmsItemValidatorMapCreate">
+		<entry key="CMSItem" value-ref="cmsCreateCMSItemValidator"/>
+		
+		<!-- Pages -->
+		<entry key="AbstractPage" value-ref="cmsCreateAbstractPageCompositeValidator"/>
+		<entry key="ContentPage" value-ref="cmsItemCreateContentPageCompositeValidator"/>
+		
+		<!-- Components -->
+		<entry key="AbstractCMSComponent" value-ref="cmsAbstractCMSComponentCompositeValidator"/>
+		<entry key="BannerComponent" value-ref="cmsBannerComponentValidator"/>
+		<entry key="CMSLinkComponent" value-ref="cmsLinkComponentValidator"/>
+		<entry key="CMSParagraphComponent" value-ref="cmsParagraphComponentValidator"/>
+		<entry key="CMSNavigationNode" value-ref="cmsCreateCMSNavigationNodeValidator"/>
+
+		<!-- Restrictions --> 
+		<entry key="AbstractRestriction" value-ref="cmsCreateAbstractRestrictionCompositeValidator"/>
+		<entry key="CMSTimeRestriction" value-ref="cmsTimeRestrictionValidator"/>
+		<entry key="CMSCategoryRestriction" value-ref="cmsCategoryRestrictionValidator"/>
+		<entry key="CMSUserGroupRestriction" value-ref="cmsUserGroupRestrictionValidator"/>
+	</util:map>
+
+	<util:map id="cmsItemValidatorMapUpdate">
+		<entry key="CMSItem" value-ref="cmsUpdateCMSItemValidator"/>
+
+		<!-- Pages -->
+		<entry key="AbstractPage" value-ref="cmsUpdateAbstractPageCompositeValidator"/>
+		<entry key="ContentPage" value-ref="cmsItemUpdateContentPageCompositeValidator"/>
+
+		<!-- Components -->
+		<entry key="AbstractCMSComponent" value-ref="cmsAbstractCMSComponentCompositeValidator"/>
+		<entry key="BannerComponent" value-ref="cmsBannerComponentValidator"/>
+		<entry key="CMSLinkComponent" value-ref="cmsLinkComponentValidator"/>
+		<entry key="CMSParagraphComponent" value-ref="cmsParagraphComponentValidator"/>
+		<entry key="CMSNavigationNode" value-ref="cmsUpdateCMSNavigationNodeValidator"/>
+
+		<!-- Restrictions -->
+		<entry key="AbstractRestriction" value-ref="cmsUpdateAbstractRestrictionCompositeValidator"/>
+		<entry key="CMSTimeRestriction" value-ref="cmsTimeRestrictionValidator"/>
+		<entry key="CMSCategoryRestriction" value-ref="cmsCategoryRestrictionValidator"/>
+		<entry key="CMSUserGroupRestriction" value-ref="cmsUserGroupRestrictionValidator"/>
+	</util:map>
+
+	
+	<!-- ATTRIBUTE VALIDATION -->
+	<util:map id="cmsBaseAttributeContentValidatorMap">
+		<!-- base validators -->
+		<entry key-ref="cmsRequiredAttributePredicate" value-ref="cmsNullCheckAttributeContentValidator"/>
+		<entry key-ref="cmsRequiredLocalizedAttributePredicate" value-ref="cmsLanguageCheckAttributeContentValidator"/>
+		<!-- custom validators -->
+		<entry key-ref="cmsIsAbstractBannerComponentMediaAttributePredicate" value-ref="cmsBaseMediaAttributeContentValidator"/>
+	</util:map>
+
+	<util:map id="cmsExtendedAttributeContentValidatorMap">
+		<!-- base validators -->
+		<entry key-ref="cmsIntegerTypeAttributePredicate" value-ref="cmsIntegerAttributeContentValidator"/>
+		<entry key-ref="cmsLongTypeAttributePredicate" value-ref="cmsLongAttributeContentValidator"/>
+		<entry key-ref="cmsFloatTypeAttributePredicate" value-ref="cmsFloatAttributeContentValidator"/>
+		<entry key-ref="cmsDoubleTypeAttributePredicate" value-ref="cmsDoubleAttributeContentValidator"/>
+		<entry key-ref="cmsDecimalTypeAttributePredicate" value-ref="cmsDecimalAttributeContentValidator"/>
+		<entry key-ref="cmsDateTypeAttributePredicate" value-ref="cmsDateFormatAttributeContentValidator"/>
+
+		<!-- custom validators -->
+		<entry key-ref="cmsMediaTypeAttributePredicate" value-ref="cmsMediaAttributeContentValidator"/>
+
+		<!-- uuid validator -->
+		<entry key-ref="cmsProductTypeAttributePredicate" value-ref="cmsUniqueIdentifierAttributeContentValidator"/>
+		<entry key-ref="cmsCategoryTypeAttributePredicate" value-ref="cmsUniqueIdentifierAttributeContentValidator"/>
+		<entry key-ref="cmsUserGroupTypeAttributePredicate" value-ref="cmsUniqueIdentifierAttributeContentValidator"/>
+		<entry key-ref="cmsCatalogVersionTypeAttributePredicate" value-ref="cmsUniqueIdentifierAttributeContentValidator"/>
+		<entry key-ref="cmsItemAttributePredicate" value-ref="cmsUniqueIdentifierAttributeContentValidator"/>
+	</util:map>
+	
+	<!-- default attribute validators -->
+	<alias name="defaultCmsBaseAttributeContentValidator" alias="cmsBaseAttributeContentValidator"/>
+	<bean id="defaultCmsBaseAttributeContentValidator" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultAttributeContentValidator">
+		<property name="validatorMap" ref="cmsBaseAttributeContentValidatorMap"/>
+	</bean>
+	
+	<alias name="defaultCmsExtendedAttributeContentValidator" alias="cmsExtendedAttributeContentValidator"/>
+	<bean id="defaultCmsExtendedAttributeContentValidator" class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultAttributeContentValidator">
+		<property name="validatorMap" ref="cmsExtendedAttributeContentValidatorMap"/>
+	</bean>
+	
+	<!-- base/abstract validators -->
+	<alias name="defaultCmsCompositeValidator" alias="cmsCompositeValidator"/>
+	<bean name="defaultCmsCompositeValidator" class="de.hybris.platform.cmsfacades.common.function.impl.DefaultCompositeValidator" abstract="true"/>
+	
+	<bean id="abstractCompositeAttributeContentValidator" abstract="true" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.impl.CompositeAttributeContentValidator"/>
+
+	<bean id="abstractCmsAttributeContentValidator" abstract="true"
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.AbstractAttributeContentValidator">
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider"/>
+	</bean>
+	
+	<alias name="defaultCmsItemValidator" alias="cmsItemValidator"/>
+	<bean id="defaultCmsItemValidator" abstract="true" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.impl.DefaultCMSItemValidator">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<!-- CMS Item Type Validators - Create -->
+	<alias name="defaultCmsItemValidatorCreate" alias="cmsItemValidatorCreate"/>
+	<bean id="defaultCmsItemValidatorCreate" parent="cmsItemValidator" >
+		<property name="validatorMap" ref="cmsItemValidatorMapCreate"/>
+	</bean>
+	<!-- CMS Item Type Validators - Update -->
+	<alias name="defaultCmsItemValidatorUpdate" alias="cmsItemValidatorUpdate"/>
+	<bean id="defaultCmsItemValidatorUpdate" parent="cmsItemValidator" >
+		<property name="validatorMap" ref="cmsItemValidatorMapUpdate"/>
+	</bean>
+	
+	<!-- Custom Predicates -->
+	<alias name="defaultCmsHasPageLabelChangedPredicate" alias="cmsHasPageLabelChangedPredicate" />
+	<bean id="defaultCmsHasPageLabelChangedPredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.HasPageLabelChangedPredicate">
+		<property name="originalClonedItemProvider" ref="cmsOriginalClonedItemProvider" />
+	</bean>
+	
+	<alias name="defaultCmsPrimaryPageWithLabelExistsPredicate" alias="cmsPrimaryPageWithLabelExistsPredicate" />
+	<bean id="defaultCmsPrimaryPageWithLabelExistsPredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.PrimaryPageWithLabelExistsPredicate">
+		<property name="originalClonedItemProvider" ref="cmsOriginalClonedItemProvider" />
+		<property name="pageVariationResolver" ref="cmsContentPageVariationResolver" />
+	</bean>
+	
+	<alias name="defaultCmsPageCanOnlyHaveOnePrimaryPredicate" alias="cmsPageCanOnlyHaveOnePrimaryPredicate" />
+	<bean id="defaultCmsPageCanOnlyHaveOnePrimaryPredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.PageCanOnlyHaveOnePrimaryPredicate">
+	</bean>
+	
+	<alias name="defaultPageRestoreWithReplacePredicate" alias="cmsPageRestoreWithReplacePredicate" />
+	<bean id="defaultPageRestoreWithReplacePredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.PageRestoreWithReplacePredicate">
+		<property name="cmsAdminSiteService" ref="cmsAdminSiteService" />
+	</bean>
+
+	<alias name="defaultPageHasVariationsPredicate" alias="cmsPageHasVariationsPredicate" />
+	<bean id="defaultPageHasVariationsPredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.PageHasVariationsPredicate">
+		<property name="pageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry" />
+	</bean>
+
+	<!-- Type Validators -->
+	<bean id="abstractCmsItemTypeValidator" abstract="true">
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider"/>
+	</bean>
+	
+	<alias name="abstractCmsUniqueNameForAttributeValidator" alias="abstractCmsUniqueNameForAttributeValidator"/>
+	<bean id="abstractCmsUniqueNameForAttributeValidator" parent="abstractCmsItemTypeValidator" abstract="true">
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<alias name="defaultCmsTimeRestrictionValidator" alias="cmsTimeRestrictionValidator"/>
+	<bean id="defaultCmsTimeRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSTimeRestrictionValidator"
+			parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsCategoryRestrictionValidator" alias="cmsCategoryRestrictionValidator"/>
+	<bean id="defaultCmsCategoryRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSCategoryRestrictionValidator"
+		  parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsUserGroupRestrictionValidator" alias="cmsUserGroupRestrictionValidator"/>
+	<bean id="defaultCmsUserGroupRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSUserGroupRestrictionValidator"
+		  parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsParagraphComponentValidator" alias="cmsParagraphComponentValidator"/>
+	<bean id="defaultCmsParagraphComponentValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSParagraphComponentValidator"
+		  parent="abstractCmsItemTypeValidator">
+		<property name="languageFacade" ref="languageFacade"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<alias name="defaultCmsCreateCMSItemValidator" alias="cmsCreateCMSItemValidator"/>
+	<bean id="defaultCmsCreateCMSItemValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCreateCMSItemValidator"
+		  parent="abstractCmsItemTypeValidator">
+		<property name="cmsAdminItemService" ref="cmsAdminItemService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="onlyHasSupportedCharactersPredicate" ref="onlyHasSupportedCharactersPredicate"/>
+		<property name="validStringLengthPredicate" ref="validStringLengthPredicate"/>
+		<property name="cmsItemNameExistsPredicate" ref="cmsItemNameExistsPredicate"/>
+	</bean>
+
+	<alias name="defaultCmsUpdateCMSItemValidator" alias="cmsUpdateCMSItemValidator"/>
+	<bean id="defaultCmsUpdateCMSItemValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultUpdateCMSItemValidator"
+		  parent="abstractCmsItemTypeValidator">
+		<property name="cmsAdminItemService" ref="cmsAdminItemService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="onlyHasSupportedCharactersPredicate" ref="onlyHasSupportedCharactersPredicate"/>
+		<property name="validStringLengthPredicate" ref="validStringLengthPredicate"/>
+		<property name="cmsItemNameExistsPredicate" ref="cmsItemNameExistsPredicate"/>
+		<property name="originalClonedItemProvider" ref="cmsOriginalClonedItemProvider" />
+	</bean>
+
+	<alias name="defaultCmsLinkComponentValidator" alias="cmsLinkComponentValidator"/>
+	<bean id="defaultCmsLinkComponentValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSLinkComponentValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="languageFacade" ref="languageFacade"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias name="defaultCMSNavigationNodeValidator" alias="cmsNavigationNodeValidator"/>
+	<bean id="defaultCMSNavigationNodeValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCMSNavigationNodeValidator"
+			parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsBaseAbstractPageValidator" alias="cmsBaseAbstractPageValidator"/>
+	<bean id="defaultCmsBaseAbstractPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultBaseAbstractPageValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="onlyHasSupportedCharactersPredicate" ref="onlyHasSupportedCharactersPredicate"/>
+		<property name="languageFacade" ref="languageFacade"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<alias name="defaultCmsUniqueNameForRestrictionsValidator" alias="cmsUniqueNameForRestrictionsValidator"/>
+	<bean id="defaultCmsUniqueNameForRestrictionsValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultUniqueNameForAttributeValidator"
+	parent="abstractCmsUniqueNameForAttributeValidator" p:attribute="restrictions" />
+	
+	<alias name="defaultCmsCreateAbstractPageValidator" alias="cmsCreateAbstractPageValidator"/>
+	<bean id="defaultCmsCreateAbstractPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCreateAbstractPageValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="pageExistsPredicate" ref="pageExistsPredicate"/>
+		<property name="primaryPageWithLabelExistsPredicate" ref="cmsPrimaryPageWithLabelExistsPredicate"/>
+		<property name="pageCanOnlyHaveOnePrimaryPredicate" ref="cmsPageCanOnlyHaveOnePrimaryPredicate"/>
+		<property name="pageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry"/>
+		<property name="cloneContextSameAsActiveCatalogVersionPredicate" ref="cloneContextSameAsActiveCatalogVersionPredicate"/>
+	</bean>
+	
+	<alias name="defaultCmsCreateContentPageValidator" alias="cmsCreateContentPageValidator"/>
+	<bean id="defaultCmsCreateContentPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCreateContentPageValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="pageExistsPredicate" ref="pageExistsPredicate"/>
+		<property name="primaryPageWithLabelExistsPredicate" ref="cmsPrimaryPageWithLabelExistsPredicate"/>
+		<property name="cloneContextSameAsActiveCatalogVersionPredicate" ref="cloneContextSameAsActiveCatalogVersionPredicate" />
+	</bean>
+	
+	<alias name="defaultCmsUpdateAbstractPageValidator" alias="cmsUpdateAbstractPageValidator"/>
+	<bean id="defaultCmsUpdateAbstractPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultUpdateAbstractPageValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="pageExistsPredicate" ref="pageExistsPredicate"/>
+		<property name="pageCanOnlyHaveOnePrimaryPredicate" ref="cmsPageCanOnlyHaveOnePrimaryPredicate"/>
+		<property name="pageUpdateRequiresValidationPredicate" ref="cmsPageUpdateRequiresValidationPredicate"/>
+		<property name="pageVariationResolverTypeRegistry" ref="cmsPageVariationResolverTypeRegistry"/>
+		<property name="pageRestoreWithReplacePredicate" ref="cmsPageRestoreWithReplacePredicate"/>
+		<property name="pageHasVariationsPredicate" ref="cmsPageHasVariationsPredicate"/>
+	</bean>
+
+	<alias name="defaultCmsUpdateContentPageValidator" alias="cmsItemUpdateContentPageValidator"/>
+	<bean id="defaultCmsUpdateContentPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultUpdateContentPageValidator"
+			parent="abstractCmsItemTypeValidator">
+		<property name="cmsAdminPageService" ref="cmsAdminPageService"/>
+		<property name="hasPageLabelChangedPredicate" ref="defaultCmsHasPageLabelChangedPredicate"/>
+		<property name="primaryPageWithLabelExistsPredicate" ref="cmsPrimaryPageWithLabelExistsPredicate"/>
+		<property name="pageExistsPredicate" ref="pageExistsPredicate"/>
+		<property name="pageUpdateRequiresValidationPredicate" ref="cmsPageUpdateRequiresValidationPredicate"/>
+		<property name="pageRestoreWithReplacePredicate" ref="cmsPageRestoreWithReplacePredicate"/>
+	</bean>
+
+	<alias name="defaultCmsTrashContentPageValidator" alias="cmsItemTrashContentPageValidator" />
+   <bean id="defaultCmsTrashContentPageValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultTrashContentPageValidator">
+	   <property name="validationErrorsProvider" ref="cmsValidationErrorsProvider" />
+	   <property name="cmsAdminPageService" ref="cmsAdminPageService" />
+	   <property name="catalogLevelService" ref="cmsCatalogLevelService" />
+   </bean>
+
+	<alias name="defaultCmsAbstractCMSComponentValidator" alias="cmsAbstractCMSComponentValidator"/>
+	<bean id="defaultCmsAbstractCMSComponentValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultAbstractCMSComponentValidator"
+			parent="abstractCmsItemTypeValidator">
+	</bean>
+	
+	<alias name="defaultCmsAbstractRestrictionValidator" alias="cmsAbstractRestrictionValidator"/>
+	<bean id="defaultCmsAbstractRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultAbstractRestrictionValidator"
+			parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsCreateAbstractRestrictionValidator" alias="cmsCreateAbstractRestrictionValidator"/>
+	<bean id="defaultCmsCreateAbstractRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultCreateAbstractRestrictionValidator"
+		  parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsUpdateAbstractRestrictionValidator" alias="cmsUpdateAbstractRestrictionValidator"/>
+	<bean id="defaultCmsUpdateAbstractRestrictionValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultUpdateAbstractRestrictionValidator"
+		  parent="abstractCmsItemTypeValidator">
+	</bean>
+
+	<alias name="defaultCmsBannerComponentValidator" alias="cmsBannerComponentValidator"/>
+	<bean id="defaultCmsBannerComponentValidator" class="de.hybris.platform.cmsfacades.cmsitems.validator.DefaultBannerComponentValidator"
+		  parent="abstractCmsItemTypeValidator">
+		<property name="languageFacade" ref="languageFacade"/>
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<!-- Attribute Validators -->
+	<alias name="defaultCmsNullCheckAttributeContentValidator" alias="cmsNullCheckAttributeContentValidator"/>
+	<bean id="defaultCmsNullCheckAttributeContentValidator"  
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.NullCheckAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator"/>
+
+	<alias name="defaultCmsLanguageCheckAttributeContentValidator" alias="cmsLanguageCheckAttributeContentValidator"/>
+	<bean id="defaultCmsLanguageCheckAttributeContentValidator"
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.LanguageCheckAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator">
+		<property name="languageFacade" ref="languageFacade"/>
+	</bean>
+
+	<alias name="defaultCmsNumberAttributeContentValidator" alias="cmsNumberAttributeContentValidator"/>
+	<bean id="defaultCmsNumberAttributeContentValidator" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.NumberAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator"/>
+
+	<alias name="defaultCmsIntegerAttributeContentValidator" alias="cmsIntegerAttributeContentValidator"/>
+	<bean id="defaultCmsIntegerAttributeContentValidator" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.IntegerAttributeContentValidator" 
+		  parent="cmsNumberAttributeContentValidator"/>
+
+	<alias name="defaultCmsLongAttributeContentValidator" alias="cmsLongAttributeContentValidator"/>
+	<bean id="defaultCmsLongAttributeContentValidator" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.LongAttributeContentValidator" 
+		  parent="cmsNumberAttributeContentValidator"/>
+
+	<alias name="defaultCmsFloatAttributeContentValidator" alias="cmsFloatAttributeContentValidator"/>
+	<bean id="defaultCmsFloatAttributeContentValidator" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.FloatAttributeContentValidator" 
+		  parent="cmsNumberAttributeContentValidator"/>
+
+	<alias name="defaultCmsDoubleAttributeContentValidator" alias="cmsDoubleAttributeContentValidator"/>
+	<bean id="defaultCmsDoubleAttributeContentValidator" 
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.DoubleAttributeContentValidator" 
+		  parent="cmsNumberAttributeContentValidator"/>
+
+	<alias name="defaultCmsDecimalAttributeContentValidator" alias="cmsDecimalAttributeContentValidator"/>
+	<bean id="defaultCmsDecimalAttributeContentValidator"
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.DecimalAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator"/>
+
+	<alias name="defaultCmsDateFormatAttributeContentValidator" alias="cmsDateFormatAttributeContentValidator"/>
+	<bean id="defaultCmsDateFormatAttributeContentValidator"
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.DateFormatAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator"/>
+
+	<alias name="defaultCmsMediaAttributeContentValidator" alias="cmsMediaAttributeContentValidator"/>
+	<bean id="defaultCmsMediaAttributeContentValidator" parent="abstractCompositeAttributeContentValidator">
+		<property name="validators">
+			<list>
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.MediaAttributeContentValidator" parent="abstractCmsAttributeContentValidator">
+					<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsBaseMediaAttributeContentValidator" alias="cmsBaseMediaAttributeContentValidator"/>
+	<bean id="defaultCmsBaseMediaAttributeContentValidator" parent="abstractCompositeAttributeContentValidator">
+		<property name="validators">
+			<list>
+				<bean class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.BaseMediaAttributeContentValidator">
+					<property name="languageFacade" ref="languageFacade"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsUniqueIdentifierAttributeContentValidator" alias="cmsUniqueIdentifierAttributeContentValidator"/>
+	<bean id="defaultCmsUniqueIdentifierAttributeContentValidator"
+		  class="de.hybris.platform.cmsfacades.cmsitems.attributevalidators.UniqueIdentifierAttributeContentValidator" 
+		  parent="abstractCmsAttributeContentValidator">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+		<property name="attributeDescriptorModelHelperService" ref="cmsAttributeDescriptorModelHelperService"/>
+	</bean>
+
+	<!-- Composite Validators -->
+	<bean name="cmsCreateAbstractPageCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsBaseAbstractPageValidator"/>
+				<ref bean="cmsCreateAbstractPageValidator"/>
+				<ref bean="cmsUniqueNameForRestrictionsValidator"/>
+			</list>
+		</property>
+	</bean>
+	<bean name="cmsItemCreateContentPageCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsCreateContentPageValidator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="cmsUpdateAbstractPageCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsBaseAbstractPageValidator"/>
+				<ref bean="cmsUpdateAbstractPageValidator"/>
+				<ref bean="cmsUniqueNameForRestrictionsValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="cmsItemUpdateContentPageCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsItemUpdateContentPageValidator"/>
+				<ref bean="cmsItemTrashContentPageValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="cmsCreateAbstractRestrictionCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsAbstractRestrictionValidator"/>
+				<ref bean="cmsCreateAbstractRestrictionValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="cmsUpdateAbstractRestrictionCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsAbstractRestrictionValidator"/>
+				<ref bean="cmsUpdateAbstractRestrictionValidator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean name="cmsAbstractCMSComponentCompositeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsAbstractCMSComponentValidator"/>
+				<ref bean="cmsUniqueNameForRestrictionsValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="cmsCreateCMSNavigationNodeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsCreateCMSItemValidator"/>
+				<ref bean="cmsNavigationNodeValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean name="cmsUpdateCMSNavigationNodeValidator" parent="cmsCompositeValidator">
+		<property name="validators">
+			<list>
+				<ref bean="cmsUpdateCMSItemValidator"/>
+				<ref bean="cmsNavigationNodeValidator"/>
+			</list>
+		</property>
+	</bean>
+
+</beans>

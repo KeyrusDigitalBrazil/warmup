@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--suppress ALL -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+    <bean id="webLazyInitOverrideBeanFactoryPostProcessor" parent="lazyInitOverrideBeanFactoryPostProcessor" />
+    <bean id="listMergeBeanPostProcessor" class="de.hybris.platform.spring.config.ListMergeDirectiveBeanPostProcessor"/>
+
+	<bean id="customersupportbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/customersupportbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+
+    <alias name="defaultCorrespondenceRenderer" alias="correspondenceRenderer" />
+    <bean id="defaultCorrespondenceRenderer" class="de.hybris.platform.customersupportbackoffice.renderers.CorrespondenceRenderer" parent="abstractEditorAreaComponentRenderer">
+        <property name="ticketService" ref="ticketService"/>
+        <property name="ticketBusinessService" ref="ticketBusinessService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="ticketAttachmentsService" ref="ticketAttachmentsService"/>
+        <property name="allowedUploadedFormats" ref="allowedUploadedFormats"/>
+        <property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <alias name="defaultTicketsContactTypeRenderer" alias="ticketsContactTypeRenderer" />
+    <bean id="defaultTicketsContactTypeRenderer" class="de.hybris.platform.customersupportbackoffice.renderers.TicketsContactTypeRenderer">
+    	<property name="labelService" ref="labelService" />
+        <property name="ticketService" ref="ticketService"/>
+    </bean>
+
+    <alias alias="createCustomerWizardHandler" name="defaultCreateCustomerWizardHandler"/>
+    <bean id="defaultCreateCustomerWizardHandler" class="de.hybris.platform.customersupportbackoffice.widgets.CreateCustomerWizardHandler" parent="csCreateBaseHandler">
+        <property name="csCreateCustomerStrategy" ref="csCreateCustomerStrategy"/>
+        <property name="userService" ref="userService"/>
+        <property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <alias alias="csCreateCustomerStrategy" name="defaultCsCreateCustomerStrategy"/>
+    <bean name="defaultCsCreateCustomerStrategy" class="de.hybris.platform.customersupportbackoffice.strategies.DefaultCsCreateCustomerStrategy">
+        <property name="customerAccountService" ref="customerAccountService"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="csFormInitialsFactory" ref="csFormInitialsFactory"/>
+    </bean>
+
+    <bean id="csCreateBaseHandler" class="de.hybris.platform.customersupportbackoffice.widgets.CsCreateWizardBaseHandler">
+    	<property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+    </bean>
+
+    <bean id="createTicketHandler" class="de.hybris.platform.customersupportbackoffice.widgets.CreateTicketWizardHandler" parent="csCreateBaseHandler">
+        <property name="ticketBusinessService" ref="ticketBusinessService"/>
+        <property name="defaultCsFormInitialsFactory" ref="defaultCsFormInitialsFactory"/>
+        <property name="userService" ref="userService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <bean id="createAddressHandler" class="de.hybris.platform.customersupportbackoffice.widgets.CreateAddressWizardHandler">
+    	<property name="customerAccountService" ref="customerAccountService"/>
+    	<property name="modelService" ref="modelService" />
+    </bean>
+
+    <bean id="closeTicketHandler" class="de.hybris.platform.customersupportbackoffice.widgets.CloseTicketWizardHandler">
+        <property name="ticketBusinessService" ref="ticketBusinessService"/>
+        <property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <bean id="reopenTicketHandler" class="de.hybris.platform.customersupportbackoffice.widgets.ReopenTicketWizardHandler">
+        <property name="ticketBusinessService" ref="ticketBusinessService"/>
+        <property name="notificationService" ref="notificationService"/>
+    </bean>
+
+    <bean id="nestedAttributeUtils" class="de.hybris.platform.omsbackoffice.renderers.NestedAttributeUtils" />
+    <bean id="nullSafeListCellRenderer" class="de.hybris.platform.omsbackoffice.renderers.NullSafeListCellRenderer">
+        <property name="nestedAttributeUtils" ref="nestedAttributeUtils" />
+        <property name="defaultListCellRenderer" ref="defaultListCellRenderer" />
+    </bean>
+
+    <bean id="orderNestedAttributePanelRenderer" class="de.hybris.platform.omsbackoffice.renderers.NestedAttributePanelRenderer" parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="nestedAttributeUtils" ref="nestedAttributeUtils" />
+        <property name="labelService" ref="labelService" />
+    </bean>
+
+    <bean id="fraudCheckButtonCellRenderer" class="de.hybris.platform.omsbackoffice.renderers.FraudCheckButtonCellRenderer">
+        <property name="businessProcessService" ref="businessProcessService" />
+        <property name="modelService" ref="modelService" />
+        <property name="notificationService" ref="notificationService" />
+    </bean>
+
+    <bean id="releaseButtonCellRenderer" abstract="true" class="de.hybris.platform.omsbackoffice.renderers.ReleaseButtonCellRenderer">
+        <property name="businessProcessService" ref="businessProcessService" />
+    </bean>
+
+    <bean id="paymentCaptureManualReleaseButtonCellRenderer" parent="releaseButtonCellRenderer"
+          class="de.hybris.platform.omsbackoffice.renderers.PaymentCaptureManualReleaseButtonCellRenderer"/>
+
+    <bean id="taxCommitManualReleaseButtonCellRenderer" parent="releaseButtonCellRenderer"
+          class="de.hybris.platform.omsbackoffice.renderers.TaxCommitManualReleaseButtonCellRenderer"/>
+
+    <bean id="priceRenderer" class="de.hybris.platform.omsbackoffice.renderers.PriceRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="propertyValueService" ref="propertyValueService" />
+        <property name="labelService" ref="labelService" />
+        <property name="permissionFacade" ref="permissionFacade" />
+        <property name="myEntry" value="" />
+    </bean>
+
+    <bean id="amountRenderer" parent="priceRenderer">
+        <property name="myEntry" value="PaymentTransactionEntry" />
+    </bean>
+
+    <bean id="refundEntryAmountRenderer" parent="priceRenderer">
+        <property name="myEntry" value="RefundEntry" />
+    </bean>
+
+    <bean id="orderEntryAmountRenderer" parent="priceRenderer">
+        <property name="myEntry" value="AbstractOrderEntry" />
+    </bean>
+
+    <bean id="paymentTransactionAmountRenderer" class="de.hybris.platform.omsbackoffice.renderers.PaymentTransactionAmountRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="propertyValueService" ref="propertyValueService" />
+        <property name="labelService" ref="labelService" />
+        <property name="permissionFacade" ref="permissionFacade" />
+    </bean>
+
+    <bean id="currencyTypeRenderer" class="de.hybris.platform.omsbackoffice.renderers.CurrencyTypeRenderer">
+        <property name="permissionFacade" ref="permissionFacade" />
+    </bean>
+
+    <bean id="refundAmountRenderer" class="de.hybris.platform.omsbackoffice.renderers.RefundAmountRenderer"  parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="labelService" ref="labelService" />
+    </bean>
+
+    <bean id="refundDeliveryCostRenderer" class="de.hybris.platform.omsbackoffice.renderers.RefundDeliveryCostRenderer" parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="returnService" ref="returnService"/>
+        <property name="invalidReturnStatusForRefundDeliveryCost" ref="invalidReturnStatusForRefundDeliveryCost"/>
+        <property name="labelService" ref="labelService" />
+    </bean>
+
+    <bean id="totalDiscountRenderer" class="de.hybris.platform.omsbackoffice.renderers.TotalDiscountRenderer"  parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="labelService" ref="labelService" />
+    </bean>
+
+    <bean id="totalPriceWithTaxRenderer" class="de.hybris.platform.omsbackoffice.renderers.TotalPriceWithTaxRenderer"  parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="labelService" ref="labelService" />
+    </bean>
+
+    <bean id="csCockpitConfigurationServiceExtender" class="com.hybris.cockpitng.core.config.util.CockpitConfigurationServiceExtender"
+	init-method="addAll" destroy-method="removeAll" lazy-init="false">
+		<property name="configurationService" ref="cockpitConfigurationService" />
+		<property name="adapters">
+			<map>
+				<entry>
+					<key>
+						<map>
+							<entry key="component" value="cs-editor-area" />
+						</map>
+					</key>
+					<ref bean="editorAtraConfigAdapter" />
+				</entry>
+				<entry>
+					<key>
+						<map>
+							<entry key="component" value="cs-listview" />
+						</map>
+					</key>
+					<ref bean="listViewConfigAdapter" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+    <bean id="ticketForm" factory-bean="csFormInitialsFactory" factory-method="getTicketForm" scope="prototype"/>
+    <bean id="customerForm" factory-bean="csFormInitialsFactory" factory-method="getCustomerForm" scope="prototype"/>
+    <bean id="addressForm" factory-bean="csFormInitialsFactory" factory-method="getAddressForm" scope="prototype"/>
+    <bean id="closeTicketForm" factory-bean="csFormInitialsFactory" factory-method="getCloseTicketForm" scope="prototype"/>
+    <bean id="reopenTicketForm" factory-bean="csFormInitialsFactory" factory-method="getReopenTicketForm" scope="prototype"/>
+
+    <alias name="defaultCsFormInitialsFactory" alias="csFormInitialsFactory" />
+    <bean id="defaultCsFormInitialsFactory" class="de.hybris.platform.customersupportbackoffice.widgets.DefaultCsFormInitialsFactory" >
+        <property name="ticketService" ref="ticketService"/>
+        <property name="userService" ref="userService"/>
+        <property name="enumerationService" ref="enumerationService"/>
+        <property name="cockpitSessionService" ref="cockpitSessionService"/>
+        <property name="defaultPriority" value="Low"/>
+        <property name="defaultCategory" value="Enquiry"/>
+        <property name="defaultIntervention" value="Call"/>
+        <property name="defaultReason" value="FirstContact"/>
+        <property name="defaultAgentGroup" value="customersupportagentgroup"/>
+        <property name="defaultRootGroup" value="csagentgroup"/>
+    </bean>
+
+    <alias alias="updateAssociatedEditorDecorator" name="defaultAssociatedEditorDecorator"/>
+    <bean id="defaultAssociatedEditorDecorator" class="de.hybris.platform.customersupportbackoffice.editor.UpdateAssociatedEditorDecorator" />
+
+    <alias alias="updateAgentEditorDecorator" name="defaultUpdateAgentEditorDecorator"/>
+    <bean id="defaultUpdateAgentEditorDecorator" class="de.hybris.platform.customersupportbackoffice.editor.UpdateAgentEditorDecorator" />
+
+    <alias alias="updateAgentGroupEditorDecorator" name="defaultUpdateAgentGroupEditorDecorator"/>
+    <bean id="defaultUpdateAgentGroupEditorDecorator" class="de.hybris.platform.customersupportbackoffice.editor.UpdateAgentGroupEditorDecorator" />
+
+    <!-- LABELS PROVIDER -->
+    <bean id="addressLabelProvider" class="de.hybris.platform.customersupportbackoffice.labelproviders.AddressLabelProvider" />
+	<bean id="reviewsBlockedCellRenderer" class="de.hybris.platform.customersupportbackoffice.labelproviders.ReviewsBlockedLabelRenderer" />
+
+  	<bean id="ticketPropertyAccessor" class="de.hybris.platform.customersupportbackoffice.accessors.impl.TicketListPropertyAccessor" />
+  	<bean id="customerPropertyAccessor" class="de.hybris.platform.customersupportbackoffice.accessors.impl.CustomerCartsPropertyAccessor" />
+
+    <cng:list-extender id="extendedAccessorsExtender" bean="evaluationContextFactory" property="additionalPropertyAccessors">
+       <cng:add value-type="org.springframework.expression.PropertyAccessor">
+           <ref bean="ticketPropertyAccessor"/>
+           <ref bean="customerPropertyAccessor"/>
+       </cng:add>
+    </cng:list-extender>
+
+    <alias name="defaultTicketTypeFacadeStrategy" alias="ticketTypeFacadeStrategy" />
+	<bean id="defaultTicketTypeFacadeStrategy" class="de.hybris.platform.customersupportbackoffice.dataaccess.facades.type.TicketTypeFacadeStrategy" parent="defaultPlatformTypeFacadeStrategy"/>
+
+	<alias name="defaultCustomerTypeFacadeStrategy" alias="customerTypeFacadeStrategy" />
+	<bean id="defaultCustomerTypeFacadeStrategy" class="de.hybris.platform.customersupportbackoffice.dataaccess.facades.type.CustomerTypeFacadeStrategy" parent="defaultPlatformTypeFacadeStrategy"/>
+
+	<bean class="com.hybris.cockpitng.dataaccess.util.DataAccessStrategyExtender"
+	            lazy-init="false"
+	            init-method="addAll"
+	            destroy-method="removeAll">
+	    <property name="objectFacadeStrategies">
+        <list>
+        </list>
+    	</property>
+	    <property name="typeFacadeStrategies">
+	        <list merge="true">
+	             <ref bean="ticketTypeFacadeStrategy"/>
+	             <ref bean="customerTypeFacadeStrategy"/>
+	        </list>
+	    </property>
+	    <property name="objectFacadeStrategyRegistry" ref="objectFacadeStrategyRegistry"/>
+	    <property name="typeFacadeStrategyRegistry" ref="typeFacadeStrategyRegistry"/>
+	</bean>
+
+	<bean id="ticketStatusCellRenderer" class="de.hybris.platform.customersupportbackoffice.renderers.TicketStatusCellRenderer" />
+
+    <bean id="cancelOrderAction" class="de.hybris.platform.omsbackoffice.actions.order.cancel.CancelOrderAction"/>
+
+    <alias name="defaultNotCancellableConsignmentStatus" alias="notCancellableConsignmentStatus"/>
+    <util:list id="defaultNotCancellableConsignmentStatus" value-type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">
+        <value>READY_FOR_PICKUP</value>
+        <value>CANCELLED</value>
+        <value>PICKUP_COMPLETE</value>
+        <value>SHIPPED</value>
+    </util:list>
+
+    <alias alias="invalidReturnStatusForRefundDeliveryCost" name="defaultInvalidReturnStatusForRefundDeliveryCost"/>
+    <util:set id="defaultInvalidReturnStatusForRefundDeliveryCost" value-type="de.hybris.platform.basecommerce.enums.ReturnStatus">
+        <value>CANCELED</value>
+        <value>CANCELLING</value>
+    </util:set>
+
+    <alias name="defaultValidOrderStatusForResourcing" alias="validOrderStatusForResourcing"/>
+    <util:list id="defaultValidOrderStatusForResourcing" value-type="de.hybris.platform.core.enums.OrderStatus">
+        <value>SUSPENDED</value>
+    </util:list>
+
+    <alias name="defaultNotCancellableOrderStatus" alias="notCancellableOrderStatus"/>
+    <util:list id="defaultNotCancellableOrderStatus" value-type="de.hybris.platform.core.enums.OrderStatus">
+        <value>PAYMENT_NOT_VOIDED</value>
+        <value>TAX_NOT_VOIDED</value>
+    </util:list>
+
+</beans>

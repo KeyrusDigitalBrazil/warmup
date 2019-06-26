@@ -1,0 +1,93 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Import essential data for the tests
+# Users
+$defaultPassword = 1234
+
+$defaultCurrency = EUR
+$defaultLanguage = en
+$deliveryCountries = US
+
+$catalog-id = testCatalog
+$catalog-version = Online
+$contentCatalog = testContentCatalog
+
+$testCategory0-id = testCategory0
+$testCategory1-id = testCategory1
+
+$catalogversion = catalogversion(catalog(id), version)[unique = true, default = $catalog-id:$catalog-version]
+$supercategories = supercategories(code, catalogversion(catalog(id[default = $catalog-id]), version[default = $catalog-version]))
+$prices = europe1prices[translator = de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+$testsiteUID = testSite
+
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalog]), CatalogVersion.version[default = $catalog-version])[default = $contentCatalog:$catalog-version]
+$itemContentCV = itemCatalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalog]), CatalogVersion.version[default = Staged])[default = $contentCatalog:Staged]
+
+INSERT_UPDATE Usergroup; uid[unique = true]; groups(uid)[mode = append]
+; customergroup; employeegroup
+; regulargroup ; customergroup
+
+INSERT_UPDATE Customer; uid[unique = true]; groups(uid); password[default = $defaultPassword]; name
+; testoauthcustomer ; customergroup ; ; Demo Customer
+
+INSERT_UPDATE Language; isocode[unique = true]; active;;;;;;;;
+; en ; true ; ; ; ; ; ; ; ;
+
+UPDATE Language; isocode[unique = true]; name[lang = en];;;;;;;
+; en ; English ; ; ; ; ; ; ;
+
+INSERT_UPDATE Unit; unitType[unique = true]; code[unique = true]; name[lang = en]; conversion;;;
+; pieces ; pieces ; pieces ; 1
+
+INSERT_UPDATE Currency; isocode[unique = true]; name[lang = en]; active; base; conversion; digits; symbol;;
+; EUR ; Euro      ; true ; true  ; 1    ; 2 ; E
+; USD ; US Dollar ; true ; false ; 1,38 ; 2 ; $
+
+INSERT_UPDATE Country; isocode[unique = true]; name[lang = en]; active;;;;;;
+; US ; United States of America ; true ; ; ; ; ; ;
+
+INSERT_UPDATE Catalog; id[unique = true]; name[lang = en]; defaultCatalog;;;;;;
+; $catalog-id ; $catalog-id ; true ; ; ; ; ; ;
+
+# Content catalog for CMS contents
+INSERT_UPDATE ContentCatalog; id[unique = true]
+; $contentCatalog
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active; defaultCurrency(isocode);;;;;;
+; $catalog-id     ; $catalog-version ; true  ; EUR ; ; ; ; ; ;
+; $contentCatalog ; $catalog-version ; true  ; EUR ; ; ; ; ; ;
+; $contentCatalog ; Staged           ; false ; EUR ; ; ; ; ; ;
+
+INSERT_UPDATE CMSSite; uid[unique = true]; defaultCatalog(id); urlPatterns; active; contentCatalogs(id)
+; testCmsSite ; $catalog-id ; (?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=testCmsSite)(|\&.*)$ ; true ; $contentCatalog
+
+INSERT_UPDATE OAuthClientDetails; clientId[unique = true]; resourceIds; scope; authorizedGrantTypes; authorities; clientSecret; registeredRedirectUri
+; mobile_android ; hybris ; basic,previewwebservices ; authorization_code,refresh_token,password,client_credentials ; ROLE_CLIENT ; secret ; http://localhost:9001/authorizationserver/oauth2_callback ;
+
+INSERT_UPDATE UserGroup; UID[unique = true]; groups(uid)[mode = append];
+; previewmanagergroup ; employeegroup                     ;
+; cmsmanagergroup     ; employeegroup,previewmanagergroup ;
+
+INSERT_UPDATE Employee; UID[unique = true]; password[default = $defaultPassword]; groups(uid)[mode = append];
+; previewmanager ; ; previewmanagergroup ;
+; randomuser     ; ;
+
+# Pages
+INSERT_UPDATE PageTemplate; $contentCV[unique = true]; uid[unique = true]; name; frontendTemplateName; restrictedPageTypes(code); active[default = true]
+; ; LandingPage2Template ; Landing Page 2 Template ; layout/landingLayout2Page ; CategoryPage,ContentPage
+
+INSERT_UPDATE ContentPage; $contentCV[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage ; Homepage ; LandingPage2Template ; homepage
+
+INSERT_UPDATE CMSVersion; $itemContentCV[unique = true]; uid[unique = true]; itemUid; label
+; ; homepage-version ; homepage ; Homepage Version

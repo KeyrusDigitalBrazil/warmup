@@ -1,0 +1,109 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#-----------------
+# create content catalog - Stage only
+$contentCatalog=testContentCatalog
+$contentCatalogName=Test Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+# create product catalogs
+$productCatalog=testProductCatalog
+$productCatalogName=Test Product Catalog
+$productCVStaged=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Staged])[default=$productCatalog:Staged]
+$productCVOnline=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$productCatalog]),CatalogVersion.version[default=Online])[default=$productCatalog:Online]
+
+$superCategoriesStaged=supercategories(code,catalogversion(catalog(id[default=$productCatalog]),version[default=Staged]))
+$superCategoriesOnline=supercategories(code,catalogversion(catalog(id[default=$productCatalog]),version[default=Online]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$defaultCurrency=USD
+
+#-----------------
+
+$defaultPassword=12341234
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;cmsmanagergroup;employeegroup
+
+
+# Customers
+INSERT_UPDATE Customer;originalUid[unique=true];uid[unique=true];title(code);name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password[default=$defaultPassword]
+;dummyuser@dummy.com;dummyuser@dummy.com;;dummy user;dummy user;en;USD;cmsmanagergroup;
+
+#-----------------
+
+# Set up platform data
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;
+;en;true;;;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=en];;;;;;;
+;en;English;;;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=en];conversion;;;
+;pieces;pieces;pieces;1
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;US;United States of America;true;;;;;;
+
+#-----------------
+# Set up content and product catalogs for Online and Staged versions
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$contentCatalog;$contentCatalogName;true;;;;;;
+;$productCatalog;$productCatalogName;true;;;;;;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;defaultCurrency(isocode);;;;;;
+;$contentCatalog;Staged;false;USD;;;;;;
+;$contentCatalog;Online;true;USD;;;;;;
+;$productCatalog;Staged;false;USD;;;;;;
+;$productCatalog;Online;true;USD;;;;;;
+
+#-----------------
+# Set up products and categories (to be passed to the product carousel component)
+
+#INSERT_UPDATE Category;$productCVStaged;code[unique=true];name[lang=en];$superCategoriesStaged
+#;;category01;test category 1;
+#;;category02;test category 2;category01
+#;;category03;test category 3;category01
+
+INSERT_UPDATE Category;code[unique=true];$productCVStaged;name[lang=en];$superCategoriesStaged
+;category01;;;
+;category02;;category01
+;category03;;category01
+
+INSERT_UPDATE Product;code[unique=true];$productCVStaged;name[lang=en];$superCategoriesStaged;approvalStatus(code)
+;product01;;Test Product 01;;approved	
+;product02;;Test Product 02;;approved	
+;product03;;Test Product 03;;approved
+;product04;;Test Product 04 from category 1;category01;approved	
+;product05;;Test Product 05 from category 1;category01;approved	
+;product06;;Test Product 06 from category 2;category02;approved		
+
+INSERT_UPDATE Product;code[unique=true];$productCVOnline;name[lang=en];$superCategoriesStaged;approvalStatus(code)
+;product07;;Test Product 07;;approved	
+;product08;;Test Product 08;;approved	
+;product09;;Test Product 09 from category 3;category03;approved	
+;product10;;Test Product 10 from category 3;category03;approved	
+
+#-----------------
+# Set up product carousel component
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];products(code);categories(code);&componentRef
+;;testProductCarouselComponent;product01,product02,product07,product08;category01,category02,category03;testProductCarouselComponent
+
+#-----------------
+# Set up search restrictions
+
+INSERT_UPDATE SearchRestriction;code[unique=true];principal(uid);query;restrictedType(code);active;generate
+;ProductInSessionCatalogVersions;anonymous;{item:catalogVersion} IN (?session.catalogversions);Product;true;true

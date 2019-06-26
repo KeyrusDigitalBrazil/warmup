@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config" xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+	xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+	xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea" xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+	xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch" xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+
+	<!-- Explorer tree configuration -->
+	<context merge-by="module" component="explorer-tree" parent="auto" module="personalizationservicesbackoffice">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="cxnode">
+				<explorer-tree:navigation-node id="cxactions">
+					<explorer-tree:type-node code="CxSearchProfileAction" id="hmc.type_tree_cxsearchprofileaction" />
+				</explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="CxSearchProfileAction">		
+		<!-- List view configuration -->
+		<context component="listview" merge-by="type" parent="CxAbstractAction">
+			<list-view:list-view>
+				<list-view:column qualifier="searchProfileCode" />
+				<list-view:column qualifier="searchProfileCatalog" />
+			</list-view:list-view>
+		</context>
+	
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" merge-by="type" parent="CxAbstractAction">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="searchProfileCode" selected="false" />
+					<advanced-search:field name="searchProfileCatalog" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+	
+		<!-- Editor area configuration -->
+		<context component="editor-area" merge-by="type" parent="CxAbstractAction">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="searchProfileCode" />
+						<editorArea:attribute qualifier="searchProfileCatalog" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	
+		<!--   Simple search configuration -->
+		<context component="simple-search" merge-by="type" parent="CxAbstractAction">
+			<simple-search:simple-search>
+				<simple-search:field name="searchProfileCode" />
+			</simple-search:simple-search>
+		</context>
+
+		<context component="create-wizard-no-save" merge-by="type" parent="CxAbstractAction">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newAction" type="ctx.TYPE_CODE" />
+					<wz:assign property="newAction.target" value="'cxSearchProfileActionPerformable'" />
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newAction">
+							<wz:property qualifier="code" />
+							<wz:property qualifier="searchProfileCode" />
+							<wz:property qualifier="searchProfileCatalog" />
+							<wz:property qualifier="variation" />
+							<wz:property qualifier="target" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+		<context component="create-wizard" merge-by="component" parent="create-wizard-no-save" type="CxPromotionAction">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done>
+							<wz:save property="newAction" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+</config>

@@ -1,0 +1,70 @@
+@import '_backoffice-variables.scss';
+
+@mixin _image-attribute-sync-status ($image-name, $animation:false) {
+    
+    width: $backoffice--sync-icon--size;
+    height: $backoffice--sync-icon--size;
+    padding: ($backoffice--sync-icon--size/2);
+    display: inline;
+    position: relative;
+    &:before {
+		content: " ";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: $backoffice--sync-icon--size;
+    	height: $backoffice--sync-icon--size;
+    	margin-left: -($backoffice--sync-icon--size/2);
+    	margin-top: -($backoffice--sync-icon--size/2);
+    	background: url("../images/sync/#{$image-name}") center no-repeat;
+    	@if $animation {
+			animation: $animation;
+    	}
+    }
+}
+
+@mixin _image-attribute-inline-icon-image ($image-name-path) {
+  background: url("../images/#{$image-name-path}") center no-repeat;
+}
+
+@mixin _image-attribute-inline-icon ($image-name-path:false, $icon-size: $backoffice--sync-icon--size, $animation:false, $icon-inline-size: $backoffice--sync-icon--size, $margin-right: false) {
+
+  width: $icon-inline-size;
+  height: $icon-inline-size;
+  padding: ($icon-inline-size/2);
+  @if $margin-right {
+    margin-right: $margin-right;
+  }
+  display: inline;
+  position: relative;
+  
+  &:before {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: $icon-size;
+    height: $icon-size;
+    margin-left: -($icon-size/2);
+    margin-top: -($icon-size/2);
+    @if $image-name-path {
+      @include _image-attribute-inline-icon-image($image-name-path);
+    }@else{
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: transparent;
+    }
+    @if $animation {
+      animation: $animation;
+    }
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

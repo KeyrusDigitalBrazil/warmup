@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <label> Custom IFrame</label>
+    <br/>
+    <button id="retrieveAccessTokens">Securely retrieve access tokens</button>
+    <br/>
+    <label id="tokens"></label>
+</body>
+
+<script>
+var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+var messageEventName = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+document.getElementById("retrieveAccessTokens")[eventMethod]("click", function(event) {
+    parent.postMessage({
+        pk: Math.random(),
+        gatewayId: 'accessTokens',
+        eventId: 'get'
+    }, '*');
+
+}, false);
+
+
+window[eventMethod](messageEventName, function(event) {
+    if (event.data.eventId === 'promiseReturn') {
+        var accessTokensMap = JSON.stringify(event.data.data.resolvedDataOfLastSubscriber);
+        document.getElementById('tokens').innerHTML = accessTokensMap;
+    }
+}, false);
+</script>
+
+</html>

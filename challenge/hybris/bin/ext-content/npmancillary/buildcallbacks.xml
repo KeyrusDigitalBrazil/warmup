@@ -1,0 +1,449 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2000-2013 hybris AG
+ All rights reserved.
+
+ This software is the confidential and proprietary information of hybris
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with hybris.
+
+  
+-->
+<project name="npmancillary_buildcallbacks">
+
+    <patternset id="extension.npmancillary.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="resources${file.separator}npm${file.separator}node_modules${file.separator}**"/>
+		<exclude name="resources${file.separator}npm${file.separator}node_modules"/>
+    </patternset>
+
+    <patternset id="extension.npmancillary.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="resources${file.separator}npm${file.separator}node_modules${file.separator}**"/>
+		<exclude name="resources${file.separator}npm${file.separator}node_modules"/>
+    </patternset>
+
+	<patternset id="extension.npmancillary.production.filter">
+	    <patternset refid="extension.production.filter" />
+	    <exclude name="resources${file.separator}npm${file.separator}**" />
+	</patternset>
+
+    <macrodef name="detectOS">
+        <sequential>
+            <if>
+                <os family="windows"/>
+                <then>
+                    <property name="os.family" value="windows"/>
+                </then>
+
+                <elseif>
+                    <os family="mac"/>
+                    <then>
+                        <property name="os.family" value="darwin"/>
+                    </then>
+                </elseif>
+
+                <else>
+                    <property name="os.family" value="linux"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!-- @deprecated since 6.6, use safeUnLink -->
+    <macrodef name="removeLink">
+        <attribute name="path" default="NOT SET" />
+        <sequential>
+            <sequential>
+                <if>
+                    <available file="@{path}" type="dir" />
+                    <then>
+                        <echo message="Removing link @{path}"/>
+                        <if>
+                            <os family="windows" />
+                            <then>
+                                <exec executable="cmd" failonerror="false">
+                                    <arg value="/c"/>
+                                    <arg value="rmdir"/>
+                                    <arg value="@{path}"/>
+                                </exec>
+                            </then>
+                            <else>
+                                <exec executable="rm">
+                                    <arg line="-rf @{path}"/>
+                                </exec>
+                            </else>
+                        </if>
+                    </then>
+                </if>
+            </sequential>
+        </sequential>
+    </macrodef>
+
+    <!-- @deprecated since 6.6, use createLink -->
+    <macrodef name="createLink">
+        <attribute name="link" default="NOT SET"/>
+        <attribute name="path" default="NOT SET"/>
+        <sequential>
+            <safeLink targetPath="@{link}" sourcePath="@{path}" />
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="invokeNpm">
+        <attribute name="arguments" default=""/>
+
+        <sequential>
+            <echo message="Running [npm @{arguments}]"/>
+            <property environment="env"/>
+            <detectOS/>
+            <property file="${ext.npmancillary.path}${file.separator}resources${file.separator}ant${file.separator}${os.family}.properties" />
+
+            <if>
+                <os family="windows" />
+                    <then>
+                        <exec executable="cmd" dir="${loc.NPM_HOME}" failonerror="true">
+                            <arg value="/c"/>
+                            <arg value="${loc.NODE_HOME}${file.separator}npm"/>
+                            <arg line="@{arguments}"/>
+                        </exec>
+                    </then>
+                <else>
+                    <exec dir="${loc.NPM_HOME}" executable="${loc.NODE_HOME}${file.separator}bin${file.separator}npm" failonerror="true" >
+                        <env key="PATH" value="${loc.EXTRA_PATH}${path.separator}${env.PATH}"/>
+                        <arg line="@{arguments}"/>
+                    </exec>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <macrodef name="cleanGruntBuildSymlinks">
+        <sequential>
+				<echo message="cleanGruntBuildSymlinks is @deprecated since 6.6"/>
+            </sequential>
+    </macrodef>
+
+    <macrodef name="removeNodeModulesSymlink">
+        <attribute name="path" default="NOT SET"/>
+        <sequential>
+            <echo level="info" message="clean up of node modules symlink: @{path}${file.separator}node_modules"/>
+            <safeUnLink targetPath="@{path}${file.separator}node_modules"/>
+            <safeUnLink targetPath="@{path}${file.separator}package.json"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="createNodeModulesSymlink">
+        <attribute name="path" default="NOT SET" />
+        <sequential>
+            <echo message="Creating node_modules SymLink"/>
+            <safeLink targetPath="@{path}${file.separator}node_modules" sourcePath="${loc.NPM_BINARIES_HOME}" />
+            <safeLink targetPath="@{path}${file.separator}package.json" sourcePath="${loc.NPM_HOME}${file.separator}package.json" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="resetNpmPermissions">
+        <sequential>
+            <if>
+                <and>
+                    <not>
+                        <isset property="npmPermissionsReset"/>
+                    </not>
+                    <not>
+                        <os family="windows"/>
+                    </not>
+                </and>
+                <then>
+					<echo message="Creating the npm .bin directory"/>
+					<mkdir dir="${loc.NPM_BINARIES_HOME}/.bin" />
+                    <echo message="Restoring NPM permissions and symlinks lost in packaging process"/>
+                    <exec executable="rm">
+                        <arg line="-rf ${loc.NPM_BINARIES_HOME}/.bin/grunt"/>
+                    </exec>
+                    <exec executable="rm">
+                        <arg line="-rf ${loc.NPM_BINARIES_HOME}/.bin/protractor"/>
+                    </exec>
+                    <exec executable="rm">
+                        <arg line="-rf ${loc.NPM_BINARIES_HOME}/.bin/webdriver-manager"/>
+                    </exec>
+                    <exec executable="ln">
+                        <arg line="-sf ${loc.NPM_BINARIES_HOME}/grunt-cli/bin/grunt ${loc.NPM_BINARIES_HOME}/.bin/grunt"/>
+                    </exec>
+                    <exec executable="ln">
+                        <arg line="-sf ${loc.NPM_BINARIES_HOME}/protractor/bin/protractor ${loc.NPM_BINARIES_HOME}/.bin/protractor"/>
+                    </exec>
+                    <exec executable="ln">
+                        <arg line="-sf ${loc.NPM_BINARIES_HOME}/protractor/bin/webdriver-manager ${loc.NPM_BINARIES_HOME}/.bin/webdriver-manager"/>
+                    </exec>
+                    <exec executable="chmod">
+                        <arg line="755 ${loc.NPM_BINARIES_HOME}/.bin/grunt"/>
+                    </exec>
+                    <exec executable="chmod">
+                        <arg line="755 ${loc.NODE_HOME}/bin/node"/>
+                    </exec>
+                    <exec executable="chmod">
+                        <arg line="-R a+x ${loc.NPM_HOME}/node_modules/protractor"/>
+                    </exec>
+                    <property name="npmPermissionsReset" value="true"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="gruntBuild">
+        <attribute name="path" default="NOT SET"/>
+        <attribute name="phase" default="NOT SET"/>
+    	<attribute name="failonerror" default="NOT SET"/>
+        <sequential>
+            <property environment="env"/>
+
+            <detectOS/>
+            <property file="${ext.npmancillary.path}${file.separator}resources${file.separator}ant${file.separator}${os.family}.properties" />
+
+        	<if>
+            	<available file="${loc.NPM_BINARIES_HOME}" type="dir"/>
+                <then>
+                	<echo message="START of calling grunt @{phase} on @{path}"/>
+		
+		            <if>
+		                <equals arg1="${phase}" arg2="clean"/>
+		                <then>
+		                    <safeUnLink targetPath="@{path}${file.separator}node_modules" />
+		                </then>
+		            </if>
+		        	<if>
+		        		<!-- default value for fail on error -->
+		        		<equals arg1="@{phase}" arg2="test_only" />
+		        		<then>
+		        			<property name="failonerrorDefault"  value="false"/>
+		        		</then>
+		        		<else>
+		        			<property name="failonerrorDefault"  value="true"/>
+		        		</else>
+		        	</if>
+		        	<if>
+		        		<!-- use default if no other value was provided  -->
+		        		<equals arg1="@{failonerror}" arg2="NOT SET" />
+		        		<then>
+			    			<property name="failonerrorValue"  value="${failonerrorDefault}"/>
+			    		</then>
+			    		<else>
+			    			<property name="failonerrorValue"  value="@{failonerror}"/>
+			    		</else>
+		        	</if>
+		        	<echo message="failonerror=@{failonerror}, default=${failonerrorDefault}, value=${failonerrorValue}" />
+		
+		            <createNodeModulesSymlink path="@{path}"/>
+		            <resetNpmPermissions/>
+		
+		            <if>
+		                <os family="windows"/>
+		                <then>
+		                    <echo message="Running grunt @{phase}"/>
+		                    <exec dir="@{path}" executable="${loc.NPM_BINARIES_HOME}${file.separator}.bin${file.separator}grunt.cmd" failonerror="${failonerrorValue}">
+		                        <env key="Path" value="${env.Path}${path.separator}${loc.EXTRA_PATH}"/>
+		                        <env key="NPM_HOME" value="${loc.NPM_HOME}"/>
+		                        <env key="NPM_BINARIES_HOME" value="${loc.NPM_BINARIES_HOME}"/>
+		                        <env key="NODE_HOME" value="${loc.NODE_HOME}"/>
+		
+		                        <arg value="@{phase}"/>
+		                    </exec>
+		                </then>
+		                <else>
+		                    <echo message="Running grunt @{phase}"/>
+		                    <exec dir="@{path}" executable="${loc.NPM_BINARIES_HOME}${file.separator}.bin${file.separator}grunt" failonerror="${failonerrorValue}">
+		                        <env key="PATH" value="${loc.EXTRA_PATH}${path.separator}${env.PATH}"/>
+		                        <env key="NPM_HOME" value="${loc.NPM_HOME}"/>
+		                        <env key="NPM_BINARIES_HOME" value="${loc.NPM_BINARIES_HOME}"/>
+		                        <env key="NODE_HOME" value="${loc.NODE_HOME}"/>
+		
+		                        <arg value="@{phase}"/>
+		                    </exec>
+		                </else>
+		            </if>
+		            <echo message="END of calling grunt @{phase}"/>
+                </then>
+            	<else>
+            		<echo message="FAILED to call grunt @{phase} on @{path}, node modules not found at ${loc.NPM_BINARIES_HOME}"/>
+            	</else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <target name="repairnpm">
+    		<echo message="fixing node/npm symlinks and permissions"/>
+
+			<detectOS/>
+			<property file="${ext.npmancillary.path}${file.separator}resources${file.separator}ant${file.separator}${os.family}.properties" />
+    		<if>
+    			<not>
+                    <os family="windows"/>
+    			</not>
+                <then>
+                	<!-- sometimes the npm link is converted to file -->
+                	<exec executable="${ext.npmancillary.path}/resources/npm/repairnpm.sh">
+                		<arg line="${os.family}"/>
+                	</exec>
+                </then>
+		    </if>
+    </target>
+
+	<target name="fixnpminstall">
+			<echo message="Fixing wrong binaries paths in previous npm install"/>
+            <invokeNpm arguments="run update-webdriver"/>
+    </target>
+
+    <target name="npmpackagelock" depends="removepackagelockfile, npminstall">
+			<echo message="Running NPM package lock on npmancillary extension"/>            
+            <invokeNpm arguments="shrinkwrap --dev"/>
+    </target>
+    
+    <target name="removepackagelockfile">
+        <safeUnLink targetPath="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}npm-shrinkwrap.json" />
+    </target>
+
+	<target name="npminstall" depends="repairnpm">
+			<echo message="running npm install on npmancillary extension"/>
+
+            <!-- delete should not be replaced by safeUnlink. It should be physically deleted. -->
+            <delete dir="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules"/>
+            <invokeNpm arguments="cache verify"/>
+            <invokeNpm arguments="install"/>
+    </target>
+
+    <macrodef name="safeLink">
+        <attribute name="sourcePath" default="NOT_SET"/>
+        <attribute name="targetPath" default="NOT_SET"/>
+        <sequential>
+            <validatePathAttribute path="@{sourcePath}" message="link sourcePath not defined" />
+            <validatePathAttribute path="@{targetPath}" message="link targetPath not defined" />
+
+            <safeUnLink targetPath="@{targetPath}"/>
+            <if>
+                <not>
+                    <available file="@{targetPath}"/>
+                </not>
+                <then>
+                    <echo message="safeLink - linking @{sourcePath} to @{targetPath}" level="info"/>
+                    <!-- (mkdir + delete) workaround to create nested folder structure and then delete leaf folder/file -->
+                    <dirname file="@{targetPath}" property="targetPath.parent" />
+                    <mkdir dir="${targetPath.parent}"/>
+                    <if>
+                        <os family="windows"/>
+                        <then>
+                            <echo message="safeLink - creating windows symlink"/>
+                            <if>
+                                <available file="@{sourcePath}" type="dir"/>
+                                <then>
+                                    <echo message="safeLink - creating diretory symlink"/>
+                                    <exec executable="cmd" failonerror="false">
+                                        <arg value="/c"/>
+                                        <arg value="mklink"/>
+                                        <arg value="/D"/>
+                                        <arg value="@{targetPath}"/>
+                                        <arg value="@{sourcePath}"/>
+                                    </exec>
+                                </then>
+                                <else>
+                                    <echo message="safeLink - creating file symlink"/>
+                                    <exec executable="cmd" failonerror="false">
+                                        <arg value="/c"/>
+                                        <arg value="mklink"/>
+                                        <arg value="@{targetPath}"/>
+                                        <arg value="@{sourcePath}"/>
+                                    </exec>
+                                </else>
+                            </if>
+                        </then>
+                        <else>
+                            <echo message="safeLink - creating symlink on *nix"/>
+                            <exec executable="ln">
+                                <arg line="-sf @{sourcePath} @{targetPath}"/>
+                            </exec>
+                        </else>
+                    </if>
+                </then>
+                <else>
+                    <echo message="safeLink - skipping symlink creation"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="safeUnLinkWindows">
+        <attribute name="targetPath" default="NOT_SET"/>
+        <sequential>
+            <if>
+                <available file="@{targetPath}" type="dir"/>
+                <then>
+                    <exec executable="cmd" failonerror="true">
+                        <arg value="/c"/>
+                        <arg value="rmdir"/>
+                        <arg value="@{targetPath}"/>
+                    </exec>
+                </then>
+                <elseif>
+                    <available file="@{targetPath}" type="file"/>
+                    <then>
+                        <exec executable="cmd" failonerror="true">
+                            <arg value="/c"/>
+                            <arg value="del"/>
+                            <arg value="@{targetPath}"/>
+                        </exec>
+                    </then>
+                </elseif>
+                <else>
+                    <!-- This is a fix for broken symlinks -->
+                    <echo message="Cleaning broken link @{targetPath}"/>
+                    <exec executable="cmd" failonerror="false">
+                        <arg value="/c"/>
+                        <arg value="del"/>
+                        <arg value="@{targetPath}"/>
+                        <arg value="2>nul"/>
+                    </exec>
+                    <exec executable="cmd" failonerror="false">
+                        <arg value="/c"/>
+                        <arg value="rmdir"/>
+                        <arg value="@{targetPath}"/>
+                        <arg value="2>nul"/>
+                    </exec>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="safeUnLink">
+        <attribute name="targetPath" default="NOT_SET"/>
+        <sequential>
+            <validatePathAttribute path="@{targetPath}" message="link targetPath not defined" />
+        	<echo message="safeUnlink - removing link @{targetPath}" level="info"/>
+            <if>
+                <os family="windows"/>
+                <then>
+                    <safeUnLinkWindows targetPath="@{targetPath}"/>
+                </then>
+                <else>
+                    <exec executable="rm">
+                        <arg line="-rf @{targetPath}"/>
+                    </exec>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="validatePathAttribute">
+        <attribute name="path"/>
+        <attribute name="message" default="Error in macro validatePathAttribute: path not provided."/>
+        <sequential>
+            <condition property="pathIsNotSet">
+                <equals arg1="@{path}" arg2="NOT_SET" />
+            </condition>
+            <fail if="pathIsNotSet" message="@{message}"/>
+        </sequential>
+    </macrodef>
+
+</project>

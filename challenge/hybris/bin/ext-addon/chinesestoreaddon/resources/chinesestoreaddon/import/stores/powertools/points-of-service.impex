@@ -1,0 +1,52 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#% impex.setLocale( Locale.GERMAN );
+
+$storeUid=powertools
+$productCatalog=powertoolsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$storeImage=storeImage(qualifier, $catalogVersion)
+
+$standardHours=powertools-cn-china-standard-hours
+$weekendHours=powertools-cn-china-weekend-hours
+
+INSERT_UPDATE OpeningSchedule;code[unique=true];
+;$standardHours;
+;$weekendHours;
+
+INSERT_UPDATE WeekdayOpeningDay;openingSchedule(code)[unique=true];dayOfWeek(code)[unique=true];openingTime[dateformat=hh:mm];closingTime[dateformat=hh:mm];
+;$standardHours;MONDAY   ; 09:00; 20:00
+;$standardHours;TUESDAY  ; 09:00; 20:00
+;$standardHours;WEDNESDAY; 09:00; 20:00
+;$standardHours;THURSDAY ; 09:00; 20:00
+;$standardHours;FRIDAY   ; 09:00; 20:00
+;$standardHours;SATURDAY ; 10:00; 20:00
+
+;$weekendHours;MONDAY   ; 09:00; 20:00
+;$weekendHours;TUESDAY  ; 09:00; 20:00
+;$weekendHours;WEDNESDAY; 09:00; 20:00
+;$weekendHours;THURSDAY ; 09:00; 20:00
+;$weekendHours;FRIDAY   ; 09:00; 20:00
+;$weekendHours;SATURDAY ; 10:00; 20:00
+;$weekendHours;SUNDAY   ; 10:00; 16:00
+
+
+INSERT_UPDATE PointOfService;name[unique=true];displayName;type(code);address(&addrID);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];$storeImage;openingSchedule(code);basestore(uid)[default=$storeUid];features(code)
+;HYBRIS 电动工具（上海旗舰店）;HYBRIS 电动工具（上海旗舰店）;STORE;addr800;31,225028219962;121,42993533453;29-05-2025;powertools_store_01;$standardHours;
+;HYBRIS 电动工具（北京旗舰店）;HYBRIS 电动工具（北京旗舰店）;STORE;addr801;39,916884986013;116,41318463262;29-05-2025;powertools_store_01;$standardHours;
+;HYBRIS 电动工具（深圳旗舰店）;HYBRIS 电动工具（深圳旗舰店）;STORE;addr802;22,523094952265;113,94217819226;29-05-2025;powertools_store_01;$standardHours;
+;HYBRIS 电动工具（武汉旗舰店）;HYBRIS 电动工具（武汉旗舰店）;STORE;addr803;30,557364236023;114,35356170681;29-05-2025;powertools_store_01;$weekendHours;
+
+INSERT_UPDATE Address;&addrID;streetname;streetnumber;postalcode[unique=true];town[unique=true];country(isocode);region(isocode);phone1;owner(PointOfService.name)[unique=true]
+;addr800;愚园路;1357号;200000;上海;CN;;22456580;HYBRIS 电动工具（上海旗舰店）
+;addr801;王府井;151号;100000;北京;CN;;22456581;HYBRIS 电动工具（北京旗舰店）
+;addr802;华强北;857号;518000;深圳;CN;;22456582;HYBRIS 电动工具（深圳旗舰店）
+;addr803;白鹭街;215号;430000;武汉;CN;;22456583;HYBRIS 电动工具（武汉旗舰店）

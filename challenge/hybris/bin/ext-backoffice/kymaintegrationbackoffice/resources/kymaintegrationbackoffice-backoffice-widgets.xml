@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+--><widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+
+    <widget-extension widgetId="collapsibleContainer">
+            <widget id="Certificate"
+                    widgetDefinitionId="com.hybris.widgets.retrievecertificatewidget"
+                    slotId="cockpitWidgetChildrenInvisible"
+                    template="true"
+                    title="com.hybris.widgets.retrievecertificatewidget.title">
+
+                <instance-settings socketEventRoutingMode="LAST_USED">
+                    <create onInit="false" reuseExisting="true">
+                        <all-incoming-events/>
+                    </create>
+                    <close>
+                        <all-outgoing-events/>
+                    </close>
+                    <select onInit="false">
+                        <all-incoming-events/>
+                    </select>
+                </instance-settings>
+                <virtual-sockets>
+                    <output id="retrieveCertificate" type="java.lang.Object"/>
+                </virtual-sockets>
+            </widget>
+    </widget-extension>
+
+    <widget-connection sourceWidgetId="STUB_com.hybris.backoffice.widgets.actions.retrieve.certificate" outputId="existingCertificate" targetWidgetId="Certificate" inputId="existingCertificate"/>
+
+    <widget-connection inputId="input" outputId="nodeSelected" sourceWidgetId="kymaintegrationbackoffice-explorer-tree" targetWidgetId="kymaintegrationbackoffice-tree-node-adapter"/>
+    <widget-connection inputId="genericInput" outputId="true" sourceWidgetId="kymaintegrationbackoffice-tree-node-adapter" targetWidgetId="kymaintegrationbackoffice-typecode-extractor"/>
+    <widget-connection inputId="genericInput" outputId="true" sourceWidgetId="kymaintegrationbackoffice-tree-node-adapter" targetWidgetId="kymaintegrationbackoffice-search-enabler"/>
+    <widget-connection inputId="genericInput" outputId="false" sourceWidgetId="kymaintegrationbackoffice-tree-node-adapter" targetWidgetId="kymaintegrationbackoffice-search-disabler"/>
+    <widget-connection inputId="type" outputId="genericOutput" sourceWidgetId="kymaintegrationbackoffice-typecode-extractor" targetWidgetId="kymaintegrationbackoffice-search-logic"/>
+    <widget-connection inputId="enabled" outputId="genericOutput" sourceWidgetId="kymaintegrationbackoffice-search-enabler" targetWidgetId="kymaintegrationbackoffice-text-search"/>
+    <widget-connection inputId="enabled" outputId="genericOutput" sourceWidgetId="kymaintegrationbackoffice-search-disabler" targetWidgetId="kymaintegrationbackoffice-text-search"/>
+    <widget-connection inputId="searchtext" outputId="query" sourceWidgetId="kymaintegrationbackoffice-text-search" targetWidgetId="kymaintegrationbackoffice-search-logic"/>
+    <widget-connection inputId="pageable" outputId="pageable" sourceWidgetId="kymaintegrationbackoffice-search-logic" targetWidgetId="kymaintegrationbackoffice-simple-list"/>
+
+</widgets>

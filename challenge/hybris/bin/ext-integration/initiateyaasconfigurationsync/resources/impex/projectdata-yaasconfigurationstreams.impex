@@ -1,0 +1,63 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$y2ySyncConfigurations = y2ySyncYaaSConfigurations
+$y2ySyncConfigurationFeed = YAAS_CONFIG_FEED
+$y2ySyncConfigruationPool = YAAS_CONFIG
+
+INSERT_UPDATE Y2YStreamConfigurationContainer; id[unique = true]; feed; pool
+; $y2ySyncConfigurations ; $y2ySyncConfigurationFeed ; $y2ySyncConfigruationPool
+
+INSERT_UPDATE Y2YStreamConfiguration; streamId[unique = true]; container(id); itemTypeForStream(code); dataHubType; resetStream[default = true]
+; configurationYaasOrganisationStream       ; $y2ySyncConfigurations ; YaasOrganisation       ; YaasOrganisationRaw
+; configurationYaasProjectStream            ; $y2ySyncConfigurations ; YaasProject            ; YaasProjectRaw
+; configurationYaasServiceStream            ; $y2ySyncConfigurations ; YaasService            ; YaasServiceRaw
+; configurationYaasClientCredentialStream   ; $y2ySyncConfigurations ; YaasClientCredential   ; YaasClientCredentialRaw
+; configurationBaseSiteServiceMappingStream ; $y2ySyncConfigurations ; BaseSiteServiceMapping ; BaseSiteServiceMappingRaw
+
+INSERT_UPDATE Y2YColumnDefinition; position[unique = true]; attributeDescriptor(enclosingType(code), qualifier); impexHeader; streamConfiguration(streamId)[unique = true]; columnName; language(isocode)[default = en]
+
+# YaaSOrganisation
+; 0 ; YaasOrganisation:identifier                 ; identifier[unique=true]          ; configurationYaasOrganisationStream       ; r_identifier
+; 1 ; YaasOrganisation:basePath                   ; basePath[unique=true]            ; configurationYaasOrganisationStream       ; r_basePath
+
+# YaasProject
+; 0 ; YaasProject:identifier                      ; identifier[unique=true]          ; configurationYaasProjectStream            ; r_identifier
+; 1 ; YaasProject:yaasOrganisation                ; yaasOrganisation(identifier)     ; configurationYaasProjectStream            ; r_organisation
+; 2 ; YaasProject:baseSite                        ; baseSite(uid)                    ; configurationYaasProjectStream            ; r_baseSite
+
+# YaasService
+; 0 ; YaasService:identifier                      ; identifier[unique=true]          ; configurationYaasServiceStream            ; r_identifier
+; 1 ; YaasService:serviceURL                      ; serviceURL                       ; configurationYaasServiceStream            ; r_serviceURL
+; 2 ; YaasService:serviceScope                    ; serviceScope                     ; configurationYaasServiceStream            ; r_serviceScope
+
+# YaasClientCredential
+; 0 ; YaasClientCredential:identifier             ; identifier[unique=true]          ; configurationYaasClientCredentialStream   ; r_identifier
+; 1 ; YaasClientCredential:clientId               ; clientId                         ; configurationYaasClientCredentialStream   ; r_clientId
+; 2 ; YaasClientCredential:clientSecret           ; clientSecret                     ; configurationYaasClientCredentialStream   ; r_clientSecret
+; 3 ; YaasClientCredential:pubsubClient           ; pubsubClient                     ; configurationYaasClientCredentialStream   ; r_pubsubClient
+; 4 ; YaasClientCredential:oauthURL               ; oauthURL                         ; configurationYaasClientCredentialStream   ; r_oauthURL
+; 5 ; YaasClientCredential:yaasProject            ; yaasProject(identifier)          ; configurationYaasClientCredentialStream   ; r_projectIdentifier
+
+# BaseSiteServiceMapping
+; 0 ; BaseSiteServiceMapping:baseSite             ; baseSite[unique=true]            ; configurationBaseSiteServiceMappingStream ; r_baseSite
+; 1 ; BaseSiteServiceMapping:yaasService          ; yaasService(identifier)          ; configurationBaseSiteServiceMappingStream ; r_yaasService
+; 2 ; BaseSiteServiceMapping:yaasClientCredential ; yaasClientCredential(identifier) ; configurationBaseSiteServiceMappingStream ; r_yaasClientCredential
+
+
+INSERT_UPDATE Y2YSyncJob; code[unique = true]; streamConfigurationContainer(id); syncType(code)
+; y2ySyncYaasConfigurationsJob ; $y2ySyncConfigurations ; DataHub
+
+INSERT_UPDATE Y2YSyncCronJob; code[unique = true]; singleExecutable; job(code); sessionLanguage(isocode)[default = en]
+; y2ySyncToDataHubYaasConfigurationsCronJob ; false ; y2ySyncYaasConfigurationsJob
+
+

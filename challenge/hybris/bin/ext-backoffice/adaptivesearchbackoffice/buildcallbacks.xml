@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="adaptivesearchbackoffice_buildcallbacks">
+	<property name="adaptivesearchbackofficeWebFragmentSrc" value="${ext.adaptivesearchbackoffice.path}/resources/web-fragment.xml"/>
+	<property name="adaptivesearchbackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_adaptivesearchbackoffice.jar"/>
+
+	<macrodef name="adaptivesearchbackoffice_after_clean">
+		<sequential>
+			<adaptivesearchbackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+    <macrodef name="adaptivesearchbackoffice_before_build">
+        <sequential>
+            <register_sass_extension extensionname="adaptivesearchbackoffice"/>
+            <register_sass_extension extensionname="adaptivesearchbackoffice" resources="resources" destination=""/>
+        </sequential>
+    </macrodef>
+
+	<macrodef name="adaptivesearchbackoffice_after_build">
+		<sequential>
+			<adaptivesearchbackoffice_remove_web_fragment/>
+			<adaptivesearchbackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="adaptivesearchbackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${adaptivesearchbackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${adaptivesearchbackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="adaptivesearchbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${adaptivesearchbackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${adaptivesearchbackofficeWebFragmentDestJar}">
+							<metainf file="${adaptivesearchbackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<patternset id="adaptivesearchbackoffice.localization.pattern">
+		<!-- core and hmc  -->
+		<include name="**/*locales*_en.properties"/>
+		<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*"/>
+		<exclude name="**/unittest/**/*"/>
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties"/>
+		<include name="**/labels_en.properties"/>
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties"/>
+		<include name="**/*messages.properties"/>
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties"/>
+
+		<!-- csv and impex -->
+		<include name="**/*_en.csv"/>
+		<include name="**/*_en.impex"/>
+
+		<include name="**/lang-en.properties"/>
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties"/>
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties"/>
+	</patternset>
+
+</project>

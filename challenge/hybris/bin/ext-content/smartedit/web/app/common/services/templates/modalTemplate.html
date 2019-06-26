@@ -1,0 +1,27 @@
+<div id="y-modal-dialog">
+    <div class="modal-header se-modal__header"
+        data-ng-if="modalController._modalManager.title">
+        <button type="button"
+            class="close"
+            data-ng-if="modalController._modalManager._showDismissButton()"
+            data-ng-click="modalController._modalManager._handleDismissButton()">
+            <span class="hyicon hyicon-close"></span>
+        </button>
+        <h4 class="se-nowrap-ellipsis se-modal__header-title"
+            id="smartedit-modal-title-{{ modalController._modalManager.title }}">{{ modalController._modalManager.title | translate }}&nbsp;{{ modalController._modalManager.titleSuffix | translate }}</h4>
+    </div>
+    <div class="modal-body"
+        id="modalBody">
+        <div data-ng-include="modalController.templateUrl" />
+    </div>
+    <div class="modal-footer"
+        data-ng-if="modalController._modalManager._hasButtons()">
+        <span data-ng-repeat="button in modalController._modalManager.getButtons()">
+            <button id='{{ button.id }}'
+                type="button"
+                data-ng-disabled="button.disabled"
+                data-ng-class="{ 'btn':true, 'btn-subordinate':button.style=='default', 'btn-primary':button.style=='primary' }"
+                data-ng-click="modalController._modalManager._buttonPressed(button)">{{ button.label | translate }}</button>
+        </span>
+    </div>
+</div>

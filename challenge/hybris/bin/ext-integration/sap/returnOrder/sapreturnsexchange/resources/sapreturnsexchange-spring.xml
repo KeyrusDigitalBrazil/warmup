@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	
+	<alias name="defaultSapDataHubInboundReturnOrderHelper" alias="sapDataHubInboundReturnOrderHelper" />
+	<bean id="defaultSapDataHubInboundReturnOrderHelper"
+		class="com.sap.hybris.returnsexchange.inbound.impl.DefaultDataHubInboundOrderHelper">
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<bean id="defaultSapRawHybrisReturnOrderBuilder"
+		class="de.hybris.platform.sap.orderexchange.outbound.impl.DefaultRawHybrisOrderBuilder"
+		parent="sapAbstractRawItemBuilder">
+		<property name="contributors">
+			<list>
+				<ref bean="returnOrderSalesConditionsContributor"></ref>
+				<ref bean="precedingDocContributor"></ref>
+				<ref bean="returnOrderContributor"></ref>
+				<ref bean="returnOrderEntryContributor"></ref>
+				<ref bean="returnOrderPartnerContributor"></ref>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="defaultReturnRequestCodeGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+		init-method="init" scope="tenant">
+		<property name="key" value="${keygen.returnorder.code.name}" />
+		<property name="digits" value="${keygen.returnorder.code.digits}" />
+		<property name="start" value="${keygen.returnorder.code.start}" />
+		<property name="type" value="${keygen.returnorder.code.type}"/>
+	</bean>
+
+<alias name="defaultReturnOrderSalesConditionsContributor" alias="returnOrderSalesConditionsContributor" />
+	<bean id="defaultReturnOrderSalesConditionsContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultReturnOrderSalesConditionsContributor">
+		<property name="tax1" value="${saporderexchange.itemtax.code1}" />
+		<property name="ruleService" ref="ruleService" />
+	</bean>
+	
+	<alias name="defaultPrecedingDocContributor" alias="precedingDocContributor" />
+	<bean id="defaultPrecedingDocContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultPrecedingDocContributor">
+	</bean>
+	
+	<alias name="defaultReturnOrderContributor" alias="returnOrderContributor" />
+	<bean id="defaultReturnOrderContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultReturnOrderContributor">
+	</bean>
+	<alias name="defaultReturnOrderEntryContributor" alias="returnOrderEntryContributor" />
+	<bean id="defaultReturnOrderEntryContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultReturnOrderEntryContributor">
+	</bean>
+	<alias name="defaultCancelReturnOrderEntryContributor" alias="cancelReturnOrderEntryContributor" />
+	<bean id="defaultCancelReturnOrderEntryContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultCancelReturnOrderEntryContributor"
+		parent="defaultReturnOrderEntryContributor">
+	</bean>
+	<alias name="defaultReturnOrderPartnerContributor" alias="returnOrderPartnerContributor" />
+	<bean id="defaultReturnOrderPartnerContributor"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultReturnOrderPartnerContributor">
+		<property name="b2CCustomerHelper" ref="sapOrderexchangeB2CCustomerHelper" />
+	</bean>
+	<alias name="sapOrderexchangeDefaultSendReturnOrderToDataHubHelper"
+		alias="sapOrderexchangeSendReturnOrderToDataHubHelper" />
+	<bean id="sapOrderexchangeDefaultSendReturnOrderToDataHubHelper"
+		class="com.sap.hybris.returnsexchange.outbound.impl.DefaultSendReturnOrderToDataHubHelper"
+		parent="sapAbstractSendToDataHubHelper">
+		<property name="rawItemBuilder" ref="defaultSapRawHybrisReturnOrderBuilder"></property>
+		<property name="rawItemType"
+			value="${saporderexchange.orderoutbound.datahub.rawOrderItemType}"></property>
+		<property name="feed" value="${returnsexchange.returnorder.outbound.datahub.feed}"></property>
+	</bean>
+	
+	<bean id="sapRefundReasonMappingTransferHubConfiguration" parent="sapCoreDataHubTransferConfiguration">
+		<property name="itemCode" value="SAPReturnOrderReason" />
+		<property name="rawType" value="RawHybrisRefundReasonMapping" />
+		<property name="converter" ref="sapRefundReasonMappingDataHubConverter" />
+	</bean>
+
+
+	<alias name="sapDefaultRefundReasonMappingPopulator" alias="sapRefundReasonMappingPopulator" />
+	<bean id="sapDefaultRefundReasonMappingPopulator"
+		class="com.sap.hybris.returnsexchange.returns.populator.DefaultRefundReasonMappingPopulator"
+		scope="prototype" />
+
+	<alias name="sapDefaultRefundReasonMappingDataHubConverter"
+		alias="sapRefundReasonMappingDataHubConverter" />
+	<bean id="sapDefaultRefundReasonMappingDataHubConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="sapCoreDataHubPropertyMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapCoreGenericModel2MapPopulator" />
+				<ref bean="sapRefundReasonMappingPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<alias name="sapOrderexchangeDefaultSendReturnOrderToDataHubAction" alias="sapOrderexchangeSendReturnOrderToDataHubAction" />
+	<bean id="sapOrderexchangeDefaultSendReturnOrderToDataHubAction" class="com.sap.hybris.returnsexchange.actions.SendReturnOrderToDataHubAction"
+		parent="abstractAction">
+		<property name="sendOrderToDataHubHelper" ref="sapOrderexchangeSendReturnOrderToDataHubHelper"></property>
+	    <property name="modelService" ref="modelService"></property>
+	</bean>
+	
+	
+	
+	
+	
+			
+</beans>

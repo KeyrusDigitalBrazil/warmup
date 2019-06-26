@@ -1,0 +1,45 @@
+<div class="pe-component-info">
+    <div class="pe-component-info__info-layout">
+        <div class="pe-component-info__title"
+            data-translate="personalization.modal.showcomponentinfolist.title"></div>
+        <div class="perso__page-level-help-message"
+            data-ng-show="$ctrl.pagination.totalCount > 0"
+            data-translate="personalization.modal.showcomponentinfolist.help.label"></div>
+
+        <div class="perso__page-level-help-message"
+            data-ng-show="$ctrl.pagination.totalCount === 0"
+            data-translate="personalization.modal.showcomponentinfolist.help.nocustomizations">
+        </div>
+    </div>
+    <div class="perso__page-level-help-message pe-component-info__info-layout"
+        data-ng-show="$ctrl.pagination.totalCount > 0">
+        <span data-translate="personalization.modal.showcomponentinfolist.help.numberofenabledcustomizations"></span>
+        <span data-ng-bind="$ctrl.pagination.totalCount"></span>
+    </div>
+    <div class="pe-component-info__wrapper"
+        personalization-infinite-scroll="$ctrl.addMoreItems()"
+        personalization-infinite-scroll-distance="2"
+        data-personalization-prevent-parent-scroll>
+        <div data-ng-class="$ctrl.customizationVisible() ? 'pe-component-info__list-item':''"
+            data-ng-repeat="item in $ctrl.actions">
+            <div class="pe-component-info__names-layout">
+                <div class="perso-wrap-ellipsis"
+                    data-ng-bind="item.customizationName"
+                    title="{{item.customizationName}}"></div>
+                <div class="perso-wrap-ellipsis perso-tree__primary-data"
+                    data-ng-bind="item.variationName"
+                    title="{{item.variationName}}"></div>
+            </div>
+            <div data-ng-class="$ctrl.customizationVisible() ? 'pe-component-info__icon':''">
+                <span data-ng-show="!$ctrl.isCustomizationFromCurrentCatalog(item.customization)"
+                    data-ng-class="$ctrl.customizationVisible()?'perso__globe-icon hyicon hyicon-globe':''"
+                    data-uib-tooltip="{{item.customization.catalogVersionNameL10N}}"
+                    data-tooltip-placement="top right"></span>
+            </div>
+        </div>
+        <div class="pe-spinner--inner"
+            data-ng-show="$ctrl.moreCustomizationsRequestProcessing">
+            <div data-ng-include="'waitDialog.html'"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+		   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	   xmlns:util="http://www.springframework.org/schema/util">
+
+	<alias name="defaultAccessibilityCheckingFilter" alias="accessibilityCheckingFilter"/>
+	<bean id="defaultAccessibilityCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.AndFilter">
+		<property name="filters">
+			<util:list>
+				<ref bean="readableCheckingFilter"/>
+				<ref bean="writableCheckingFilter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultPermissionCheckingFilter" alias="permissionCheckingFilter"/>
+	<bean id="defaultPermissionCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.PermissionCheckingFilter">
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+	</bean>
+
+	<alias name="defaultTranslatorAvailabilityCheckingFilter" alias="translatorAvailabilityCheckingFilter"/>
+	<bean id="defaultTranslatorAvailabilityCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.TranslatorAvailabilityCheckingFilter">
+		<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+	</bean>
+
+	<alias name="defaultSkippingPkFilter" alias="skippingPkFilter"/>
+	<bean id="defaultSkippingPkFilter" class="com.hybris.backoffice.excel.template.filter.SkippingPkFilter"/>
+
+	<alias name="defaultSkippingItemTypeFilter" alias="skippingItemTypeFilter"/>
+	<bean id="defaultSkippingItemTypeFilter" class="com.hybris.backoffice.excel.template.filter.SkippingItemTypeAttributeFilter"/>
+
+	<alias name="defaultValueCheckingFilter" alias="valueCheckingFilter"/>
+	<bean id="defaultValueCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.DefaultValueCheckingFilter"/>
+
+	<alias name="defaultMandatoryAndAvailableCheckingFilter" alias="mandatoryAndAvailableCheckingFilter"/>
+	<bean id="defaultMandatoryAndAvailableCheckingFilter" class="com.hybris.backoffice.excel.template.filter.AndFilter">
+		<property name="filters">
+			<util:list value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter">
+				<ref bean="mandatoryCheckingFilter"/>
+				<ref bean="accessibilityCheckingFilter"/>
+				<ref bean="permissionCheckingFilter"/>
+				<ref bean="translatorAvailabilityCheckingFilter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultReadableCheckingFilter" alias="readableCheckingFilter"/>
+	<bean id="defaultReadableCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.ReadableCheckingFilter"/>
+
+	<alias name="defaultWritableCheckingFilter" alias="writableCheckingFilter"/>
+	<bean id="defaultWritableCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.WritableCheckingFilter"/>
+
+	<alias name="defaultNotWritableAndUniqueFilter" alias="notWritableAndUniqueFilter"/>
+	<bean id="defaultNotWritableAndUniqueFilter" class="com.hybris.backoffice.excel.template.filter.AndFilter">
+		<property name="filters">
+			<util:list value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter">
+				<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+					<property name="excelFilter" ref="writableCheckingFilter"/>
+				</bean>
+				<ref bean="uniqueCheckingFilter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultMandatoryCheckingFilter" alias="mandatoryCheckingFilter"/>
+	<bean id="defaultMandatoryCheckingFilter"
+		  class="com.hybris.backoffice.excel.template.filter.MandatoryCheckingFilter"/>
+
+	<alias name="defaultUniqueAndAvailableCheckingFilter" alias="uniqueAndAvailableCheckingFilter"/>
+	<bean id="defaultUniqueAndAvailableCheckingFilter" class="com.hybris.backoffice.excel.template.filter.AndFilter">
+		<property name="filters">
+			<util:list value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter">
+				<ref bean="uniqueCheckingFilter"/>
+				<ref bean="accessibilityCheckingFilter"/>
+				<ref bean="permissionCheckingFilter"/>
+				<ref bean="translatorAvailabilityCheckingFilter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultAvailableCheckingFilter" alias="availableCheckingFilter"/>
+	<bean id="defaultAvailableCheckingFilter" class="com.hybris.backoffice.excel.template.filter.AndFilter">
+		<property name="filters">
+			<util:list value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter">
+				<bean class="com.hybris.backoffice.excel.template.filter.OrFilter">
+					<property name="excelFilter1" ref="accessibilityCheckingFilter"/>
+					<property name="excelFilter2" ref="notWritableAndUniqueFilter"/>
+				</bean>
+				<ref bean="permissionCheckingFilter"/>
+				<ref bean="translatorAvailabilityCheckingFilter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultRequiredCheckingFilter" alias="requiredCheckingFilter"/>
+	<bean id="defaultRequiredCheckingFilter" class="com.hybris.backoffice.excel.template.filter.OrFilter">
+		<property name="excelFilter1" ref="uniqueCheckingFilter"/>
+		<property name="excelFilter2">
+			<bean class="com.hybris.backoffice.excel.template.filter.AndFilter">
+				<property name="filters">
+					<util:list value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter">
+						<ref bean="mandatoryCheckingFilter"/>
+						<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+							<property name="excelFilter" ref="valueCheckingFilter"/>
+						</bean>
+					</util:list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultUniqueCheckingFilter" alias="uniqueCheckingFilter"/>
+	<bean id="defaultUniqueCheckingFilter" class="com.hybris.backoffice.excel.template.filter.UniqueCheckingFilter"/>
+
+	<alias name="defaultExcelClassificationServiceFilters" alias="excelClassificationServiceFilters"/>
+	<util:list id="defaultExcelClassificationServiceFilters"
+			   value-type="com.hybris.backoffice.excel.template.filter.ExcelFilter"/>
+
+</beans>

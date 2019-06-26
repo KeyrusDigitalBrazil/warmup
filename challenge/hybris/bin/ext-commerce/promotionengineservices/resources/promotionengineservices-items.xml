@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	
+	<collectiontypes>
+		<collectiontype code="PromotionActionParameterCollection"
+			elementtype="PromotionActionParameter" autocreate="true"
+			generate="false" />
+	</collectiontypes>
+	
+	<enumtypes>
+
+		<enumtype code="RuleType" autocreate="false" generate="true" dynamic="true">
+			<value code="PROMOTION" />
+		</enumtype>
+
+		<enumtype code="FactContextType" autocreate="false" generate="false">
+			<value code="PROMOTION_ORDER" />
+			<value code="PROMOTION_PRODUCT" />
+		</enumtype>
+
+	</enumtypes>
+	
+	<relations>
+		<relation generate="true" localized="false" code="PromotionGroup2PromotionSourceRuleRelation" autocreate="true">
+			<sourceElement type="PromotionGroup" qualifier="website" cardinality="one" />
+			<targetElement type="PromotionSourceRule" qualifier="promotionSourceRules" cardinality="many" collectiontype="collection" />
+		</relation>		
+	</relations>
+	<itemtypes>
+	    <itemtype code="PromotionActionParameter"
+	        jaloclass="de.hybris.platform.promotionengineservices.jalo.PromotionActionParameter"
+			autocreate="true"
+			generate="true">
+			<deployment table="PromotionActionParameter" typecode="5406" />
+			<attributes>
+				<attribute qualifier="uuid" autocreate="true"
+					type="java.lang.String">
+					<description>Action parameter uuid</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="value" autocreate="true"
+					type="java.lang.Object">
+					<description>Action parameter value</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="RuleBasedPromotion" 
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedPromotion" 
+				extends="AbstractPromotion">
+			<attributes>
+				<attribute redeclare="true" qualifier="code" type="java.lang.String" >
+					<modifiers unique="true"/>
+				</attribute>
+				<attribute 
+					qualifier="messageFired"
+					autocreate="true"
+					type="localized:java.lang.String">
+					<description>Message for fired promotion.</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute 
+					qualifier="rule"
+					autocreate="true"
+					type="AbstractRuleEngineRule">
+					<description>The rule for this promotion.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute 
+					qualifier="promotionDescription"
+					autocreate="true"
+					type="localized:java.lang.String">
+					<description>Localized description of promotion.</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="ruleVersion" type="java.lang.Long">
+					    <description>applied rule version</description>
+	                    <persistence type="property"/>
+	                    <modifiers optional="true" />
+	            </attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractRuleEngineRule" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="promotion" type="RuleBasedPromotion"> 
+					<modifiers optional="true" partof="true" />
+					<persistence type="property" />
+					<description>Promotion created for this rule.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractRuleBasedPromotionAction" abstract="true"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.AbstractRuleBasedPromotionAction" 
+				extends="AbstractPromotionAction">
+			<attributes>
+				<attribute 
+					qualifier="rule"
+					autocreate="true"
+					type="AbstractRuleEngineRule">
+					<description>The rule that created this promotion action.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute 
+					qualifier="strategyId"
+					autocreate="true"
+					type="java.lang.String">
+					<description>the strategyId (i.e. spring bean id) this action was created by.</description>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="metadataHandlers" type="StringCollection" autocreate="true">
+                    <persistence type="property" />
+                </attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="RuleBasedOrderAdjustTotalAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedOrderAdjustTotalAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="amount"
+					autocreate="true"
+					type="java.math.BigDecimal">
+					<defaultvalue>java.math.BigDecimal.ZERO</defaultvalue>
+					<description>The amount to adjust the cart total by.</description>
+					<modifiers read="true" write="true" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="RuleBasedOrderEntryAdjustAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedOrderEntryAdjustAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="amount"
+					autocreate="true"
+					type="java.math.BigDecimal">
+					<defaultvalue>java.math.BigDecimal.ZERO</defaultvalue>
+					<description>The amount to adjust the order entry by.</description>
+					<persistence type="property"/>
+				</attribute>
+
+				<attribute
+					qualifier="orderEntryProduct"
+					autocreate="true"
+					type="Product">
+					<description>The product of the order entry to adjust</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute
+					qualifier="orderEntryQuantity"
+					autocreate="true"
+					type="java.lang.Long">
+					<description>The quantity of the order entry to adjust</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute
+					qualifier="orderEntryNumber"
+					autocreate="true"
+					type="java.lang.Integer">
+					<description>The entry number in the order</description>
+					<persistence type="property" />
+				</attribute>
+
+			</attributes>
+		</itemtype>
+
+		<itemtype code="RuleBasedOrderAddProductAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedOrderAddProductAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="product"
+					autocreate="true"
+					type="Product">
+					<description>The product to be added</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute
+					qualifier="quantity"
+					autocreate="true"
+					type="java.lang.Long">
+					<description>The quantity to be added</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="RuleBasedOrderChangeDeliveryModeAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedOrderChangeDeliveryModeAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="deliveryMode"
+					autocreate="true"
+					type="DeliveryMode">
+					<description>The delivery mode to apply to the order</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute
+					qualifier="deliveryCost"
+					autocreate="true"
+					type="java.math.BigDecimal">
+					<description>The delivery cost to apply to the order</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute
+					qualifier="replacedDeliveryMode"
+					autocreate="true"
+					type="DeliveryMode">
+					<description>The delivery mode that was set to order before a promotion was applied</description>
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute
+					qualifier="replacedDeliveryCost"
+					autocreate="true"
+					type="java.math.BigDecimal">
+					<description>The delivery cost that was set to order before a promotion was applied</description>
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="RuleBasedPotentialPromotionMessageAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.RuleBasedPotentialPromotionMessageAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+			<attribute qualifier="parameters" autocreate="true"
+				type="PromotionActionParameterCollection">
+				<description>List of parameters</description>
+				<persistence type="property" />
+			</attribute>
+		</attributes>
+		</itemtype>
+		
+		<itemtype code="PromotionSourceRuleTemplate"
+			extends="SourceRuleTemplate"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.PromotionSourceRuleTemplate"
+			autocreate="true"
+			generate="true">
+		</itemtype>
+		
+		<itemtype code="PromotionSourceRule"
+			extends="SourceRule"
+			jaloclass="de.hybris.platform.promotionengineservices.jalo.PromotionSourceRule"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute qualifier="excludeFromStorefrontDisplay" type="java.lang.Boolean">
+					<description>
+					flag to indicate whether this promotion will be displayed
+					in the storefront (e.g. product details page etc)
+					</description>
+					<persistence type="property" />
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="ProductForPromotionSourceRule" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.ProductForPromotionSourceRule">
+			<description>Contains a relation between product code and PromotionSourceRule in which that product code is used</description>
+			<deployment table="ProdForPromoSourceRule" typecode="5402" />
+			<attributes>
+				<attribute qualifier="productCode" type="java.lang.String">
+					<description>product code used in the given PromotionSourceRule</description>
+					<persistence type="property" />
+					<modifiers read="true" write="false" initial="true" optional="false" />
+				</attribute>
+				<attribute qualifier="rule" type="PromotionSourceRule">
+					<description>PromotionSourceRule containing the product code</description>
+					<persistence type="property" />
+					<modifiers read="true" write="false" initial="true" optional="false" />
+				</attribute>
+				<attribute qualifier="promotion" type="RuleBasedPromotion">
+					<description>RuleBasedPromotion related to the rule</description>
+					<persistence type="property" />
+					<modifiers read="true" write="false" initial="true" optional="false" />
+				</attribute>
+			</attributes>
+			
+			<indexes>
+				<index name="ProdForPromoSourceRule_IDX">
+					<key attribute="productCode" />
+					<key attribute="rule" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="CatForPromotionSourceRule" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.CatForPromotionSourceRule">
+				<description>Contains a relation between category code and PromotionSourceRule in which that category code is used</description>
+				<deployment table="CatForPromoSourceRule" typecode="5403" />
+				<attributes>
+					<attribute qualifier="categoryCode" type="java.lang.String">
+						<description>category code used in the given PromotionSourceRule</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+					<attribute qualifier="rule" type="PromotionSourceRule">
+						<description>PromotionSourceRule containing the category code</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+					<attribute qualifier="promotion" type="RuleBasedPromotion">
+						<description>RuleBasedPromotion related to the rule</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+			</attributes>
+			
+			<indexes>
+				<index name="CatForPromoSourceRule_IDX">
+					<key attribute="categoryCode" />
+					<key attribute="rule" />
+					<key attribute="promotion" />
+					<key attribute="itemtype" />
+				</index>
+				<index name="CatForPromoSourceRuleItemType_IDX">
+					<key attribute="itemtype" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="PromotionResult" autocreate="false" generate="true">
+			<attributes>
+				<attribute qualifier="rulesModuleName" type="java.lang.String">
+					<description>applied rules module name</description>
+					<persistence type="property"/>
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="moduleVersion" type="java.lang.Long">
+					    <description>applied module version</description>
+	                    <persistence type="property"/>
+	                    <modifiers optional="true" />
+	            </attribute>
+				<attribute qualifier="ruleVersion" type="java.lang.Long">
+					    <description>applied rule version</description>
+	                    <persistence type="property"/>
+	                    <modifiers optional="true" />
+	            </attribute>
+				<attribute qualifier="messageFired" type="localized:java.lang.String">
+					<description>fired promotion description message</description>
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+					<modifiers optional="true" />
+
+				</attribute>
+				<attribute qualifier="orderCode" type="java.lang.String">
+					<description>Order code</description>
+					<persistence type="property"/>
+					<modifiers optional="true" />
+				</attribute>
+            </attributes>
+		</itemtype>
+ 	
+		<itemtype code="ExcludedCatForRule" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.ExcludedCatForRule">
+				<description>Contains a relation between excluded category code and PromotionSourceRule in which that category code is used</description>
+				<deployment table="ExcludedCatForRule" typecode="5020" />
+				<attributes>
+					<attribute qualifier="categoryCode" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+					<attribute qualifier="rule" type="PromotionSourceRule">
+						<description>PromotionSourceRule containing the excluded category code</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+			</attributes>
+			
+			<indexes>
+				<index name="ExcludedCatForRule_IDX">
+					<key attribute="rule" />
+					<key attribute="categoryCode" />
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="ExcludedProductForRule" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.ExcludedProductForRule">
+				<description>Contains a relation between excluded product code and PromotionSourceRule in which that product is used.</description>
+				<deployment table="ExcludedProductForRule" typecode="5021" />
+				<attributes>
+					<attribute qualifier="productCode" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false"  />
+					</attribute>
+					<attribute qualifier="rule" type="PromotionSourceRule">
+						<description>PromotionSourceRule containing the excluded product code</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" />
+					</attribute>
+			</attributes>
+			
+			<indexes>
+				<index name="ExcludedProductForRule_IDX">
+					<key attribute="rule" />
+					<key attribute="productCode" />
+				</index>
+			</indexes>
+		</itemtype>
+ 	
+		<itemtype code="CombinedCatsForRule" autocreate="true"
+				generate="true" extends="GenericItem"
+				jaloclass="de.hybris.platform.promotionengineservices.jalo.CombinedCatsForRule">
+				<description>Categories combined in one condition for one PromotionSourceRule.</description>
+				<deployment table="CombinedCatsForRule" typecode="5022" />
+				<attributes>
+					<attribute qualifier="rule" type="PromotionSourceRule">
+						<description>PromotionSourceRule containing combined category codes</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" unique="true" />
+					</attribute>
+					<attribute qualifier="conditionId" type="java.lang.Integer">
+						<description>Id for the category codes that are combined in one condition</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" unique="true" />
+					</attribute>
+					<attribute qualifier="categoryCode" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" unique="true" />
+					</attribute>
+					<attribute qualifier="promotion" type="RuleBasedPromotion">
+						<description>RuleBasedPromotion related to the rule</description>
+						<persistence type="property" />
+						<modifiers read="true" write="false" initial="true" optional="false" unique="false" />
+					</attribute>
+			</attributes>
+			
+			<indexes>
+				<index name="CombinedCatsForRule_IDX">
+					<key attribute="rule" />
+					<key attribute="categoryCode" />
+					<key attribute="conditionId" />
+					<key attribute="promotion" />
+					<key attribute="itemtype" />
+				</index>
+				<index name="CombinedCatsForRuleItemType_IDX">
+					<key attribute="itemtype" />
+				</index>
+			</indexes>
+		</itemtype>
+			
+   </itemtypes>
+</items>

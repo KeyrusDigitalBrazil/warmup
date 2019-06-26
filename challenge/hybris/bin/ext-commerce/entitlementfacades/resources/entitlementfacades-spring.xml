@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+    	   http://www.springframework.org/schema/context 
+		   http://www.springframework.org/schema/context/spring-context.xsd" >
+
+    <context:annotation-config />
+
+	<import resource="classpath:/entitlementfacades/ycommercewebservices/spring/typealiasmappings.xml"/>
+
+    <bean id="entitlementData" class="de.hybris.platform.entitlementfacades.data.EntitlementData" scope="prototype"/>
+
+	<alias name="defaultProductEntitlementCollectionPopulator" alias="productEntitlementCollectionPopulator"/>
+	<bean name="defaultProductEntitlementCollectionPopulator" parent="baseProductPopulator"
+			class="de.hybris.platform.entitlementfacades.product.converters.populator.ProductEntitlementCollectionPopulator">
+		<property name="entitlementConverter" ref="entitlementConverter"/>
+	</bean>
+	
+	<alias name="defaultEntitlementConverter" alias="entitlementConverter"/>
+	<bean id="defaultEntitlementConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="entitlementData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productEntitlementPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productBasicPopulatorList"/>
+		<property name="add" ref="productEntitlementCollectionPopulator"/>
+	</bean>
+	
+	<alias name="defaultProductEntitlementPopulator" alias="productEntitlementPopulator" />
+	<bean name="defaultProductEntitlementPopulator"
+			class="de.hybris.platform.entitlementfacades.product.converters.populator.ProductEntitlementPopulator"/>
+
+	<alias name="defaultSearchResultProductPopulator" alias="searchResultProductPopulator"/>
+	<bean id="defaultSearchResultProductPopulator" class="de.hybris.platform.entitlementfacades.product.converters.populator.SearchResultProductPopulator">
+		<property name="productService" ref="productService"/>
+		<property name="productEntitlementCollectionPopulator" ref="productEntitlementCollectionPopulator"/>
+	</bean>
+
+    <alias name="defaultEntitlementModelToDataPopulator" alias="entitlementModelToDataPopulator"/>
+    <bean id="defaultEntitlementModelToDataPopulator" class="de.hybris.platform.entitlementfacades.entitlement.populator.EntitlementModelToDataPopulator"/>
+
+    <alias name="defaultCoreEntitlementConverter" alias="coreEntitlementConverter"/>
+    <bean id="defaultCoreEntitlementConverter" parent="abstractPopulatingConverter" >
+        <lookup-method name="createTarget" bean="entitlementData"/>
+        <property name="populators">
+            <list>
+                <ref bean="entitlementModelToDataPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean parent="configurablePopulatorModification">
+        <property name="target" ref="productConfiguredPopulator"/>
+        <property name="keyType" value="de.hybris.platform.commercefacades.product.ProductOption"/>
+        <property name="key" value="ENTITLEMENTS"/>
+        <property name="add" ref="productEntitlementCollectionPopulator"/>
+    </bean>
+
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="orderEntryProductConverter"/>
+        <property name="add" ref="productEntitlementCollectionPopulator"/>
+    </bean>
+
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="commerceSearchResultProductConverter"/>
+        <property name="add" ref="searchResultProductPopulator"/>
+    </bean>
+
+</beans>

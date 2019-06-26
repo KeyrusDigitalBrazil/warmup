@@ -1,0 +1,101 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <context:annotation-config/> 
+    
+	<!-- Scan for annotation configured controller -->
+	<context:component-scan base-package="de.hybris.platform.acceleratorstorefrontcommons" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	<!-- Checkout flow validationAspect for entring a checkout step -->
+	<bean id='checkoutStepValidationAspect' class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.validation.CheckoutStepValidationAspect" >
+		<property name="checkoutFlowGroupMap" ref="checkoutFlowGroupMap"/>
+		<property name="checkoutFacade" ref="acceleratorCheckoutFacade"/>
+	</bean>
+
+	<!-- Pointcut definition with annotation-->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="entryCheckoutStepPoint"  expression="@annotation(de.hybris.platform.acceleratorstorefrontcommons.annotations.PreValidateCheckoutStep)" />
+		<aop:aspect ref="checkoutStepValidationAspect">
+			<aop:around pointcut-ref="entryCheckoutStepPoint" method="validateCheckoutStep" />
+		</aop:aspect>
+	</aop:config>
+	
+	<!-- Quote Checkout flow validationAspect for entring a checkout step -->
+	<bean id='quoteCheckoutStepValidationAspect' class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.validation.QuoteCheckoutStepValidationAspect" >
+		<property name="quoteFacade" ref="quoteFacade"/>
+		<property name="cartFacade" ref="cartFacade"/>
+	</bean>
+
+	<!-- Pointcut definition with annotation-->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="entryQuoteCheckoutStepPoint"  expression="@annotation(de.hybris.platform.acceleratorstorefrontcommons.annotations.PreValidateQuoteCheckoutStep)" />
+		<aop:aspect ref="quoteCheckoutStepValidationAspect">
+			<aop:around pointcut-ref="entryQuoteCheckoutStepPoint" method="validateQuoteCheckoutStep" />
+		</aop:aspect>
+	</aop:config>
+
+	<!-- Login Failure Handlers -->
+	<alias name="defaultBruteForceAttackCounter" alias="bruteForceAttackCounter"/>
+    <bean id="defaultBruteForceAttackCounter" class="de.hybris.platform.acceleratorstorefrontcommons.security.impl.DefaultBruteForceAttackCounter">
+        <constructor-arg name="maxFailedLogins" value="5" />
+        <constructor-arg name="cacheExpiration" value="60" />
+        <constructor-arg name="cacheSizeLimit" value="1000" />
+    </bean>
+    
+    <alias name="defaultAbstractAcceleratorAuthenticationProvider" alias="abstractAcceleratorAuthenticationProvider"/>
+    <bean id="defaultAbstractAcceleratorAuthenticationProvider" abstract="true" 
+    		class="de.hybris.platform.acceleratorstorefrontcommons.security.AbstractAcceleratorAuthenticationProvider">
+		<property name="bruteForceAttackCounter" ref="bruteForceAttackCounter" />
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userDetailsService" ref="originalUidUserDetailsService" />
+	</bean>
+	
+	<bean id="defaultAccessDeniedHandler" class="de.hybris.platform.acceleratorstorefrontcommons.security.impl.DefaultAcceleratorAccessDeniedHandler"/>
+
+	<alias name="defaultAddressDataUtil" alias="addressDataUtil"/>
+	<bean id="defaultAddressDataUtil" class="de.hybris.platform.acceleratorstorefrontcommons.util.AddressDataUtil"/>
+	
+	<!-- Cart restoration strategies -->
+	<alias name="defaultCartRestorationStrategy" alias="cartRestorationStrategy"/>
+	<bean id="defaultCartRestorationStrategy" class="de.hybris.platform.acceleratorstorefrontcommons.strategy.impl.DefaultCartRestorationStrategy">
+		<property name="cartFacade" ref="cartFacade"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<bean id="mergingCartRestorationStrategy" class="de.hybris.platform.acceleratorstorefrontcommons.strategy.impl.MergingCartRestorationStrategy" parent="defaultCartRestorationStrategy" />
+	
+	<bean id="noOpCartRestorationStrategy" class="de.hybris.platform.acceleratorstorefrontcommons.strategy.impl.NoOpCartRestorationStrategy" />
+
+	<!-- Customer ConsentData strategy -->
+	<alias name="defaultCustomerConsentDataStrategy" alias="customerConsentDataStrategy"/>
+	<bean id="defaultCustomerConsentDataStrategy" class="de.hybris.platform.acceleratorstorefrontcommons.strategy.impl.DefaultCustomerConsentDataStrategy">
+		<property name="consentFacade" ref="consentFacade"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+</beans>

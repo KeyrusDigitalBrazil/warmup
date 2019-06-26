@@ -1,0 +1,182 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# ImpEx for Importing Categories into Marketplace Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=globalMarketplaceProductCatalog
+$productCatalogName=Marketplace Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=source(code, $catalogVersion)[unique=true]
+$categories=target(code, $catalogVersion)[unique=true]
+
+# Insert Categories
+INSERT_UPDATE Category;code[unique=true];allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+ ;1
+ ;106
+ ;206
+ ;571
+ ;574
+ ;575
+ ;576
+ ;577
+ ;578
+ ;584
+ ;585
+ ;586
+ ;587
+ ;588
+ ;597
+ ;598
+ ;604
+ ;814
+ ;816
+ ;827
+ ;829
+ ;902
+ ;934
+ ;1201
+ ;1288
+ ;1421
+ 
+ ;2647
+ ;1337
+ ;1873
+ ;1334
+ ;897
+ ;2871
+ ;1331
+ ;1320
+ ;151
+ ;153
+ 
+ ;301
+ ;302
+ ;303
+ ;304
+
+ ;2863
+ ;2862
+
+# Insert Category Structure
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+ ;106;1
+ ;206;1
+ ;571;1
+ ;1421;1
+ ;574;571
+ ;575;571
+ ;577;571
+ ;584;571
+ ;576;575
+ ;578;575
+ ;585;571
+ ;586;585
+ ;587;578
+ ;588;578
+ ;597;585
+ ;598;585
+ ;604;585
+ ;814;816
+ ;816;106
+ ;827;816
+ ;829;816
+ ;902;206
+ ;934;585
+ ;1201;585
+ ;1288;578
+ 
+ ;301;1
+ ;302;1
+ ;303;1
+ ;304;1
+ 
+ ;2647;302
+ ;1337;304
+ ;1873;303
+ ;1334;304
+ ;2863;304
+ ;2862;304
+ 
+ ;897;301
+ ;2871;302
+ ;1331;303
+ ;1320;303
+ ;151;301
+ ;153;301
+ 
+# -----------------------apparelstore product start -----------------------------
+# ImpEx for Importing Categories into Apparel Store
+
+# Create Categories
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;supercategories(code,$catalogVersion);allowedPrincipals(uid)[default='customergroup']
+;categories;;1
+;clothes;;categories
+;collections;;1
+;snow;;collections
+;streetwear;;collections
+;shirts;;clothes,collections
+;brands;;
+;Playboard;;brands
+;Nixon;;brands;
+;Special Blend;;brands
+;Alien Workshop;;brands
+;Volcom;;brands
+;Hurley;;brands
+;Quiksilver;;brands
+;Element;;brands
+;Dakine;;brands
+;Bench;;brands
+;Fox;;brands
+;Roxy;;brands
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;allowedPrincipals(uid)[default='customergroup']
+;340000;;;
+;190100;;;
+;250100;;;
+;260700;;;
+;160400;;;
+;370900;;;
+;251100;;;
+;220000;;;
+;251100;;;
+;190000;;;
+;250000;;;
+;260000;;;
+;370000;;;
+
+;200064;;;
+;200065;;;
+
+INSERT_UPDATE CategoryCategoryRelation;$categories;$supercategories
+;220000;categories;
+;340000;220000;
+;251100;220000;
+;190000;categories;
+;190100;190000;
+;250000;categories;
+;250100;250000;
+;260000;categories;
+;260700;260000;
+;370000;categories;
+;160400;370000;
+;370900;370000;
+
+;200064;categories;
+;200065;categories;
+;340000;200064;
+;190100;200064;
+;250100;200064;
+;260700;200065;
+;160400;200065;
+;370900;200065;
+
+ # -----------------------apparelstore product end   -----------------------------
+ 

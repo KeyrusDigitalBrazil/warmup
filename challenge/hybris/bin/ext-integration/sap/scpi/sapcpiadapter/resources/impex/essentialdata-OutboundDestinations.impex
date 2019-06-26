@@ -1,0 +1,37 @@
+#*******************************************************************************************************************************#
+#   Please change only the sample data inside the angle brackets to match your configuration and leave everything else as is:   #
+#       1.	Change whatever inside the angle brackets                                                                           #
+#       2.	Remove the angle brackets                                                                                           #
+#       3.	Do NOT change anything else!                                                                                        #
+#*******************************************************************************************************************************#
+
+#******************************************#
+#************  OAuth CredentialS **********#
+#******************************************#
+INSERT_UPDATE OAuthClientDetails; clientId[unique = true]; oAuthUrl; scope
+; sampleClientId ; https://test.sap.hana.ondemand.com/oauth2/api/v1/token
+INSERT_UPDATE ExposedOAuthCredential; id[unique = true]   ; oAuthClientDetails(clientId); password
+; scpiOauthCredential ; sampleClientId ; samplePassword
+
+#**********************************#
+#************  Endpoints  *********#
+#**********************************#
+INSERT_UPDATE Endpoint; id[unique = true]; version[unique = true]; specUrl; name
+; scpiCustomerEndpoint          ; unknown ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-B2C-CUSTOMER-FROM-SAP-COMMERCE-CLOUD-TO-ERP/$metadata;v=1/"            ; scpiCustomerEndpoint
+; scpiB2BCustomerEndpoint       ; unknown ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-B2B-CUSTOMER-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP/$metadata;v=1/"            ; scpiB2BCustomerEndpoint
+; scpiOrderEndpoint             ; unknown ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-ORDERS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP/$metadata;v=1/"              ; scpiOrderEndpoint
+; scpiOrderCancellationEndpoint ; unknown ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-ORDER-CANCELLATIONS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP/$metadata;v=1/" ; scpiOrderCancellationEndpoint
+
+INSERT_UPDATE DestinationTarget; id[unique=true]
+; scpiOutboundDestination
+
+#**********************************************#
+#************  Consumed Destinations  *********#
+#**********************************************#
+INSERT_UPDATE ConsumedDestination; id[unique = true]; url; endpoint(id, version); credential(id); destinationTarget(id); additionalProperties
+; scpiCustomerDestination          ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-B2C-CUSTOMER-FROM-SAP-COMMERCE-CLOUD-TO-ERP;v=1/SAPCpiOutboundCustomers"                 ; scpiCustomerEndpoint:unknown          ; scpiOauthCredential; scpiOutboundDestination
+; scpiB2BCustomerDestination       ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-B2B-CUSTOMER-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP;v=1/SAPCpiOutboundB2BCustomers"                  ; scpiB2BCustomerEndpoint:unknown       ; scpiOauthCredential ;scpiOutboundDestination
+; scpiOrderDestination             ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-ORDERS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP;v=1/SAPCpiOutboundOrders"                          ; scpiOrderEndpoint:unknown             ; scpiOauthCredential ;scpiOutboundDestination
+; scpiOrderCancellationDestination ; "https://tester.hana.ondemand.com/gw/odata/SAP/REPLICATE-ORDER-CANCELLATIONS-FROM-SAP-COMMERCE-CLOUD-TO-SAP-ERP;v=1/SAPCpiOutboundOrderCancellations" ; scpiOrderCancellationEndpoint:unknown ; scpiOauthCredential ;scpiOutboundDestination
+
+

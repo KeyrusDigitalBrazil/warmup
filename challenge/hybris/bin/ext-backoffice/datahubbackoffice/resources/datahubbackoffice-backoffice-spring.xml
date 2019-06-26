@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="datahubbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton"
+		  init-method="init" lazy-init="false">
+		<property name="location" value="/datahubbackoffice-labels/" />
+		<property name="name" value="labels" />
+	</bean>
+
+	<import resource="classpath:/spring/datahub-rest-spring.xml" />
+	<import resource="classpath:/spring/datahub-spring.xml" />
+	<import resource="classpath:/spring/datahub-strategy-spring.xml" />
+	<import resource="classpath:/spring/datahub-service-spring.xml" />
+
+	<alias name="adminPropertySecurityCredentialsInfo" alias="adminSecurityCredentialsInfo" />
+	<bean name="adminPropertySecurityCredentialsInfo" class="com.hybris.datahub.client.BasicSecurityCredentialsInfo">
+		<constructor-arg name="username" value="${datahub.backoffice.rest.client.username.admin:}" />
+		<constructor-arg name="password" value="${datahub.backoffice.rest.client.password.admin:}" />
+	</bean>
+
+	<alias name="developerPropertySecurityCredentialsInfo" alias="developerSecurityCredentialsInfo" />
+	<bean name="developerPropertySecurityCredentialsInfo" class="com.hybris.datahub.client.BasicSecurityCredentialsInfo">
+		<constructor-arg name="username" value="${datahub.backoffice.rest.client.username.developer:}" />
+		<constructor-arg name="password" value="${datahub.backoffice.rest.client.password.developer:}" />
+	</bean>
+
+	<alias name="typeSystemBasedDataHubNameService" alias="dataHubNameService" />
+	<bean id="typeSystemBasedDataHubNameService"
+		  class="de.hybris.platform.datahubbackoffice.service.TypeSystemBasedDataHubNameService">
+		<property name="dataHubInstanceDAO" ref="dataHubInstanceDao" />
+		<property name="userContext" ref="userContext" />
+	</bean>
+
+	<bean id="dataHubInstanceDao" class="de.hybris.platform.datahubbackoffice.daos.impl.DefaultDataHubInstanceDAOImpl">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+</beans>

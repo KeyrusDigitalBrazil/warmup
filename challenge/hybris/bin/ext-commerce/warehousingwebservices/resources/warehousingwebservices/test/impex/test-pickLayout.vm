@@ -1,0 +1,177 @@
+##messageSource=classpath:/ordermanagementaddon/messages/document-picklabel_$lang.properties
+<html>
+<head>
+    <style type='text/css'>@media screen, print {
+        table {
+            width: 96%;
+            margin: 25px 10px 0;
+            font-family: "Open Sans", sans-serif;
+            color: #151c22;
+        }
+
+        th{
+            padding: 5px 5px 5px 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        th.hd1 {
+            font-size: 19px;
+        }
+
+        th.hd2 {
+        }
+
+        td {
+            padding: 5px 0 5px 15px;
+            font-size: 15px;
+        }
+
+        div.pick-slip-border{
+            border-top: 1px solid #e5e9ed;
+        }
+
+        td.headline{
+            font-size: 27px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+
+        td.table-header{
+            font-size: 19px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+
+        .sitelogo>img{
+            max-width: 250px;
+        }
+
+        body>table{
+            max-width: 1200px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+    }</style>
+</head>
+<body>
+<table>
+    <tr>
+        <td colspan="2" class="sitelogo">
+            ${ctx.cmsSlotContents.SiteLogo}
+        </td>
+        <td><!--company name data--></td>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.TopContent}</a>
+        </td>
+    </tr>
+    <tr>
+        <table>
+            <tr>
+                <td class="headline">
+                    $!{ctx.messages.pickSlip}
+                </td>
+                <td style="text-align:right;">
+                    <strong>$!{ctx.messages.date}</strong>$!{ctx.date}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><div class="pick-slip-border"></div></td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>$!{ctx.messages.orderId}</strong>
+                </td>
+                <td>
+                    <strong>$!{ctx.messages.orderDate}</strong>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    $!{ctx.order.code}
+                </td>
+                <td>
+                    $!{ctx.order.date}
+                </td>
+                </tr>
+            <tr>
+                <td colspan="2"><div class="pick-slip-border"></div></td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>$!{ctx.messages.shipTo} </strong><br/>
+                    $!{ctx.consignment.shippingAddress.firstname} $!{ctx.consignment.shippingAddress.lastname}
+                </td>
+                <td>
+                    <strong>$!{ctx.messages.billTo} </strong>
+                </td>
+            </tr>
+            <tr>
+                <td >
+                    $!{ctx.messages.shippingAddressLine1} <br/>
+                    $!{ctx.messages.shippingAddressLine2} <br/>
+                    $!{ctx.messages.shippingAddressCity} <br/>
+                    $!{ctx.messages.shippingAddressPostalCode} <br/>
+                    $!{ctx.messages.shippingAddressPhone} <br/>
+                </td>
+                <td>
+                    $!{ctx.consignment.shippingAddress.line1} <br/>
+                    $!{ctx.consignment.shippingAddress.line2} <br/>
+                    $!{ctx.consignment.shippingAddress.town} <br/>
+                    $!{ctx.consignment.shippingAddress.postalcode} <br/>
+                    $!{ctx.consignment.shippingAddress.phone1} <br/>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><div class="pick-slip-border"></div></td>
+            </tr>
+        </table>
+    </tr>
+    <tr>
+        <table class='data'>
+            <tr>
+                <td colspan="6" class="headline">$!{ctx.messages.customerOrder}</td>
+            </tr>
+            <tr>
+                <td colspan="6"><div class="pick-slip-border"></div></td>
+            </tr>
+            <tr>
+                <th colspan="6" class="hd1">$!{ctx.messages.shipmentDetails}</th>
+            </tr>
+            <tr>
+                <th class="hd2">$!{ctx.messages.productCount}</th>
+                <th class="hd2">$!{ctx.messages.productCode}</th>
+                <th class="hd2">$!{ctx.messages.productImage}</th>
+                <th class="hd2">$!{ctx.messages.productDescription}</th>
+                <th class="hd2">$!{ctx.messages.productBinCode}</th>
+                <th class="hd2">$!{ctx.messages.productQuantity}</th>
+            </tr>
+            <tr>
+                <td colspan="6"><div class="pick-slip-border"></div></td>
+            </tr>
+
+            #foreach( $consignmentEntry in ${ctx.consignmentEntries} )
+                <tr>
+                    <td>$foreach.count</td>
+                    <td>$!{consignmentEntry.orderEntry.product.code}</td>
+                    <td><img src="${ctx.mediaBaseUrl}$!{ctx.getProductImageURL($consignmentEntry)}" /></td>
+                    <td>$!{consignmentEntry.orderEntry.product.name}</td>
+                    <td>$!{ctx.calculateBin($consignmentEntry)}</td>
+                    <td>$!{consignmentEntry.quantityPending}</td>
+                </tr>
+            #end
+            <tr>
+                <td colspan="6"><div class="pick-slip-border"></div></td>
+            </tr>
+        </table>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.BottomContent}</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

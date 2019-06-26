@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/mvc
+		   http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="de.hybris.platform.chinesepaymentaddon" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties resource bundle as javascript variables -->
+	<bean id="defaultChinesepaymentaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="chinesepaymentaddon" />
+	</bean>
+
+	<bean id="defaultChinesepaymentaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee"
+		class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultChinesepaymentaddonJavaScriptMessageResourceAccessor" />
+	</bean>
+
+	<bean id="getChinesepaymentaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultChinesepaymentaddonBeforeViewJsPropsHandlerAdaptee" />
+		</property>
+	</bean>
+	<bean id="ChinesepaymentaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getChinesepaymentaddonBeforeViewHandler" />
+	</bean>
+
+	<bean id="chinesePaymentCheckoutStepValidator" class="de.hybris.platform.chinesepaymentaddon.checkout.steps.validation.impl.ChinesePaymentCheckoutStepValidator">
+	</bean>
+
+	<alias name="defaultSummaryCheckoutStep" alias="summaryCheckoutStep" />
+	<bean id="defaultSummaryCheckoutStep" parent="checkoutStep">
+		<property name="checkoutGroup" ref="defaultCheckoutGroup" />
+		<property name="checkoutStepValidator" ref="chineseSummaryCheckoutValidator" />
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_PAYMENT_METHOD" />
+				<entry key="current" value-ref="REDIRECT_TO_SUMMARY" />
+				<entry key="next" value="redirect:/checkout/orderConfirmation/%s" />
+			</map>
+		</property>
+		<property name="progressBarId" value="confirmOrder" />
+	</bean>
+
+	<alias name="defaultResponsiveSummaryCheckoutStep" alias="responsiveSummaryCheckoutStep" />
+	<bean id="defaultResponsiveSummaryCheckoutStep" parent="checkoutStep">
+		<property name="checkoutGroup" ref="responsiveCheckoutGroup" />
+		<property name="checkoutStepValidator" ref="chineseResponsiveSummaryCheckoutValidator" />
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_PAYMENT_METHOD" />
+				<entry key="current" value-ref="REDIRECT_TO_SUMMARY" />
+				<entry key="next" value="redirect:/checkout/orderConfirmation/%s" />
+			</map>
+		</property>
+		<property name="progressBarId" value="confirmOrder" />
+	</bean>
+
+	<alias name="chineseSummaryCheckoutValidator" alias="chineseResponsiveSummaryCheckoutValidator" />
+	<bean id="chineseSummaryCheckoutValidator" class="de.hybris.platform.chinesepaymentaddon.checkout.steps.validation.impl.ChineseSummaryCheckoutValidator"
+		parent="abstractCheckoutStepValidator" />
+
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="PaymentInfoComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="PaymentActionsComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+	
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="PayNowAction" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+	
+	<!--  Deactivate this function by this release.
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="OrderCancelAction" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+	-->
+
+	<!-- Controllers & Mappings (necessary to override controllers with the same mappings in the target storefront) -->
+	<alias alias="paymentMethodCheckoutStepController" name="chinesePaymentMethodCheckoutStepController" /> 
+	<bean id="chinesePaymentMethodCheckoutStepController" class="de.hybris.platform.chinesepaymentaddon.controllers.pages.checkout.steps.ChinesePaymentMethodCheckoutStepController" />
+	
+	<alias alias="summaryCheckoutStepController" name="chineseSummaryCheckoutStepController" /> 
+	<bean id="chineseSummaryCheckoutStepController" class="de.hybris.platform.chinesepaymentaddon.controllers.pages.checkout.steps.ChineseSummaryCheckoutStepController" />
+	
+	<alias alias="checkoutController" name="chineseOrderConfirmationController" /> 
+	<bean id="chineseOrderConfirmationController" class="de.hybris.platform.chinesepaymentaddon.controllers.pages.ChineseOrderConfirmationController" />
+	
+</beans>

@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+   	http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <!-- ATTRIBUTE CONVERTERS -->
+    <!-- Attribute to Data converters -->
+    <alias name="defaultAttributeToDataConverter" alias="cmsDefaultAttributeToDataConverter"/>
+    <bean id="defaultAttributeToDataConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.DefaultAttributeToDataConverter"/>
+
+    <alias name="defaultCMSItemAttributeToDataConverter" alias="cmsCMSItemAttributeToDataConverter"/>
+    <bean id="defaultCMSItemAttributeToDataConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.CMSItemToDataConverter">
+        <property name="cmsVersionService" ref="cmsVersionService"/>
+        <property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="typeService" ref="typeService" />
+    </bean>
+
+    <alias name="defaultItemAttributeToDataConverter" alias="cmsItemAttributeToDataConverter"/>
+    <bean id="defaultItemAttributeToDataConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.ItemToDataConverter"/>
+
+    <alias name="defaultCMSMediaContainerAttributeToDataConverter" alias="cmsMediaContainerAttributeToDataConverter"/>
+    <bean id="defaultCMSMediaContainerAttributeToDataConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.MediaContainerToDataConverter">
+        <property name="modelService" ref="modelService"/>
+        <property name="cmsVersionToDataConverter" ref="cmsVersionToDataConverter"/>
+        <property name="cmsVersionService" ref="cmsVersionService"/>
+        <property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider" />
+    </bean>
+
+    <!-- Data to Attribute converters -->
+    <alias name="defaultDataToModelConverter" alias="cmsDefaultDataToModelConverter"/>
+    <bean id="defaultDataToModelConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.DefaultDataToModelConverter"/>
+
+    <bean id="abstractPKDataToModelConverter" abstract="true"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.AbstractPKDataToModelConverter">
+        <property name="modelService" ref="modelService"/>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <alias name="defaultPKDataToModelPreviewConverter" alias="cmsPKDataToModelPreviewConverter"/>
+    <bean id="defaultPKDataToModelPreviewConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.PKDataToModelPreviewConverter"
+          parent="abstractPKDataToModelConverter">
+        <property name="cmsVersionService" ref="cmsVersionService"/>
+    </bean>
+
+    <alias name="defaultPKDataToModelRollbackConverter" alias="cmsPKDataToModelRollbackConverter"/>
+    <bean id="defaultPKDataToModelRollbackConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.PKDataToModelRollbackConverter"
+          parent="abstractPKDataToModelConverter">
+        <property name="cmsVersionService" ref="cmsVersionService"/>
+    </bean>
+
+    <alias name="defaultEnumDataToModelConverter" alias="cmsEnumDataToModelConverter"/>
+    <bean id="defaultEnumDataToModelConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.EnumDataToModelConverter">
+        <property name="enumerationService" ref="enumerationService"/>
+    </bean>
+
+    <alias name="defaultDateDataToModelConverter" alias="cmsDateDataToModelConverter"/>
+    <bean id="defaultDateDataToModelConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.DateDataToModelConverter"/>
+
+    <!-- Attribute to Data converter provider -->
+    <alias name="defaultCmsVersionAttributeToDataStrategyConverter" alias="cmsVersionAttributeToDataStrategyConverter"/>
+    <bean name="defaultCmsVersionAttributeToDataStrategyConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.VersionAttributeToDataStrategyConverterProvider">
+        <property name="attributeContentConverters" ref="cmsVersionAttributesConverterList"/>
+    </bean>
+
+    <!-- Data to Attribute converter provider -->
+    <alias name="defaultCmsVersionDataToAttributeStrategyPreviewConverter"
+           alias="cmsVersionDataToAttributeStrategyPreviewConverter"/>
+    <bean name="defaultCmsVersionDataToAttributeStrategyPreviewConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.VersionDataToAttributeStrategyConverterProvider">
+        <property name="attributeContentConverters" ref="cmsVersionDataToModelAttributesConverterPreviewList"/>
+    </bean>
+
+    <alias name="defaultCmsVersionDataToAttributeStrategyRollbackConverter"
+           alias="cmsVersionDataToAttributeStrategyRollbackConverter"/>
+    <bean name="defaultCmsVersionDataToAttributeStrategyRollbackConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.VersionDataToAttributeStrategyConverterProvider">
+        <property name="attributeContentConverters" ref="cmsVersionDataToModelAttributesRollbackConverterList"/>
+    </bean>
+
+    <!-- Custom attribute converter provider -->
+    <alias name="defaultCustomAttributeStrategyPreviewConverter" alias="customAttributeStrategyPreviewConverter"/>
+    <bean name="defaultCustomAttributeStrategyPreviewConverter"
+          class="de.hybris.platform.cms2.version.converter.customattribute.impl.DefaultCustomAttributeStrategyConverterProvider">
+        <property name="converters" ref="cmsCustomAttributeConverterPreviewList"/>
+    </bean>
+
+    <alias name="defaultCustomAttributeStrategyRollbackConverter" alias="customAttributeStrategyRollbackConverter"/>
+    <bean name="defaultCustomAttributeStrategyRollbackConverter"
+          class="de.hybris.platform.cms2.version.converter.customattribute.impl.DefaultCustomAttributeStrategyConverterProvider">
+        <property name="converters" ref="cmsCustomAttributeRollbackConverterList"/>
+    </bean>
+
+    <!-- Attribute Converter Wrappers with Predicated -->
+    <!-- Attribute to Data converter wrappers -->
+    <alias name="defaultVersionAttributeContentConverter" alias="cmsVersionAttributeContentConverter"/>
+    <bean name="defaultVersionAttributeContentConverter"
+          class="de.hybris.platform.cms2.version.converter.attribute.impl.VersionAttributeContentConverter"
+          parent="baseAttributeContentConverter"/>
+
+    <alias name="defaultAtomicTypeAttributeConverter" alias="atomicTypeAttributeConverter"/>
+    <bean name="defaultAtomicTypeAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:modelToDataConverter-ref="cmsDefaultAttributeToDataConverter"
+          p:constrainedBy-ref="atomicTypePredicate">
+    </bean>
+
+    <alias name="defaultEnumTypeAttributeConverter" alias="enumTypeAttributeConverter"/>
+    <bean name="defaultEnumTypeAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:modelToDataConverter-ref="cmsDefaultAttributeToDataConverter"
+          p:constrainedBy-ref="enumTypePredicate">
+    </bean>
+
+    <alias name="defaultItemAttributeConverter" alias="itemAttributeConverter"/>
+    <bean name="defaultItemAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:modelToDataConverter-ref="cmsItemAttributeToDataConverter"
+          p:constrainedBy-ref="nonCMSItemTypePredicate">
+    </bean>
+
+    <alias name="defaultCMSItemAttributeConverter" alias="cmsItemAttributeConverter"/>
+    <bean name="defaultCMSItemAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:modelToDataConverter-ref="cmsCMSItemAttributeToDataConverter"
+          p:constrainedBy-ref="cmsItemTypePredicate">
+    </bean>
+
+    <alias name="defaultMediaContainerTypeAttributeConverter" alias="mediaContainerTypeAttributeConverter"/>
+    <bean name="defaultMediaContainerTypeAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:modelToDataConverter-ref="cmsMediaContainerAttributeToDataConverter"
+          p:constrainedBy-ref="mediaContainerTypePredicate">
+    </bean>
+
+    <!-- Data to Attribute converter wrappers -->
+    <alias name="defaultDataAttributeConverter" alias="cmsDefaultDataAttributeConverter"/>
+    <bean name="defaultDataAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:dataToModelConverter-ref="cmsDefaultDataToModelConverter"
+          p:constrainedBy-ref="dataToModelAtomicTypePredicate">
+    </bean>
+
+    <alias name="defaultPKAttributePreviewConverter" alias="cmsPKAttributePreviewConverter"/>
+    <bean name="defaultPKAttributePreviewConverter" parent="cmsVersionAttributeContentConverter"
+          p:dataToModelConverter-ref="cmsPKDataToModelPreviewConverter"
+          p:constrainedBy-ref="dataToModelPKPredicate">
+    </bean>
+
+    <alias name="defaultPKAttributeRollbackConverter" alias="cmsPKAttributeRollbackConverter"/>
+    <bean name="defaultPKAttributeRollbackConverter" parent="cmsVersionAttributeContentConverter"
+          p:dataToModelConverter-ref="cmsPKDataToModelRollbackConverter"
+          p:constrainedBy-ref="dataToModelPKPredicate">
+    </bean>
+
+    <alias name="defaultEnumAttributeConverter" alias="cmsEnumAttributeConverter"/>
+    <bean name="defaultEnumAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:dataToModelConverter-ref="cmsEnumDataToModelConverter"
+          p:constrainedBy-ref="dataToModelEnumPredicate">
+    </bean>
+
+    <alias name="defaultDateAttributeConverter" alias="cmsDateAttributeConverter"/>
+    <bean name="defaultDateAttributeConverter" parent="cmsVersionAttributeContentConverter"
+          p:dataToModelConverter-ref="cmsDateDataToModelConverter"
+          p:constrainedBy-ref="dataToModelDatePredicate">
+    </bean>
+
+    <!-- ATTRIBUTE CONVERTER LISTS -->
+    <!-- Attribute to Data converter list -->
+    <alias name="defaultVersionAttributesConverterList" alias="cmsVersionAttributesConverterList"/>
+    <util:list id="defaultVersionAttributesConverterList">
+        <ref bean="atomicTypeAttributeConverter"/>
+        <ref bean="itemAttributeConverter"/>
+        <ref bean="cmsItemAttributeConverter"/>
+        <ref bean="enumTypeAttributeConverter"/>
+        <ref bean="mediaContainerTypeAttributeConverter"/>
+    </util:list>
+
+    <!-- Data to Attribute converter list -->
+    <alias name="defaultVersionDataToModelAttributesConverterPreviewList"
+           alias="cmsVersionDataToModelAttributesConverterPreviewList"/>
+    <util:list id="defaultVersionDataToModelAttributesConverterPreviewList">
+        <ref bean="cmsDefaultDataAttributeConverter"/>
+        <ref bean="cmsPKAttributePreviewConverter"/>
+        <ref bean="cmsEnumAttributeConverter"/>
+        <ref bean="cmsDateAttributeConverter"/>
+    </util:list>
+
+    <alias name="defaultVersionDataToModelAttributesRollbackConverterList"
+           alias="cmsVersionDataToModelAttributesRollbackConverterList"/>
+    <util:list id="defaultVersionDataToModelAttributesRollbackConverterList">
+        <ref bean="cmsDefaultDataAttributeConverter"/>
+        <ref bean="cmsPKAttributeRollbackConverter"/>
+        <ref bean="cmsEnumAttributeConverter"/>
+        <ref bean="cmsDateAttributeConverter"/>
+    </util:list>
+
+    <!-- Custom attribute converter list -->
+    <alias name="defaultCustomAttributeConverterPreviewList" alias="cmsCustomAttributeConverterPreviewList"/>
+    <util:list id="defaultCustomAttributeConverterPreviewList">
+        <ref bean="cmsContentSlotForPagePreviewConverter"/>
+    </util:list>
+    
+    <alias name="defaultCustomAttributeRollbackConverterList" alias="cmsCustomAttributeRollbackConverterList"/>
+    <util:list id="defaultCustomAttributeRollbackConverterList">
+        <ref bean="cmsContentSlotForPageRollbackConverter"/>
+    </util:list>
+
+    <!-- Custom attribute converters -->
+    <alias name="defaultContentSlotForPagePreviewConverter" alias="cmsContentSlotForPagePreviewConverter"/>
+    <bean id="defaultContentSlotForPagePreviewConverter"
+          class="de.hybris.platform.cms2.version.converter.customattribute.impl.ContentSlotsForPageConverter">
+        <property name="qualifier" value="contentSlotsForPage"/>
+        <property name="constrainedBy" ref="abstractTypePredicate"/>
+        <property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService"/>
+        <property name="cmsItemToDataConverter" ref="cmsCMSItemAttributeToDataConverter"/>
+        <property name="contentSlotRelationDataFactory" ref="contentSlotForPageRelationDataFactory"/>
+        <property name="pkDataToModelConverter" ref="cmsPKDataToModelPreviewConverter"/>
+        <property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider"/>
+    </bean>
+
+    <alias name="defaultContentSlotForPageRollbackConverter" alias="cmsContentSlotForPageRollbackConverter"/>
+    <bean id="defaultContentSlotForPageRollbackConverter"
+          class="de.hybris.platform.cms2.version.converter.customattribute.impl.ContentSlotsForPageConverter"
+          parent="cmsContentSlotForPagePreviewConverter">
+        <property name="pkDataToModelConverter" ref="cmsPKDataToModelRollbackConverter"/>
+    </bean>
+
+    <!-- Version Model to Data Converter -->
+    <alias name="defaultCMSVersionToDataConverter" alias="cmsVersionToDataConverter"/>
+    <bean id="defaultCMSVersionToDataConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.DefaultCMSVersionToDataConverter">
+        <property name="payloadSerializer" ref="defaultPayloadSerializer"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="converterProvider" ref="cmsVersionAttributeToDataStrategyConverter"/>
+        <property name="customConverterProvider" ref="customAttributeStrategyPreviewConverter"/>
+        <property name="collectionHelper" ref="cmsCollectionHelper"/>
+        <property name="cmsVersionHelper" ref="cmsVersionHelper"/>
+        <property name="isCollectionPredicate" ref="isCollectionPredicate" />
+    </bean>
+
+    <!-- Version Data to Model Preview Converter -->
+    <alias name="defaultCMSVersionToItemModelPreviewConverter" alias="cmsVersionToItemModelPreviewConverter"/>
+    <bean id="defaultCMSVersionToItemModelPreviewConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.DefaultCMSVersionToItemModelPreviewConverter">
+        <property name="payloadDeserializer" ref="payloadDeserializer"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="cmsVersionSessionContextProvider" ref="cmsVersionSessionContextProvider"/>
+        <property name="cmsVersionToItemModelPopulator" ref="cmsVersionToItemModelPreviewPopulator"/>
+    </bean>
+    
+    <alias name="defaultCMSVersionToItemModelRollbackConverter" alias="cmsVersionToItemModelRollbackConverter"/>
+    <bean id="defaultCMSVersionToItemModelRollbackConverter"
+          class="de.hybris.platform.cms2.version.converter.impl.DefaultCMSVersionToItemModelRollbackConverter"
+          parent="cmsVersionToItemModelPreviewConverter">
+        <property name="itemService" ref="itemService"/>
+        <property name="cmsVersionToItemModelPopulator" ref="cmsVersionToItemModelRollbackPopulator"/>
+        <property name="cmsItemRollbackStrategyConverterProvider" ref="cmsItemRollbackStrategyConverterProvider" />
+    </bean>
+
+    <!-- Custom Rollback Item Converters -->
+    <alias name="defaultItemRollbackStrategyConverterProvider" alias="cmsItemRollbackStrategyConverterProvider" />
+    <bean id="defaultItemRollbackStrategyConverterProvider"
+          class="de.hybris.platform.cms2.version.converter.rollback.impl.DefaultItemRollbackStrategyConverterProvider">
+        <property name="cmsItemRollbackConverters" ref="cmsItemRollbackConverters" />
+    </bean>
+
+    <alias name="defaultItemRollbackConverters" alias="cmsItemRollbackConverters"/>
+    <util:list id="defaultItemRollbackConverters">
+        <ref bean="cmsComponentRollbackConverter"/>
+    </util:list>
+
+    <alias name="componentRollbackConverter" alias="cmsComponentRollbackConverter"/>
+    <bean id="componentRollbackConverter" class="de.hybris.platform.cms2.version.converter.rollback.impl.ComponentRollbackConverter">
+        <property name="modelService" ref="modelService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="constrainedBy" ref="cmsComponentPredicate" />
+        <property name="cmsVersionService" ref="cmsVersionService"/>
+        <property name="cmsComponentService" ref="cmsComponentService"/>
+        <property name="cmsItemCloningService" ref="cmsItemCloningService"/>
+        <property name="cmsPageService" ref="cmsPageService"/>
+    </bean>
+
+
+    <!-- Version to Model Populator -->
+    <alias name="defaultCMSVersionToItemModelPreviewPopulator" alias="cmsVersionToItemModelPreviewPopulator"/>
+    <bean id="defaultCMSVersionToItemModelPreviewPopulator"
+          class="de.hybris.platform.cms2.version.populator.CMSVersionToItemModelPopulator">
+        <property name="modelService" ref="modelService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="collectionHelper" ref="cmsCollectionHelper"/>
+        <property name="customConverterProvider" ref="customAttributeStrategyPreviewConverter"/>
+        <property name="cmsVersionHelper" ref="cmsVersionHelper"/>
+        <property name="converterProvider" ref="cmsVersionDataToAttributeStrategyPreviewConverter"/>
+        <property name="isCollectionPredicate" ref="isCollectionPredicate"/>
+    </bean>
+
+    <alias name="defaultCMSVersionToItemModelRollbackPopulator" alias="cmsVersionToItemModelRollbackPopulator"/>
+    <bean id="defaultCMSVersionToItemModelRollbackPopulator"
+          class="de.hybris.platform.cms2.version.populator.CMSVersionToItemModelPopulator"
+          parent="cmsVersionToItemModelPreviewPopulator">
+        <property name="customConverterProvider" ref="customAttributeStrategyRollbackConverter"/>
+        <property name="converterProvider" ref="cmsVersionDataToAttributeStrategyRollbackConverter"/>
+    </bean>
+
+</beans>

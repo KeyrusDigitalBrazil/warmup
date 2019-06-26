@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+	
+	<alias name="defaultNotificationService" alias="notificationService" />
+	<bean id="defaultNotificationService" class="de.hybris.platform.notificationservices.service.impl.DefaultNotificationService">
+		<property name="processorRegistry" ref="processorRegistry" />
+		<property name="notificationLanguageStrategyMap" ref="notificationLanguageStrategyMap" />
+		<property name="notificationChannelStrategyMap" ref="notificationChannelStrategies" />
+	</bean>
+	
+	<alias name="defaultNotifyCustomerDao" alias="notifyCustomerDao" />
+	<bean id="defaultNotifyCustomerDao" class="de.hybris.platform.notificationservices.dao.impl.DefaultNotifyCustomerDao">
+	</bean>
+
+    <alias name="defaultProcessorRegistry" alias="processorRegistry" />
+	<bean id="defaultProcessorRegistry" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistry" />	
+
+	<alias name="defaultSMSNotificationChannelStrategy" alias="smsNotificationChannelStrategy"/>
+	<bean id="defaultSMSNotificationChannelStrategy" class="de.hybris.platform.notificationservices.service.strategies.impl.DefaultSmsNotificationChannelStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<alias name="defaultSendSmsMessageStrategy" alias="sendSmsMessageStrategy"/>
+	<bean id="defaultSendSmsMessageStrategy" class="de.hybris.platform.notificationservices.strategies.impl.DefaultSendSmsMessageStrategy">
+	</bean>
+	
+	<alias name="defaultSMSChannelStrategy" alias="smsChannelStrategy"/>
+	<bean id="defaultSMSChannelStrategy" class="de.hybris.platform.notificationservices.service.strategies.impl.DefaultSmsChannelStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<alias name="defaultEmailChannelStrategy" alias="emailChannelStrategy"/>
+	<bean id="defaultEmailChannelStrategy" class="de.hybris.platform.notificationservices.service.strategies.impl.DefaultEmailChannelStrategy">		
+	</bean>
+	
+	<alias name="defaultEmailNotificationLanguageStrategy" alias="emailNotificationLanguageStrategy"/>
+	<bean id="defaultEmailNotificationLanguageStrategy" class="de.hybris.platform.notificationservices.service.strategies.impl.DefaultEmailNotificationLanguageStrategy">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<alias name="defaultNotificationLanguageStrategyMap"  alias="notificationLanguageStrategyMap"/>
+    <util:map id="defaultNotificationLanguageStrategyMap" map-class="java.util.HashMap" value-type="de.hybris.platform.notificationservices.service.strategies.NotificationLanguageStrategy">
+        <entry key="EMAIL" value-ref="emailNotificationLanguageStrategy"/>
+    </util:map>
+    
+    <alias name="defaultSiteMessageDao" alias="siteMessageDao"/>
+    <bean id="defaultSiteMessageDao" class="de.hybris.platform.notificationservices.dao.impl.DefaultSiteMessageDao">
+    	<property name="paginatedFlexibleSearchService" ref="paginatedFlexibleSearchService"/>
+    	<property name="siteMessageSortCodeToQueryAlias" ref="siteMessageSortCodeToQueryAlias"/>
+    </bean>
+    
+    <alias name="defaultSiteMessageService" alias="siteMessageService"/>
+    <bean id="defaultSiteMessageService" class="de.hybris.platform.notificationservices.service.impl.DefaultSiteMessageService">
+    	<property name="siteMessageDao" ref="siteMessageDao"/>
+    	<property name="modelService" ref="modelService"/>
+    	<property name="i18nService" ref="i18nService"/>
+    	<property name="siteMessageUidGenerator" ref="siteMessageUidGenerator"/>
+    	<property name="siteMessageContentFormatters" ref="siteMessageContentFormatters"/>
+    </bean>
+    
+    <util:map id="siteMessageSortCodeToQueryAlias">
+		<entry key="sentdate" value="smc"/>
+	</util:map>
+	
+    <bean id="siteMessageUidGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="site_message_uid" />
+		<property name="digits" value="11" />
+		<property name="start" value="000" />
+    </bean>
+    
+    <alias name="defaultSendSiteMessageStrategy" alias="sendSiteMessageStrategy"/>
+    <bean id="defaultSendSiteMessageStrategy" class="de.hybris.platform.notificationservices.strategies.impl.DefaultSendSiteMessageStrategy">
+    	<property name="modelService" ref="modelService"/>
+    </bean>
+    
+    <util:map id="sendSiteMessageStrategies" key-type="de.hybris.platform.notificationservices.enums.SiteMessageType" value-type="de.hybris.platform.notificationservices.strategies.SendSiteMessageStrategy" map-class="java.util.HashMap">
+    	<entry key="SYSTEM" value-ref="sendSiteMessageStrategy"/>
+    </util:map>
+    
+    <alias name="defaultSiteMessageContentFormatter" alias="siteMessageContentFormatter"/>
+    <bean id="defaultSiteMessageContentFormatter" class="de.hybris.platform.notificationservices.formatters.impl.DefaultSiteMessageContentFormatter"/>
+    
+    <util:map id="siteMessageContentFormatters" key-type="de.hybris.platform.notificationservices.enums.SiteMessageType" value-type="de.hybris.platform.notificationservices.formatters.SiteMessageContentFormatter" map-class="java.util.HashMap">
+    	<entry key="SYSTEM" value-ref="siteMessageContentFormatter"/>
+    </util:map>
+    
+    <util:map id="notificationChannelStrategies" key-type="de.hybris.platform.notificationservices.enums.NotificationChannel" value-type="de.hybris.platform.notificationservices.service.strategies.NotificationChannelStrategy" map-class="java.util.HashMap">
+    	<entry key="SMS" value-ref="smsChannelStrategy"/>
+    	<entry key="EMAIL" value-ref="emailChannelStrategy"/>  	
+    </util:map>
+    	
+	<util:list id="customerSettingsChangedHooks"
+				  value-type="de.hybris.platform.notificationservices.service.hooks.CustomerSettingsChangedHook">
+	</util:list>
+	
+    <bean id="siteMessageCleanupHook" class="de.hybris.platform.notificationservices.retention.hook.SiteMessageCleanupHook">
+    	<property name="modelService" ref="modelService"/>
+    	<property name="siteMessageService" ref="siteMessageService"/>
+    </bean>
+    
+    <bean id="siteMessageCleanupHookListMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective" >
+        <property name="add" ref="siteMessageCleanupHook" />
+    </bean>
+    
+</beans>

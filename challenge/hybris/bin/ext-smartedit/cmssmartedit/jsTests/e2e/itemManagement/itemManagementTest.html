@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <!--this should really just use a customView??? -->
+    <script src="/smartedit-build/webroot/static-resources/dist/smartedit/js/thirdparties.js"></script>
+    <script src="/smartedit-build/webroot/static-resources/thirdparties/ckeditor/ckeditor.js"></script>
+    <link rel="stylesheet" href="/smartedit-build/webroot/static-resources/dist/smartedit/css/outer-styling.css">
+    <script src="/smartedit-build/webroot/static-resources/smarteditloader/js/smarteditloader.js"></script>
+    <script src="/smartedit-build/webroot/static-resources/smarteditcontainer/js/smarteditcontainer.js"></script>
+
+    <script src="/web/webroot/cmssmartedit/js/cmssmarteditContainer.js"></script>
+
+    <!-- mocks -->
+    <script src="outerMocks.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body data-ng-app="cmssmarteditContainer">
+    <div data-ng-controller="testController as $ctrl">
+        <div style="text-align: center; width: 40%; margin: auto">
+            <div>
+                <div>
+                    <h2>Component input options</h2>
+                </div>
+                <div class="btn-group">
+                    <label data-ng-class="{ 'btn': true, 'btn-primary': $ctrl.mode === 'add' }" data-ng-click="$ctrl.modeChanged('add')">Add</label>
+                    <label data-ng-class="{ 'btn': true, 'btn-primary': $ctrl.mode === 'edit' }" data-ng-click="$ctrl.modeChanged('edit')">Edit</label>
+                    <label data-ng-class="{ 'btn': true, 'btn-primary': $ctrl.mode === 'create' }" data-ng-click="$ctrl.modeChanged('create')">Create</label>
+                </div>
+                <div><br /></div>
+            </div>
+            <h2>Component being tested</h2>
+            <div style="border: solid; padding: 1em; margin: 1em">
+                <div style="text-align: left" data-ng-if="$ctrl.visible">
+                    <item-manager data-item="$ctrl.restriction"
+                                         data-submit-function="$ctrl.submitCallback"
+                                         data-mode="$ctrl.mode"
+                                         data-structure-api="$ctrl.structureApi"
+                                         data-content-api="$ctrl.contentApi"
+                                         data-uri-context="$ctrl.uriContext"
+                                         data-is-dirty="$ctrl.isDirty"
+                    />
+                </div>
+            </div>
+            <div>
+                <button data-ng-class="{ 'btn': true, 'btn-primary': $ctrl.submitEnabled }" data-ng-disabled="!$ctrl.submitEnabled()" data-ng-click="$ctrl.submit()">Submit</button>
+                <div>
+                    <h2>Output of component</h2>
+                </div>
+                <div><br /></div>
+                <div>Result: {{ $ctrl.result }}</div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+</html>

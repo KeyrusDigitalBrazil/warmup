@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+	<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        
+	<!-- register the customer interceptor to trigger the sap consumer export -->
+	<bean id="sapCustomerInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultCustomerInterceptor" />
+		<property name="typeCode" value="Customer" />
+		<property name="order" value="5000" />
+	</bean>
+
+	<!-- interceptor to trigger the export after changing the default address -->
+	<bean id="defaultCustomerInterceptor" class="com.sap.hybris.sapcustomerb2c.outbound.DefaultCustomerInterceptor" autowire="byName">
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+		<property name="customerExportService" ref="customerExportService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>
+
+	<!-- register an address interceptor to trigger the sap consumer export -->
+	<bean id="sapAddressInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="defaultAddressInterceptor" />
+		<property name="typeCode" value="Address" />
+		<property name="order" value="5000" />
+	</bean>
+
+	<!-- interceptor to trigger the export after changing the default address -->
+	<bean id="defaultAddressInterceptor" class="com.sap.hybris.sapcustomerb2c.outbound.DefaultAddressInterceptor" autowire="byName">
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+		<property name="customerExportService" ref="customerExportService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>
+
+	<!-- Customer Import -->
+	<alias alias="customerImportService" name="defaultCustomerImportService" />
+	<bean id="defaultCustomerImportService" class="com.sap.hybris.sapcustomerb2c.inbound.CustomerImportService">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="eventService" ref="eventService" />
+	</bean>
+
+	<!-- Customer Export -->
+	<alias alias="customerExportService" name="defaultCustomerExportService" />
+	<bean id="defaultCustomerExportService" class="com.sap.hybris.sapcustomerb2c.outbound.CustomerExportService">
+		<property name="dataHubOutboundService" ref="dataHubOutboundService" />
+		<property name="customerNameStrategy" ref="customerNameStrategy" />
+		<property name="feed" value="${sapcustomerexchange.outbound.datahub.feed}" />
+		<property name="sapCoreSAPGlobalConfigurationService" ref="sapCoreSAPGlobalConfigurationService" />
+		<property name="batchIdAttributes">
+			<map key-type="java.lang.String">
+				<entry key="dh_batchId" value="${sapcustomerexchange.outbound.batchid:000001}" />
+				<entry key="dh_sourceId" value="${sapcustomerexchange.outbound.sourceid:HYBRIS}" />
+				<entry key="dh_type" value="${sapcustomerexchange.outbound.idoctype:DEBMAS_ADRMAS}" />
+			</map>
+		</property>
+	</bean>
+
+	<!-- catch register event -->
+	<alias alias="customerRegistrationEventListener" name="defaultCustomerRegistrationEventListener" />
+	<bean id="defaultCustomerRegistrationEventListener" class="com.sap.hybris.sapcustomerb2c.outbound.CustomerRegistrationEventListener">
+		<property name="modelService" ref="modelService" />
+		<property name="sapCoreSAPGlobalConfigurationService" ref="sapCoreSAPGlobalConfigurationService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="clusterService" ref="clusterService" />
+		<property name="tenantService" ref="tenantService" />
+	</bean>
+
+	<!-- register customer publish process -->
+	<alias alias="customerPublishProcess" name="defaultCustomerPublishProcess" />
+	<bean id="defaultCustomerPublishProcess" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/sapcustomerb2c/outbound/CustomerPublishProcess.xml" />
+	</bean>
+
+	<!-- action to trigger the sap consumer -->
+	<alias alias="customerPublishAction" name="defaultCustomerPublishAction" />
+	<bean id="defaultCustomerPublishAction" class="com.sap.hybris.sapcustomerb2c.outbound.CustomerPublishAction" parent="abstractAction">
+		<property name="sendCustomerToDataHub" ref="customerExportService" />
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+		<property name="customerAccountService" ref="customerAccountService" />
+	</bean>
+
+	<!-- enhancement of the customer model to set the sap contact ID -->
+	<alias alias="customerAccountService" name="defaultB2CSapCustomerAccountService" />
+	<bean id="defaultB2CSapCustomerAccountService" class="com.sap.hybris.sapcustomerb2c.outbound.DefaultB2CSapCustomerAccountService"
+		parent="defaultCustomerAccountService">
+		<property name="sapCustomerIdGenerator" ref="sapCustomerIdGenerator"></property>
+		<property name="sapContactIdGenerator" ref="sapContactIdGenerator"></property>
+	</bean>
+
+	<!-- key generator for the sap customer ID -->
+	<bean id="sapCustomerIdGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="sap_customer_id" />
+		<property name="digits" value="${keygen.customer.sap_customer_id.digits}" />
+		<property name="start" value="${keygen.customer.sap_customer_id.start}" />
+		<property name="type" value="${keygen.customer.sap_customer_id.type}" />
+		<property name="template" value="${keygen.customer.sap_customer_id.template}" />
+	</bean>
+
+	<!-- key generator for the sap contact ID -->
+	<bean id="sapContactIdGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="sap_contact_id" />
+		<property name="digits" value="${keygen.customer.sap_contact_id.digits}" />
+		<property name="start" value="${keygen.customer.sap_contact_id.start}" />
+		<property name="type" value="${keygen.customer.sap_contact_id.type}" />
+		<property name="template" value="${keygen.customer.sap_contact_id.template}" />
+	</bean>
+
+</beans>

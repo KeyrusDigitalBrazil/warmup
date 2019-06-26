@@ -1,0 +1,29 @@
+<ui-select id="{{ySelect.id}}-selector"
+    multiple
+    sortable="true"
+    theme="<%= theme %>"
+    data-ng-model="ySelect.model"
+    style="width:100%"
+    data-ng-change="ySelect.internalOnChange()"
+    ng-disabled="ySelect.isReadOnly"
+    reset-search-input="ySelect.resetSearchInput"
+    on-remove="ySelect.internalOnRemove($item, $model)"
+    on-select="ySelect.internalOnSelect($item, $model)"
+    data-ng-init="ySelect.internalInit($select)"
+    data-ng-keyup="ySelect.internalKeyup($event, $select.search)"
+    class="se-generic-editor-dropdown"
+    data-ng-class="{'se-generic-editor-dropdown__paged':ySelect.requiresPaginatedStyling(), 'has-error': ySelect.hasError(), 'has-warning': ySelect.hasWarning()}">
+    <ui-select-match class="se-generic-editor-dropdown__match se-generic-editor-multiple-dropdown__match"
+        placeholder="{{ySelect.placeholder || 'se.genericeditor.sedropdown.placeholder' | translate}}">
+        <item-printer id="{{ySelect.id}}-selected"
+            data-model="$item"
+            data-template-url="ySelect.itemTemplate"
+            class=""
+            data-ng-class="{'se-generic-editor-dropdown__item-printer':ySelect.hasControls()}"> </item-printer>
+    </ui-select-match>
+    <ui-select-choices id="{{ySelect.id}}-list"
+        "<%= filtering %>"
+        position="down">
+        <div data-ng-include="ySelect.itemTemplate"></div>
+    </ui-select-choices>
+</ui-select>

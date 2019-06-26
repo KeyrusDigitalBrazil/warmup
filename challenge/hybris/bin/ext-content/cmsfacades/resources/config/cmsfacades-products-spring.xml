@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<alias name="defaultCmsProductSearchFacade" alias="cmsProductSearchFacade" />
+	<bean id="defaultCmsProductSearchFacade" class="de.hybris.platform.cmsfacades.products.impl.DefaultProductSearchFacade">
+		<property name="productService" ref="productService" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="productDataConverter" ref="cmsProductDataConverter" />
+		<property name="categoryDataConverter" ref="cmsCategoryDataConverter" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="productCategorySearchService" ref="cmsProductCategorySearchService" />
+		<property name="productSearchService" ref="cmsProductSearchService" />
+	</bean>
+
+	<alias name="defaultCmsProductCategorySearchService" alias="cmsProductCategorySearchService" />
+	<bean id="defaultCmsProductCategorySearchService" class="de.hybris.platform.cmsfacades.products.service.impl.DefaultProductCategorySearchService">
+		<property name="namedQueryService" ref="flexibleSearchNamedQueryService" />
+	</bean>
+
+	<alias name="defaultNamedQueryServiceCmsProductSearchService" alias="cmsProductSearchService" />
+	<bean id="defaultNamedQueryServiceCmsProductSearchService" class="de.hybris.platform.cmsfacades.products.service.impl.DefaultNamedQueryServiceProductSearchService">
+		<property name="namedQueryService" ref="flexibleSearchNamedQueryService" />
+	</bean>
+
+	<!-- converters -->
+
+	<alias name="defaultCmsProductDataConverter" alias="cmsProductDataConverter" />
+	<bean id="defaultCmsProductDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ProductData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsProductDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsCategoryDataConverter" alias="cmsCategoryDataConverter" />
+	<bean id="defaultCmsCategoryDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CategoryData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsCategoryDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Product Catalog Localized Populator -->
+	<alias name="defaultCmsProductCatalogLocalizedPopulator" alias="cmsProductCatalogLocalizedPopulator"/>
+	<bean id="defaultCmsProductCatalogLocalizedPopulator" parent="cmsLocalizedPopulator">
+		<property name="languageFacade" ref="catalogVersionCentricLanguageFacade" />
+	</bean>
+	
+	<!-- populators -->
+	<alias name="defaultCmsProductDataPopulator" alias="cmsProductDataPopulator" />
+	<bean id="defaultCmsProductDataPopulator" class="de.hybris.platform.cmsfacades.products.populator.ProductDataPopulator">
+		<property name="localizedPopulator" ref="cmsProductCatalogLocalizedPopulator"/>
+	</bean>
+
+	<alias name="defaultCmsCategoryDataPopulator" alias="cmsCategoryDataPopulator" />
+	<bean id="defaultCmsCategoryDataPopulator" class="de.hybris.platform.cmsfacades.products.populator.CategoryDataPopulator">
+		<property name="localizedPopulator" ref="cmsProductCatalogLocalizedPopulator"/>
+	</bean>
+
+</beans>

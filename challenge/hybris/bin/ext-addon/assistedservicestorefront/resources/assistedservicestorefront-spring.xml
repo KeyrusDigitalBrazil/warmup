@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/context 
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+	
+	<bean id="assistedservicestorefrontCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2C</value>
+				<value>B2B</value>
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class=" de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false" />
+				<property name="baseExtensionName" value="assistedservicestorefront" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="assistedservicestorefrontSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener">
+		<property name="extensionName" value="assistedservicestorefront" />
+	</bean>
+
+ 	<!-- *** Restriction Evaluators *** -->
+	<bean id="assistedServiceSessionRestrictionEvaluator" class="de.hybris.platform.assistedservicestorefront.restrictions.AssistedServiceSessionRestrictionEvaluator"
+		scope="tenant">
+		<property name="defaultAssistedServiceFacade" ref="assistedServiceFacade" />
+	</bean>
+
+	<bean id="asmCMSUserGroupRestrictionEvaluator" class="de.hybris.platform.assistedservicestorefront.restrictions.ASMCMSUserGroupRestrictionEvaluator"
+          scope="tenant">
+        <property name="userService" ref="userService" />
+        <property name="sessionService" ref="sessionService"/>
+    </bean>	
+
+	<!-- *** Restriction Evaluator Mappings *** -->
+
+	<bean id="assistedServiceSessionRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+		scope="tenant">
+		<property name="restrictionTypeCode" value="AssistedServiceSessionRestriction" />
+		<property name="restrictionEvaluator" ref="assistedServiceSessionRestrictionEvaluator" />
+	</bean>
+
+	<bean id="asmCMSUserGroupRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping"
+          scope="tenant">
+        <property name="restrictionTypeCode" value="ASMCMSUserGroupRestriction" />
+        <property name="restrictionEvaluator" ref="asmCMSUserGroupRestrictionEvaluator" />
+    </bean>
+	
+	<alias name="defaultAssistedServiceRedirectStrategy" alias="assistedServiceRedirectStrategy"/>
+	<bean id="defaultAssistedServiceRedirectStrategy" class="de.hybris.platform.assistedservicestorefront.redirect.impl.DefaultAssistedServiceRedirectStrategy">
+		<property name="cartService" ref="cartService" />
+		<property name="userService" ref="userService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="assistedServiceService" ref="assistedServiceService" />
+	</bean>
+	
+	<bean id="assistedServicePathRestriction" abstract="true" class="de.hybris.platform.assistedservicestorefront.restrictions.AssistedServicePathRestriction">
+		<property name="userService" ref="userService" />
+		<property name="assistedServiceFacade" ref="assistedServiceFacade"/>
+	</bean>
+	
+	<alias name="defaultAsmSalesGroupRestrictedPathsList" alias="asmSalesGroupRestrictedPathsList" />
+	<util:list id="defaultAsmSalesGroupRestrictedPathsList" value-type="java.lang.String">
+		<value>/checkout/multi/summary/placeOrder</value>
+	</util:list>
+	
+	<alias name="defaultAsmAllAgentsRestrictedPathsList" alias="asmAllAgentsRestrictedPathsList" />
+	<util:list id="defaultAsmAllAgentsRestrictedPathsList" value-type="java.lang.String">
+		<value>/my-account/add-support-ticket</value>
+		<value>POST:/my-account/support-ticket/**</value>
+	</util:list>
+	
+	<bean id="assistedServiceSalesGroupPathRestriction" parent="assistedServicePathRestriction" class="de.hybris.platform.assistedservicestorefront.restrictions.AssistedServiceSalesGroupPathRestriction">
+		<property name="paths" ref="asmSalesGroupRestrictedPathsList" />
+	</bean>
+	
+	<bean id="assistedServiceAllAgentsPathRestriction" parent="assistedServicePathRestriction" class="de.hybris.platform.assistedservicestorefront.restrictions.AssitedServiceAllAgentsPathRestriction">
+		<property name="paths" ref="asmAllAgentsRestrictedPathsList" />
+	</bean>
+	
+	<alias name="defaultAssistedServicePathRestrictionsList" alias="assistedServicePathRestrictionsList" />
+	<util:list id="defaultAssistedServicePathRestrictionsList">
+		<ref bean="assistedServiceSalesGroupPathRestriction"/>
+		<ref bean="assistedServiceAllAgentsPathRestriction"/>
+	</util:list>
+	
+	<bean id="assistedServicePathRestrictionEvaluator" class="de.hybris.platform.assistedservicestorefront.restrictions.AssistedServicePathRestrictionEvaluator">
+		<property name="restrictions" ref="assistedServicePathRestrictionsList"/>
+	</bean>
+
+	<!-- AIF Fragments and Sections -->
+
+	<!-- Heading Fragment -->
+	<bean id="headingFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="headingFragment"/>
+	</bean>
+
+	<bean id="defaultCustomer360HeadingProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="headingFragment"/>
+		<property name="value" ref="headingModelProvider" />
+	</bean>
+
+	<alias name="deafultHeadingModelProvider" alias="headingModelProvider"/>
+	<bean id="deafultHeadingModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.HeadingDataProvider">
+		<property name="orderFacade" ref="orderFacade"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="ticketService" ref="ticketService"/>
+		<property name="ticketBusinessService" ref="ticketBusinessService"/>
+		<property name="userService" ref="userService"/>
+		<property name="cartFacade" ref="cartFacade"/>
+		<property name="addressConverter" ref="addressConverter" />
+		<property name="imageConverter" ref="imageConverter" />
+	</bean>
+
+
+	<!-- <Customer Overview Section>  -->
+
+	<bean id="customerOverviewSection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.customer_overview"/>
+		<property name="id" value="customerOverviewSection"/>
+		<property name="fragments" ref="customerOverviewFragments"/>
+		<property name="priority" value="10"/>
+	</bean>
+
+	<util:list id="customerOverviewFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="customerSummaryFragment"/>
+		<ref bean="customerColorsFragment" />
+		<ref bean="customerCartFragment"/>
+		<ref bean="customerSavedCartFragment" />
+	</util:list>
+
+	<bean id="customerSummaryFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="customerSummaryFragment"/>
+		<property name="priority" value="10"/>
+	</bean>
+
+	<bean id="customerColorsFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="customerColorsFragment" />
+		<property name="priority" value="20"/>
+	</bean>
+
+	<bean id="customerCartFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="customerCartFragment"/>
+		<property name="priority" value="30"/>
+	</bean>
+
+	<bean id="customerSavedCartFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="customerSavedCartFragment"/>
+		<property name="priority" value="40"/>
+		<property name="properties">
+			<map>
+				<entry key="listSize" value="6"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="defaultCustomerSummaryDetailsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerSummaryFragment"/>
+		<property name="value" ref="customerOverviewDataProvider" />
+	</bean>
+	
+	<bean id="defaultCustomer360CustomerCartProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerCartFragment"/>
+		<property name="value" ref="customerCartModelProvider" />
+	</bean>
+
+	<bean id="defaultCustomer360CustomerOverviewSectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+		<property name="add" ref="customerOverviewSection" />
+	</bean>
+
+	<alias name="defaultCustomer360CustomerOverviewDataPopulator" alias="customerOverviewDataPopulator"/>
+	<bean id="defaultCustomer360CustomerOverviewDataPopulator" class="de.hybris.platform.assistedservicestorefront.customer360.populators.CustomerOverviewDataPopulator">
+		<property name="addressConverter" ref="addressConverter" />
+		<property name="imageConverter" ref="imageConverter" />
+	</bean>
+	
+	<alias name="defaultCustomer360CustomerOverviewDataConverter" alias="customerOverviewDataConverter"/>
+	<bean id="defaultCustomer360CustomerOverviewDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicestorefront.customer360.CustomerOverviewData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerOverviewDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCustomerOverviewDataProvider" alias="customerOverviewDataProvider"/>
+	<bean id="defaultCustomerOverviewDataProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.CustomerOverviewDataProvider">
+		<property name="userService" ref="userService" />
+		<property name="customerOverviewDataConverter" ref="customerOverviewDataConverter" />
+	</bean>
+	
+	<bean id="defaultCustomer360ColorsProviderMap" depends-on="customer360ModelProvidersMap"
+		parent="mapMergeDirective">
+		<property name="key" value="customerColorsFragment" />
+		<property name="value" ref="customerColorsModelProvider" />
+	</bean>
+	
+    <alias name="defaultCustomerColorsModelProvider" alias="customerColorsModelProvider" />
+	<bean id="defaultCustomerColorsModelProvider"
+		class="de.hybris.platform.assistedservicestorefront.customer360.provider.CustomerFavoriteColorsProvider">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="defaultCustomer360CustomerSavedCartProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerSavedCartFragment"/>
+		<property name="value" ref="customerSavedCartModelProvider" />
+	</bean>
+
+	<alias name="defaultCustomerSavedCartModelProvider" alias="customerSavedCartModelProvider" />
+	<bean id="defaultCustomerSavedCartModelProvider"
+		  class="de.hybris.platform.assistedservicestorefront.customer360.provider.CustomerSavedCartModelProvider">
+		<property name="userService" ref="userService" />
+		<property name="saveCartFacade" ref="saveCartFacade" />
+	</bean>
+
+	<!-- </Customer Overview Section>  -->
+
+	<!-- <Customer Profile Section>  -->
+	<bean id="customerProfileSection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.customer_profile"/>
+		<property name="id" value="customerProfileSection"/>
+		<property name="fragments" ref="customerProfileFragments"/>
+		<property name="priority" value="20"/>
+	</bean>
+	
+	<bean id="defaultCustomer360CustomerDetailsSectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+        <property name="add" ref="customerProfileSection" />
+    </bean>
+
+	<util:list id="customerProfileFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="customerProfileFragment"/>
+	</util:list>
+
+	<bean id="customerProfileFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="customerProfileFragment"/>
+		<property name="priority" value="10"/>
+	</bean>
+
+	<bean id="defaultCustomer360CustomerDetailsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerProfileFragment"/>
+		<property name="value" ref="customerProfileDataProvider" />
+	</bean>
+	
+	<alias name="defaultCustomer360CustomerProfileDataPopulator" alias="customerProfileDataPopulator"/>
+	<bean id="defaultCustomer360CustomerProfileDataPopulator" class="de.hybris.platform.assistedservicestorefront.customer360.populators.CustomerProfileDataPopulator">
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="creditCardPaymentInfoConverter" ref="creditCardPaymentInfoConverter" />
+		<property name="paymentMethodsListSize" value="${assistedservicestorefront.aif.profile.savedPaymentMethodsSize:3}" />
+		<property name="addressConverter" ref="addressConverter" />
+	</bean>
+	
+	<alias name="defaultCustomer360CustomerProfileDataConverter" alias="customerProfileDataConverter"/>
+	<bean id="defaultCustomer360CustomerProfileDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicestorefront.customer360.CustomerProfileData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerProfileDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCustomerProfileDataProvider" alias="customerProfileDataProvider"/>
+	<bean id="defaultCustomerProfileDataProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.CustomerProfileDataProvider">
+		<property name="userService" ref="userService" />
+		<property name="customerProfileDataConverter" ref="customerProfileDataConverter" />
+	</bean>
+
+	<!-- </Customer Profile Section>  -->
+
+
+	<!-- <Activity Section>  -->
+	<bean id="activitySection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.activity"/>
+		<property name="id" value="activitySection"/>
+		<property name="fragments" ref="activitySectionFragments"/>
+		<property name="priority" value="30"/>
+	</bean>
+	
+    <bean id="defaultCustomer360CustomerActivitySectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+        <property name="add" ref="activitySection" />
+    </bean>
+    
+	<util:list id="activitySectionFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="generalActivityFragment"/>
+	</util:list>
+
+	<bean id="generalActivityFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="generalActivityFragment"/>
+		<property name="priority" value="10"/>
+	</bean>
+	
+	<bean id="defaultCustomer360CustomerActivityProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="generalActivityFragment"/>
+		<property name="value" ref="generalActivityModelProvider" />
+	</bean>
+
+	<alias name="defaultGeneralActivityModelProvider" alias="generalActivityModelProvider"/>
+	<bean id="defaultGeneralActivityModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.GeneralActivityModelProvider" parent="defaultTicketsModelProvider">
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="commerceSaveCartService" ref="commerceSaveCartService"/>
+	</bean>
+
+	<alias name="defaultTicketsModelProvider" alias="ticketsModelProvider"/>
+	<bean id="defaultTicketsModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.TicketsModelProvider">
+		<property name="userService" ref="userService"/>
+		<property name="ticketService" ref="ticketService"/>
+		<property name="ticketConverter" ref="generalActivityTicketConverter" />
+	</bean>
+
+	<alias name="defaultCustomerCartModelProvider" alias="customerCartModelProvider" />
+	<bean id="defaultCustomerCartModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.CustomerCartModelProvider">
+		<property name="cartFacade" ref="cartFacade"/>
+	</bean>
+
+	<!-- </Activity Details Section>  -->
+
+	<!-- <Feedback Section> -->
+
+	<bean id="feedbackSection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.feedback"/>
+		<property name="id" value="feedbackSection"/>
+		<property name="fragments" ref="feedbackSectionFragments"/>
+		<property name="priority" value="40"/>
+	</bean>
+
+	<util:list id="feedbackSectionFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="ticketsFragment"/>
+		<ref bean="reviewFragment"/>
+	</util:list>
+
+	<bean id="ticketsFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="ticketsFragment"/>
+		<property name="priority" value="10"/>
+		<property name="properties">
+			<map>
+				<entry key="listSize" value="5"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="reviewFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="reviewFragment"/>
+		<property name="priority" value="20"/>
+		<property name="properties">
+			<map>
+				<entry key="listSize" value="10"/>
+			</map>
+		</property>
+	</bean>
+	
+	<alias name="defaultGeneralActivityTicketPopulator" alias="generalActivityTicketPopulator"/>
+	<bean id="defaultGeneralActivityTicketPopulator" class="de.hybris.platform.assistedservicestorefront.customer360.populators.GeneralActivityTicketPopulator">
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+	
+	<alias name="defaultGeneralActivityTicketConverter" alias="generalActivityTicketConverter"/>
+	<bean id="defaultGeneralActivityTicketConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicestorefront.customer360.GeneralActivityData"/>
+		<property name="populators">
+			<list>
+				<ref bean="generalActivityTicketPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="defaultCustomer360CustomerTicketsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="ticketsFragment"/>
+		<property name="value" ref="ticketsModelProvider" />
+	</bean>
+
+	<bean id="defaultCustomer360FeedbackSectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+		<property name="add" ref="feedbackSection" />
+	</bean>
+
+	<bean id="defaultCustomer360CustomerReviewsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="reviewFragment"/>
+		<property name="value" ref="reviewsModelProvider"/>
+	</bean>
+
+	<alias name="defaultReviewsModelProvider" alias="reviewsModelProvider"/>
+	<bean id="defaultReviewsModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.ReviewsModelProvider">
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService" />
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="customerReviewService" ref="customerReviewService" />
+		<property name="asmReviewConverter" ref="asmReviewDataConverter" />
+	</bean>
+
+	<alias name="defaultAsmReviewDataPopulator" alias="asmReviewDataPopulator"/>
+	<bean id="defaultAsmReviewDataPopulator" class="de.hybris.platform.assistedservicestorefront.customer360.populators.ReviewDataPopulator">
+		<property name="productModelUrlResolver" ref="productModelUrlResolver"/>
+	</bean>
+
+	<alias name="defaultAsmReviewDataConverter" alias="asmReviewDataConverter"/>
+	<bean id="defaultAsmReviewDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicestorefront.customer360.ReviewData"/>
+		<property name="populators">
+			<list>
+				<ref bean="asmReviewDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- </Feedback Section> -->
+
+	<!-- <Store locations section>  -->
+	<bean id="storeLocationsSection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.storeLocations"/>
+		<property name="id" value="storeLocationsSection"/>
+		<property name="fragments" ref="storeLocationsSectionFragments"/>
+		<property name="priority" value="60"/>
+	</bean>
+
+	<bean id="defaultCustomer360CustomerStoreLocationsSectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+		<property name="add" ref="storeLocationsSection" />
+	</bean>
+
+	<util:list id="storeLocationsSectionFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="storeLocationsFragment"/>
+	</util:list>
+
+	<bean id="storeLocationsFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="storeLocationsFragment"/>
+		<property name="priority" value="10"/>
+	</bean>
+
+	<bean id="defaultCustomer360StoreLocationsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="storeLocationsFragment"/>
+		<property name="value" ref="storeLocationsModelProvider" />
+	</bean>
+
+	<alias name="defaultStoreLocationsModelProvider" alias="storeLocationsModelProvider"/>
+	<bean id="defaultStoreLocationsModelProvider" class="de.hybris.platform.assistedservicestorefront.customer360.provider.StoreLocationsProvider">
+		<property name="assistedServiceService" ref="assistedServiceService" />
+	</bean>
+	<!-- </Store locations section> -->
+</beans>

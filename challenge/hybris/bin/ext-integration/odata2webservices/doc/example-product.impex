@@ -1,0 +1,57 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; OutboundProduct;
+; InboundProduct; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; InboundProduct  ; Product              ; Product
+; InboundProduct  ; Unit                 ; Unit
+; InboundProduct  ; Catalog              ; Catalog
+; InboundProduct  ; CatalogVersion       ; CatalogVersion
+; InboundProduct  ; PriceRow             ; PriceRow
+; InboundProduct  ; Category             ; Category
+; InboundProduct  ; ProductPriceGroup    ; ProductPriceGroup
+; InboundProduct  ; ProductDiscountGroup ; ProductDiscountGroup
+; InboundProduct  ; ProductTaxGroup      ; ProductTaxGroup
+; InboundProduct  ; VariantType          ; VariantType
+; InboundProduct  ; Vendor               ; Vendor
+
+; OutboundProduct ; Product              ; Product
+; OutboundProduct ; Catalog              ; Catalog
+; OutboundProduct ; CatalogVersion       ; CatalogVersion
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; InboundProduct:Catalog              ; id                      ; Catalog:id                      ;
+; InboundProduct:CatalogVersion       ; catalog                 ; CatalogVersion:catalog          ; InboundProduct:Catalog
+; InboundProduct:CatalogVersion       ; version                 ; CatalogVersion:version          ;
+; InboundProduct:CatalogVersion       ; active                  ; CatalogVersion:active           ;
+; InboundProduct:Unit                 ; code                    ; Unit:code                       ;
+; InboundProduct:Unit                 ; name                    ; Unit:name                       ;
+; InboundProduct:Unit                 ; unitType                ; Unit:unitType                   ;
+; InboundProduct:ProductPriceGroup    ; code                    ; ProductPriceGroup:code          ;
+; InboundProduct:ProductDiscountGroup ; code                    ; ProductDiscountGroup:code       ;
+; InboundProduct:ProductTaxGroup      ; code                    ; ProductTaxGroup:code            ;
+; InboundProduct:VariantType          ; code                    ; VariantType:code                ;
+; InboundProduct:Vendor               ; code                    ; Vendor:code                     ;                                ; true
+; InboundProduct:Product              ; code                    ; Product:code                    ;
+; InboundProduct:Product              ; catalogVersion          ; Product:catalogVersion          ; InboundProduct:CatalogVersion
+; InboundProduct:Product              ; name                    ; Product:name                    ;
+; InboundProduct:Product              ; unit                    ; Product:unit                    ; InboundProduct:Unit
+; InboundProduct:Product              ; pricerow                ; Product:ownEurope1Prices        ; InboundProduct:PriceRow
+; InboundProduct:Product              ; Europe1PriceFactory_PPG ; Product:Europe1PriceFactory_PPG ; InboundProduct:ProductPriceGroup
+; InboundProduct:Product              ; Europe1PriceFactory_PDG ; Product:Europe1PriceFactory_PDG ; InboundProduct:ProductDiscountGroup
+; InboundProduct:Product              ; Europe1PriceFactory_PTG ; Product:Europe1PriceFactory_PTG ; InboundProduct:ProductTaxGroup
+; InboundProduct:Product              ; supercategories         ; Product:supercategories         ; InboundProduct:Category
+; InboundProduct:Product              ; variantType             ; Product:variantType             ; InboundProduct:VariantType
+; InboundProduct:Product              ; vendors                 ; Product:vendors                 ; InboundProduct:Vendor
+# a little contrived to set price as unique, but i needed a way to import into scpi
+; InboundProduct:PriceRow             ; price                   ; PriceRow:price                  ;                                ; true
+; InboundProduct:PriceRow             ; unit                    ; PriceRow:unit                   ; InboundProduct:Unit
+; InboundProduct:Category             ; code                    ; Category:code                   ;
+; InboundProduct:Category             ; name                    ; Category:name                   ;
+
+; OutboundProduct:Product             ; code                    ; Product:code                    ;                                ;
+; OutboundProduct:Product             ; catalogVersion          ; Product:catalogVersion          ; OutboundProduct:CatalogVersion ;
+; OutboundProduct:Product             ; name                    ; Product:name                    ;                                ;
+; OutboundProduct:CatalogVersion      ; catalog                 ; CatalogVersion:catalog          ; OutboundProduct:Catalog        ;
+; OutboundProduct:CatalogVersion      ; version                 ; CatalogVersion:version          ;                                ;
+; OutboundProduct:Catalog             ; id                      ; Catalog:id                      ;                                ;

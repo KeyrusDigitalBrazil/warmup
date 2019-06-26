@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+  <widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="explorerTree">
+
+        <widget id="initPromotionRulesModuleAdvancedSearch" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine.genericinitializer"
+                slotId="cockpitWidgetChildrenInvisible" template="false">
+            <setting key="requiredTypeCode" type="String" value="DroolsKIEModule"/>
+            <setting key="navigationNodeId" type="String" value="hmc_typenode_promotion_modules"/>
+            <setting key="handlerBeanId" type="String" value="rulesModulesForPromotionTypeAdvancedSearchInitializer"/>
+            <virtual-sockets/>
+        </widget>
+
+        <widget id="initPromotionRuleGroupsAdvancedSearch" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine.genericinitializer"
+                slotId="cockpitWidgetChildrenInvisible" template="false">
+            <setting key="requiredTypeCode" type="String" value="RuleGroup"/>
+            <setting key="navigationNodeId" type="String" value="hmc_typenode_promotion_rule_groups"/>
+            <setting key="handlerBeanId" type="String" value="ruleGroupCodesForTypeSearchInitializer"/>
+            <virtual-sockets/>
+        </widget>
+
+        <widget id="tree-node-selector" widgetDefinitionId="de.hybris.platform.promotionenginebackoffice.treenodeselector"
+                slotId="cockpitWidgetChildrenInvisible" template="false">
+            <setting key="roleToNodeMapping" type="String">marketingmanagerrole->hmc_typenode_promotion_rules</setting>
+            <setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+            <setting key="widgetStyleAttribute" type="String"></setting>
+            <setting key="widgetStyleClass" type="String"></setting>
+            <virtual-sockets/>
+		</widget>
+	</widget-extension>
+    <widget-connection sourceWidgetId="backofficeMainSlot" outputId="perspectiveSelected" targetWidgetId="tree-node-selector" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="tree-node-selector" outputId="treeNodeSelector" targetWidgetId="explorerTree" inputId="nodeIdSelected"/>
+
+    <widget-connection inputId="input" outputId="nodeSelected" sourceWidgetId="promotionenginebackoffice-explorer-tree" targetWidgetId="promotionenginebackoffice-tree-node-adapter"/>
+    <widget-connection inputId="genericInput" outputId="true" sourceWidgetId="promotionenginebackoffice-tree-node-adapter" targetWidgetId="promotionenginebackoffice-typecode-extractor"/>
+    <widget-connection inputId="genericInput" outputId="true" sourceWidgetId="promotionenginebackoffice-tree-node-adapter" targetWidgetId="promotionenginebackoffice-search-enabler"/>
+    <widget-connection inputId="genericInput" outputId="false" sourceWidgetId="promotionenginebackoffice-tree-node-adapter" targetWidgetId="promotionenginebackoffice-search-disabler"/>
+    <widget-connection inputId="type" outputId="genericOutput" sourceWidgetId="promotionenginebackoffice-typecode-extractor" targetWidgetId="promotionenginebackoffice-search-logic"/>
+    <widget-connection inputId="enabled" outputId="genericOutput" sourceWidgetId="promotionenginebackoffice-search-enabler" targetWidgetId="promotionenginebackoffice-text-search"/>
+    <widget-connection inputId="enabled" outputId="genericOutput" sourceWidgetId="promotionenginebackoffice-search-disabler" targetWidgetId="promotionenginebackoffice-text-search"/>
+    <widget-connection inputId="searchtext" outputId="query" sourceWidgetId="promotionenginebackoffice-text-search" targetWidgetId="promotionenginebackoffice-search-logic"/>
+    <widget-connection inputId="pageable" outputId="pageable" sourceWidgetId="promotionenginebackoffice-search-logic" targetWidgetId="promotionenginebackoffice-simple-list"/>
+
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecompilepromotionformoduleaction" outputId="deselectItems" targetWidgetId="hmc2list" inputId="deselectItems"/>
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecompilepromotionformoduleaction" outputId="selectItem" targetWidgetId="hmc2list" inputId="selectItem"/>
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecompilepromotionformoduleaction" outputId="selectItem" targetWidgetId="editorArea" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecompileallpromotionsformoduleaction" outputId="refreshPageableObject" targetWidgetId="hmc2list" inputId="pageable"/>
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecreatepromotionfromtemplateaction" outputId="nodeToNavigate" targetWidgetId="explorerTree" inputId="nodeIdSelected"/>
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecreatepromotionfromtemplateaction" outputId="newObject" targetWidgetId="hmc2list" inputId="selectItem"/>
+    <widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.rulecreatepromotionfromtemplateaction" outputId="newObject" targetWidgetId="editorArea" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.ruleundeployselectedpromotionsfrommoduleaction" outputId="refreshPageableObject" targetWidgetId="hmc2list" inputId="pageable"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.promotionrulecloneaction" outputId="newObject" targetWidgetId="editorArea" inputId="inputObject"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.promotionrulecloneaction" outputId="deselectItems" targetWidgetId="hmc2list" inputId="deselectItems"/>
+
+	<widget-connection sourceWidgetId="explorerTree" outputId="nodeSelected" targetWidgetId="initPromotionSourceRuleAdvancedSearch" inputId="nodeSelected"/>
+	<widget-connection sourceWidgetId="initPromotionSourceRuleAdvancedSearch" outputId="outContext" targetWidgetId="advancedSearch" inputId="initContext"/>
+    <widget-connection sourceWidgetId="explorerTree" outputId="nodeSelected" targetWidgetId="initPromotionRulesModuleAdvancedSearch" inputId="nodeSelected"/>
+    <widget-connection sourceWidgetId="initPromotionRulesModuleAdvancedSearch" outputId="outContext" targetWidgetId="advancedSearch" inputId="initContext"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.ruleundeploypromotionfrommoduleaction" outputId="selectItem" targetWidgetId="hmc2list" inputId="selectItem"/>
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.promotionenginebackoffice.action.ruleundeploypromotionfrommoduleaction" outputId="selectItem" targetWidgetId="editorArea" inputId="inputObject"/>
+    <widget-connection sourceWidgetId="explorerTree" outputId="nodeSelected" targetWidgetId="initPromotionRuleGroupsAdvancedSearch" inputId="nodeSelected"/>
+    <widget-connection sourceWidgetId="initPromotionRuleGroupsAdvancedSearch" outputId="outContext" targetWidgetId="advancedSearch" inputId="initContext"/>
+
+</widgets>

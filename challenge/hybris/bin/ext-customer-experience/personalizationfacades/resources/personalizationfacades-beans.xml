@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+    <enum class="de.hybris.platform.personalizationfacades.enums.ItemStatus">
+        <value>ENABLED</value>
+        <value>DISABLED</value>
+        <value>DELETED</value>
+    </enum>
+
+    <!-- DTO -->
+    <bean class="de.hybris.platform.personalizationfacades.data.CustomerData">
+        <description>Customer details</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">customer</hint>
+        </hints>
+        <property name="uid" type="String">
+            <description>ID of the customer</description>
+        </property>
+        <property name="segmentLinks" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.CustomerSegmentationData>">
+            <description>List of customer's segmentation details</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.SegmentData">
+        <description>Segment details</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">segment</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Segment code</description>
+        </property>
+        <property name="description" type="String">
+            <description>Segment description</description>
+        </property>
+        <property name="customerLinks" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.CustomerSegmentationData>">
+            <description>Customer segmentation details</description>
+        </property>
+        <property name="segmentTriggers" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.SegmentTriggerData>">
+            <description>Segment trigger details</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.VariationData">
+        <description>Variation</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">variation</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Variation code</description>
+        </property>
+        <property name="name" type="String">
+            <description>Variation name</description>
+        </property>
+        <property name="active" type="Boolean">
+            <description>Dynamic attribute describing whether the variation affects the experience</description>
+        </property>
+        <property name="enabled" type="Boolean" deprecated="Use status field instead">
+            <description>This is deprecated field (use status field instead)</description>
+        </property>
+        <property name="rank" type="Integer">
+            <description>Priority of the variation</description>
+        </property>
+        <property name="status" type="de.hybris.platform.personalizationfacades.enums.ItemStatus">
+            <description>Status of the variation</description>
+            <hints>
+                <hint name="allowedValues">ENABLED,DISABLED,DELETED</hint>
+            </hints>
+        </property>
+        <property name="catalog" type="String">
+            <description>Catalog name</description>
+        </property>
+        <property name="catalogVersion" type="String">
+            <description>Catalog version</description>
+        </property>
+        <property name="customization" type="de.hybris.platform.personalizationfacades.data.CustomizationData">
+            <description>Details of the customization the variation belongs to</description>
+        </property>
+        <property name="triggers" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.TriggerData>">
+            <description>Details of the variation triggers</description>
+        </property>
+        <property name="actions" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.ActionData>">
+            <description>Details of the variation actions</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.CustomizationData">
+        <description>Customization</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">customization</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Customization code</description>
+        </property>
+        <property name="name" type="String">
+            <description>Customization name</description>
+        </property>
+        <property name="description" type="String">
+            <description>Customization description</description>
+        </property>
+        <property name="rank" type="Integer">
+            <description>Priority of the customization</description>
+        </property>
+        <property name="active" type="Boolean">
+            <description>Dynamic attribute describing whether the customization affects the experience</description>
+        </property>
+        <property name="status" type="de.hybris.platform.personalizationfacades.enums.ItemStatus">
+            <description>Status of the customization</description>
+            <hints>
+                <hint name="allowedValues">ENABLED,DISABLED,DELETED</hint>
+            </hints>
+        </property>
+        <property name="enabledStartDate" type="java.util.Date">
+            <description>Point in time when the customization will activate, if it's enabled</description>
+            <hints>
+                <hint name="example">yyyy-MM-ddTHH:mm:ssZ</hint>
+            </hints>
+        </property>
+        <property name="enabledEndDate" type="java.util.Date">
+            <description>Point in time when the customization will deactivate</description>
+            <hints>
+                <hint name="example">yyyy-MM-ddTHH:mm:ssZ</hint>
+            </hints>
+        </property>
+        <property name="catalog" type="String">
+            <description>Catalog name</description>
+        </property>
+        <property name="catalogVersion" type="String">
+            <description>Catalog version</description>
+        </property>
+        <property name="variations" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.VariationData>">
+            <description>Details of the variations in this customization</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.ActionData">
+        <description>Action</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">action</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Action code</description>
+        </property>
+        <property name="catalog" type="String">
+            <description>Catalog name</description>
+        </property>
+        <property name="catalogVersion" type="String">
+            <description>Catalog version</description>
+        </property>
+        <property name="rank" type="Integer">
+            <description>Priority of the action</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.ActionFullData">
+        <description>Action Full Data</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">action</hint>
+        </hints>
+        <property name="customizationCode" type="String"/>
+        <property name="customizationName" type="String"/>
+        <property name="customizationStatus" type="String"/>
+        <property name="customizationRank" type="Integer"/>
+        <property name="variationCode" type="String"/>
+        <property name="variationName" type="String"/>
+        <property name="variationStatus" type="String"/>
+        <property name="variationRank" type="Integer"/>
+        <property name="actionCode" type="String"/>
+        <property name="actionCatalog" type="String"/>
+        <property name="actionCatalogVersion" type="String"/>
+        <property name="actionRank" type="Integer"/>
+    </bean>
+    <bean class="de.hybris.platform.personalizationfacades.data.CustomerSegmentationData">
+        <description>Customer segmentation</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">customerSegmentation</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Customer segmentation code</description>
+        </property>
+        <property name="provider" type="String">
+            <description>Provider identifier</description>
+        </property>
+        <property name="baseSite" type="String">
+            <description>Basesite identifier</description>
+        </property>
+        <property name="affinity" type="java.math.BigDecimal">
+            <description>Affinity of the customer to the segment</description>
+        </property>
+        <property name="customer" type="de.hybris.platform.personalizationfacades.data.CustomerData">
+            <description>Details of the customer</description>
+        </property>
+        <property name="segment" type="de.hybris.platform.personalizationfacades.data.SegmentData">
+            <description>Details of the segment</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.TriggerData">
+        <description>Trigger</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">trigger</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Trigger code</description>
+        </property>
+        <property name="catalog" type="String">
+            <description>Catalog name</description>
+        </property>
+        <property name="catalogVersion" type="String">
+            <description>Catalog version</description>
+        </property>
+        <property name="variation" type="de.hybris.platform.personalizationfacades.data.VariationData">
+            <description>Details of the variation</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.DefaultTriggerData" extends="de.hybris.platform.personalizationfacades.data.TriggerData">
+        <description>Default trigger</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">defaultTrigger</hint>
+        </hints>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.SegmentTriggerData" extends="de.hybris.platform.personalizationfacades.data.TriggerData">
+        <description>Segment trigger</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">segmentTrigger</hint>
+        </hints>
+        <property name="segments" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.SegmentData>">
+            <description>Details of the segments</description>
+        </property>
+        <property name="groupBy" type="String">
+            <description>Logical operator connecting the segments</description>
+            <hints>
+                <hint name="allowedValues">AND,OR</hint>
+            </hints>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData" extends="de.hybris.platform.personalizationfacades.data.TriggerData">
+        <description>Expression trigger</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">expressionTrigger</hint>
+        </hints>
+        <property name="expression" type="de.hybris.platform.personalizationfacades.data.ExpressionData">
+            <description>Details of the expression</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.ExpressionData" abstract="true"/>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.GroupExpressionData" extends="de.hybris.platform.personalizationfacades.data.ExpressionData">
+        <description>Group expression</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">groupExpression</hint>
+        </hints>
+        <property name="elements" type="java.util.List&lt;de.hybris.platform.personalizationfacades.data.ExpressionData>">
+            <description>Expressions building the group expression</description>
+        </property>
+        <property name="operator" type="String">
+            <description>Operator joining the expressions</description>
+            <hints>
+                <hint name="allowedValues">AND,OR</hint>
+            </hints>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.NegationExpressionData" extends="de.hybris.platform.personalizationfacades.data.ExpressionData">
+        <description>Negation expression</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">negationExpression</hint>
+        </hints>
+        <property name="element" type="de.hybris.platform.personalizationfacades.data.ExpressionData">
+            <description>Expression to negate</description>
+        </property>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationfacades.data.SegmentExpressionData" extends="de.hybris.platform.personalizationfacades.data.ExpressionData">
+        <description>Segment expression</description>
+        <hints>
+            <hint name="wsRelated"/>
+            <hint name="alias">segmentExpression</hint>
+        </hints>
+        <property name="code" type="String">
+            <description>Segment code</description>
+        </property>
+    </bean>
+
+</beans>

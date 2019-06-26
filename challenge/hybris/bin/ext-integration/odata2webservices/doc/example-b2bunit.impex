@@ -1,0 +1,66 @@
+#*********************************
+#************* B2BUnit ***********
+#*********************************
+INSERT_UPDATE IntegrationObject; code[unique = true]
+; B2BUnit
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; B2BUnit ; B2BUnit ; B2BUnit
+; B2BUnit ; Address ; Address
+; B2BUnit ; Country ; Country
+; B2BUnit ; Region  ; Region
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; B2BUnit:B2BUnit ; addresses    ; B2BUnit:addresses    ; B2BUnit:Address ;
+; B2BUnit:B2BUnit ; uid          ; B2BUnit:uid          ;                 ; true
+; B2BUnit:B2BUnit ; name         ; B2BUnit:name         ;                 ;
+; B2BUnit:B2BUnit ; locName      ; B2BUnit:locName      ;                 ;
+; B2BUnit:B2BUnit ; active       ; B2BUnit:active       ;                 ;
+; B2BUnit:B2BUnit ; buyer        ; B2BUnit:buyer        ;                 ;
+
+; B2BUnit:Address ; region       ; Address:region       ; B2BUnit:Region  ;
+; B2BUnit:Address ; country      ; Address:country      ; B2BUnit:Country ;
+; B2BUnit:Address ; streetname   ; Address:streetname   ;                 ;
+; B2BUnit:Address ; streetnumber ; Address:streetnumber ;                 ;
+; B2BUnit:Address ; postalcode   ; Address:postalcode   ;                 ;
+; B2BUnit:Address ; town         ; Address:town         ;                 ;
+; B2BUnit:Address ; publicKey    ; Address:publicKey    ;                 ; true
+
+; B2BUnit:Country ; isocode      ; Country:isocode      ;                 ;
+; B2BUnit:Region  ; isocode      ; Region:isocode       ;                 ;
+
+#*************************************
+#************* B2BCustomer ***********
+#*************************************
+INSERT_UPDATE IntegrationObject; code[unique = true]
+; B2BCustomer
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; B2BCustomer ; B2BCustomer ; B2BCustomer
+; B2BCustomer ; Address     ; Address
+; B2BCustomer ; Title       ; Title
+; B2BCustomer ; Gender      ; Gender
+; B2BCustomer ; UserGroup   ; UserGroup
+; B2BCustomer ; B2BUnit     ; B2BUnit
+
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; B2BCustomer:Address     ; publicKey      ; Address:publicKey          ;                       ; true
+; B2BCustomer:Address     ; title          ; Address:title              ; B2BCustomer:Title     ;
+; B2BCustomer:Address     ; gender         ; Address:gender             ; B2BCustomer:Gender    ;
+; B2BCustomer:Address     ; firstname      ; Address:firstname          ;                       ;
+; B2BCustomer:Address     ; lastname       ; Address:lastname           ;                       ;
+; B2BCustomer:Address     ; contactAddress ; Address:contactAddress     ;                       ;
+
+; B2BCustomer:B2BCustomer ; addresses      ; B2BCustomer:addresses      ; B2BCustomer:Address   ;
+; B2BCustomer:B2BCustomer ; customerID     ; B2BCustomer:customerID     ;                       ; true
+; B2BCustomer:B2BCustomer ; name           ; B2BCustomer:name           ;                       ;
+; B2BCustomer:B2BCustomer ; uid            ; B2BCustomer:uid            ;                       ;
+; B2BCustomer:B2BCustomer ; email          ; B2BCustomer:email          ;                       ;
+; B2BCustomer:B2BCustomer ; groups         ; B2BCustomer:groups         ; B2BCustomer:UserGroup ;
+; B2BCustomer:B2BCustomer ; defaultB2BUnit ; B2BCustomer:defaultB2BUnit ; B2BCustomer:B2BUnit   ;
+; B2BCustomer:B2BCustomer ; title          ; B2BCustomer:title          ; B2BCustomer:Title     ;
+; B2BCustomer:Title       ; code           ; Title:code                 ;                       ;
+; B2BCustomer:Gender      ; code           ; Gender:code                ;                       ;
+; B2BCustomer:UserGroup   ; uid            ; UserGroup:uid              ;                       ;
+; B2BCustomer:B2BUnit     ; uid            ; B2BUnit:uid                ;                       ;

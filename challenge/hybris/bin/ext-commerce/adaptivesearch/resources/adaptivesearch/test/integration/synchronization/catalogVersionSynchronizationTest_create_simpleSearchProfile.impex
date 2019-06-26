@@ -1,0 +1,57 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+
+### Simple Search Profile ###
+
+# search profile
+
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name;indexType[default=$indexType];$catalogVersion[unique=true] 
+;simpleProfile;Simple Search Profile;;
+
+# search configuration
+
+INSERT_UPDATE AsSimpleSearchConfiguration;searchProfile(code,$catalogVersion)[unique=true];uid[unique=true];facetsMergeMode(code);boostItemsMergeMode(code);boostRulesMergeMode(code);sortsMergeMode(code);$catalogVersion[unique=true]
+;simpleProfile;searchConfiguration;ADD_AFTER;ADD_AFTER;ADD;ADD_AFTER;
+
+INSERT_UPDATE AsPromotedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property2;MULTISELECT_OR;100;
+
+INSERT_UPDATE AsFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property1;REFINE;120;
+
+INSERT_UPDATE AsExcludedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property3;MULTISELECT_AND;90;
+
+INSERT_UPDATE AsPromotedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;searchConfiguration;product1;
+
+INSERT_UPDATE AsExcludedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;searchConfiguration;product2;
+
+INSERT_UPDATE AsBoostRule;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];indexProperty;operator(code);value;boost;boostType(code);$catalogVersion[unique=true]
+;searchConfiguration;af0d0509-cc0b-4418-b446-6e5f0b696fc1;property1;EQUAL;value;1.1;MULTIPLICATIVE;
+
+INSERT_UPDATE AsSort;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];code;name[lang=en];$catalogVersion[unique=true]
+;searchConfiguration;sort1;sort1code;sort1name;
+;searchConfiguration;sort2;sort2code;sort2name;
+
+INSERT_UPDATE AsSortExpression;sortConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];expression;order(code);$catalogVersion[unique=true]
+;sort1;sort1expression1;property1;ASCENDING;
+;sort2;sort2expression1;property2;ASCENDING;
+
+### Search Profile Activation Set ###
+
+INSERT_UPDATE AsSearchProfileActivationSet;indexType[default=$indexType][unique=true];$catalogVersion[unique=true];searchProfiles(code,$catalogVersion)
+;;;simpleProfile
+

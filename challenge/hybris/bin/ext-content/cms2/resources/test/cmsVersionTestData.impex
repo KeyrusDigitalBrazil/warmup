@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$catalog-id=cms_Catalog
+$catalog-name=Cms_Catalog_Name
+$catalog-version=CatalogVersion1
+$setCatalog-version-page-template=catalogVersion(catalog(id),version)[unique=true]
+$setCatalog=catalog(id)[unique=true]
+$setVersion=version[unique=true]
+$masterTemplate-uid=mainTemplate
+$content-slot-id=BodySlot
+$empty-content-slot-id=EmptySlot
+$content-slot-position=0;
+$content-slot-for-page-id=ContentSlotForPage_0
+$shared-content-slot-id=SharedSlot
+$shared-slot-position=1;
+$content-slot-for-template-id=ContentSlotForTemplate_1
+$content-page-uid=homepage
+
+$productCatalog=cms_ProductCatalog
+$productCatalogName=CMS Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+$contentCatVersion=catalogVersion(catalog(id[default=$catalog-id]),version[default=$catalog-online])[default=$catalog-id:$catalog-online]
+
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=en];
+;$catalog-id;$catalog-name;
+
+INSERT_UPDATE CatalogVersion;$setCatalog;$setVersion;active;
+;$catalog-id;$catalog-version;true;
+
+INSERT_UPDATE PageTemplate;uid[unique=true];$setCatalog-version-page-template;name;
+;$masterTemplate-uid;$catalog-id:$catalog-version;Main template;
+
+INSERT_UPDATE ContentPage;catalogVersion(catalog(id),version)[unique=true,allownull=true];defaultPage[allownull=true];homepage[allownull=true];label;masterTemplate(catalogVersion(catalog(id),version),uid)[allownull=true];name;uid[unique=true,allownull=true];title[lang=en];
+;$catalog-id:$catalog-version;true;true;homepage;$catalog-id:$catalog-version:$masterTemplate-uid;Homepage;$content-page-uid;homePageTitle;
+
+INSERT_UPDATE CMSLinkComponent;catalogVersion(catalog(id),version)[unique=true,allownull=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;&componentRef
+;$catalog-id:$catalog-version;LinkInSlot;LinkInSlotName;cmsLinkInSlotUrl;;;;cmsLinkInSlotRef
+;$catalog-id:$catalog-version;LinkForEmptySlot;LinkForEmptySlotName;cmsLinkInSlotUrl;;;;cmsLinkForEmptySlotRef
+
+INSERT_UPDATE ContentSlot;active[allownull=true];catalogVersion(catalog(id),version)[unique=true,allownull=true];name;uid[unique=true,allownull=true];cmsComponents(&componentRef)
+;true;$catalog-id:$catalog-version;Add To Cart;$content-slot-id;cmsLinkInSlotRef
+;true;$catalog-id:$catalog-version;Shared Slot;$shared-content-slot-id;
+;true;$catalog-id:$catalog-version;Empty Content Slot;$empty-content-slot-id;
+
+INSERT_UPDATE ContentSlotForPage;catalogVersion(catalog(id),version)[unique=true,allownull=true];contentSlot(catalogVersion(catalog(id),version),uid)[allownull=true];page(catalogVersion(catalog(id),version),uid)[allownull=true];position[allownull=true];uid[unique=true,allownull=true]
+;$catalog-id:$catalog-version;$catalog-id:$catalog-version:$content-slot-id;$catalog-id:$catalog-version:$content-page-uid;0;ApparelUK-MiddleContent-Errorpage
+;$catalog-id:$catalog-version;$catalog-id:$catalog-version:$empty-content-slot-id;$catalog-id:$catalog-version:$content-page-uid;1;ApparelUK-BottomContent-Errorpage
+
+INSERT_UPDATE ContentSlotForTemplate;catalogVersion(catalog(id),version)[unique=true,allownull=true];contentSlot(catalogVersion(catalog(id),version),uid)[allownull=true];pageTemplate(catalogVersion(catalog(id),version),uid)[allownull=true];position[allownull=true];uid[unique=true,allownull=true]
+;$catalog-id:$catalog-version;$catalog-id:$catalog-version:$shared-content-slot-id;$catalog-id:$catalog-version:$masterTemplate-uid;1;$content-slot-for-template-id

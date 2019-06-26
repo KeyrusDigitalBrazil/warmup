@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the extensions 
+	core configuration file (ySapConfiguration/resources/ySapConfiguration-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="de.hybris.platform.sap.productconfig.frontend" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<alias name="sapProductConfigDefaultBeforeViewHandler" alias="sapProductConfigBeforeViewHandler" />
+	<bean id="sapProductConfigDefaultBeforeViewHandler" class="de.hybris.platform.sap.productconfig.frontend.beforeview.ProductDetailsBeforeViewHandler">
+		<property name="extender" ref="sapProductConfigBeforeViewExtender" />
+	</bean>
+
+	<bean id="beforeViewHandlerAdapter" abstract="true" class="de.hybris.platform.addonsupport.interceptors.BeforeViewHandlerAdapter">
+		<property name="proxyInterfaceName" value="de.hybris.platform.acceleratorstorefrontcommons.interceptors.BeforeViewHandler" />
+	</bean>
+
+
+	<bean id="cpqWebLazyInitOverrideBeanFactoryPostProcessor" parent="lazyInitOverrideBeanFactoryPostProcessor" />
+
+	<bean depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add">
+			<bean parent="beforeViewHandlerAdapter">
+				<property name="adaptee" ref="sapProductConfigBeforeViewHandler" />
+			</bean>
+		</property>
+	</bean>
+
+
+	<bean id="sapProductConfigBreadcrumbBuilder" parent="productBreadcrumbBuilder"
+		class="de.hybris.platform.sap.productconfig.frontend.breadcrumb.ProductConfigureBreadcrumbBuilder">
+		<property name="accountBreadcrumbBuilder" ref="accountBreadcrumbBuilder" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+	</bean>
+
+	<bean id="sapProductConfigFormComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationFormComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigAddConfigToCartComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductAddConfigToCartComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigCartDisplayComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="CartConfigurationDisplayComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigImageComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationImageComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigTitleSummaryComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationTitleSummaryComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigMenuComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationMenuComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigPriceSummaryComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationPriceSummaryComponent" />
+		<property name="renderer" ref="sapProductConfigPriceSummaryComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigPriceSummaryComponentRenderer" class="de.hybris.platform.sap.productconfig.frontend.renderer.PriceSummaryComponentRenderer"
+		parent="genericAddOnCMSComponentRenderer">
+		<property name="providerFactory" ref="sapProductConfigProviderFactory" />
+	</bean>
+
+	<bean id="sapProductConfigurationVariantListComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationVariantListComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigPrevNextComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationPrevNextComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigOverviewComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationOverviewComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigFilterComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationFilterComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<bean id="sapProductConfigOverviewTitleComponentRendererMapping" class="de.hybris.platform.addonsupport.renderer.impl.AddOnCMSComponentRendererMapping">
+		<property name="typeCode" value="ProductConfigurationOverviewTitleComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCssClassResolver" alias="sapProductConfigCssClassResolver" />
+	<bean id="sapProductConfigDefaultCssClassResolver" class="de.hybris.platform.sap.productconfig.frontend.util.impl.CSSClassResolverImpl">
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultCopyActionHandler" alias="sapProductConfigCopyActionHandler" />
+	<bean id="sapProductConfigDefaultCopyActionHandler" class="de.hybris.platform.sap.productconfig.frontend.handler.ConfigCopyCartEntryActionHandler">
+		<property name="configCartFacade" ref="sapProductConfigCartIntegrationFacade" />
+		<property name="cartFacade" ref="cartFacade" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configurationCopyStrategy" ref="sapProductConfigConfigurationCopyStrategy" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+	</bean>
+
+	<bean id="sapProductConfigCopyAction" class="de.hybris.platform.acceleratorfacades.cart.action.CartEntryAction"
+		factory-method="valueOf">
+		<constructor-arg>
+			<value>CPQ_COPY</value>
+		</constructor-arg>
+	</bean>
+
+	<bean id="sapProductConfigCopyActionMergeDirective" depends-on="cartEntryActionHandlerMap" parent="mapMergeDirective">
+		<property name="key" ref="sapProductConfigCopyAction" /><!-- The key must be of type CartEntryAction -->
+		<property name="value" ref="sapProductConfigCopyActionHandler" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultErrorHandler" alias="sapProductConfigErrorHandler" />
+	<bean id="sapProductConfigDefaultErrorHandler" class="de.hybris.platform.sap.productconfig.frontend.util.impl.ConfigErrorHandlerImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultUiStateHandler" alias="sapProductConfigUiStateHandler" />
+	<bean id="sapProductConfigDefaultUiStateHandler" class="de.hybris.platform.sap.productconfig.frontend.util.impl.UiStateHandler">
+	</bean>
+
+	<alias name="sapProductConfigDefaultUiStatusSync" alias="sapProductConfigUiStatusSync" />
+	<bean id="sapProductConfigDefaultUiStatusSync" class="de.hybris.platform.sap.productconfig.frontend.util.impl.UiStatusSync">
+	</bean>
+</beans>

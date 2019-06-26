@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- Product Recommendation Component Validator -->
+	<alias name="recommendationComponentValidator" alias="cmsRecommendationComponentValidator"/>
+	<bean id="recommendationComponentValidator" class="com.hybris.ymkt.recommendationwebservices.validators.RecommendationComponentValidator" parent="cmsAbstractCMSComponentValidator">
+	</bean>
+
+	<!-- Add validator to create maps -->
+	<bean id="recommendationComponentCreateValidatorMapMergeDirective" depends-on="cmsItemValidatorMapCreate" parent="mapMergeDirective">
+		<property name="key" value="CMSSAPRecommendationComponent" />
+		<property name="value" ref="cmsRecommendationComponentValidator" />
+	</bean>
+
+	<!-- Add validator to update maps -->
+	<bean id="recommendationComponentUpdateValidatorMapMergeDirective" depends-on="cmsItemValidatorMapUpdate" parent="mapMergeDirective">
+		<property name="key" value="CMSSAPRecommendationComponent" />
+		<property name="value" ref="cmsRecommendationComponentValidator" />
+	</bean>
+
+	<!-- Offer Recommendation Component Validator -->
+	<alias name="offerRecommendationComponentValidator" alias="cmsOfferRecoComponentValidator"/>
+	<bean id="offerRecommendationComponentValidator" class="com.hybris.ymkt.recommendationwebservices.validators.OfferRecommendationComponentValidator" parent="cmsAbstractCMSComponentValidator">
+	</bean>
+
+	<!-- Add offer validator to create maps -->
+	<bean id="offerRecommendationComponentCreateValidatorMapMergeDirective" depends-on="cmsItemValidatorMapCreate" parent="mapMergeDirective">
+		<property name="key" value="CMSSAPOfferRecoComponent" />
+		<property name="value" ref="cmsOfferRecoComponentValidator" />
+	</bean>
+
+	<!-- Add offer validator to update maps -->
+	<bean id="offerRecommendationComponentUpdateValidatorMapMergeDirective" depends-on="cmsItemValidatorMapUpdate" parent="mapMergeDirective">
+		<property name="key" value="CMSSAPOfferRecoComponent" />
+		<property name="value" ref="cmsOfferRecoComponentValidator" />
+	</bean>
+</beans>

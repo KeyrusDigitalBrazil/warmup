@@ -1,0 +1,175 @@
+/*
+* ----------------------------------------------------------------
+* --- WARNING: THIS FILE IS GENERATED AND WILL BE OVERWRITTEN!
+* --- Generated at $currentDateTime
+* ----------------------------------------------------------------
+*
+* [y] hybris Platform
+*
+* Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+*
+* This software is the confidential and proprietary information of SAP
+* ("Confidential Information"). You shall not disclose such Confidential
+* Information and shall use it only in accordance with the terms of the
+* license agreement you entered into with SAP.
+*/
+#set( $useBuilder = "false" )
+#set( $extendsParentBuilder = "false" )
+#foreach($h in $hints.entrySet())
+#if( $h.key == 'useBuilder' )
+#set( $useBuilder = $h.value )
+#end
+#if( $h.key == 'extendsParentBuilder' )
+#set( $extendsParentBuilder = $h.value )
+#end
+#end
+
+package $packageName;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+#if( $useBuilder == 'true' )
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+#end
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+#foreach($i in $imports)
+import $i;
+#end
+#if ( ! ($imports.isEmpty() && $superclassName) )
+
+#end
+#if ( $hasDescription || $hasDeprecated )
+/**
+#end
+#if ( $hasDescription)
+ * $description
+#end
+#if ( $hasDescription && $hasDeprecated )
+ *
+#end
+#if ( $hasDeprecated )
+ * @deprecated $deprecated
+#end
+#if ( $hasDescription || $hasDeprecated )
+ */
+#end
+#if ( $hasAnnotations )
+$annotations.trim()
+#end
+#if ( $hasDeprecated )
+@Deprecated
+#end
+
+## with an DTO extending maps, additional information comming from profile service can be easily consumed, especially with script mappers. E.g. in groovy accessing data like externalData?.insights?.affinitites?.... can be done. The java mappers still can access the data through getters
+#if( $useBuilder == 'true' )
+@JsonDeserialize(builder = ${shortClassName}.${shortClassName}Builder.class)
+#end
+public#if ($isAbstract) abstract #end class ${shortClassName} extends#if($superclassName) $superclassName#else LinkedHashMap<String, Object>#end implements Map<String, Object> ## implements Map to enforce only classes extending maps are used
+{
+
+	public static class ${shortClassName}Builder extends#if($extendsParentBuilder == 'true' ) ${superclassName}Builder #else LinkedHashMap<String, Object>#end {
+#foreach($v in $memberVariables)
+
+		public ${shortClassName}Builder with${StringUtils.capitalize($v.name)}(final ${v.type} ${v.name}) {
+			this.put("${v.name}", ${v.name});
+			return this;
+		}
+#end
+		public $shortClassName build() {
+			final $shortClassName dto = new $shortClassName();
+			dto.putAll(this);
+			return dto;
+		}
+	}
+
+#set( $constructorArgs = "" )
+#foreach($v in $memberVariables)
+#set( $constructorArgs = "${constructorArgs}@JsonProperty(""${v.name}"") final ${v.type} ${v.name}" )
+#if( $foreach.hasNext )
+	#set( $constructorArgs = "$constructorArgs, " )
+#end
+#end
+#if( ! $superclassName)
+	/** Default serialVersionUID value. */
+ 	private static final long serialVersionUID = 1L;
+#end
+
+#if( $useBuilder != 'true' )
+## if @JsonCreator would not be present, jackson would just deserialize maps. With JsonCreator in place, this constructor is used to deserialize the json payload (but additional values are still put into the map)
+    @JsonCreator
+	public ${constructorName}($constructorArgs)
+	{
+#foreach($v in $memberVariables)
+		this.put("${v.name}", ${v.name});
+#end
+	}
+#end
+
+#if( $constructorArgs != "")
+	public ${constructorName}()
+	{
+		// default constructor
+	}
+#end
+
+
+#foreach($v in $memberVariables)
+	$v.comment
+#if ($v.deprecated)@Deprecated
+	/**
+	* @deprecated $v.deprecatedMessage
+	*/
+#end
+#if ($v.overridden)
+	@Override
+#end
+#if ("$!v.setterAnnotations" != "")
+	$v.setterAnnotations.trim()
+#end
+	public void set${StringUtils.capitalize($v.name)}(final ${v.type} ${v.name})
+	{
+		this.put("${v.name}", ${v.name});
+	}
+
+#if ($v.deprecated)@Deprecated
+	/**
+	* @deprecated $v.deprecatedMessage
+	*/
+#end
+#if ($v.overridden)
+	@Override
+#end
+#if ("$!v.getterAnnotations" != "")
+	$v.getterAnnotations.trim()
+#end
+#if ($v.type == 'boolean')
+	public $v.type is${StringUtils.capitalize($v.name)}()
+	{
+		return ($v.type)this.getOrDefault("${v.name}", false);
+	}
+#else
+	public $v.type get${StringUtils.capitalize($v.name)}()
+	{
+	## default values taken from here https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html for unititialized primitives to have the same behavior as with instance variables of the same type, otherwiese we would have NPEs
+#if ($v.type == 'byte' || $v.type == 'short' || $v.type == 'int')
+	return ($v.type)this.getOrDefault("${v.name}", ($v.type)0);
+#elseif ($v.type == 'long')
+	return ($v.type)this.getOrDefault("${v.name}", 0L);
+#elseif ($v.type == 'float')
+	return ($v.type)this.getOrDefault("${v.name}", 0.0f);
+#elseif ($v.type == 'double')
+	return ($v.type)this.getOrDefault("${v.name}", 0.0d);
+#elseif ($v.type == 'char')
+	return ($v.type)this.getOrDefault("${v.name}", '\u0000');
+#else ## else it is an object, so null values are ok
+	return ($v.type)this.get("${v.name}");
+#end
+	}
+
+#end
+#end
+## equals and hashCode is up to the Maps implementation
+}

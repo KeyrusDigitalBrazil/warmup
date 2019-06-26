@@ -1,0 +1,24 @@
+package de.hybris.platform.promotionengineservices.test
+
+import java.math.*;
+import de.hybris.platform.ruleengineservices.rao.*;
+
+salience 20;
+// cart with code XYZ gets 20% discount
+rule "raoPromotion02"
+@ruleCode("raoPromotion02.drl")
+@moduleName("promotions-module-junit")
+    when
+    	$cart:CartRAO(code == "XYZ")
+    	$result:RuleEngineResultRAO()
+    	// check if rule discount is not applied already
+    	not $discount:DiscountRAO( firedRuleCode == "raoPromotion02.drl" )
+    then
+    	DiscountRAO $discount = new DiscountRAO();
+    	$discount.setFiredRuleCode("raoPromotion02.drl");
+    	$discount.setValue(BigDecimal.valueOf(20L));
+    	$result.getActions().add($discount);
+    	// above check only works if the discount is inserted as fact
+    	insert($discount);
+    	update($result);
+end

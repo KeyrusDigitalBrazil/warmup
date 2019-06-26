@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Query controller -->
+	<alias name="defaultAbstractRestQueryExecutor" alias="abstractRestQueryExecutor"/>
+	<bean id="defaultAbstractRestQueryExecutor" class="de.hybris.platform.personalizationwebservices.queries.impl.AbstractRestQueryExecutor" abstract="true">
+		<property name="localViewExecutor" ref="localViewExecutor" />
+		<property name="queryEndpointPermissionsChecker" ref="queryEndpointPermissionsChecker"/>
+	</bean>
+
+	<alias name="defaultAbstractFlexibleSearchRestQuery" alias="abstractFlexibleSearchRestQuery"/>
+	<bean id="defaultAbstractFlexibleSearchRestQuery" class="de.hybris.platform.personalizationwebservices.queries.impl.AbstractFlexibleSearchRestQueryExecutor" abstract="true" parent="abstractRestQueryExecutor">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultRestQueryService" alias="restQueryService"/>
+	<bean name="defaultRestQueryService" class="de.hybris.platform.personalizationwebservices.queries.impl.DefaultRestQueryService" autowire="constructor" />
+
+	<alias name="defaultQueryEndpointPermissionsChecker" alias="queryEndpointPermissionsChecker"/>
+	<bean id="defaultQueryEndpointPermissionsChecker" class="de.hybris.platform.personalizationwebservices.security.impl.DefaultQueryEndpointPermissionsChecker">
+		<property name="permissionsFacade" ref="permissionsFacade"/>
+		<property name="userService" ref="userService"/>
+	</bean>
+
+	<!-- subclass mapping -->
+	<bean id="triggerSubclassMapping" parent="subclassMapping">
+		<property name="parentClass" value="de.hybris.platform.personalizationfacades.data.TriggerData" />
+		<property name="subclassesSet">
+			<set>
+				<value>de.hybris.platform.personalizationfacades.data.SegmentTriggerData</value>
+				<value>de.hybris.platform.personalizationfacades.data.ExpressionTriggerData</value>
+				<value>de.hybris.platform.personalizationfacades.data.DefaultTriggerData</value>
+			</set>
+		</property>
+	</bean>
+
+	<bean id="expressionSubclassMapping" parent="subclassMapping">
+		<property name="parentClass" value="de.hybris.platform.personalizationfacades.data.ExpressionData" />
+		<property name="subclassesSet">
+			<set>
+				<value>de.hybris.platform.personalizationfacades.data.SegmentExpressionData</value>
+				<value>de.hybris.platform.personalizationfacades.data.GroupExpressionData</value>
+				<value>de.hybris.platform.personalizationfacades.data.NegationExpressionData</value>
+			</set>
+		</property>
+	</bean>
+
+</beans>

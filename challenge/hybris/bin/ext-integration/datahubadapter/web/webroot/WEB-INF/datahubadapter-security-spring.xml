@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!-- Security OAuth2 -->
+    <beans>
+
+        <import resource="classpath*:oauth2-resource-spring.xml"/>
+
+        <bean id="protocol" class="java.lang.String">
+            <constructor-arg value="#{${datahubadapter.security.https.enabled} ? 'https' : 'http'}" />
+        </bean>
+
+        <http pattern="/import/**" entry-point-ref="oauthAuthenticationEntryPoint"
+              access-decision-manager-ref="accessDecisionManager"
+              xmlns="http://www.springframework.org/schema/security"
+              use-expressions="false">
+
+            <csrf disabled="true"/>
+            <anonymous username="anonymous" granted-authority="ROLE_ANONYMOUS" />
+            <session-management
+                    session-authentication-strategy-ref="fixation" />
+            <intercept-url pattern="/import/**" requires-channel="#{protocol}" access="IS_AUTHENTICATED_FULLY" />
+
+            <port-mappings>
+                <port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}"
+                              https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}"/>
+            </port-mappings>
+
+            <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+            <custom-filter ref="hybrisUserFilter" after="LAST" />
+            <access-denied-handler ref="oauthAccessDeniedHandler"/>
+        </http>
+
+        <bean id="hybrisUserFilter" class="de.hybris.platform.webservicescommons.oauth2.HybrisOauth2UserFilter" />
+        <bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/>
+    </beans>
+</beans>

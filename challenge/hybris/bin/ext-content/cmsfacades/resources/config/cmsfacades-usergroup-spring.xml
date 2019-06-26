@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<alias name="defaultCmsUserGroupFacade" alias="cmsUserGroupFacade" />
+	<bean id="defaultCmsUserGroupFacade" class="de.hybris.platform.cmsfacades.usergroups.impl.DefaultUserGroupFacade">
+		<property name="userService" ref="userService" />
+		<property name="userGroupDataConverter" ref="cmsUserGroupDataConverter" />
+		<property name="userGroupSearchService" ref="cmsUserGroupNamedQuerySearchService" />
+	</bean>
+
+	<!-- converters -->
+
+	<alias name="defaultCmsUserGroupDataConverter" alias="cmsUserGroupDataConverter" />
+	<bean id="defaultCmsUserGroupDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.UserGroupData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsUserGroupDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<!-- populators -->
+	<alias name="defaultCmsUserGroupDataPopulator" alias="cmsUserGroupDataPopulator" />
+	<bean id="defaultCmsUserGroupDataPopulator" class="de.hybris.platform.cmsfacades.usergroups.populator.UserGroupDataPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+
+</beans>

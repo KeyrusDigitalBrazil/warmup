@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultChineseAbstractEmailContext" alias="chineseAbstractEmailContext" />
+	<bean id="defaultChineseAbstractEmailContext" class="de.hybris.platform.chineseprofileservices.process.email.context.ChineseAbstractEmailContext"
+		parent="defaultAbstractEmailContext" abstract="true" scope="prototype">
+		<property name="customerNameStrategy" ref="defaultCustomerNameStrategy" />
+		<property name="nameWithTitleFormatStrategy" ref="nameWithTitleFormatStrategy" />
+	</bean>
+	
+	<alias name="defaultChineseUserDao" alias="userDao"/>
+	<alias name="defaultChineseUserDao" alias="chineseUserDao"/>
+	<bean id="defaultChineseUserDao" class="de.hybris.platform.chineseprofileservices.user.daos.impl.DefaultChineseUserDao" />
+	
+	<alias name="chineseUserDetailsService" alias="originalUidUserDetailsService"/>
+	<bean id="chineseUserDetailsService" class="de.hybris.platform.chineseprofileservices.security.ChineseUserDetailsService" >
+		<property name="userDao" ref="chineseUserDao" />
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<bean id="chineseCustomerAccountService" class="de.hybris.platform.chineseprofileservices.customer.impl.DefaultChineseCustomerAccountService" parent="customerAccountService" >
+		<property name="verificationCodeGenerationStrategy" ref="verificationCodeGenerationStrategy"/>
+		<property name="verificationCodeSendingStrategy" ref="verificationCodeSendingStrategy"/>
+		<property name="userDao" ref="chineseUserDao"/>
+	</bean>
+	
+	<alias name="chineseVerificationCodeGenerationStrategy" alias="verificationCodeGenerationStrategy"/>
+	<bean id="chineseVerificationCodeGenerationStrategy" class="de.hybris.platform.chineseprofileservices.strategies.impl.ChineseVerificationCodeGenerationStrategy">
+		<property name="length" value="4"/>
+	</bean>
+	
+	<alias name="chineseVerificationCodeSendingStrategy" alias="verificationCodeSendingStrategy"/>
+	<bean id="chineseVerificationCodeSendingStrategy" class="de.hybris.platform.chineseprofileservices.strategies.impl.ChineseVerificationCodeSendingStrategy">
+		<property name="chineseSmsService" ref="chineseSmsService"/>
+	</bean>
+	
+	<alias name="defaultChineseSmsService" alias="chineseSmsService"/>
+	<bean id="defaultChineseSmsService" class="de.hybris.platform.chineseprofileservices.sms.impl.DefaultChineseSmsService"/>
+	
+	<alias name="chineseProfileSMSChannelStrategy" alias="smsChannelStrategy"/>
+	<bean id="chineseProfileSMSChannelStrategy" parent="defaultSMSChannelStrategy" class="de.hybris.platform.chineseprofileservices.strategies.impl.ChineseProfileSMSChannelStrategy">
+	</bean>
+	
+	
+</beans>

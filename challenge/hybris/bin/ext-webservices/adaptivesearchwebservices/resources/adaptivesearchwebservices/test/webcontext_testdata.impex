@@ -1,0 +1,61 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the Solr configuration for the spTest store
+#
+$productCatalog=spTestProductCatalog
+$serverConfigName=spTestSolrServerConfig
+$indexConfigName=spTestSolrIndexConfig
+$searchConfigName=spTestPageSize
+$facetSearchConfigName=spTestIndex
+$facetSearchConfigDescription=spTest Solr Index
+$searchIndexNamePrefix=spTest
+$solrIndexedType=spTestProductType
+$indexBaseSite=spTest
+$catalogVersion=hwcatalog:Online;
+$lang=en
+
+$defaultPassword=1234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$employeegroup=employeegroup
+
+#
+# Setup the Solr server, indexer, and search configs
+#
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append]
+;$regulargroup;customergroup
+;searchmanagergroup;$employeegroup
+
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;testoauthcustomer;customergroup;;Demo Customer
+
+INSERT_UPDATE Employee;UID[unique=true];password[default=$defaultPassword];groups(uid)[mode=append];description;name
+;testsearchmanager;;searchmanagergroup;Test Search Manager;Test Search Manager
+
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true]	;resourceIds	;scope		;authorizedGrantTypes											;authorities			;clientSecret	;registeredRedirectUri
+								;mobile_android			;hybris			;basic		;authorization_code,refresh_token,password,client_credentials	;ROLE_CLIENT			;secret	;http://localhost:9001/authorizationserver/oauth2_callback;
+
+# Create Catalog version
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog
+;hwcatalog;Computer hardware;false
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;readPrincipals(uid)[mode = append]
+;hwcatalog;online;true;searchmanagergroup
+
+# Search profile
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name[lang=$lang];indexType;catalogVersion(catalog(id),version)[unique=true]
+;simpleProfile;Simple search profile;testIndex;hwcatalog:online

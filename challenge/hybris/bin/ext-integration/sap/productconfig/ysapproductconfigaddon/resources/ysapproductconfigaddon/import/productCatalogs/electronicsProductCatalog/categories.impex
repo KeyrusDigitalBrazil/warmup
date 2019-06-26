@@ -1,0 +1,13 @@
+$productCatalog=electronicsProductCatalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+$lang=en
+
+# Add CPQ configurator settings
+insert_update cpqconfiguratorsettings;$productCV[unique=true];id[unique=true];configuratortype(code);configurationcategory(code,$catalogVersion);qualifier
+;;CPQConfiguratorSettings;CPQCONFIGURATOR;CPQConfigurableCategory;CPQCONFIGURATORSETTINGS
+
+# Add CPQ configurable product category
+insert_update configurationcategory;$productCV[unique=true];code[unique=true];name[lang=$lang];configuratorsettings(id,$catalogVersion)
+;;CPQConfigurableCategory;CPQ Configurable Category;CPQConfiguratorSettings

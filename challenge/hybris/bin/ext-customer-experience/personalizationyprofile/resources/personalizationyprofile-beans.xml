@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Profile" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="insights" type="de.hybris.platform.personalizationyprofile.yaas.Insights"/>
+        <property name="segments" type="java.util.Map&lt;String,de.hybris.platform.personalizationyprofile.yaas.Segment>" />
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Insights" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="affinities" type="de.hybris.platform.personalizationyprofile.yaas.Affinities"/>
+        <property name="metrics" type="de.hybris.platform.personalizationyprofile.yaas.Metrics"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Metrics" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="orders" type="de.hybris.platform.personalizationyprofile.yaas.OrderMetrics"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.OrderMetrics" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="allOrdersValuesSum" type="java.math.BigDecimal"/>
+        <property name="allOrdersCount" type="Integer"/>
+        <property name="avgOrderValue" type="java.math.BigDecimal"/>
+        <property name="avgOrderValueAllCustomers" type="java.math.BigDecimal"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Affinities" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="categories" type="java.util.Map&lt;String,de.hybris.platform.personalizationyprofile.yaas.Affinity>"/>
+        <property name="products" type="java.util.Map&lt;String,de.hybris.platform.personalizationyprofile.yaas.Affinity>"/>
+        <property name="locations" type="java.util.Map&lt;String,de.hybris.platform.personalizationyprofile.yaas.LocationsAffinity>"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Affinity" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="score" type="java.math.BigDecimal"/>
+        <property name="recentViewCount" type="Integer"/>
+        <property name="recentScore" type="java.math.BigDecimal"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.LocationsAffinity" extends="de.hybris.platform.personalizationyprofile.yaas.Affinity" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <hints>
+            <hint name="useBuilder">true</hint>
+            <hint name="extendsParentBuilder">true</hint>
+        </hints>
+        <property name="recentCount" type="Integer"/>
+        <property name="location" type="de.hybris.platform.personalizationyprofile.yaas.Location"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Location" template="resources/personalizationyprofile/map-beantemplate.vm">
+        <property name="regionCode" type="String"/>
+        <property name="city" type="String"/>
+        <property name="countryCode" type="String"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.Segment" template="resources/personalizationyprofile/map-beantemplate.vm" >
+    </bean>
+    
+    
+    <bean class="de.hybris.platform.personalizationyprofile.yaas.ProfileReference">
+        <property name="profileId" type="String"/>
+    </bean>
+
+    <enum class="de.hybris.platform.personalizationservices.process.strategies.CxProcessParameterType">
+        <value>PROFILE_ID</value>
+    </enum>
+
+    <enum class="de.hybris.platform.personalizationservices.RecalculateAction">
+        <value>UPDATE_CDS</value>
+        <value>ASYNC_PROCESS_CDS</value>
+    </enum>
+
+</beans>

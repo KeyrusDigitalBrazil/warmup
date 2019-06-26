@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="promotionenginebackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/promotionenginebackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+  	
+  	<alias name="defaultClonePromotionRuleComposer" alias="clonePromotionRuleComposer" />
+    <bean id="defaultClonePromotionRuleComposer" class="de.hybris.platform.promotionenginebackoffice.actions.RuleClonePromotionComposer" scope="prototype"/>
+
+
+	<alias name="defaultPromotionEngineResultsTabEditorAreaRenderer" alias="promotionEngineResultsTabEditorAreaRenderer"/>
+	<bean id="defaultPromotionEngineResultsTabEditorAreaRenderer" class="de.hybris.platform.promotionenginebackoffice.editors.PromotionEngineResultsTabEditorAreaRenderer"
+		  parent="abstractEditorAreaComponentRenderer">
+		<property name="reportPromotionService" ref="reportPromotionService"/>
+	</bean>
+	
+	<alias name="defaultCreatePromotionRuleFromTemplateComposer" alias="createPromotionRuleFromTemplateComposer" />
+	<bean id="defaultCreatePromotionRuleFromTemplateComposer" class="de.hybris.platform.promotionenginebackoffice.actions.RuleCreatePromotionFromTemplateComposer" scope="prototype"/>
+
+	<alias name="defaultRulesModulesForPromotionTypeAdvancedSearchInitializer" alias="rulesModulesForPromotionTypeAdvancedSearchInitializer"/>
+	<bean id="defaultRulesModulesForPromotionTypeAdvancedSearchInitializer" class="de.hybris.platform.ruleenginebackoffice.handlers.RulesModulesForTypeAdvancedSearchInitializer">
+		<property name="ruleType" value="PROMOTION"/>
+	</bean>
+
+	<alias name="defaultRuleGroupCodesForTypeSearchInitializer" alias="ruleGroupCodesForTypeSearchInitializer"/>
+	<bean id="defaultRuleGroupCodesForTypeSearchInitializer" class="de.hybris.platform.ruleenginebackoffice.handlers.RuleGroupCodesForTypeSearchInitializer">
+		<property name="ruleType" value="PROMOTION"/>
+		<property name="ruleGroupDao" ref="ruleGroupDao"/>
+	</bean>
+</beans>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+			http://www.springframework.org/schema/util/spring-util.xsd">
+           
+	<alias name="defaultCustomerCouponFacade" alias="customerCouponFacade"/>
+	<bean id="defaultCustomerCouponFacade" class="de.hybris.platform.customercouponfacades.impl.DefaultCustomerCouponFacade">
+		<property name="userService" ref="userService"/>
+		<property name="customerCouponService" ref="customerCouponService"/>
+		<property name="customerCouponConverter" ref="customerCouponConverter"/>
+		<property name="cartFacade" ref="cartFacade"/>	
+		<property name="voucherFacade" ref="voucherFacade"/>
+		<property name="customerCouponRemovableStrategy" ref="customerCouponRemovableStrategy"/>
+		<property name="customerCouponSearchPageDataConverter" ref="customerCouponSearchPageDataConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomerCouponRemovableStrategy" alias="customerCouponRemovableStrategy"/>
+	<bean id="defaultCustomerCouponRemovableStrategy" class="de.hybris.platform.customercouponfacades.strategies.impl.DefaultCustomerCouponRemovableStrategy">
+		<property name="customerCouponService" ref="customerCouponService"/>
+	</bean>
+	
+	<bean id="customerCouponPopulator" class="de.hybris.platform.customercouponfacades.converter.populators.CustomerCouponPopulator">
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+		<property name="customerCouponService" ref="customerCouponService"/>
+	</bean>
+	
+	<alias name="defaultCustomerCouponConverter" alias="customerCouponConverter"/>
+	<bean id="defaultCustomerCouponConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customercouponfacades.customercoupon.data.CustomerCouponData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerCouponPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="couponNotificationEmailContext" class="de.hybris.platform.customercouponfacades.process.email.context.CouponNotificationEmailContext" parent="abstractEmailContext" scope="prototype" >
+		<property name="customerCouponConverter" ref="customerCouponConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomerNotificationPreferenceCheckStrategy" alias="customerNotificationPreferenceCheckStrategy"/>
+	<bean id="defaultCustomerNotificationPreferenceCheckStrategy" class="de.hybris.platform.customercouponfacades.strategies.impl.DefaultCustomerNotificationPreferenceCheckStrategy">
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<bean id="customerCouponSearchPageDataPopulator" class="de.hybris.platform.customercouponfacades.converter.populators.CustomerCouponSearchPageDataPopulator">
+		<property name="customerCouponConverter" ref="customerCouponConverter"/>
+	</bean>
+	
+	<alias name="defaultCustomerCouponSearchPageDataConverter" alias="customerCouponSearchPageDataConverter"/>
+	<bean id="defaultCustomerCouponSearchPageDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.customercouponfacades.customercoupon.data.CustomerCouponSearchPageData"/>
+		<property name="populators">
+			<list>
+				<ref bean="customerCouponSearchPageDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="couponNotificationSiteMsgUrlResolver" class="de.hybris.platform.customercouponfacades.url.impl.CouponNotificationSiteMsgUrlResolver">
+		<property name="defaultUrl" value="${customercoupon.notification.sitemessage.link}"/>
+	</bean>
+	<bean depends-on="siteMessageUrlResolversMap" parent="mapMergeDirective">
+		<property name="key" value="COUPON_EFFECTIVE"/>
+		<property name="value" ref="couponNotificationSiteMsgUrlResolver" />
+	</bean>
+	<bean depends-on="siteMessageUrlResolversMap" parent="mapMergeDirective">
+		<property name="key" value="COUPON_EXPIRE"/>
+		<property name="value" ref="couponNotificationSiteMsgUrlResolver" />
+	</bean>
+	
+</beans>
