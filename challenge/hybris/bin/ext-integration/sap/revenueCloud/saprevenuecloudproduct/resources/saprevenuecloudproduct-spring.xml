@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+ 	<bean name="sapMarketToCatalogMappingModelGenericDao"
+          class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="SAPMarketToCatalogMapping"/>
+    </bean>
+    
+    <bean name="sapRevenueCloudConfigurationModelGenericDao"
+          class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="SAPRevenueCloudConfiguration"/>
+    </bean>
+    
+   	<alias name="defaultSapRevenueCloudProductInboudHelper" alias="sapRevenueCloudProductInboudHelper"/>
+    <bean name="defaultSapRevenueCloudProductInboudHelper"
+          class="com.sap.hybris.saprevenuecloudproduct.inbound.SapRevenueCloudProductInboudHelper">
+        <property name="defaultCatalogId" value="${saprevenuecloud.product.inbound.defaultcatalog.id}"></property>
+        <property name="defaultCatalogVersion" value="${saprevenuecloud.product.inbound.defaultcatalog.version}"></property>
+        <property name="catalogService" ref="catalogService"></property>
+        <property name="catalogVersionService" ref="catalogVersionService"></property>
+        <property name="sapMarketToCatalogMappingModelGenericDao" ref="sapMarketToCatalogMappingModelGenericDao" />
+        <property name="productService" ref="productService"></property>
+        <property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"></property>
+        <property name="modelService" ref="modelService"></property>
+        <property name="billingTimeService" ref="billingTimeService"></property>
+    </bean>
+    
+    
+    <alias name="defaultSapRevenueCloudProductService" alias="sapRevenueCloudProductService"/>
+    <bean name="defaultSapRevenueCloudProductService" class="com.sap.hybris.saprevenuecloudproduct.service.impl.DefaultSapRevenueCloudProductService">
+    	<property name="sapRevenueCloudProductDao" ref="sapRevenueCloudProductDao"></property>
+    	<property name="sapRatePlanElementDao" ref="sapRatePlanElementDao"></property>
+    	<property name="usageUnitDao" ref="usageUnitDao"></property>
+    </bean>
+    
+     <alias name="defaultSapRevenueCloudProductDao" alias="sapRevenueCloudProductDao"/>
+    <bean name="defaultSapRevenueCloudProductDao" class="com.sap.hybris.saprevenuecloudproduct.dao.impl.DefaultSapSubscriptionProductDao">
+    </bean>
+    
+    <alias name="defaultSapRevenueCloudProductImportJob" alias="sapRevenueCloudProductImportJob"/>
+    <bean id="defaultSapRevenueCloudProductImportJob"
+		  class="com.sap.hybris.saprevenuecloudproduct.jobs.SapRevenueCloudProductImportJob"
+		  parent="abstractJobPerformable">
+		<property name="configurationService" ref="configurationService" />
+		<property name="outboundServiceFacade" ref="outboundServiceFacade" />
+		<property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"/>
+	</bean>
+			
+    
+    <bean id="sapRevenueCloudProductSubscriptionCodeValueProvider"
+		  class="com.sap.hybris.saprevenuecloudproduct.solr.valueprovider.SapRevenueCloudProductSubscriptionCodeValueProvider"
+		  parent="subscriptionAwareFieldValueProvider" >
+		<property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="subscriptionProductService" ref="subscriptionProductService"/>
+	</bean>
+	
+	<alias name="SapRevenueCloudSearchResultSubscriptionProductPopulator" alias="searchResultSubscriptionProductPopulator"/>
+    <bean id="SapRevenueCloudSearchResultSubscriptionProductPopulator" class="com.sap.hybris.saprevenuecloudproduct.populator.SapRevenueCloudSearchResultsSubscriptionProductPopulator" parent="defaultSearchResultSubscriptionProductPopulator">
+	</bean>
+	
+	<alias name="defaultSAPRatePlanElementDao" alias="sapRatePlanElementDao"/>
+	 <bean name="defaultSAPRatePlanElementDao"
+          class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="SAPRatePlanElement"/>        
+    </bean>
+
+    <alias name="sapRevenueCloudProductDetailsPopulator" alias="sapRevenueCloudProductDetailsPopulator"/>
+    	<bean id="sapRevenueCloudProductDetailsPopulator" class="com.sap.hybris.saprevenuecloudproduct.populator.SapRevenueCloudProductDetailsPopulator">
+	</bean>
+	
+    <bean parent="modifyPopulatorList">
+		<property name="list" ref="productConverter"/>
+		<property name="add" ref="sapRevenueCloudProductDetailsPopulator"/>
+	</bean>
+	
+	  <alias name="defaultUsageUnitDao" alias="usageUnitDao"/>
+	 <bean name="defaultUsageUnitDao"
+          class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="UsageUnit"/>        
+     </bean>
+     
+     
+     <bean id="sapRevenueCloudSubscriptionPricePlanPostPersistenceHook"
+          class="com.sap.hybris.saprevenuecloudproduct.inbound.SapRevenueCloudSubscriptionPricePlanPostPersistenceHook">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+    	
+</beans>

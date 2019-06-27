@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+
+	<!-- ** (Predicate -> Populator List) Map ** 
+		Note that the predicates should be tested in order 
+	-->
+	<alias name="defaultCmsAttributePredicatePopulatorListMap" alias="cmsAttributePredicatePopulatorListMap"/>
+	<bean id="defaultCmsAttributePredicatePopulatorListMap" class="org.springframework.beans.factory.config.MapFactoryBean" scope="singleton">
+		<property name="sourceMap">
+			<util:map key-type="java.util.function.Predicate" value-type="java.util.List" map-class="java.util.LinkedHashMap">
+				<entry>
+					<key>
+						<ref bean="cmsRequiredAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="requiredComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.LocalizedStructureTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="localizedComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+
+				<entry>
+					<!-- Default Collection is always EditableDropdown -->
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.ComplexTypeAttributePredicate">
+							<property name="attributeDescriptorModelHelperService" ref="attributeDescriptorModelHelperService"/>
+							<property name="isEnumPredicate" ref="isEnumPredicate" />
+						</bean>
+					</key>
+					<list>
+						<ref bean="dropdownComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<!-- If Collection is of type CMSItem use CMSItemDropdown -->
+					<key>
+						<bean parent="cmsAssignableFromAttributePredicate" p:typeCode="CMSItem"/>
+					</key>
+					<list>
+						<ref bean="cmsItemDropdownComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="isEnumPredicate"/>
+					</key>
+					<list>
+						<ref bean="cmsStructureEnumTypeComponentTypeAttributePopulator" />
+					</list>	
+				</entry>
+				<entry>
+					<!-- String is mapped to ShortString --> 
+					<key>
+						<ref bean="cmsStringTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="shortStringComponentTypeAttributePopulator" />
+					</list>	
+				</entry>
+				<entry>
+					<!-- Integer is mapped to Number -->
+					<key>
+						<ref bean="cmsIntegerTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="numberComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<!-- Long is mapped to Number -->
+					<key>
+						<ref bean="cmsLongTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="numberComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsFloatTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="floatComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsDoubleTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="floatComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsBooleanTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="booleanComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsDateTypeAttributePredicate"/>
+					</key>
+					<list>
+						<ref bean="dateComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.RegexpStructureTypeAttributePredicate" p:pattern=".*@.*:CMSNavigationNode"/>
+					</key>
+					<list>
+						<ref bean="navigationNodeSelectorComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.RegexpStructureTypeAttributePredicate" p:pattern=".*@.*:Media"/>
+					</key>
+					<list>
+						<ref bean="mediaComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.RegexpStructureTypeAttributePredicate" p:pattern="AbstractMediaContainerComponent@MapType:localized:MediaContainer"/>
+					</key>
+					<list>
+						<ref bean="mediaContainerComponentTypeAttributePopulator" />
+						<ref bean="mediaFormatsComponentTypeAttributePopulator" />
+						<ref bean="mediaContainerContainedTypesComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="isProductAssignableFromPredicate" />
+					</key>
+					<list>
+						<ref bean="productTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.MultiCatalogAwareItemAttributePredicate">
+							<property name="isCollectionPredicate" ref="isCollectionPredicate" />
+							<property name="assignableFromAttributePredicate" ref="isProductAssignableFromPredicate" />
+						</bean>
+					</key>
+					<list>
+						<ref bean="multiProductSelectorPopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="isCategoryAssignableFromPredicate" />
+					</key>
+					<list>
+						<ref bean="categoryTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean parent="cmsAssignableFromAttributePredicate" p:typeCode="AbstractRestriction" p:enclosingTypeCode="AbstractCMSComponent"/>
+					</key>
+					<list>
+						<ref bean="componentRestrictionComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean parent="cmsAssignableFromAttributePredicate" p:typeCode="AbstractRestriction" p:enclosingTypeCode="AbstractPage"/>
+					</key>
+					<list>
+						<ref bean="pageRestrictionComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<bean parent="cmsAssignableFromAttributePredicate" p:typeCode="AbstractPage"/>
+					</key>
+					<list>
+						<ref bean="pageDropdownComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.MultiCatalogAwareItemAttributePredicate">
+							<property name="isCollectionPredicate" ref="isCollectionPredicate" />
+							<property name="assignableFromAttributePredicate" ref="isCategoryAssignableFromPredicate" />
+						</bean>
+					</key>
+					<list>
+						<ref bean="multiCategorySelectorPopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsLinkTargetAttributePredicate" />
+					</key>
+					<list>
+						<ref bean="booleanComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+				<entry>
+					<key>
+						<ref bean="cmsPartOfLinkToggleAttributePredicate" />
+					</key>
+					<list>
+						<ref bean="itemLinkToggleTypeAttributePopulator" />
+					</list>
+				</entry>
+				<!-- Navigation entry -->
+				<entry>
+					<key>
+						<bean class="de.hybris.platform.cmsfacades.types.service.predicate.AndAttributePredicate">
+							<property name="predicates" ref="cmsNavigationEntryItemPredicatesList"/>
+						</bean>
+					</key>
+					<list>
+						<ref bean="navigationEntryItemPopulator" />
+					</list>
+				</entry>
+				<!--Navigation Node-->
+				<entry>
+					<key>
+						<bean parent="cmsAssignableFromAttributePredicate" p:typeCode="CMSNavigationEntry" p:enclosingTypeCode="CMSNavigationNode"/>
+					</key>
+					<list>
+						<ref bean="navigationEntryDropdownComponentTypeAttributePopulator" />
+					</list>
+				</entry>
+			</util:map>
+		</property>
+	</bean>
+
+</beans>

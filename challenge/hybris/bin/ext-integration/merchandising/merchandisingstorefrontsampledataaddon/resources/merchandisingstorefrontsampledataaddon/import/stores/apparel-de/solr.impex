@@ -1,0 +1,31 @@
+#
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+#
+
+$solrIndexedType=apparel-deProductType
+$merchCatalogVersions=merchCatalogVersions(catalog(id),version);
+$productCatalog=apparelProductCatalog
+
+INSERT_UPDATE MerchIndexingConfig;indexedType(identifier)[unique=true];enabled[default=false];language(isocode);currency(isocode);$merchCatalogVersions
+;$solrIndexedType;false;de;EUR;$productCatalog:Online
+
+INSERT_UPDATE MerchProperty;merchIndexingConfig(indexedType(identifier))[unique=true];indexedProperty(solrIndexedType(identifier),name)[unique=true];merchMappedName
+;$solrIndexedType;$solrIndexedType:code;id
+;$solrIndexedType;$solrIndexedType:name;name
+;$solrIndexedType;$solrIndexedType:url;pageUrl
+;$solrIndexedType;$solrIndexedType:baseProductCode;baseProductCode
+;$solrIndexedType;$solrIndexedType:priceValue;price
+;$solrIndexedType;$solrIndexedType:summary;summary
+;$solrIndexedType;$solrIndexedType:description;description
+;$solrIndexedType;$solrIndexedType:allCategories;categories
+
+INSERT_UPDATE MerchImageProperty;merchIndexingConfig(indexedType(identifier))[unique=true];indexedProperty(solrIndexedType(identifier),name)[unique=true];merchMappedName
+;$solrIndexedType;$solrIndexedType:img-65Wx65H;thumbnailImage
+;$solrIndexedType;$solrIndexedType:img-515Wx515H;mainImage

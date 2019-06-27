@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/>
+	<context:component-scan base-package="de.hybris.platform.orderselfserviceaddon.controllers" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultOrderselfserviceaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="orderselfserviceaddon"/>
+	</bean>
+
+	<bean id="defaultOrderselfserviceaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultOrderselfserviceaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getOrderselfserviceaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultOrderselfserviceaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="OrderselfserviceaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getOrderselfserviceaddonBeforeViewHandler"/>
+	</bean>
+
+	<bean id="cancelOrderActionRenderer"  parent="genericAddOnCMSComponentRenderer"/>
+
+	<bean id="cancelOrderActionRendererMapping" parent="addonCmsComponentRendererMapping" >
+		<property name="typeCode" value="CancelOrderAction" />
+		<property name="renderer" ref="cancelOrderActionRenderer" />
+	</bean>
+
+	<bean id="returnOrderActionRenderer"  parent="genericAddOnCMSComponentRenderer"/>
+
+	<bean id="returnOrderActionRendererMapping" parent="addonCmsComponentRendererMapping" >
+		<property name="typeCode" value="ReturnOrderAction" />
+		<property name="renderer" ref="returnOrderActionRenderer" />
+	</bean>
+
+	<bean id="cancelReturnActionRenderer"  parent="genericAddOnCMSComponentRenderer"/>
+
+	<bean id="cancelReturnActionRendererMapping" parent="addonCmsComponentRendererMapping" >
+		<property name="typeCode" value="CancelReturnAction" />
+		<property name="renderer" ref="cancelReturnActionRenderer" />
+	</bean>
+
+
+</beans>

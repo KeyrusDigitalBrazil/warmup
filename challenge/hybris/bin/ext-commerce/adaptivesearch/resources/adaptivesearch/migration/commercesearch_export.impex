@@ -1,0 +1,54 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#-----------------------------------------------------------
+"#% impex.setLocale( new Locale( ""en"" , """" ) );"
+#-----------------------------------------------------------
+
+$indexType=electronicsProductType
+$catalogId=electronicsProductCatalog
+$version=Online
+$searchProfile=commercesearch-electronics
+
+
+### Search Configurations ###
+
+"#% impex.setTargetFile( ""GlobalSearchConfiguration.csv"" );"
+insert GlobalSolrSearchProfile;&searchConfiguration
+"#% impex.exportItemsFlexibleSearch( ""SELECT {SP:pk} FROM {GlobalSolrSearchProfile as SP},{SolrIndexedType as IT} WHERE {SP:indexedType}={IT:PK} AND {IT:identifier}='$indexType'"" );"
+
+"#% impex.setTargetFile( ""CategorySearchConfiguration.csv"" );"
+insert CategorySolrSearchProfile;&searchConfiguration;categoryCode;solrFacetReconfigurations;boostRules
+"#% impex.exportItemsFlexibleSearch( ""SELECT {SP:pk} FROM {CategorySolrSearchProfile as SP},{SolrIndexedType as IT} WHERE {SP:indexedType}={IT:PK} AND {IT:identifier}='$indexType'"" );"
+
+
+### Facets ###
+
+"#% impex.setTargetFile( ""Facet.csv"" );"
+insert SolrFacetReconfiguration2SolrSearchProfile;&facet;source(facet(name));source(priority);source(facet(facetType(code)));source(facet(customFacetSortProvider));source(facet(facetDisplayNameProvider));source(facet(topValuesProvider));target(&searchConfiguration)
+"#% impex.exportItemsFlexibleSearch( ""SELECT {F2SP:PK} FROM {SolrFacetReconfiguration2SolrSearchProfile as F2SP},{SolrFacetReconfiguration as F},{AbstractSolrSearchProfile as SP},{SolrIndexedType as IT} WHERE {F2SP:source}={F:PK} AND {F:visible}=1 AND {F2SP:target}={SP:PK} AND {SP:indexedType}={IT:PK} AND {IT:identifier}='$indexType'"" );"
+
+"#% impex.setTargetFile( ""ExcludedFacet.csv"" );"
+insert SolrFacetReconfiguration2SolrSearchProfile;&excludedFacet;source(facet(name));source(priority);source(facet(facetType(code)));source(facet(customFacetSortProvider));source(facet(facetDisplayNameProvider));source(facet(topValuesProvider));target(&searchConfiguration)
+"#% impex.exportItemsFlexibleSearch( ""SELECT {F2SP:PK} FROM {SolrFacetReconfiguration2SolrSearchProfile as F2SP},{SolrFacetReconfiguration as F},{AbstractSolrSearchProfile as SP},{SolrIndexedType as IT} WHERE {F2SP:source}={F:PK} AND {F:visible}=0 AND {F2SP:target}={SP:PK} AND {SP:indexedType}={IT:PK} AND {IT:identifier}='$indexType'"" );"
+
+
+### Boost Rules ###
+
+"#% impex.setTargetFile( ""BoostRule.csv"" );"
+insert SolrBoostRule2SolrSearchProfile;&boostRule;source(solrIndexedProperty(name));source(solrIndexedProperty(type(code)));source(operator(code));source(propertyValue);source(boostFactor);target(&searchConfiguration)
+"#% impex.exportItemsFlexibleSearch( ""SELECT {BR2SP:PK} FROM {SolrBoostRule2SolrSearchProfile as BR2SP},{SolrBoostRule as BR},{AbstractSolrSearchProfile as SP},{SolrIndexedType as IT} WHERE {BR2SP:source}={BR:PK} AND {BR2SP:target}={SP:PK} AND {SP:indexedType}={IT:PK} AND {IT:identifier}='$indexType'"" );"
+
+
+### Boost Items ###
+
+"#% impex.setTargetFile( ""PromotedItem.csv"" );"
+insert SolrHeroProductDef2ProductRelation;&promotedItem;target(code);source(category(code))
+"#% impex.exportItemsFlexibleSearch( ""SELECT {HP2P:PK} FROM {SolrHeroProductDef2ProductRelation as HP2P},{SolrHeroProductDefinition as HP},{SolrIndexedType as IT},{CatalogVersion as CV},{Catalog as C} WHERE {HP2P:source}={HP:PK} AND {HP:indexedType}={IT:PK} AND {IT:identifier}='$indexType' AND {HP:catalogVersion}={CV:PK} AND {CV:version}='$version' AND {CV:catalog}={C:PK} AND {C:id}='$catalogId'"" );"

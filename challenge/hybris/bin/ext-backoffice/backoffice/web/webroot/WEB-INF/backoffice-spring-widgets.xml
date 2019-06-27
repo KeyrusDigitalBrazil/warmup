@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           	http://www.springframework.org/schema/context
+		   	http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+
+    <alias name="defaultCatalogTreeModelPopulator" alias="catalogTreeModelPopulator"/>
+    <bean id="defaultCatalogTreeModelPopulator" class="com.hybris.backoffice.tree.model.CatalogTreeModelPopulator">
+        <property name="catalogService" ref="catalogService"/>
+        <property name="permissionFacade" ref="permissionFacade"/>
+        <property name="cockpitUserService" ref="cockpitUserService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="excludedTypes">
+            <util:set>
+                <value>ContentCatalog</value>
+            </util:set>
+        </property>
+        <property name="labelService" ref="labelService"/>
+        <property name="catalogTreeSimpleLabelProvider" ref="catalogTreeSimpleLabelProvider" />
+        <property name="partitionThreshold" value="100" />
+    </bean>
+
+    <alias name="defaultCatalogTreeSimpleLabelProvider" alias="catalogTreeSimpleLabelProvider" />
+    <bean id="defaultCatalogTreeSimpleLabelProvider" class="com.hybris.backoffice.tree.model.DefaultCatalogTreeSimpleLabelProvider"/>
+
+    <alias name="defaultWorkflowStatusRenderer" alias="workflowStatusRenderer"/>
+    <bean id="defaultWorkflowStatusRenderer" class="com.hybris.backoffice.renderer.WorkflowStatusRenderer">
+        <property name="workflowFacade" ref="workflowFacade"/>
+    </bean>
+
+    <alias name="defaultWorkflowDetailedNameRenderer" alias="detailedWorkflowNameRenderer"/>
+    <bean id="defaultWorkflowDetailedNameRenderer" class="com.hybris.backoffice.workflow.renderer.WorkflowDetailedNameRenderer">
+        <property name="workflowActionService" ref="workflowActionService"/>
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+</beans>

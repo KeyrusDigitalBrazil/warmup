@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+    <enum class="de.hybris.platform.personalizationservices.enums.CxActionType">
+        <value>CxAbstractAction</value>
+    </enum>
+
+    <bean class="de.hybris.platform.personalizationservices.CxContext">
+        <property name="user" type="de.hybris.platform.core.model.user.UserModel"/>
+        <property name="actionResult" type="de.hybris.platform.personalizationservices.data.CxAbstractActionResult"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationservices.data.CxAbstractActionResult">
+        <property name="actionCode" type="java.lang.String"/>
+        <property name="customizationCode" type="java.lang.String"/>
+        <property name="variationCode" type="java.lang.String"/>
+        <property name="customizationName" type="java.lang.String" />
+        <property name="variationName" type="java.lang.String" />
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationservices.data.CxVariationKey">
+        <property name="variationCode" type="java.lang.String" equals="true"/>
+        <property name="customizationCode" type="java.lang.String" equals="true"/>
+        <property name="catalog" type="java.lang.String" equals="true"/>
+        <property name="catalogVersion" type="java.lang.String" equals="true"/>
+    </bean>
+
+    <enum class="de.hybris.platform.personalizationservices.RecalculateAction">
+        <description>Vote for personalization recalculation.</description>
+        <value>IGNORE</value>
+        <value>RECALCULATE</value>
+        <value>UPDATE</value>
+        <value>UPDATE_DEFAULT</value>
+        <value>ASYNC_PROCESS</value>
+        <value>ASYNC_PROCESS_DEFAULT</value>
+        <value>LOAD</value>
+    </enum>
+
+    <bean class="de.hybris.platform.personalizationservices.voters.Vote">
+        <description>Vote used for defining what should be done with given request.</description>
+        <property name="recalculateActions" type="java.util.Set&lt;de.hybris.platform.personalizationservices.RecalculateAction>"/>
+        <property name="conclusive" type="boolean"/>
+    </bean>
+
+    <bean class="de.hybris.platform.personalizationservices.trigger.expression.CxExpressionContext">
+        <property name="segments" type="java.util.Collection&lt;String>"/>
+    </bean>
+
+    <enum class="de.hybris.platform.personalizationservices.process.strategies.CxProcessParameterType">
+        <value>BASE_SITE</value>
+        <value>SESSION_TOKEN</value>
+        <value>USER_CONSENTS</value>
+        <value>ANONYMOUS_SEGMENTATION</value>
+        <value>SEGMENTATION</value>
+    </enum>
+
+    <bean class="de.hybris.platform.personalizationservices.data.UserToSegmentData">
+        <property name="code" type="java.lang.String" />
+	<property name="affinity" type="java.math.BigDecimal" />
+        <property name="provider" type="java.lang.String" />
+        <property name="description" type="java.lang.String" />
+	</bean>
+
+    <bean class="de.hybris.platform.personalizationservices.CxCalculationContext">
+        <property name="segmentUpdateProviders" type="java.util.Set&lt;String>" />
+    </bean>
+
+</beans>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config/>
+	
+	<!-- Consignment Process Actions -->
+    
+	<bean id="redirectConsignmentFulfillmentProcessAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.RedirectConsignmentFulfillmentProcessAction" parent="abstractAction"/>
+
+	<bean id="processConsignmentPreFulfillmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.ProcessConsignmentPreFulfillmentAction" parent="abstractAction">
+		<property name="preFulfillmentStrategyRegistry" ref="preFulfillmentStrategyRegistry" />
+	</bean>
+
+	<alias name="defaultPreFulfillmentStrategyRegistry" alias="preFulfillmentStrategyRegistry"/>
+	<util:map id="defaultPreFulfillmentStrategyRegistry" key-type="java.lang.String" value-type="java.util.List&lt;de.hybris.platform.warehousing.externalfulfillment.strategy.ConsignmentPreFulfillmentStrategy>"/>
+
+	<bean id="sendConsignmentToExternalFulfillmentSystemAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.SendConsignmentToExternalFulfillmentSystemAction" parent="abstractAction">
+		<property name="sendConsignmentToExternalFulfillmentSystemStrategyMap" ref="sendConsignmentToExternalFulfillmentSystemStrategyMap"/>
+	</bean>
+
+	<alias name="defaultSendConsignmentToExternalFulfillmentSystemStrategyMap" alias="sendConsignmentToExternalFulfillmentSystemStrategyMap"/>
+	<util:map id="defaultSendConsignmentToExternalFulfillmentSystemStrategyMap" key-type="String" value-type="de.hybris.platform.warehousing.externalfulfillment.strategy.SendConsignmentToExternalFulfillmentSystemStrategy"/>
+
+	<bean id="redirectConsignmentByDeliveryModeAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.RedirectConsignmentByDeliveryModeAction" parent="abstractAction"/>
+
+	<bean id="verifyConsignmentCompletionAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.VerifyConsignmentCompletionAction" parent="abstractAction">
+		<property name="warehousingConsignmentWorkflowService" ref="warehousingConsignmentWorkflowService"/>
+	</bean>
+
+	<bean id="abstractConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.AbstractConsignmentAction" parent="abstractAction"
+	      abstract="true">
+		<property name="eventService" ref="eventService"/>
+		<property name="warehousingConsignmentWorkflowService" ref="warehousingConsignmentWorkflowService"/>
+	</bean>
+
+	<bean id="confirmShipConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.ConfirmShipConsignmentAction" parent="abstractConsignmentAction"/>
+	<bean id="confirmPickupConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.ConfirmPickupConsignmentAction" parent="abstractConsignmentAction"/>
+
+	<bean id="reallocateConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.ReAllocateConsignmentAction" parent="abstractAction">
+		<property name="orderBusinessProcessService" ref="orderBusinessProcessService"/>
+		<property name="allocationService" ref="allocationService"/>
+		<property name="declineActionsMap" ref="declineActionsMap"/>
+		<property name="externalWarehouseDeclineActionsMap" ref="externalWarehouseDeclineActionsMap"/>
+		<property name="warehousingConsignmentWorkflowService" ref="warehousingConsignmentWorkflowService"/>
+	</bean>
+	
+	<bean id="makeReadyForPickupConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.UpdateConsignmentAction" parent="abstractAction">
+		<property name="status"> 
+			<value type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">READY_FOR_PICKUP</value>
+		</property>
+	</bean>
+	
+	<bean id="makeReadyForShipConsignmentAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.UpdateConsignmentAction" parent="abstractAction">
+		<property name="status"> 
+			<value type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">READY_FOR_SHIPPING</value>
+		</property>
+	</bean>
+	
+	<bean id="consignmentProcessEndAction" class="de.hybris.platform.yacceleratorordermanagement.actions.consignment.ConsignmentProcessEndAction" parent="abstractAction">
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+
+</beans>

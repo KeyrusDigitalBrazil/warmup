@@ -1,0 +1,56 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog
+;hwcatalog;Computer hardware;false
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode)
+;hwcatalog;Staged;en
+;hwcatalog;Online;en
+
+# search profiles
+
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name[lang=$lang];indexType;catalogVersion(catalog(id),version)[unique=true]
+;simpleProfile;Simple search profile;testIndex;hwcatalog:Staged
+;simpleProfile;Simple search profile;testIndex;hwcatalog:Online
+
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name[lang=$lang];indexType
+;nullSimpleProfile;Null simple search profile;testIndex2
+
+INSERT_UPDATE AsCategoryAwareSearchProfile;code[unique=true];name[lang=$lang];indexType;catalogVersion(catalog(id),version)[unique=true]
+;categoryAwareProfile;Category aware search profile;testIndex;hwcatalog:Staged
+;categoryAwareProfile;Category aware search profile;testIndex;hwcatalog:Online
+
+INSERT_UPDATE AsCategoryAwareSearchProfile;code[unique=true];name[lang=$lang];indexType
+;nullCategoryAwareProfile;Null category aware search profile;testIndex2
+
+# search configurations
+
+INSERT_UPDATE AsSimpleSearchConfiguration;searchProfile(code,catalogVersion(catalog(id),version))[unique=true];uid[unique=true];catalogVersion(catalog(id),version)[unique=true]
+;simpleProfile:hwcatalog:Staged;simpleConfiguration;hwcatalog:Staged
+;simpleProfile:hwcatalog:Online;simpleConfiguration;hwcatalog:Online
+
+INSERT_UPDATE AsSimpleSearchConfiguration;searchProfile(code)[unique=true];uid[unique=true]
+;nullSimpleProfile;nullSimpleConfiguration
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration;searchProfile(code,catalogVersion(catalog(id),version))[unique=true];uid[unique=true];catalogVersion(catalog(id),version)[unique=true]
+;categoryAwareProfile:hwcatalog:Staged;categoryAwareConfiguration;hwcatalog:Staged
+;categoryAwareProfile:hwcatalog:Online;categoryAwareConfiguration;hwcatalog:Online
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration;searchProfile(code)[unique=true];uid[unique=true]
+;nullCategoryAwareProfile;nullCategoryAwareConfiguration
+
+# sorts
+
+INSERT_UPDATE AsSort;searchConfiguration(uid,catalogVersion(catalog(id),version))[unique=true];uid[unique=true];code;name[lang=en];catalogVersion(catalog(id),version)[unique=true]
+;simpleConfiguration:hwcatalog:Staged;sort1;sort1code;sort1name;hwcatalog:Staged
+;simpleConfiguration:hwcatalog:Online;sort1;sort1code;sort1name;hwcatalog:Online

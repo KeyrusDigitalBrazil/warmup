@@ -1,0 +1,193 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# OMS velocity template for printing label
+
+$contentCatalog=apparel-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$wideContent=CMSImageComponent,BannerComponent
+$siteResource=jar:de.hybris.platform.ordermanagementaddon.constants.OrdermanagementaddonConstants&/ordermanagementaddon/import
+
+# Document page Template
+INSERT_UPDATE DocumentPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;frontendTemplateName;htmlTemplate(code);restrictedPageTypes(code)
+;;PackLabelDocumentTemplate;Pack Label Document Template;true;packLabel;pack-template;DocumentPage
+;;PickLabelDocumentTemplate;Pick Label Document Template;true;pickLabel;pick-slip-template;DocumentPage
+;;ConsolidatedPickLabelDocumentTemplate;Consolidated Pick Label Document Template;true;consolidatedPickLabel;consolidated-pick-slip-template;DocumentPage
+;;ShippingLabelDocumentTemplate;Shipping Label Document Template;true;shippingLabel;shipping-label-template;DocumentPage
+;;ReturnShippingLabelDocumentTemplate;Return Shipping Label Document Template;true;returnshippingLabel;return-shipping-label-template;DocumentPage
+;;ExportFormDocumentTemplate;Export Form Document Template;true;exportForm;export-form-template;DocumentPage
+;;ReturnFormDocumentTemplate;Return Form Document Template;true;returnForm;return-form-template;DocumentPage
+
+# Templates for CMS Cockpit Page Edit
+UPDATE DocumentPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;PackLabelDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_packLayout.vm
+;;PickLabelDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_pickLayout.vm
+;;ConsolidatedPickLabelDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_consolidatedPickLayout.vm
+;;ShippingLabelDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_shippingLayout.vm
+;;ReturnShippingLabelDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_returnShippingLayout.vm
+;;ExportFormDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_exportFormLayout.vm
+;;ReturnFormDocumentTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_returnFormLayout.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='PickLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ConsolidatedPickLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='PackLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ShippingLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnShippingLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ExportFormDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnFormDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+# Create Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;DocumentTopSlot;Default Document Top Slot;true
+;;DocumentBottomSlot;Default Document Bottom Slot;true
+;;DocumentSiteLogoSlot;Default Document Site Slot;true
+
+# Bind Content Slots to Document Page Templates
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='PickLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-PickLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-PickLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-PickLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ConsolidatedPickLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ConsolidatedPickLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ConsolidatedPickLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ConsolidatedPickLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='PackLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-PackLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-PackLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-PackLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ShippingLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ShippingLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ShippingLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ShippingLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnShippingLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnShippingLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ReturnShippingLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ReturnShippingLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ExportFormDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ExportFormDocument;SiteLogo;;DocumentSiteLogoSlot;true 
+;;TopContent-ExportFormDocument;TopContent;;DocumentTopSlot;true 
+;;BottomContent-ExportFormDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnFormDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnFormDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ReturnFormDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ReturnFormDocument;BottomContent;;DocumentBottomSlot;true
+
+# Document Pages
+INSERT_UPDATE DocumentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;packLabel;Pack Label Document Page;PackLabelDocumentTemplate;true;
+;;pickLabel;Pick Label Document Page;PickLabelDocumentTemplate;true;
+;;consolidatedPickLabel;Consolidated Pick Label Document Page;ConsolidatedPickLabelDocumentTemplate;true;
+;;shippingLabel;Shipping Label Document Page;ShippingLabelDocumentTemplate;true;
+;;returnshippingLabel;Return Shipping Label Document Page;ReturnShippingLabelDocumentTemplate;true;
+;;exportForm;Export Form Document Page;ExportFormDocumentTemplate;true;
+;;returnForm;Return Form Document Page;ReturnFormDocumentTemplate;true;
+
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity']
+;shipping-label-template;de.hybris.platform.warehousing.labels.context.ShippingLabelContext
+;return-shipping-label-template;de.hybris.platform.warehousing.labels.context.ReturnShippingLabelContext
+;pick-slip-template;de.hybris.platform.warehousing.labels.context.PickSlipContext
+;consolidated-pick-slip-template;de.hybris.platform.warehousing.labels.context.ConsolidatedPickSlipContext
+;pack-template;de.hybris.platform.warehousing.labels.context.PackContext
+;export-form-template;de.hybris.platform.warehousing.labels.context.ExportFormContext
+;return-form-template;de.hybris.platform.warehousing.labels.context.ReturnFormContext
+
+# Media
+# Preview image displayed in the CMS Cockpit
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];folder(qualifier)[default='images']
+;;ReturnLabelBarcode;barcode.jpg;$siteResource/documents/images/barcode.jpg;;
+;;HybrisLogo;hybris_logo.jpg;$siteResource/documents/images/hybris_logo.jpg;;
+;;PageContent_preview;page_content.gif;$siteResource/documents/images/page_content.gif;text/gif;;
+
+# Email page Template
+INSERT_UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;frontendTemplateName;subject(code);htmlTemplate(code);restrictedPageTypes(code)
+;;ReturnLabelEmailTemplate;Return Label Email Template;true;ReturnLabelEmail;apparel-uk_Email_Return_Label_Subject;apparel-uk_Email_Return_Label_Body;EmailPage
+
+# Templates for CMS Cockpit Page Edit
+UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ReturnLabelEmailTemplate;jar:/ordermanagementaddon/import/documents/structure-view/structure_returnLabelEmailTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+# Bind Content Slots to Email Page Templates
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnLabelEmail;SiteLogo;;EmailSiteLogoSlot;true
+;;TopContent-ReturnLabelEmail;TopContent;;EmailTopSlot;true
+;;BottomContent-ReturnLabelEmail;BottomContent;;EmailBottomSlot;true
+
+# Email Pages
+INSERT_UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;ReturnLabelEmail;Return Label Email;ReturnLabelEmailTemplate;true;
+
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity']
+;apparel-uk_Email_Return_Label_Body;de.hybris.platform.yacceleratorordermanagement.email.ReturnLabelEmailContext
+;apparel-uk_Email_Return_Label_Subject;de.hybris.platform.yacceleratorordermanagement.email.ReturnLabelEmailContext
+
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;ReturnLabelEmail;EmailPageModel_preview
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnLabelEmail;SiteLogo;;EmailSiteLogoSlot;true
+;;TopContent-ReturnLabelEmail;TopContent;;EmailTopSlot;true
+;;BottomContent-ReturnLabelEmail;BottomContent;;EmailBottomSlot;true
+
+
+# DocumentPage preview image
+INSERT_UPDATE DocumentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;returnForm;PageContent_preview
+;;packLabel;PageContent_preview
+;;pickLabel;PageContent_preview
+;;consolidatedPickLabel;PageContent_preview
+;;shippingLabel;PageContent_preview
+;;returnshippingLabel;PageContent_preview
+;;exportForm;PageContent_preview

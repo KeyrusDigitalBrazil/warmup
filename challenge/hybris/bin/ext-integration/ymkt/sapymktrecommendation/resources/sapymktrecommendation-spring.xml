@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="recommendationService" class="com.hybris.ymkt.recommendation.services.RecommendationService">
+		<property name="ODataService" ref="ODataService_PROD_RECO_RUNTIME_SRV" />
+		<property name="cartService" ref="cartService" />
+		<property name="recentViewedItemsService" ref="recentViewedItemsService" />
+		<property name="recommendationBufferService" ref="recommendationBufferService"/>
+		<property name="userContextService" ref="userContextService" />
+		<property name="requestTimeoutThreshold" value="#{configurationService.configuration.getProperty('sapymktrecommendation.productrecommendation.requestTimeoutThreshold')}" />
+	</bean>
+
+	<bean id="interactionService" class="com.hybris.ymkt.recommendation.services.InteractionService">
+		<property name="modelService" ref="modelService" />
+		<property name="ODataService" ref="ODataService_PROD_RECO_RUNTIME_SRV" />
+		<property name="recommendationBufferService" ref="recommendationBufferService"/>
+		<property name="userContextService" ref="userContextService" />
+		<property name="interactionType" value="#{configurationService.configuration.getProperty('sapymktrecommendation.clickthrough.interactionType')}" />
+		<property name="readBatchSize" value="#{configurationService.configuration.getProperty('sapymktrecommendation.clickthrough.readBatchSize')}" />
+	</bean>
+
+	<bean id="impressionService" class="com.hybris.ymkt.recommendation.services.ImpressionService">
+		<property name="modelService" ref="modelService" />
+		<property name="ODataService" ref="ODataService_PROD_RECO_RUNTIME_SRV" />
+		<property name="recommendationBufferService" ref="recommendationBufferService"/>
+		<property name="aggregationTimeWindow" value="#{configurationService.configuration.getProperty('sapymktrecommendation.impression.aggregationTimeWindow')}" />
+		<property name="readBatchSize" value="#{configurationService.configuration.getProperty('sapymktrecommendation.impression.readBatchSize')}" />
+		<property name="sendBatchSize" value="#{configurationService.configuration.getProperty('sapymktrecommendation.impression.sendBatchSize')}" />
+	</bean>
+
+	<bean id="offerInteractionService" class="com.hybris.ymkt.recommendation.services.OfferInteractionService">
+		<property name="modelService" ref="modelService" />
+		<property name="ODataService" ref="ODataService_CUAN_IMPORT_SRV" />
+		<property name="recommendationBufferService" ref="recommendationBufferService"/>
+		<property name="userContextService" ref="userContextService" />
+		<property name="readBatchSize" value="#{configurationService.configuration.getProperty('sapymktrecommendation.offerinteraction.readBatchSize')}" />
+	</bean>
+
+	<bean id="recommendationScenarioService" class="com.hybris.ymkt.recommendation.services.RecommendationScenarioService">
+		<property name="ODataService" ref="ODataService_PROD_RECO_RUNTIME_SRV" />
+	</bean>
+
+	<bean id="offerDiscoveryService" class="com.hybris.ymkt.recommendation.services.OfferDiscoveryService">
+		<property name="ODataService" ref="ODataService_CUAN_OFFER_DISCOVERY_SRV" />
+		<property name="userContextService" ref="userContextService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="cartService" ref="cartService" />
+		<property name="recentViewedItemsService" ref="recentViewedItemsService" />
+		<property name="recommendationBufferService" ref="recommendationBufferService"/>
+	</bean>
+
+	<bean id="recommendationDataSourceTypeService" class="com.hybris.ymkt.recommendation.services.RecommendationDataSourceTypeService">
+		<property name="ODataService" ref="ODataService_PROD_RECO_RUNTIME_SRV" />
+	</bean>
+
+	<bean id="sendRecoClickthroughJob" class="com.hybris.ymkt.recommendation.cronjobs.SendRecoClickthroughJob" parent="abstractJobPerformable">
+	    <property name="interactionService" ref="interactionService" />
+	</bean>
+
+	<bean id="aggregateRecoImpressionsJob" class="com.hybris.ymkt.recommendation.cronjobs.AggregateRecoImpressionsJob" parent="abstractJobPerformable">
+		<property name="impressionService" ref="impressionService" />
+	</bean>
+
+	<bean id="sendRecoImpressionsJob" class="com.hybris.ymkt.recommendation.cronjobs.SendRecoImpressionsJob" parent="abstractJobPerformable">
+		<property name="impressionService" ref="impressionService" />
+	</bean>
+
+	<bean id="sendOfferRecoInteractionJob" class="com.hybris.ymkt.recommendation.cronjobs.SendOfferRecoInteractionJob" parent="abstractJobPerformable">
+		<property name="offerInteractionService" ref="offerInteractionService" />
+	</bean>
+
+	<bean id="recentViewedItemsService" class="com.hybris.ymkt.recommendation.services.RecentViewedItemsService">
+		<property name="sessionService" ref="sessionService"/>
+		<property name="maxRecentViewedItems" value="3"/>
+	</bean>
+
+</beans>

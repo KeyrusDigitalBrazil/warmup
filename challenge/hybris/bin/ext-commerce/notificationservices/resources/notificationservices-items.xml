@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+    <collectiontypes>
+		<collectiontype code="NotificationChannels" elementtype="NotificationChannel"  autocreate="true" type="set"/>
+	</collectiontypes>
+	
+	<enumtypes>
+		<enumtype code="NotificationChannel" autocreate="true" generate="true" dynamic="false">
+			<value code="EMAIL"/>
+			<value code="SMS"/>
+			<value code="SITE_MESSAGE"/>
+		</enumtype>
+
+		<enumtype code="NotificationType" autocreate="true" generate="true" dynamic="false">
+			<description>This is only place holder that needs to be extended by specific Notification Types</description>
+			<value code="NOTIFICATION"></value>
+		</enumtype>
+		
+		<enumtype code="SiteMessageType" autocreate="true" generate="true" dynamic="false">
+			<value code="SYSTEM"/>
+		</enumtype>
+		
+	</enumtypes>     
+	
+	<itemtypes>
+
+		<itemtype code="Customer" generate="false" autocreate="false">
+			<attributes>
+				<attribute autocreate="true" qualifier="emailPreference" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<model>
+							<getter name="emailPreference" default="true" deprecated="true" deprecatedSince="6.7"/>
+							<setter name="emailPreference" default="true" deprecated="true" deprecatedSince="6.7"/>
+					</model>
+					<description>Deprecated since 6.7, will be removed in the future.</description>
+				</attribute>
+				<attribute autocreate="true" qualifier="smsPreference" type="java.lang.Boolean">
+					<modifiers read="true" write="true" search="true" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+					<model>
+							<getter name="smsPreference" default="true" deprecated="true" deprecatedSince="6.7"/>
+							<setter name="smsPreference" default="true" deprecated="true" deprecatedSince="6.7"/>
+					</model>
+					<description>Deprecated since 6.7, will be removed in the future.</description>
+				</attribute>								
+				<attribute qualifier="notificationChannels" type="NotificationChannels">                       
+                    <modifiers read="true" write="true" search="true"/>
+                    <persistence type="property"/>
+                </attribute>				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SiteMessage" jaloclass="de.hybris.platform.notificationservices.jalo.SiteMessage"
+			extends="GenericItem" generate="true" autocreate="true">
+			<deployment table="SiteMessages" typecode="9875" />
+			<attributes>
+				<attribute qualifier="uid" type="java.lang.String">
+					<modifiers unique="true" optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="title" type="localized:java.lang.String">
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="content" type="localized:java.lang.String">
+					<modifiers optional="true"/>
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="externalItem" type="GenericItem">
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="type" type="SiteMessageType">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="notificationType" type="NotificationType">
+					<modifiers optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+                <index name="IDX_SITE_MESSAGE_UID">
+                    <key attribute="uid"/>
+                </index>
+            </indexes>
+		</itemtype>
+		
+		<itemtype code="SiteMessageForCustomer" extends="GenericItem" generate="true" autocreate="true" jaloclass="de.hybris.platform.notificationservices.jalo.SiteMessageForCustomer">
+			<deployment table="SiteMsgForCustomers" typecode="9876" />
+			<attributes>
+				<attribute qualifier="message" type="SiteMessage">
+					<modifiers initial="true" read="true" write="false" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="customer" type="Customer">
+					<modifiers initial="true" read="true" write="false" optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sentDate" type="java.util.Date">
+					<modifiers initial="true" read="true" write="false" optional="false"/>
+					<persistence type="property"/>				
+				</attribute>
+			</attributes>
+			<indexes>
+                <index name="IDX_MESSAGE">
+                    <key attribute="message"/>
+                </index>
+                <index name="IDX_CUSTOMER">
+                    <key attribute="customer"/>
+                </index>
+            </indexes>
+		</itemtype>
+
+	</itemtypes>
+</items>

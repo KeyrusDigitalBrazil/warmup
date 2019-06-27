@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+
+	<context:component-scan base-package="de.hybris.platform.customerticketingaddon.controllers"/>
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultCustomerticketingaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="customerticketingaddon"/>
+	</bean>
+
+	<bean id="defaultCustomerticketingaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultCustomerticketingaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+	
+	<!-- localization -->
+	<bean id="messageSource"
+	    class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+	    <property name="basenames">
+	         <list>
+	            <value>/WEB-INF/messages/base</value>
+	            <value>/WEB-INF/messages/addons/customerticketingaddon/base</value>
+	        </list>
+	     </property>
+	    <property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+	<bean id="getCustomerticketingaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultCustomerticketingaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="CustomerticketingaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getCustomerticketingaddonBeforeViewHandler"/>
+	</bean>
+
+    <bean id="CustomerTicketingSecureMediaFilterListMergeDirective" depends-on="defaultStorefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+        <property name="add" ref="attachmentsStorefrontWebAppMediaFilter"/>
+    </bean>
+
+    <bean id="attachmentsStorefrontWebAppMediaFilter" class="de.hybris.platform.servicelayer.web.WebAppMediaFilter">
+        <property name="mediaPermissionService" ref="mediaPermissionService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="userService" ref="userService"/>
+        <property name="mediaService" ref="mediaService"/>
+    </bean>
+
+    <bean depends-on="fileUploadUrlFilterMappings" parent="mapMergeDirective">
+        <property name="key" value="/my-account/*support-ticket/**" />
+        <property name="value" ref="csAttachmentsMultipartFilter" />
+    </bean>
+
+    <bean id="csAttachmentsMultipartFilter" class="org.springframework.web.multipart.support.MultipartFilter">
+        <property name="multipartResolverBeanName" value="csAttachmentsMultipartResolver"/>
+    </bean>
+    <bean id="csAttachmentsMultipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" ref="csAttachmentUploadMaxSize"/>
+    </bean>
+
+	<bean id="csAttachmentUploadMaxSize" class="java.lang.Long">
+		<constructor-arg type="long" value="10485760"/>
+	</bean>
+</beans>

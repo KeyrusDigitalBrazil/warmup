@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultDeliveryTimeSlotConverter" alias="deliveryTimeSlotConverter"/>
+	<bean id="defaultDeliveryTimeSlotConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.chineselogisticfacades.delivery.data.DeliveryTimeSlotData"/>
+		<property name="populators">
+			<list>
+				<ref bean="deliveryTimeSlotPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="chineseDeliveryTimeSlotFacade" alias="deliveryTimeSlotFacade"/>  
+	<bean id="chineseDeliveryTimeSlotFacade" class="de.hybris.platform.chineselogisticfacades.delivery.impl.DefaultChineseDeliveryTimeSlotFacade" parent="acceleratorCheckoutFacade">
+		<property name="deliveryTimeSlotConverter" ref="deliveryTimeSlotConverter"></property>
+		<property name="deliveryTimeSlotService" ref="deliveryTimeSlotService"></property>
+	</bean>
+	
+	<alias name="deliveryTimeSlotPopulator" alias="deliveryTimeSlotPopulator"/>  
+	<bean id="deliveryTimeSlotPopulator" class="de.hybris.platform.chineselogisticfacades.delivery.populator.DeliveryTimeSlotPopulator"></bean>		
+			
+	<alias name="cartDeliveryTimeSlotPopulator" alias="cartDeliveryTimeSlotPopulator"/>  
+	<bean id="cartDeliveryTimeSlotPopulator" class="de.hybris.platform.chineselogisticfacades.delivery.populator.CartDeliveryTimeSlotPopulator"></bean>
+		
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="cartConverter"/>
+        <property name="add"  ref="cartDeliveryTimeSlotPopulator"/>
+    </bean>	
+    
+    <bean parent="modifyPopulatorList">
+        <property name="list" ref="accExtendedCartConverter"/>
+        <property name="add"  ref="cartDeliveryTimeSlotPopulator"/>
+    </bean>	
+	
+	<bean id="orderDeliveryTimeSlotPopulator"
+			class="de.hybris.platform.chineselogisticfacades.delivery.populator.OrderDeliveryTimeSlotPopulator"
+			parent="baseOrderPopulator"/>
+	
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="defaultOrderConverter"/>
+        <property name="add"  ref="orderDeliveryTimeSlotPopulator"/>
+    </bean>	
+		
+</beans>

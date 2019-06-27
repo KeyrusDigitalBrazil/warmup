@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+	<!-- Add any custom extension beans that are deployment agnostic -->
+
+
+	<bean id="fraudClient" class="com.hybris.charon.HttpClientFactoryBean">
+		<property name="type" value="com.hybris.cis.client.fraud.FraudClient"/>
+		<property name="clientId" value="fraud"/>
+		<property name="url" value="#{configurationService.configuration.getProperty('cis.fraud.url')}"/>
+	</bean>
+
+	<bean id="fraudClientMock" class="com.hybris.cis.client.mock.FraudClientMock"/>
+
+	<bean id="cisClientFraudService" class="com.hybris.cis.service.impl.DefaultCisClientFraudService">
+		<property name="fraudClient" ref="#{${cis.client.fraud.mock} eq true ? 'fraudClientMock' : 'fraudClient'}"/>
+	</bean>
+
+</beans>

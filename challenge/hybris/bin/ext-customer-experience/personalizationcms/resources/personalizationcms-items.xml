@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ATTENTION: This is just an example file. You have to edit it according to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="CxCmsAction" code="cxCmsActionSet" autocreate="true" generate="true" type="set"/>
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="CxCatalogLookupType" autocreate="false" generate="false" dynamic="false">
+			<value code="LEAF_CATALOGS"><description>Current catalog lookup only</description></value>
+			<value code="LEAF_CLOSEST_ANCESTOR_CATALOGS"><description>Current catalog or parents if empty</description></value>			
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="PreviewDataToCxVariation" autocreate="true" generate="true" localized="false">
+			<deployment table="PreviewToVariation" typecode="3700" />
+			<sourceElement qualifier="previews" type="PreviewData" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="variations" type="CxVariation" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="PreviewDataToCxSegment" autocreate="true" generate="true" localized="false">
+			<deployment table="PreviewToSegment" typecode="3701" />
+			<sourceElement qualifier="previews" type="PreviewData" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="segments" type="CxSegment" cardinality="many">
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+	
+
+
+	<itemtypes>
+
+		<itemtype generate="true" code="CxCmsAction" jaloclass="de.hybris.platform.personalizationcms.jalo.CxCmsAction" autocreate="true" extends="CxAbstractAction"
+			abstract="false">
+			<attributes>
+				<attribute qualifier="componentId" type="java.lang.String">
+					<description>Targeted component id</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="componentCatalog" type="java.lang.String">
+					<description>Targeted component catalog</description>
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="containerId" type="java.lang.String">
+					<description>Targeted container id</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="affectedObjectKey" redeclare="true">
+					<modifiers write="false" />
+					<persistence type="dynamic" attributeHandler="cxCmsActionAffectedObjectKeyAttributeHandler" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype generate="true" code="CxCmsComponentContainer" jaloclass="de.hybris.platform.personalizationcms.jalo.CxCmsComponentContainer" autocreate="true"
+			extends="AbstractCMSComponentContainer" abstract="false">
+			<attributes>
+
+				<attribute type="SimpleCmsComponent" qualifier="defaultCmsComponent">
+					<description>Default component displayed if no custom variation is changing the container</description>
+					<persistence type="property" />
+				</attribute>
+				
+				<attribute type="java.lang.String" qualifier="sourceId">
+					<description>Id of container used by cms actions. Does not need to be unique.</description>
+					<persistence type="property" />
+				</attribute>				
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CxConfig" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="containerCleanupEnabled" type="boolean">
+					<description>Attribute defining if cx container should be removed in case there is no actions related to it</description>
+					<modifiers read="true" write="true"/>
+					<persistence type="property" />
+					<defaultvalue>false</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<typegroup name="Preview">
+			<itemtype code="PreviewData" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="code" type="java.lang.String">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

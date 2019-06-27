@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<!-- Item Collector Registries -->
+	<alias name="defaultBasicSynchronizationItemCollectorRegistry" alias="basicSynchronizationItemCollectorRegistry"/>
+	<bean name="defaultBasicSynchronizationItemCollectorRegistry" class="de.hybris.platform.cmsfacades.common.itemcollector.impl.DefaultItemCollectorRegistry">
+		<property name="typeService" ref="typeService"/>
+		<property name="itemCollectorMap">
+			<map>
+				<entry value-ref="synchronizationCmsBasicPageItemCollector">
+					<key>
+						<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+					</key>
+				</entry>
+				<entry value-ref="basicContentSlotItemCollector">
+					<key>
+						<util:constant static-field="de.hybris.platform.cms2.model.contents.contentslot.ContentSlotModel._TYPECODE"/>
+					</key>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultSharedSynchronizationItemCollectorRegistry" alias="sharedSynchronizationItemCollectorRegistry"/>
+	<bean name="defaultSharedSynchronizationItemCollectorRegistry" class="de.hybris.platform.cmsfacades.common.itemcollector.impl.DefaultItemCollectorRegistry">
+		<property name="typeService" ref="typeService"/>
+		<property name="itemCollectorMap">
+			<map>
+				<entry value-ref="synchronizationCmsSharedPageItemCollector">
+					<key>
+						<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+					</key>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="defaultDependentSynchronizationItemCollectorRegistry" alias="dependentSynchronizationItemCollectorRegistry"/>
+	<bean name="defaultDependentSynchronizationItemCollectorRegistry" class="de.hybris.platform.cmsfacades.common.itemcollector.impl.DefaultItemCollectorRegistry">
+		<property name="typeService" ref="typeService"/>
+		<property name="itemCollectorMap">
+			<map>
+				<entry value-ref="synchronizationCmsDependentPageItemCollector">
+					<key>
+						<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+					</key>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Item collectors -->
+	<alias name="defaultSynchronizationCmsBasicPageItemCollector" alias="synchronizationCmsBasicPageItemCollector"/>
+	<bean name="defaultSynchronizationCmsBasicPageItemCollector" class="de.hybris.platform.cmsfacades.synchronization.itemcollector.BasicAbstractPageItemCollector">
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService"/>
+	</bean>
+
+	<alias name="defaultSynchronizationCmsSharedPageItemCollector" alias="synchronizationCmsSharedPageItemCollector"/>
+	<bean name="defaultSynchronizationCmsSharedPageItemCollector" class="de.hybris.platform.cmsfacades.synchronization.itemcollector.SharedAbstractPageItemCollector">
+		<property name="contentSlotService" ref="cmsAdminContentSlotService"/>
+		<property name="contentSlotExistsPredicate" ref="contentSlotExistsPredicate" />
+	</bean>
+	
+	<alias name="defaultSynchronizationCmsDependentPageItemCollector" alias="synchronizationCmsDependentPageItemCollector"/>
+	<bean name="defaultSynchronizationCmsDependentPageItemCollector" class="de.hybris.platform.cmsfacades.synchronization.itemcollector.DependentAbstractPageItemCollector" />
+
+	<alias name="defaultBasicContentSlotItemCollector" alias="basicContentSlotItemCollector"/>
+	<bean name="defaultBasicContentSlotItemCollector" class="de.hybris.platform.cmsfacades.synchronization.itemcollector.BasicContentSlotItemCollector"/>
+
+</beans>

@@ -1,0 +1,135 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$contentCatalogName=Powertools Content Catalog
+$productCatalog=powertoolsProductCatalog
+$productCatalogName=Powertools Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$picture=media(code, $contentCV);
+$image=image(code, $contentCV);
+$media=media(code, $contentCV);
+$page=page(uid, $contentCV);
+$contentPage=contentPage(uid, $contentCV);
+$product=product(code, $productCV)
+$category=category(code, $productCV)
+$addonExtensionName=sapsubscriptionaddon
+$lang=en
+
+
+#Subscription ProductAddToCart Component
+INSERT_UPDATE SubscriptionProductAddToCartComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SubscriptionAddToCart;Subscription Product Add To Cart;AddToCartAction,PickUpInStoreAction;SubscriptionAddToCart
+
+#Subscription search results
+INSERT_UPDATE SubscriptionSearchResultsGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SubscriptionSearchResultsGrid;Search Result Grid Component for Subscription Products;ListPickUpInStoreAction,ListAddToCartAction;SubscriptionSearchResultsGrid
+INSERT_UPDATE SubscriptionSearchResultsListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SubscriptionSearchResultsList;Search Result List Component for Subscription Products;ListPickUpInStoreAction,ListAddToCartAction;SubscriptionSearchResultsList
+
+
+
+INSERT_UPDATE ApplicableCmsActionsTypeForCmsComponent;target(code)[unique=true];source(code)[unique=true];
+;SubscriptionProductAddToCartComponent;PickUpInStoreAction;
+;SubscriptionProductAddToCartComponent;AddToCartAction;
+;SubscriptionSearchResultsGridComponent;ListPickUpInStoreAction;
+;SubscriptionSearchResultsGridComponent;ListAddToCartAction;
+;SubscriptionSearchResultsListComponent;ListPickUpInStoreAction;
+;SubscriptionSearchResultsListComponent;ListAddToCartAction;
+
+
+
+## Configure page for subscriptions
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false']
+;;subscriptions;Manage My Subscriptions;AccountPageTemplate;/my-account/subscriptions
+;;subscription;Subscription Details Page;AccountPageTemplate;subscription
+;;subscriptionBills;Subscription Bills page;AccountPageTemplate;subscriptionBills
+;;subscriptionBillDetails;Subscription Bill details page;AccountPageTemplate;subscriptionBillDetails
+
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-subscriptions;Side Content Slot for My Subscriptions Listing;true;;;;
+;;BodyContent-subscriptions;Body Content Slot for My Subscriptions Listing;true;AccountSubscriptionComponent;;;
+;;SideContent-subscription;Side Content Slot for Subscription Details;true;;;;
+;;BodyContent-subscription;Body Content Slot for Subscription Details;true;AccountSubscriptionDetailsComponent;;;
+;;AddToCartSlot;;true;SubscriptionAddToCart
+;;SearchResultsGridSlot;Search Result Grid Slot for Search List;true;SubscriptionSearchResultsGrid;;;
+;;SearchResultsListSlot;Search Result List Slot for Search List;true;SubscriptionSearchResultsList;;;
+#For Bills Listing Page
+;;SideContent-subscriptionBills;Side Content Slot for Subscription Bills;true;;;;
+;;BodyContent-subscriptionBills;Body Content Slot for Subscription Bills ;true;SubscriptionBillsComponent;;;
+
+#For Bills Detail Page
+;;SideContent-subscriptionBillDetails;Side Content Slot for Subscription Details;true;;;;
+;;BodyContent-subscriptionBillDetails;Body Content Slot for Subscription Details;true;SubscriptionBillDetailsComponent;;;
+
+
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='subscriptions'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-subscriptions;SideContent;;SideContent-subscriptions;;;
+;;BodyContent-subscriptions;BodyContent;;BodyContent-subscriptions;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='subscription'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-subscription;SideContent;;SideContent-subscription;;;
+;;BodyContent-subscription;BodyContent;;BodyContent-subscription;;;
+
+#Billing
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='subscriptionBills'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-subscriptionBills;SideContent;;SideContent-subscriptionBills;;;
+;;BodyContent-subscriptionBills;BodyContent;;BodyContent-subscriptionBills;;;
+
+
+#Billing
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='subscriptionBillDetails'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-subscriptionBillDetails;SideContent;;SideContent-subscriptionBillDetails;;;
+;;BodyContent-subscriptionBillDetails;BodyContent;;BodyContent-subscriptionBillDetails;;;
+# JSP Components
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountSubscriptionComponent;Account My Subscriptions Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountSubscriptionsPage.jsp;;AccountSubscriptionComponent
+;;AccountSubscriptionDetailsComponent;Account Subscription Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountSubscriptionPage.jsp;;AccountSubscriptionDetailsComponent
+;;SubscriptionBillsComponent;Subscription Bills Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/subscriptionBillsPage.jsp;;SubscriptionBillsComponent
+;;SubscriptionBillDetailsComponent;Subscription Bill Details Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/subscriptionBillDetailsPage.jsp;;SubscriptionBillDetailsComponent
+
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow']
+;;SubscriptionsLink;SubscriptionsLink;/my-account/subscriptions;SubscriptionsLink;SubscriptionsLink;
+;;SubscriptionBillingLink;SubscriptionBillingLink;/my-account/subscription/bills;SubscriptionBillingLink;SubscriptionBillingLink;
+
+
+# CMS Navigation Nodes (children of my account)
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SubscriptionsNavNode;;Subscription History;MyAccountNavNode;;SubscriptionsNavNode
+;SubscriptionBillingNavNode;;Subscription Bills;MyAccountNavNode;;SubscriptionBillingNavNode
+
+# Create cms navigation entry for nvaigation child nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;SubscriptionsNavNodeEntry;;SubscriptionsNavNodeEntry;SubscriptionsNavNode;SubscriptionsLink;
+;SubscriptionBillingNavNodeEntry;;SubscriptionBillingNavNodeEntry;SubscriptionBillingNavNode;SubscriptionBillingLink;
+
+# CMS Link Components
+UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];linkName[lang=$lang]
+;;SubscriptionsLink;"Subscriptions"
+;;SubscriptionBillingLink;"Subscription Bills"
+
+# CMS Navigation Nodes
+UPDATE CMSNavigationNode;$contentCV[unique=true];uid[unique=true];title[lang=$lang]
+;;SubscriptionsNavNode;"Subscriptions"
+;;SubscriptionsNavNode;"Subscription Bills"
+
+
+
+
+
+

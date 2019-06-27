@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    <alias name="cisSapDigitalPaymentFormActionUrlStrategy" alias="paymentFormActionUrlStrategy"/>
+	<bean id="cisSapDigitalPaymentFormActionUrlStrategy" class="de.hybris.platform.cissapdigitalpayment.strategies.impl.CisSapDigitalPaymentFormActionUrlStrategy" >
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="paymentFormActionUrlStrategy" ref="defaultPaymentFormActionUrlStrategy"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+	<alias name="defaultCisSapDigitalPaymentService" alias="cisSapDigitalPaymentService"/>
+	<bean id="defaultCisSapDigitalPaymentService" class="de.hybris.platform.cissapdigitalpayment.service.impl.DefaultCisSapDigitalPaymentService" >
+		<property name="pollCardStatusMap" ref="sapDigiPayPollCardStatusMap"/>
+		<property name="defaultPollCardDelay" value="1000" />
+		<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentBaseStoreConfigurationStrategy"/>
+	</bean>
+
+	
+	<alias name="defaultCisSapDigitalPaymentFacade" alias="cisSapDigitalPaymentFacade"/>
+	<bean id="defaultCisSapDigitalPaymentFacade" class="de.hybris.platform.cissapdigitalpayment.facade.impl.DefaultCisSapDigitalPaymentFacade" >
+		<property name="sessionService" ref="sessionService"/>
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="cisSapDigitalPaymentPaymentInfoConverter" ref="cisSapDigitalPaymentPaymentInfoConverter"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="paymentAddressReverseConverter" ref="defaultAddressReverseConverter"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="paymentAddressConverter" ref="defaultAddressConverter"/>
+		<property name="userService" ref="userService"/>
+		<property name="calculationService" ref="calculationService"/>
+	</bean>
+	
+	
+	
+	<alias name="defaultSapDigitalPaymentFacade" alias="sapDigitalPaymentFacade"/>
+	<bean id="defaultSapDigitalPaymentFacade" class="de.hybris.platform.cissapdigitalpayment.facade.impl.DefaultSapDigitalPaymentFacade" >
+		<property name="sapDigitalPaymentService" ref="sapDigitalPaymentService"/>
+	</bean>
+	
+	
+	<alias name="defaultCisSapDigitalPaymentPaymentInfoConverter" alias="cisSapDigitalPaymentPaymentInfoConverter"/>
+	<bean id="defaultCisSapDigitalPaymentPaymentInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.CCPaymentInfoData"/>
+		<property name="populators">
+			<list>
+				<ref bean="cisSapDigitalPaymentPaymentInfoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCisSapDigitalPaymentPaymentInfoPopulator" alias="cisSapDigitalPaymentPaymentInfoPopulator"/>
+	<bean id="defaultCisSapDigitalPaymentPaymentInfoPopulator" class="de.hybris.platform.cissapdigitalpayment.populator.CisSapDigitalPaymentPaymentInfoPopulator" />
+
+	<alias name="defaultSapDigitalCardPaymentService" alias="cardPaymentService"/>
+	<bean id="defaultSapDigitalCardPaymentService" class="de.hybris.platform.cissapdigitalpayment.service.impl.DefaultSapDigitalCardPaymentService">
+		<property name="commandFactoryRegistry" ref="commandFactoryRegistry"/>
+	</bean>	
+	
+	<alias name="defaultSapDigitalPaymentAcceleratorCheckoutFacade" alias="acceleratorCheckoutFacade"/>
+	<bean id="defaultSapDigitalPaymentAcceleratorCheckoutFacade" class="de.hybris.platform.cissapdigitalpayment.facade.impl.DefaultSapDigitalPaymentAcceleratorCheckoutFacade" parent="defaultAcceleratorCheckoutFacade" >
+	<property name="sapDigitalPaymentAuthorizationService" ref="sapDigitalPaymentAuthorizationService" />
+	</bean>
+	
+	
+	<alias name="defaultSapDigitalCommercePaymentAuthorizationStrategy" alias="commercePaymentAuthorizationStrategy"/>
+	<bean id="defaultSapDigitalCommercePaymentAuthorizationStrategy"
+			class="de.hybris.platform.cissapdigitalpayment.strategies.impl.SapDigitalCommercePaymentAuthorizationStrategy" parent="defaultPaymentAuthorizationStrategy">
+		<property name="i18nService" ref="i18nService"/>
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="authorizePaymentHooks" ref="authorizePaymentHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentBaseStoreConfigurationStrategy"/>
+		<property name="sapDigitalPaymentAuthorizationService"  ref="sapDigitalPaymentAuthorizationService"/>
+	</bean>
+	
+	
+	<alias name="defaultSapDigitalPaymentService" alias="sapDigitalPaymentService"/>
+	<bean id="defaultSapDigitalPaymentService" class="de.hybris.platform.cissapdigitalpayment.service.impl.DefaultSapDigitalPaymentService" >
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="paymentService" ref="paymentService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="paymentFormActionUrlStrategy" ref="paymentFormActionUrlStrategy"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCardTypeService" ref="commerceCardTypeService"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="commerceCheckoutService" ref="commerceCheckoutService"/>
+		<property name="addressConverter" ref="addressConverter"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="sapDigiPayAuthTranResult" ref="sapDigiPayTranResult"/>
+		<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentConfigurationStrategy"/>
+		
+		
+	</bean>
+	
+	
+	<alias name="defaultSapDigitalPaymentCustomerAccountService" alias="sapDigitalPaymentCustomerAccountService"/>
+	<bean id="defaultSapDigitalPaymentCustomerAccountService" class="de.hybris.platform.cissapdigitalpayment.service.impl.DefaultSapDigitalPaymentCustomerAccountService" parent="defaultCustomerAccountService" >
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="sapDigiPayDeleteCardTranResult" ref="sapDigiPayTranResult"/>
+		<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentBaseStoreConfigurationStrategy"/>
+	</bean>
+	
+	<alias name="sapDigitalPaymentBaseStoreConfigurationStrategy" alias="sapDigitalPaymentBaseStoreConfigurationStrategy"/>
+	<bean id="sapDigitalPaymentBaseStoreConfigurationStrategy"
+			class="de.hybris.platform.cissapdigitalpayment.strategies.impl.SapDigitalPaymentConfigurationBaseStoreStrategy">
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+	
+	<alias name="defaultSapDigitalPaymentConfigurationDao" alias="sapDigitalPaymentConfigurationDao"/>
+	<bean name="defaultSapDigitalPaymentConfigurationDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+		<constructor-arg value="SAPDigitalPaymentConfiguration"/>
+	</bean>
+	
+	<alias name="defaultSapDigitalPaymentConfigurationStrategy" alias="sapDigitalPaymentConfigurationStrategy"/>
+	<bean id="defaultSapDigitalPaymentConfigurationStrategy"
+			class="de.hybris.platform.cissapdigitalpayment.strategies.impl.DefaultSapDigitalPaymentConfigurationStrategy">
+		<property name="sapDigitalPaymentConfigurationDao" ref="sapDigitalPaymentConfigurationDao"/>
+	</bean>
+	
+	
+	<!-- GDRP spring configuration start-->
+	<alias name="cisSapDigitalPaymentCustomerCleanupHook" alias="cisSapDigitalPaymentCustomerCleanupHook"/>
+	<bean id="cisSapDigitalPaymentCustomerCleanupHook" class="de.hybris.platform.cissapdigitalpayment.retention.impl.CisSapDigitalPaymentCustomerCleanupHook" >
+		<property name="sapDigitalPaymentCustomerAccountService" ref="sapDigitalPaymentCustomerAccountService"/>
+		<property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+		<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentConfigurationStrategy"/>
+	</bean>
+	
+	<bean id="cisSapDigitalPaymentCustomerCleanupHookMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective" >
+    <property name="add" ref="cisSapDigitalPaymentCustomerCleanupHook" />
+    <property name="beforeBeanNames">
+			<list value-type="java.lang.String">
+				<value>commerceServicesCustomerCleanupHook</value>
+			</list>
+	</property>
+	</bean>
+	
+	<!-- GDRP spring configuration end-->
+	
+	<alias name="defaultSapDigitalPaymentUserFacade" alias="sapDigitalPaymentUserFacade"/>
+	<bean id="defaultSapDigitalPaymentUserFacade" class="de.hybris.platform.commercefacades.user.impl.DefaultUserFacade"  parent="defaultUserFacade">
+		<property name="customerAccountService" ref="sapDigitalPaymentCustomerAccountService"/>
+	</bean>
+	
+	
+	<bean id="sapDigitalPaymentPollCardDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+   		<property name="resource" value="classpath:/cissapdigitalpayment/process/sapdigitalpayment-poll-card-process.xml"/>
+   	</bean>
+	 <import resource="/cissapdigitalpayment/process/sapdigitalpayment-poll-card-spring.xml"/>
+	
+	<util:map id="sapDigiPayTranResult" >
+	    <entry key="01" value="SUCCESS" />
+	    <entry key="02" value="FAILURE" />
+	</util:map>
+	
+	<alias name="defaultSapDigitalPaymentAuthorizationService" alias="sapDigitalPaymentAuthorizationService"/>
+	<bean id="defaultSapDigitalPaymentAuthorizationService" class="de.hybris.platform.cissapdigitalpayment.service.impl.DefaultSapDigitalPaymentAuthorizationService">
+	<property name="sapDigitalPaymentConfigurationStrategy" ref="sapDigitalPaymentBaseStoreConfigurationStrategy"/>
+	<property name="sapDigitalPaymentAuthorizationStrategyMap" ref="sapDigitalPaymentAuthorizationStrategyMap"/>
+	<property name="generateMerchantTransactionCodeStrategy" ref="generateMerchantTransactionCodeStrategy"/>
+	<property name="modelService" ref="modelService"/>
+	<property name="sapDigitalPaymentService" ref="sapDigitalPaymentService"/>
+	</bean>
+	
+	<alias name="defaultSapDigitalPaymentAuthorizationStrategyMap" alias="sapDigitalPaymentAuthorizationStrategyMap"/>
+	<util:map id="defaultSapDigitalPaymentAuthorizationStrategyMap" key-type="de.hybris.platform.cissapdigitalpayment.enums.SapDigitalPaymentAuthTypeEnum" value-type="de.hybris.platform.cissapdigitalpayment.strategies.SapDigitalPaymentAuthorizationStrategy">
+	    <entry key="DEFAULT" value-ref="sapDigitalPaymentDefaultAuthorizationStrategy" />
+	    <entry key="DUMMY" value-ref="sapDigitalPaymentDummyAuthorizationStrategy"  />
+	    <entry key="SPLIT" value-ref="sapDigitalPaymentSplitAuthorizationStrategy"  />
+	</util:map>
+	
+	<alias name="defaultSapDigitalPaymentDefaultAuthorizationStrategy" alias="sapDigitalPaymentDefaultAuthorizationStrategy"/>
+	<bean id="defaultSapDigitalPaymentDefaultAuthorizationStrategy" class="de.hybris.platform.cissapdigitalpayment.strategies.impl.DefaultSapDigitalPaymentAuthorizationStrategy">
+	<property name="commerceCheckoutService" ref="commerceCheckoutService"/>
+	</bean>
+	
+	<alias name="defaultSapDigitalPaymentDummyAuthorizationStrategy" alias="sapDigitalPaymentDummyAuthorizationStrategy"/>
+	<bean id="defaultSapDigitalPaymentDummyAuthorizationStrategy" class="de.hybris.platform.cissapdigitalpayment.strategies.impl.SapDigitalPaymentDummyAuthorizationStrategy">
+	<property name="sapDigitalPaymentAuthorizationService" ref="sapDigitalPaymentAuthorizationService" />
+	<property name="i18nService" ref="i18nService" />
+	</bean>
+	
+	<alias name="defaultSapDigitalPaymentSplitAuthorizationStrategy" alias="sapDigitalPaymentSplitAuthorizationStrategy"/>
+	<bean id="defaultSapDigitalPaymentSplitAuthorizationStrategy" class="de.hybris.platform.cissapdigitalpayment.strategies.impl.SapDigitalPaymentSplitAuthorizationStrategy">
+	</bean>
+	
+	
+	
+	
+</beans>

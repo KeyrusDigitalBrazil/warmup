@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+	 
+ 	<alias name="defaultFlashBuyDao" alias="flashBuyDao"/>
+ 	<bean id="defaultFlashBuyDao" class="de.hybris.platform.timedaccesspromotionengineservices.daos.impl.DefaultFlashBuyDao"/>
+ 
+ 	<alias name="defaultFlashBuyService" alias="flashBuyService"/>
+ 	<bean id="defaultFlashBuyService" class="de.hybris.platform.timedaccesspromotionengineservices.impl.DefaultFlashBuyService">
+ 		<property name="flashBuyDao" ref="flashBuyDao"/>
+	 	<property name="ruleMaintenanceService" ref="ruleMaintenanceService"></property>
+ 		<property name="promotionDao" ref="promotionDao"/>
+ 		<property name="modelService" ref="modelService"/>
+        <property name="jobDao" ref="jobDao"/>
+        <property name="cronJobDao" ref="cronJobDao"/>	
+        <property name="cronJobService" ref="cronJobService"/>
+ 		<property name="productDao" ref="productDao"/>
+ 	</bean>
+
+	<bean parent="mapMergeDirective" depends-on="redemptionStrategyMap">
+    	<property name="key" value="FlashBuyCoupon"/>
+		<property name="value" ref="singleCodeCouponRedemptionStrategy"/>
+	</bean>
+	
+	<bean id="flashBuyPlaceOrderMethodHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective" >
+         <property name="add" ref="flashBuyCommercePlaceOrderMethodHook" />
+    </bean>
+     
+    <alias name="defaultFlashBuyCommercePlaceOrderMethodHook"  alias="flashBuyCommercePlaceOrderMethodHook"/>
+    <bean id="defaultFlashBuyCommercePlaceOrderMethodHook" depends-on="voucherRedeemableCartValidationMethodHook" class="de.hybris.platform.timedaccesspromotionengineservices.order.hooks.DefaultFlashBuyCommercePlaceOrderMethodHook">
+     	 <property name="flashBuyService" ref="flashBuyService"></property>
+	 	 <property name="couponRedemptionStrategy" ref="singleCodeCouponRedemptionStrategy"/>
+    </bean>
+    
+    <bean id="resetMaxOrderQuantityJob" class="de.hybris.platform.timedaccesspromotionengineservices.cronjob.ResetMaxOrderQuantityJob"
+			parent="abstractJobPerformable">
+		<property name="productDao" ref="defaultProductDao" />
+		<property name="flashBuyService" ref="flashBuyService"/>
+	</bean>
+	
+	<bean id="setMaxOrderQuantityJob" class="de.hybris.platform.timedaccesspromotionengineservices.cronjob.SetMaxOrderQuantityJob" parent="abstractJobPerformable">
+		<property name="productDao" ref="defaultProductDao" />
+	</bean>
+	
+	<alias name="defaultFlashBuyCartValidationHook" alias="flashBuyCartValidationHook"/>
+ 	<bean id="defaultFlashBuyCartValidationHook" class="de.hybris.platform.timedaccesspromotionengineservices.cart.hooks.DefaultFlashBuyCartValidationHook">
+		<property name="couponDao" ref="couponDao"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="couponService" ref="couponService"/>
+		<property name="flashBuyService" ref="flashBuyService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="promotionsService" ref="promotionsService"/>
+	</bean>
+
+	<bean depends-on="cartValidationHooks" parent="listMergeDirective">
+		<property name="add" ref="flashBuyCartValidationHook"/>
+	</bean>
+
+	<bean id="flashBuyCouponCleanUpInterceptor" class="de.hybris.platform.timedaccesspromotionengineservices.interceptor.FlashBuyCouponCleanUpInterceptor" >
+		<property name="flashBuyService" ref="flashBuyService"/>
+	</bean>
+	
+	<bean id="flashBuyCouponInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="flashBuyCouponCleanUpInterceptor"/>
+		<property name="typeCode" value="FlashBuyCoupon"/>
+	</bean>
+</beans>

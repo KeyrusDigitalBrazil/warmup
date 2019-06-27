@@ -1,0 +1,40 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+#test customers
+INSERT_UPDATE Customer;uid[unique=true];name;password;europe1PriceFactory_upg(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];sessionCurrency(isocode[default='USD']);sessionLanguage(isocode[default='en'])
+;testuser@saved-carts.com;testuser@saved-carts.com;1234;;
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"SP1";;
+;"SP2";;
+;"SP3";;
+
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;SP1;SP1;testCategory0;;monthly
+;SP2;SP2;testCategory0;;monthly
+;SP3;SP3;testCategory0;;monthly
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;SPP1;;;USD;SP1
+;SPP2;;;USD;SP2
+;SPP3;;;USD;SP3
+
+#for test subscription price plans, add one time payments
+INSERT OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(name[lang=$lang, unique=true]);price;$catalogversion;billingEvent(code)
+;SPP1_onfirstbill;SPP1;10.00;;onfirstbill
+;SPP2_onfirstbill;SPP2;10.00;;onfirstbill
+
+#add recurring charges
+INSERT RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(name[lang=$lang, unique=true]);price;cycleStart;cycleEnd;$catalogversion
+;SPP2_Start_0_End_;SPP2;10.00;0;
+;SPP3_Start_0_End_;SPP3;20.00;0;

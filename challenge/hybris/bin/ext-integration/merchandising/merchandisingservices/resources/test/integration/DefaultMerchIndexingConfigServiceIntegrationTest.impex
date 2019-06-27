@@ -1,0 +1,56 @@
+#
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+#
+
+$solrIndexedType1=solrIndexedType1
+$solrIndexedType2=solrIndexedType2
+$solrIndexedProperty11=solrIndexedProperty11
+$solrIndexedPropertyMerchMappedName11=solrIndexedPropertyMerchMappedName11
+$solrIndexedProperty12=solrIndexedProperty12
+$solrIndexedProperty13=solrIndexedProperty13
+$solrIndexedProperty21=solrIndexedProperty21
+$solrIndexedProperty22=solrIndexedProperty22
+$solrIndexedPropertyMerchMappedName22=solrIndexedPropertyMerchMappedName22
+$solrIndexedProperty23=solrIndexedProperty23
+$solrIndexedPropertyMerchMappedName23=solrIndexedPropertyMerchMappedName23
+
+# Languages
+INSERT_UPDATE Language;isocode[unique=true];fallbackLanguages(isocode);active[default=true]
+;en;;;
+;de;en;;
+
+# Currencies
+INSERT_UPDATE Currency;isocode[unique=true];conversion;digits;symbol
+;GBP;1;2;£
+;EUR;1;2;€
+
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);indexName
+;$solrIndexedType1;Product;$solrIndexedType1
+;$solrIndexedType2;Product;$solrIndexedType2
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code)
+;$solrIndexedType1;$solrIndexedProperty11;string
+;$solrIndexedType1;$solrIndexedProperty12;string
+;$solrIndexedType1;$solrIndexedProperty13;string
+;$solrIndexedType2;$solrIndexedProperty21;string
+;$solrIndexedType2;$solrIndexedProperty22;string
+;$solrIndexedType2;$solrIndexedProperty23;string
+
+INSERT_UPDATE MerchIndexingConfig;indexedType(identifier)[unique=true];enabled[default=false];language(isocode);currency(isocode)
+;$solrIndexedType1;true;en;GBP
+;$solrIndexedType2;;de;EUR
+
+INSERT_UPDATE MerchProperty;merchIndexingConfig(indexedType(identifier))[unique=true];indexedProperty(name)[unique=true];merchMappedName
+;$solrIndexedType1;$solrIndexedProperty11;$solrIndexedPropertyMerchMappedName11
+;$solrIndexedType1;$solrIndexedProperty12;
+;$solrIndexedType1;$solrIndexedProperty13;
+;$solrIndexedType2;$solrIndexedProperty21;
+;$solrIndexedType2;$solrIndexedProperty22;$solrIndexedPropertyMerchMappedName22
+;$solrIndexedType2;$solrIndexedProperty23;$solrIndexedPropertyMerchMappedName23

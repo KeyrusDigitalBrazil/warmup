@@ -1,0 +1,84 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$contentCatalog=singleCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$defaultCurrency=EUR
+$languages=en
+$defaultLanguage=en
+
+INSERT_UPDATE Language;isocode[unique=true];active
+;de;true
+;en;true
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en];defaultCatalog
+;$contentCatalog;$contentCatalog;$contentCatalog;true
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode);languages(isoCode)
+;$contentCatalog;Online;false;$defaultCurrency;$languages
+
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;active[default=true]
+;;pagetemplate1;pagetemplate1;layout/landingLayout2Page;
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;contentpage1;contentpage1;pagetemplate1;contentpage1
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;component1;component1;;component1
+;;component2;component2;;component2
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];sourceId;name;defaultCmsComponent(&componentRef);&componentRef
+;;container1;container1;container1;component1;container1
+;;container2;container2;container2;component1;container2
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-contentpage1;true;container1
+
+# ContentSlotForPage 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='contentpage1'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-contentpage1;Section1;;Section1Slot-contentpage1;;;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+;default;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='default'];status(code)[default=ENABLED]
+;customization1;customization1;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];enabled[default=true];customization(code,$contentCV)[unique=true];status(code)[default=ENABLED]
+;variation1;variation1;;;customization1;
+;variation2;variation2;;;customization1;
+;variation3;variation3;;;customization1;
+;variation4;variation4;;;customization1;
+;variation5;variation5;;;customization1;
+;variation6;variation6;;;customization1;
+;variation7;variation7;;;customization1;
+
+INSERT_UPDATE CxCmsAction;code[unique=true];$contentCV[unique=true];componentId;variation(code,$contentCV)[unique=true];target;type(code);containerId;
+;cmsaction1;;cxcomponent1;variation1;cxCmsActionPerformable;PLAIN;container1
+;cmsaction2;;cxcomponent1;variation2;cxCmsActionPerformable;PLAIN;container2
+;cmsaction3;;cxcomponent2;variation2;cxCmsActionPerformable;PLAIN;container2
+;cmsaction4;;cxcomponent1;variation3;cxCmsActionPerformable;PLAIN;container2
+;cmsaction5;;cxcomponent1;variation3;cxCmsActionPerformable;PLAIN;container2
+;cmsaction6;;cxcomponent1;variation4;cxCmsActionPerformable;PLAIN;container2
+;cmsaction7;;cxcomponent2;variation5;cxCmsActionPerformable;PLAIN;container2
+;cmsaction8;;cxcomponent2;variation6;cxCmsActionPerformable;PLAIN;container2
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];name;&containerRef
+;;container1;container1;container1;
+
+

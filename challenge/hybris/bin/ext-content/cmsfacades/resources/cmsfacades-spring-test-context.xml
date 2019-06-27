@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Object Mothers -->
+	
+	<bean id="abstractModelMother" class="de.hybris.platform.warehousing.util.models.AbstractModelMother" abstract="true">
+		<property name="modelService" ref="modelService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="contentCatalogModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentCatalogModelMother" parent="abstractModelMother">
+		<property name="cmsContentCatalogDao" ref="cmsContentCatalogDao" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+	</bean>
+
+	<bean id="productCatalogModelMother" class="de.hybris.platform.cmsfacades.util.models.ProductCatalogModelMother" parent="abstractModelMother">
+		<property name="catalogDao" ref="catalogDao" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+	</bean>
+
+	<bean id="catalogVersionModelMother" class="de.hybris.platform.cmsfacades.util.models.CatalogVersionModelMother" parent="abstractModelMother">
+		<property name="catalogVersionDao" ref="catalogVersionDao" />
+		<property name="currencyModelMother" ref="currencyModelMother" />
+		<property name="contentCatalogModelMother" ref="contentCatalogModelMother" />
+		<property name="productCatalogModelMother" ref="productCatalogModelMother" />
+		<property name="contentPageModelMother" ref="contentPageModelMother" />
+		<property name="cronJobService" ref="cronJobService" />
+		<property name="languageModelMother" ref="languageModelMother" />
+		<property name="typeService" ref="typeService" />
+	</bean>
+	
+	<bean id="cmsComponentTypeModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSComponentTypeModelMother" parent="abstractModelMother">
+		<property name="cmsComponentTypeDao" ref="cmsComponentTypeDao" />
+	</bean>
+	
+	<bean id="cmsPageTypeModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSPageTypeModelMother" parent="abstractModelMother">
+		<property name="cmsPageTypeDao" ref="cmsPageTypeDao" />
+	</bean>
+	
+	<bean id="restrictionTypeModelMother" class="de.hybris.platform.cmsfacades.util.models.RestrictionTypeModelMother" parent="abstractModelMother">
+		<property name="restrictionTypeDao" ref="restrictionTypeDao" />
+	</bean>
+	
+	<bean id="componentTypeGroupModelMother" class="de.hybris.platform.cmsfacades.util.models.ComponentTypeGroupModelMother" parent="abstractModelMother">
+		<property name="componentTypeGroupDao" ref="componentTypeGroupDao" />
+		<property name="cmsComponentTypeModelMother" ref="cmsComponentTypeModelMother" />
+	</bean>
+	
+	<bean id="contentPageModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentPageModelMother" parent="abstractModelMother">
+		<property name="contentPageDao" ref="contentPageDao" />
+		<property name="pageTemplateModelMother" ref="pageTemplateModelMother" />
+		<property name="mediaModelMother" ref="mediaModelMother" />
+	</bean>
+	
+	<bean id="productPageModelMother" class="de.hybris.platform.cmsfacades.util.models.ProductPageModelMother" parent="abstractModelMother">
+		<property name="productPageDao" ref="productPageDao" />
+		<property name="pageTemplateModelMother" ref="pageTemplateModelMother" />
+		<property name="mediaModelMother" ref="mediaModelMother" />
+	</bean>
+	
+	<bean id="contentSlotForPageModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentSlotForPageModelMother" parent="abstractModelMother">
+		<property name="contentSlotForPageDao" ref="contentSlotForPageDao" />
+		<property name="contentSlotModelMother" ref="contentSlotModelMother" />
+		<property name="contentPageModelMother" ref="contentPageModelMother" />
+	</bean>
+	
+	<bean id="contentSlotForTemplateModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentSlotForTemplateModelMother" parent="abstractModelMother">
+		<property name="contentSlotForTemplateDao" ref="contentSlotForTemplateDao" />
+		<property name="contentSlotModelMother" ref="contentSlotModelMother" />
+		<property name="pageTemplateModelMother" ref="pageTemplateModelMother" />
+	</bean>
+	
+	<bean id="contentSlotModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentSlotModelMother" parent="abstractModelMother">
+		<property name="cmsContentSlotDao" ref="cmsContentSlotDao"/>
+		<property name="paragraphComponentModelMother" ref="paragraphComponentModelMother" />
+		<property name="linkComponentModelMother" ref="linkComponentModelMother" />
+		<property name="flashComponentModelMother" ref="flashComponentModelMother" />
+		<property name="abTestCMSComponentContainerModelMother" ref="abTestCMSComponentContainerModelMother" />
+	</bean>
+	
+	<bean id="contentSlotNameModelMother" class="de.hybris.platform.cmsfacades.util.models.ContentSlotNameModelMother" parent="abstractModelMother">
+		<property name="contentSlotNameDao" ref="contentSlotNameDao" />
+		<property name="componentTypeGroupModelMother" ref="componentTypeGroupModelMother" />
+	</bean>
+
+	<bean id="catalogVersionSyncJobModelMother" class="de.hybris.platform.cmsfacades.util.models.CatalogVersionSyncJobModelMother" parent="abstractModelMother">
+		<property name="syncJobDao" ref="syncJobDao" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+	</bean>
+	
+	<bean id="currencyModelMother" class="de.hybris.platform.cmsfacades.util.models.CurrencyModelMother" parent="abstractModelMother">
+		<property name="currencyDao" ref="currencyDao" />
+	</bean>
+	
+	<bean id="mediaModelMother" class="de.hybris.platform.cmsfacades.util.models.MediaModelMother" parent="abstractModelMother">
+		<property name="mediaDao" ref="mediaDao" />
+		<property name="mediaFormatModelMother" ref="mediaFormatModelMother" />
+	</bean>
+	
+	<bean id="pageTemplateModelMother" class="de.hybris.platform.cmsfacades.util.models.PageTemplateModelMother" parent="abstractModelMother">
+		<property name="pageTemplateDao" ref="pageTemplateDao" />
+		<property name="contentSlotNameModelMother" ref="contentSlotNameModelMother" />
+		<property name="cmsPageTypeModelMother" ref="cmsPageTypeModelMother" />
+		<property name="mediaModelMother" ref="mediaModelMother" />
+	</bean>
+	
+	<bean id="mediaContainerModelMother" class="de.hybris.platform.cmsfacades.util.models.MediaContainerModelMother" parent="abstractModelMother">
+		<property name="mediaContainerDao" ref="mediaContainerDao" />
+		<property name="mediaModelMother" ref="mediaModelMother" />
+	</bean>
+	
+	<bean id="paragraphComponentModelMother" class="de.hybris.platform.cmsfacades.util.models.ParagraphComponentModelMother" parent="abstractModelMother">
+		<property name="paragraphComponentDao" ref="paragraphComponentDao" />
+	</bean>
+	
+	<bean id="flashComponentModelMother" class="de.hybris.platform.cmsfacades.util.models.FlashComponentModelMother" parent="abstractModelMother">
+		<property name="flashComponentDao" ref="flashComponentDao" />
+		<property name="mediaModelMother" ref="mediaModelMother" />
+	</bean>
+	
+	<bean id="abTestCMSComponentContainerModelMother" class="de.hybris.platform.cmsfacades.util.models.ABTestCMSComponentContainerModelMother" parent="abstractModelMother">
+		<property name="paragraphComponentModelMother" ref="paragraphComponentModelMother" />
+		<property name="abTestCMSComponentContainerDao" ref="abTestCMSComponentContainerDao" />
+	</bean>
+
+	<bean id="cmsSiteModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSSiteModelMother" parent="abstractModelMother">
+		<property name="cmsSiteDao" ref="cmsSiteDao" />
+		<property name="cmsContentCatalogDao" ref="cmsContentCatalogDao" />
+	</bean>
+
+	<bean id="productCategoryModelMother" class="de.hybris.platform.cmsfacades.util.models.ProductCategoryModelMother" parent="abstractModelMother">
+		<property name="categoryDao" ref="categoryDao" />
+	</bean>
+
+	<bean id="productModelMother" class="de.hybris.platform.cmsfacades.util.models.ProductModelMother" parent="abstractModelMother">
+		<property name="productDao" ref="productDao" />
+	</bean>
+	
+	<bean id="languageModelMother" class="de.hybris.platform.cmsfacades.util.models.LanguageModelMother" parent="abstractModelMother">
+		<property name="languageDao" ref="languageDao" />
+	</bean>
+
+	<bean id="siteModelMother" class="de.hybris.platform.cmsfacades.util.models.SiteModelMother" parent="abstractModelMother">
+		<property name="languageModelMother" ref="languageModelMother" />
+		<property name="contentCatalogModelMother" ref="contentCatalogModelMother" />
+		<property name="productCatalogModelMother" ref="productCatalogModelMother" />
+		<property name="cmsSiteDao" ref="cmsSiteDao" />
+		<property name="baseStoreModelMother" ref="baseStoreModelMother" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+	</bean>
+
+	<bean id="baseStoreModelMother" class="de.hybris.platform.cmsfacades.util.models.BaseStoreModelMother" parent="abstractModelMother">
+		<property name="baseStoreDao" ref="baseStoreDao" />
+		<property name="languageModelMother" ref="languageModelMother" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+		<property name="currencyModelMother" ref="currencyModelMother" />
+		<property name="countryModelMother" ref="countryModelMother" />
+		<property name="deliveryModeModelMother" ref="deliveryModeModelMother" />
+	</bean>
+
+	<bean id="countryModelMother" class="de.hybris.platform.cmsfacades.util.models.CountryModelMother" parent="abstractModelMother">
+		<property name="countryDao" ref="countryDao" />
+	</bean>
+
+	<bean id="deliveryModeModelMother" class="de.hybris.platform.cmsfacades.util.models.DeliveryModeModelMother" parent="abstractModelMother">
+		<property name="deliveryModeDao" ref="deliveryModeDao" />
+	</bean>
+	
+	<bean id="mediaFormatModelMother" class="de.hybris.platform.cmsfacades.util.models.MediaFormatModelMother" parent="abstractModelMother">
+		<property name="mediaFormatDao" ref="cmsMediaFormatDao" />
+	</bean>
+	
+	<bean id="timeRestrictionModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSTimeRestrictionModelMother" parent="abstractModelMother">
+		<property name="restrictionDao" ref="cmsRestrictionDao" />
+	</bean>
+	
+	<bean id="categoryModelMother" class="de.hybris.platform.cmsfacades.util.models.CategoryModelMother" parent="abstractModelMother">
+		<property name="categoryDao" ref="categoryDao" />
+	</bean>
+
+	<bean id="userGroupModelMother" class="de.hybris.platform.cmsfacades.util.models.UserGroupModelMother" parent="abstractModelMother">
+		<property name="userGroupDao" ref="userGroupDao" />
+	</bean>
+	
+	<bean id="categoryRestrictionModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSCategoryRestrictionModelMother" parent="abstractModelMother">
+		<property name="restrictionDao" ref="cmsRestrictionDao" />
+		<property name="categoryModelMother" ref="categoryModelMother" />
+	</bean>
+	
+	<bean id="userGroupRestrictionModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSUserGroupRestrictionModelMother" parent="abstractModelMother">
+		<property name="restrictionDao" ref="cmsRestrictionDao" />
+		<property name="userGroupModelMother" ref="userGroupModelMother" />
+	</bean>
+
+	<bean id="navigationNodeModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSNavigationNodeModelMother" parent="abstractModelMother">
+		<property name="navigationService" ref="cmsNavigationService" />
+		<property name="navigationDao" ref="cmsNavigationDao" />
+		<property name="linkComponentModelMother" ref="linkComponentModelMother" />
+	</bean>
+
+    <bean id="navigationEntryModelMother" class="de.hybris.platform.cmsfacades.util.models.CMSNavigationEntryModelMother" parent="abstractModelMother">
+        <property name="navigationDao" ref="cmsNavigationDao" />
+    </bean>
+
+	<bean id="linkComponentModelMother" class="de.hybris.platform.cmsfacades.util.models.LinkComponentModelMother" parent="abstractModelMother">
+		<property name="productModelMother" ref="productModelMother" />
+		<property name="categoryModelMother" ref="categoryModelMother" />
+		<property name="contentPageModelMother" ref="contentPageModelMother" />
+		<property name="catalogVersionModelMother" ref="catalogVersionModelMother" />
+		<property name="linkComponentDao" ref="linkComponentDao" />
+	</bean>
+
+	<!-- DAOs bean definition -->
+	
+	<bean id="abstractDao" class="de.hybris.platform.cmsfacades.util.dao.impl.AbstractCmsWebServicesDao" abstract="true">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="paragraphComponentDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ParagraphComponentDao" parent="abstractDao"/>
+	<bean id="abTestCMSComponentContainerDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ABTestCMSComponentContainerDao" parent="abstractDao"/>
+	<bean id="flashComponentDao" class="de.hybris.platform.cmsfacades.util.dao.impl.FlashComponentDao" parent="abstractDao"/>
+	<bean id="mediaContainerDao" class="de.hybris.platform.servicelayer.media.dao.MediaContainerDao" parent="abstractDao"/>
+	<bean id="contentPageDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ContentPageDao" parent="abstractDao"/>
+	<bean id="productPageDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ProductPageDao" parent="abstractDao"/>
+	<bean id="contentSlotForPageDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ContentSlotForPageDao" parent="abstractDao"/>
+	<bean id="contentSlotForTemplateDao" class="de.hybris.platform.cmsfacades.util.dao.impl.ContentSlotForTemplateDao" parent="abstractDao"/>
+	<bean id="pageTemplateDao" class="de.hybris.platform.cmsfacades.util.dao.impl.PageTemplateDao" parent="abstractDao"/>
+	<bean id="cmsComponentTypeDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultCMSComponentTypeDao" parent="abstractDao" />
+	<bean id="cmsPageTypeDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultCMSPageTypeDao" parent="abstractDao" />
+	<bean id="restrictionTypeDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultRestrictionTypeDao" parent="abstractDao" />
+	<bean id="componentTypeGroupDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultComponentTypeGroupDao" parent="abstractDao" />
+	<bean id="contentSlotNameDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultContentSlotNameDao" parent="abstractDao" />
+	<bean id="syncJobDao" class="de.hybris.platform.cmsfacades.util.dao.impl.DefaultSyncJobDao" parent="abstractDao" />
+	<bean id="cmsMediaFormatDao" class="de.hybris.platform.cms2.servicelayer.daos.CMSMediaFormatDao" parent="abstractDao" />
+	<bean id="linkComponentDao" class="de.hybris.platform.cmsfacades.util.dao.impl.LinkComponentDao" parent="abstractDao" />
+
+</beans>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="sapOrdermgmtProductConfigurationStrategy" name="sapOrdermgmtDefaultProductConfigurationStrategy" />
+	<bean id="sapOrdermgmtDefaultProductConfigurationStrategy" scope="prototype"
+		class="de.hybris.platform.sap.sapproductconfigsombol.transaction.salesdocument.backend.impl.erp.strategy.ProductConfigurationStrategyImpl">
+		<property name="messageMapper" ref="sapOrdermgmtBackendMessageMapper" />
+	</bean>
+	
+	<alias alias="sapOrdermgmtItem" name="sapOrdermgmtCPQDefaultItem" />
+	<bean id="sapOrdermgmtCPQDefaultItem" scope="prototype"
+		class="de.hybris.platform.sap.sapproductconfigsombol.transaction.item.businessobject.impl.CPQItemSalesDoc" parent="sapOrdermgmtDefaultItem">
+		<property name="genericFactory" ref="sapCoreGenericFactory" />
+		<property name="partnerList" ref="sapOrdermgmtPartnerList" />
+	</bean>
+	
+		<bean id="userService" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="de.hybris.platform.servicelayer.user.UserService" />
+	</bean>
+	
+	<bean id="productService" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="de.hybris.platform.product.ProductService" />
+	</bean>
+	
+	<bean id="catalogVersionService" class="org.mockito.Mockito" factory-method="mock">
+		<constructor-arg value="de.hybris.platform.catalog.CatalogVersionService" />
+	</bean>
+
+</beans>

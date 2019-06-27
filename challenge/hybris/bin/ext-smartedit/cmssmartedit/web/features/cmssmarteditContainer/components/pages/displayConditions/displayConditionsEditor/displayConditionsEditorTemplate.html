@@ -1,0 +1,40 @@
+<div>
+    <y-event-message class="existing-homepage__ymessage"
+        data-show-event="'CMS_EVENT_SHOW_REPLACE_PARENT_HOMEPAGE_INFO'"
+        data-hide-event="'CMS_EVENT_HIDE_REPLACE_PARENT_HOMEPAGE_INFO'">
+    </y-event-message>
+    <display-conditions-page-info data-page-name="$ctrl.getPageName()"
+        data-page-type="$ctrl.getPageType()"
+        data-is-primary="$ctrl.isPagePrimary()"></display-conditions-page-info>
+    <div data-ng-if="$ctrl.isPagePrimary()">
+        <display-conditions-page-variations data-variations="$ctrl.getVariations()"></display-conditions-page-variations>
+    </div>
+    <div data-ng-if="!$ctrl.isPagePrimary()">
+        <display-conditions-primary-page data-read-only="$ctrl.getIsAssociatedPrimaryReadOnly()"
+            data-associated-primary-page="$ctrl.getAssociatedPrimaryPage()"
+            data-all-primary-pages="$ctrl.getPrimaryPages()"
+            data-on-primary-page-select="$ctrl.onPrimaryPageSelect(primaryPage)"></display-conditions-primary-page>
+    </div>
+
+    <div data-ng-if="$ctrl.showHomePageWidget()">
+        <div class="se-component-homepage checkbox">
+            <input type="checkbox"
+                id="set-homepage-checkbox"
+                class="se-component-item--details"
+                name="clone-on-drop"
+                data-ng-disabled="$ctrl.disableHomepageCheckbox()"
+                data-ng-change="$ctrl.homePageChanged()"
+                data-ng-model="$ctrl.page.homepage">
+            <label class="control-label se-component-homepage--label"
+                for="set-homepage-checkbox"
+                data-translate="se.cms.display.conditions.homepage.set" />
+            <y-help data-ng-if="$ctrl.disableHomepageCheckbox()"
+                data-template="$ctrl.getHomePageDisabledTooltipTemplate()"></y-help>
+        </div>
+        <label class="control-label se-component-homepage--label"
+            for="set-homepage-checkbox"
+            data-ng-if="$ctrl.showReplaceLabel">
+            {{ "se.cms.display.conditions.homepage.replace" | translate: { currentHomepage: $ctrl.currentHomePageName } }}
+        </label>
+    </div>
+</div>

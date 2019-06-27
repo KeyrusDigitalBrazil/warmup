@@ -1,0 +1,226 @@
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="classpath*:/datahub-rest-spring.xml" />
+
+    <!-- Canonical Item Facade Strategies -->
+    <!-- describes type of the object being displayed in the widget -->
+
+	<alias alias="canonicalItemTypeFacadeStrategy" name="defaultCanonicalItemTypeFacadeStrategy"/>
+	<bean id="defaultCanonicalItemTypeFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.DatahubCanonicalTypeFacadeStrategy">
+		<property name="canonicalTypesService" ref="canonicalTypeService" />
+	</bean>
+	<!-- provides item search functionality -->
+	<alias alias="canonicalItemFieldSearchFacadeStrategy" name="defaultCanonicalItemFieldSearchFacadeStrategy" />
+	<bean id="defaultCanonicalItemFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.DatahubCanonicalFieldSearchFacadeStrategy">
+		<property name="dataItemClient" ref="dataItemClient" />
+	</bean>
+	<!-- manipulates object -->
+	<alias alias="canonicalItemObjectFacadeStrategy" name="defaultCanonicalItemObjectFacadeStrategy" />
+	<bean id="defaultCanonicalItemObjectFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.DatahubCanonicalObjectFacadeStrategy">
+		<property name="dataItemClient" ref="dataItemClient" />
+	</bean>
+
+	<!-- Raw Item Facade Strategies -->
+	<alias alias="rawItemTypeFacadeStrategy" name="defaultRawItemTypeFacadeStrategy" />
+	<bean id="defaultRawItemTypeFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.rawdata.RawItemTypeFacadeStrategy" />
+	<alias alias="rawItemFieldSearchFacadeStrategy" name="defaultRawItemFieldSearchFacadeStrategy" />
+	<bean id="defaultRawItemFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.rawdata.RawItemFieldSearchFacadeStrategy" />
+	<alias alias="rawItemObjectFacadeStrategy" name="defaultRawItemObjectFacadeStrategy"/>
+	<bean id="defaultRawItemObjectFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.rawdata.RawItemObjectFacadeStrategy" />
+
+	<!-- Pool History Facade Strategies -->
+	<alias alias="poolHistoryTypeFacadeStrategy" name="defaultPoolHistoryTypeFacadeStrategy" />
+	<bean id="defaultPoolHistoryTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.pool.history.PoolHistoryTypeFacadeStrategy" />
+	<alias alias="poolHistoryFieldSearchFacadeStrategy" name="defaultPoolHistoryFieldSearchFacadeStrategy"/>
+	<bean id="defaultPoolHistoryFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.pool.history.PoolHistoryFieldSearchFacadeStrategy">
+		<property name="poolActionClient" ref="poolActionClient" />
+	</bean>
+	<alias alias="poolHistoryObjectFacadeStrategy" name="defaultPoolHistoryObjectFacadeStrategy" />
+	<bean id="defaultPoolHistoryObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.pool.history.PoolHistoryObjectFacadeStrategy" />
+
+	<!-- Pool Facade Strategies -->
+	<bean id="poolTypeFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.pool.PoolTypeFacadeStrategy" />
+	<bean id="poolFieldSearchFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.pool.PoolFieldSearchFacadeStrategy">
+		<property name="dataPoolClient" ref="dataPoolClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+	<bean id="poolObjectFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.pool.PoolObjectFacadeStrategy">
+		<property name="poolClient" ref="dataPoolClient" />
+	</bean>
+
+	<bean id="feedTypeFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.feed.FeedTypeFacadeStrategy" />
+	<bean id="feedFieldSearchFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.feed.FeedFieldSearchFacadeStrategy">
+		<property name="dataFeedClient" ref="dataFeedClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<bean id="canonicalAttributeTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.CanonicalAttributeDefinitionTypeFacadeStrategy" />
+	<bean id="canonicalAttributeFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.CanonicalAttributeDefinitionFieldSearchFacadeStrategy">
+		<property name="canonicalItemClassClient" ref="canonicalItemClassClient" />
+	</bean>
+	<bean id="canonicalAttributeObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.search.strategy.CanonicalAttributeDefinitionObjectFacadeStrategy" />
+
+	<bean id="publicationTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.PublicationsInErrorTypeFacadeStrategy" />
+
+	<bean id="publicationFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.PublicationsInErrorFieldSearchFacadeStrategy">
+		<property name="publicationClient" ref="publicationClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<bean id="compositionErrorFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.composition.error.CompositionErrorFieldSearchFacadeStrategy">
+	<property name="poolActionClient" ref="poolActionClient" />
+	</bean>
+
+	<bean id="publicationObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.PublicationsInErrorObjectFacadeStrategy" />
+
+	<bean id="publicationErrorObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.error.PublicationErrorObjectFacadeStrategy" />
+	<bean id="publicationErrorsFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.error.PublicationErrorFieldSearchFacadeStrategy">
+		<property name="publicationClient" ref="publicationClient" />
+	</bean>
+	<bean id="publicationErrorTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.publication.error.PublicationErrorTypeFacadeStrategy" />
+
+	<bean id="dataLoadingActionObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.dataloading.DataLoadingActionObjectFacadeStrategy" />
+	<bean id="dataLoadingActionFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.dataloading.DataLoadingActionFieldSearchFacadeStrategy">
+		<property name="dataFeedClient" ref="dataFeedClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+	<bean id="dataLoadingActionTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.dataloading.DataLoadingActionTypeFacadeStrategy" />
+
+	<bean id="compositionActionObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.composition.CompositionActionObjectFacadeStrategy" />
+	<bean id="compositionFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.composition.CompositionActionFieldSearchFacadeStrategy">
+		<property name="poolActionClient" ref="poolActionClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+	<bean id="compositionActionTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.composition.CompositionActionTypeFacadeStrategy" />
+
+	<bean id="targetSystemTypeFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.targetsystem.TargetSystemTypeFacadeStrategy" />
+	<bean id="targetSystemObjectFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.targetsystem.TargetSystemObjectFacadeStrategy" />
+	<bean id="targetSystemFieldSearchFacadeStrategy"
+		  class="de.hybris.platform.datahubbackoffice.dataaccess.targetsystem.TargetSystemFieldSearchFacadeStrategy">
+		<property name="targetSystemClient" ref="targetSystemClient" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<bean id="feedObjectFacadeStrategy" class="de.hybris.platform.datahubbackoffice.dataaccess.feed.FeedObjectFacadeStrategy">
+		<property name="feedClient" ref="dataFeedClient"/>
+	</bean>
+
+
+	<!--Datahub specific configuration adjustments -->
+	<bean id="editorAreaFallbackStrategyExtender" class="de.hybris.platform.datahubbackoffice.service.cockpitng.fallback.extender.ConfigurationFallbackStrategyExtender"
+		  init-method="init" destroy-method="remove" lazy-init="false">
+		<property name="cockpitConfigurationService" ref="cockpitConfigurationService" />
+		<property name="key" value="com.hybris.cockpitng.core.config.impl.jaxb.editorarea.EditorArea" />
+		<property name="replacement" ref="datahubCanonicalItemEditorFallbackStrategy" />
+	</bean>
+
+	<bean id="datahubCanonicalItemEditorFallbackStrategy" parent="defaultEditorAreaConfigurationFallbackStrategy"
+		  class="de.hybris.platform.datahubbackoffice.service.cockpitng.fallback.DatahubCanonicalItemEditorAreaConfigFallbackStrategy">
+		<property name="componentName" value="editor-area-errors"/>
+		<property name="customSectionName" value="datahub.canonical.item.attributes"/>
+		<property name="customSectionDescr" value="section.attributes"/>
+		<property name="customSectionSpringId" value="canonicalItemCustomSection"/>
+	</bean>
+
+
+
+	<bean class="com.hybris.cockpitng.dataaccess.util.DataAccessStrategyExtender"
+		  lazy-init="false"
+		  init-method="addAll"
+		  destroy-method="removeAll">
+		<property name="fieldSearchFacadeStrategies">
+			<list>
+				<ref bean="canonicalItemFieldSearchFacadeStrategy" />
+				<ref bean="poolHistoryFieldSearchFacadeStrategy" />
+				<ref bean="canonicalAttributeFieldSearchFacadeStrategy" />
+				<ref bean="poolFieldSearchFacadeStrategy" />
+				<ref bean="rawItemFieldSearchFacadeStrategy" />
+				<ref bean="feedFieldSearchFacadeStrategy" />
+				<ref bean="publicationFieldSearchFacadeStrategy" />
+				<ref bean="publicationErrorsFieldSearchFacadeStrategy" />
+				<ref bean="targetSystemFieldSearchFacadeStrategy" />
+				<ref bean="dataLoadingActionFieldSearchFacadeStrategy" />
+				<ref bean="compositionFieldSearchFacadeStrategy" />
+			</list>
+		</property>
+		<property name="typeFacadeStrategies">
+			<list>
+				<ref bean="poolHistoryTypeFacadeStrategy" />
+				<ref bean="poolTypeFacadeStrategy" />
+				<ref bean="canonicalItemTypeFacadeStrategy" />
+				<ref bean="rawItemTypeFacadeStrategy" />
+				<ref bean="feedTypeFacadeStrategy" />
+				<ref bean="canonicalAttributeTypeFacadeStrategy" />
+				<ref bean="publicationTypeFacadeStrategy" />
+				<ref bean="publicationErrorTypeFacadeStrategy" />
+				<ref bean="targetSystemTypeFacadeStrategy" />
+				<ref bean="dataLoadingActionTypeFacadeStrategy" />
+				<ref bean="compositionActionTypeFacadeStrategy" />
+			</list>
+		</property>
+
+		<property name="objectFacadeStrategies">
+			<list>
+				<ref bean="canonicalItemObjectFacadeStrategy" />
+				<ref bean="poolObjectFacadeStrategy" />
+				<ref bean="poolHistoryObjectFacadeStrategy" />
+				<ref bean="rawItemObjectFacadeStrategy" />
+				<ref bean="feedObjectFacadeStrategy" />
+				<ref bean="canonicalAttributeObjectFacadeStrategy" />
+				<ref bean="publicationObjectFacadeStrategy" />
+				<ref bean="publicationErrorObjectFacadeStrategy" />
+				<ref bean="targetSystemObjectFacadeStrategy" />
+				<ref bean="dataLoadingActionObjectFacadeStrategy" />
+				<ref bean="compositionActionObjectFacadeStrategy" />
+			</list>
+		</property>
+
+		<property name="permissionFacadeStrategies">
+			<list>
+			</list>
+		</property>
+
+		<property name="typeFacadeStrategyRegistry" ref="typeFacadeStrategyRegistry" />
+		<property name="fieldSearchFacadeStrategyRegistry" ref="fieldSearchFacadeStrategyRegistry" />
+		<property name="objectFacadeStrategyRegistry" ref="objectFacadeStrategyRegistry" />
+		<property name="permissionFacadeStrategyRegistry" ref="permissionFacadeStrategyRegistry" />
+	</bean>
+
+</beans>

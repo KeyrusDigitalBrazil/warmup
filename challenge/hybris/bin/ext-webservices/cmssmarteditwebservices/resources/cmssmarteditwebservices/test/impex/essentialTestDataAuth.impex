@@ -1,0 +1,60 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$defaultPassword=nimda
+$lang=en
+
+INSERT_UPDATE Employee;UID[unique=true];groups(uid)[mode=append];sessionLanguage(isocode);password[default=$defaultPassword];name
+;admin;cmsmanagergroup;$lang;;Admin
+;cmsmanager;cmsmanagergroup;$lang;1234;CmsManager
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append];locname[lang=en]; readableLanguages(isocode); writeableLanguages(isocode)
+;basecmsmanagergroup;employeegroup;Base CMS Manager Group ; en ; en
+;cmsmanagergroup;employeegroup,basecmsmanagergroup;CmsManagerGroup ; ;
+
+INSERT_UPDATE User;UID[unique=true];name;groups(uid);
+;cmsmanager;CmsManager;cmsmanagergroup;
+
+# Content catalogs
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=$lang];defaultCatalog;
+;ID_APPLE;Apple's Content Catalog;true
+
+# Product catalogs
+INSERT_UPDATE Catalog;id[unique=true];name[lang=$lang];defaultCatalog;
+;ID_PHONES;Phone Product Catalog;true
+;ID_LAPTOPS;Laptop Product Catalog;false
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;languages(isoCode);readPrincipals(uid);writePrincipals(uid)
+;ID_APPLE;staged;false;$lang;;cmsmanagergroup
+;ID_APPLE;online;true;$lang;cmsmanagergroup;cmsmanagergroup
+;ID_PHONES;staged1;false;$lang;;cmsmanagergroup
+;ID_PHONES;staged2;false;$lang;;cmsmanagergroup
+;ID_PHONES;online;true;$lang;cmsmanagergroup;
+;ID_LAPTOPS;staged1;false;$lang;;cmsmanagergroup
+;ID_LAPTOPS;staged2;false;$lang;;cmsmanagergroup
+;ID_LAPTOPS;online;true;$lang;cmsmanagergroup;
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true];resourceIds;scope;authorizedGrantTypes;authorities;clientSecret;registeredRedirectUri
+;trusted_client;hybris;basic;authorization_code,refresh_token,password,client_credentials	;ROLE_ADMINGROUP,ROLE_CMSMANAGERGROUP;secret;http://localhost:9001/authorizationserver/oauth2_callback;
+
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmsmanagergroup;;;;;;;;
+
+;;;;CatalogVersion;+;+;-;-;-;
+;;;;Type;+;-;-;-;-;
+;;;;Item;+;-;-;-;-;
+
+# cms2 items
+;;;;CMSItem;+;+;+;+;+;
+
+$END_USERRIGHTS;;;;;

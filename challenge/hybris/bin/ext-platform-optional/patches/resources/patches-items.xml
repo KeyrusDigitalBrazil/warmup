@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="items.xsd">
+
+   <enumtypes>
+      <enumtype code="ExecutionStatus">
+         <description>Statuses of PatchExecution and PatchExecutionUnit</description>
+         <value code="UNKNOWN" />
+         <value code="ERROR" />
+         <value code="SUCCESS" />
+      </enumtype>
+
+      <enumtype code="ExecutionUnitType">
+         <description>Types of PatchExecutionUnit</description>
+         <value code="IMPEX_IMPORT" />
+         <value code="SQL_COMMAND" />
+         <value code="ACTION" />
+      </enumtype>
+   </enumtypes>
+
+   <relations>
+      <relation code="PatchExecution2PatchExecutionUnitRel" localized="false">
+         <sourceElement qualifier="patch" type="PatchExecution" cardinality="one">
+            <modifiers unique="true" />
+         </sourceElement>
+         <targetElement qualifier="patchUnits" type="PatchExecutionUnit" cardinality="many" ordered="false">
+            <modifiers partof="true" />
+         </targetElement>
+      </relation>
+    </relations>
+
+   <itemtypes>
+      <typegroup name="Patch">
+         <itemtype generate="true"
+            code="PatchExecution"
+            jaloclass="de.hybris.platform.patches.jalo.PatchExecution"
+            autocreate="true">
+               <deployment table="patchexecutions" typecode="9460" />
+            <attributes>
+               <attribute qualifier="patchId" type="java.lang.String">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="patchName" type="java.lang.String">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="patchDescription" type="java.lang.String">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="executionTime" type="java.util.Date">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="previousExecution" type="PatchExecution">
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="nextExecution" type="PatchExecution">
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="jenkinsBuild" type="java.lang.String">
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="gitHashCode" type="java.lang.String">
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="numberOfUnits" type="java.lang.Integer">
+                  <modifiers write="false" />
+                  <persistence type="dynamic" attributeHandler="numberOfUnitsAttributeHandler"/>
+               </attribute>
+               <attribute qualifier="numberOfErrorUnits" type="java.lang.Integer">
+                  <modifiers write="false" />
+                  <persistence type="dynamic" attributeHandler="numberOfErrorUnitsAttributeHandler"/>
+               </attribute>
+               <attribute qualifier="executionStatus" type="ExecutionStatus">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+                  <defaultvalue>em().getEnumerationValue("ExecutionStatus","UNKNOWN")</defaultvalue>
+               </attribute>
+               <attribute qualifier="errorLog" type="java.lang.String">
+                  <description>Details about major errors during the patch execution.</description>
+                  <persistence type="property">
+                     <columntype database="oracle">
+                        <value>CLOB</value>
+                     </columntype>
+                     <columntype database="sap">
+                        <value>NCLOB</value>
+                     </columntype>
+                     <columntype database="mysql">
+                        <value>MEDIUMTEXT</value>
+                     </columntype>
+                     <columntype database="hsqldb">
+                        <value>LONGVARCHAR</value>
+                     </columntype>
+                     <columntype>
+                        <value>HYBRIS.LONG_STRING</value>
+                     </columntype>
+                  </persistence>
+               </attribute>
+               <attribute qualifier="rerunnable" type="boolean">
+                  <modifiers optional="false"/>
+                  <persistence type="property"/>
+                  <defaultvalue>Boolean.FALSE</defaultvalue>
+                  <description>
+                     Flag indicating whether patch is re runnable by default.
+                  </description>
+               </attribute>
+            </attributes>
+         </itemtype>
+
+         <itemtype generate="true"
+            code="PatchExecutionUnit"
+            jaloclass="de.hybris.platform.patches.jalo.PatchExecutionUnit"
+            autocreate="true">
+               <deployment table="patchexecutionunits" typecode="9461" />
+            <attributes>
+               <attribute qualifier="idHash" type="java.lang.String">
+                  <description>The execution unit id hash</description>
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="name" type="java.lang.String">
+                  <modifiers optional="false" unique="true" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="orderNumber" type="java.lang.Integer">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="organisation" type="java.lang.String">
+                  <modifiers optional="true" unique="true" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="executionStatus" type="ExecutionStatus">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+                  <defaultvalue>em().getEnumerationValue("ExecutionStatus","UNKNOWN")</defaultvalue>
+               </attribute>
+               <attribute qualifier="executionType" type="ExecutionUnitType">
+                  <modifiers optional="false" />
+                  <persistence type="property" />
+               </attribute>
+               <attribute qualifier="executionTime" type="java.util.Date">
+                        <description>The time when the patch item was applied.</description>
+                        <persistence type="property" />
+                    </attribute>
+                    <attribute qualifier="contentHash" type="java.lang.String" >
+                        <description>The impex content hash.</description>
+                        <persistence type="property" />
+                    </attribute>
+               <attribute qualifier="errorLog" type="java.lang.String">
+                        <description>Details about errors during the execution of specific patch execution unit element.</description>
+                        <persistence type="property">
+                            <columntype database="oracle">
+                                <value>CLOB</value>
+                            </columntype>
+                            <columntype database="sap">
+                                <value>NCLOB</value>
+                            </columntype>
+                            <columntype database="mysql">
+                                <value>MEDIUMTEXT</value>
+                            </columntype>
+                            <columntype database="hsqldb">
+                                <value>LONGVARCHAR</value>
+                            </columntype>
+                            <columntype>
+                                <value>HYBRIS.LONG_STRING</value>
+                            </columntype>
+                        </persistence>
+                    </attribute>
+                    <attribute qualifier="cronjob" type="CronJob">
+                  <persistence type="property" />
+               </attribute>
+            </attributes>
+            <indexes>
+               <index name="patchExecutionUnitIndex">
+                  <key attribute="organisation" />
+                  <key attribute="patch" />
+                  <key attribute="name" />
+               </index>
+            </indexes>
+         </itemtype>
+      </typegroup>
+   </itemtypes>
+</items>

@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="DestinationChannel" autocreate="true" generate="true">
+			<value code="KYMA"/>
+		</enumtype>
+		<enumtype code="EventPriority" autocreate="true" generate="true">
+			<value code="CRITICAL"/>
+			<value code="HIGH"/>
+			<value code="MEDIUM"/>
+			<value code="LOW"/>
+		</enumtype>
+		<enumtype code="EventMappingType" autocreate="true" generate="true">
+			<value code="GENERIC"/>
+			<value code="BEAN"/>
+			<value code="PROCESS"/>
+		</enumtype>
+	</enumtypes>
+	<relations>
+		<relation code="Endpoint2AbstractDestination" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="endpoint" type="Endpoint" cardinality="one">
+				<modifiers optional="false"  />
+			</sourceElement>
+			<targetElement qualifier="destinations" type="AbstractDestination" cardinality="many" collectiontype="collection">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+		<relation code="EventConfiguration2EventPropertyConfiguration" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="eventConfiguration" type="EventConfiguration" cardinality="one" >
+				<modifiers optional="false" initial="true" write="false"  />
+			</sourceElement>
+			<targetElement qualifier="eventPropertyConfigurations" type="EventPropertyConfiguration" cardinality="many"
+						   collectiontype="list" ordered="true" >
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+		<relation code="DestinationTarget2EventConfiguration" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="destinationTarget" type="DestinationTarget" cardinality="one">
+				<modifiers optional="false" initial="true" write="false"  />
+			</sourceElement>
+			<targetElement qualifier="eventConfigurations" type="EventConfiguration" cardinality="many"/>
+		</relation>
+		<relation code="DestinationTarget2Destination" generate="true" localized="false" autocreate="true">
+			<sourceElement qualifier="destinationTarget" type="DestinationTarget" cardinality="one">
+				<modifiers optional="false" initial="true" write="false"  />
+			</sourceElement>
+			<targetElement qualifier="destinations" type="AbstractDestination" cardinality="many" />
+		</relation>
+	</relations>
+	<itemtypes>
+		<itemtype code="EventExportDeadLetter" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.EventExportDeadLetter">
+			<deployment table="EventExportDeadLetter" typecode="6616" />
+			<attributes>
+				<attribute qualifier="id"  type="java.lang.String">
+					<modifiers optional="false" unique="true" initial="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="eventType" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="destinationTarget" type="DestinationTarget">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="destinationChannel" type="DestinationChannel">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="timestamp" type="java.util.Date">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="payload" type="java.lang.String">
+					<modifiers optional="false" />
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype database="mysql">
+                            <value>MEDIUMTEXT</value>
+                        </columntype>
+                        <columntype database="sqlserver">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+				</attribute>
+				<attribute qualifier="error" type="java.lang.String">
+					<modifiers optional="false" />
+                    <persistence type="property">
+                        <columntype database="oracle">
+                            <value>CLOB</value>
+                        </columntype>
+                        <columntype database="sap">
+                            <value>NCLOB</value>
+                        </columntype>
+                        <columntype database="mysql">
+                            <value>MEDIUMTEXT</value>
+                        </columntype>
+                        <columntype database="sqlserver">
+                            <value>TEXT</value>
+                        </columntype>
+                        <columntype>
+                            <value>HYBRIS.LONG_STRING</value>
+                        </columntype>
+                    </persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="DestinationTarget" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.DestinationTarget">
+			<deployment table="DestinationTarget" typecode="6615" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<modifiers optional="false" unique="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="destinationChannel" type="DestinationChannel">
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("DestinationChannel", "KYMA")</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="OAuthClientDetails" autocreate="false" generate="false">
+			<description>Extending the OAuthClientDetails from core with additional attributes.</description>
+			<attributes>
+				<attribute qualifier="oAuthUrl" type="java.lang.String">
+					<description>URL for accessing oauth</description>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="Endpoint" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.Endpoint">
+			<deployment table="Endpoints" typecode="6610" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<modifiers optional="false" unique="true" initial="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="version" type="java.lang.String">
+					<modifiers optional="false" unique="true" initial="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="java.lang.String">
+					<modifiers optional="true" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="specUrl" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="specData" type="java.lang.String">
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>MEDIUMTEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="extensionName" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="endpointUniqueIdx" unique="true">
+					<key attribute="id" />
+					<key attribute="version" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractDestination" autocreate="true" generate="true" abstract="true" extends="GenericItem"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.AbstractDestination">
+			<deployment table="Destinations" typecode="6611" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<modifiers optional="false" unique="true" initial="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="url" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="active" type="boolean">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>false</defaultvalue>
+				</attribute>
+				<attribute qualifier="additionalProperties" type="String2StringMapType">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="credential" type="AbstractCredential">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="destUniqueIdx" unique="true">
+					<key attribute="id"/>
+					<key attribute="destinationTarget"/>
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="ExposedDestination" autocreate="true" generate="true" extends="AbstractDestination"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ExposedDestination">
+			<attributes>
+				<attribute qualifier="targetId" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="ConsumedDestination" autocreate="true" generate="true" extends="AbstractDestination"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ConsumedDestination">
+		</itemtype>
+
+		<itemtype code="AbstractCredential" autocreate="true" generate="true" abstract="true" extends="GenericItem"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.AbstractCredential">
+			<deployment table="Credentials" typecode="6612" />
+			<attributes>
+				<attribute qualifier="id" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="credUniqueIdx" unique="true">
+					<key attribute="id"/>
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="BasicCredential" autocreate="true" generate="true" extends="AbstractCredential"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.BasicCredential">
+			<attributes>
+				<attribute qualifier="username" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="password" type="java.lang.String">
+					<modifiers optional="false" encrypted="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="ExposedOAuthCredential" autocreate="true" generate="true" extends="AbstractCredential"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ExposedOAuthCredential">
+			<attributes>
+				<attribute qualifier="oAuthClientDetails" type="OAuthClientDetails">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="password" type="java.lang.String">
+					<modifiers encrypted="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="ConsumedOAuthCredential" autocreate="true" generate="true" extends="AbstractCredential"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ConsumedOAuthCredential">
+			<attributes>
+				<attribute qualifier="clientId" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="oAuthUrl" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="clientSecret" type="java.lang.String">
+					<modifiers encrypted="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="ConsumedCertificateCredential" autocreate="true" generate="true" extends="AbstractCredential"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ConsumedCertificateCredential">
+			<attributes>
+				<attribute qualifier="certificateData" type="java.lang.String">
+					<description>Serialized authentication object</description>
+					<modifiers  encrypted="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>MEDIUMTEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="privateKey" type="java.lang.String">
+					<description>Serialized authentication object</description>
+					<modifiers  encrypted="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>MEDIUMTEXT</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="EventConfiguration" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.events.EventConfiguration">
+			<deployment table="EventConfigurations" typecode="6613" />
+			<attributes>
+				<attribute qualifier="eventClass" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="version" type="int">
+					<modifiers optional="false" initial="true" write="false" unique="true"/>
+					<persistence type="property"/>
+					<defaultvalue>1</defaultvalue>
+				</attribute>
+				<attribute qualifier="exportFlag" type="boolean">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>false</defaultvalue>
+				</attribute>
+				<attribute qualifier="priority" type="EventPriority">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("EventPriority", "MEDIUM")</defaultvalue>
+				</attribute>
+				<attribute qualifier="exportName" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="mappingType" type="EventMappingType">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("EventMappingType", "GENERIC")</defaultvalue>
+				</attribute>
+				<!-- OPTIONAL -->
+				<attribute qualifier="converterBean" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="description" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="extensionName" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="eventConfIdx" unique="true">
+					<key attribute="eventClass"/>
+					<key attribute="destinationTarget"/>
+					<key attribute="version"/>
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="EventPropertyConfiguration" autocreate="true" generate="true"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.events.EventPropertyConfiguration">
+			<deployment table="EventPropertyConfigs" typecode="6614" />
+			<attributes>
+				<attribute qualifier="propertyName" type="java.lang.String">
+					<modifiers optional="false" initial="true" write="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="propertyMapping" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="type" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="title" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="required" type="boolean">
+					<modifiers optional="false" />
+					<defaultvalue>true</defaultvalue>
+					<persistence type="property"/>
+				</attribute>
+				<!-- OPTIONAL -->
+				<attribute qualifier="description" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="examples" type="String2StringMapType">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="eventPropertyUniqueIdx" unique="true">
+					<key attribute="propertyName"/>
+					<key attribute="eventConfiguration"/>
+				</index>
+			</indexes>
+		</itemtype>
+		<itemtype code="ProcessEventConfiguration" autocreate="true" generate="true" extends="EventConfiguration"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.ProcessEventConfiguration">
+			<attributes>
+				<attribute qualifier="mappingType" type="EventMappingType" redeclare="true">
+                    <description>Enumeration attribute which defines type of event property mapping</description>
+					<modifiers optional="false" initial="true" write="false"/>
+					<persistence type="property"/>
+					<defaultvalue>em().getEnumerationValue("EventMappingType", "PROCESS")</defaultvalue>
+				</attribute>
+				<attribute qualifier="process" type="java.lang.String">
+                    <description>Fully qualified classname of business process</description>
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<!-- Constraints -->
+		<itemtype code="EventMappingConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+				  jaloclass="de.hybris.platform.apiregistryservices.jalo.constraints.EventMappingConstraint">
+			<description>Custom constraint which checks if the MappingType and mappingConfiguration/converterBean of EventConfiguration are valid.</description>
+			<attributes>
+				<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+					<modifiers write="false" initial="true" optional="false"/>
+					<defaultvalue>de.hybris.platform.apiregistryservices.constraints.EventMappingValid.class</defaultvalue>
+				</attribute>
+				<attribute qualifier="keyRegexp" type="java.lang.String">
+					<description>Regular expression of toString() Map key representation</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="keyFlags" type="FlagsCollection">
+					<description>Regular expression for constraint</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="valueRegexp" type="java.lang.String">
+					<description>Regular expression of toString() Map value representation</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="valueFlags" type="FlagsCollection">
+					<description>Regular expression for constraint</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

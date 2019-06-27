@@ -1,0 +1,147 @@
+##############################################################
+#Set up Product Catalog and Catalog Version for Revenue Cloud 
+##############################################################
+
+$productCatalog=reveuneCloudProductCatalog
+
+# Product catalog
+INSERT_UPDATE Catalog;id[unique=true]
+;$productCatalog
+
+
+# Product versions for product catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active
+;$productCatalog;Staged;false
+;$productCatalog;Online;true
+
+
+#############################
+#Set up SubscriptionTerm 
+#############################
+
+INSERT_UPDATE SubscriptionTerm;id[unique=true];name[lang=en];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id);cancellable;
+;calendar-monthly;Twelve months contract - monthly first day billing;monthly;12;non_renewing;calendar_monthly;true;
+;anniversary-monthly;Twelve months contract - monthly subscription start date billing;monthly;12;non_renewing;anniversary_monthly;true;
+;calendar-quarterly;Four quarters contract - quarterly first day billing;quarterly;4;non_renewing;calendar_quarterly;true;
+;anniversary-quarterly;Four quarters contract - quarterly subscription start date billing;quarterly;4;non_renewing;anniversary_quarterly;true;
+;calendar-half-yearly;One Year contract - half-yearly first day of half year;half_yearly;2;non_renewing;calendar_half_yearly;true;
+;anniversary-half-yearly;Twelve months contract - half-yearly subscription start date billing;half_yearly;2;non_renewing;anniversary_half_yearly;true;
+;calendar-yearly;One Year contract - yearly first day billing;annually;1;non_renewing;calendar_yearly;true;
+;anniversary-yearly;Twelve months contract - yearly subscription start date billing;annually;1;non_renewing;anniversary_yearly;true;
+
+
+
+#############################
+#Set up BillingPlan
+#############################
+
+INSERT_UPDATE BillingPlan;id[unique=true];name[lang=en];billingCycleDay;billingCycleType(code);billingFrequency(code);
+;calendar_monthly;Monthly on first day of month;1;day_of_month;monthly;
+;anniversary_monthly;Monthly on subscription start date;;subscription_start;monthly;
+;calendar_quarterly;Quarterly on first day of quarter;1;day_of_month;quarterly;
+;anniversary_quarterly;Quarterly on subscription start date;;subscription_start;quarterly;
+;calendar_half_yearly;Half yearly on first day of half year;1;day_of_month;half-yearly;
+;anniversary_half_yearly;Half yearly on subscription start date;;subscription_start;half-yearly;
+;calendar_yearly;Yearly on January 1;1;day_of_month;yearly;
+;anniversary_yearly;Yearly on subscription start date;;subscription_start;yearly;
+
+
+
+#############################
+#Set up BillingFrequency
+#############################
+
+INSERT_UPDATE BillingFrequency;code[unique=true];nameInCart[lang=en];nameInOrder[lang=en];order;cartAware[default=true]
+;monthly;monthly payment;monthly payment;1
+;quarterly;quarterly payment;quarterly payment;2
+;half-yearly;half yearly payment;half yearly payment;3
+;yearly;yearly payment;yearly payment;4
+
+#############################
+#Set up BillingEvent
+#############################
+
+INSERT_UPDATE BillingEvent;code[unique=true];nameInCart[lang=en];nameInOrder[lang=en];order;cartAware[default=true]
+;OneTime;;;1;
+;Recurrring;;;2;
+;#RP4;;;3;
+
+
+
+#################
+#Set up Warehouse
+#################
+
+$storesUid=electronics,powertools
+$wareHouseCode=rc_warehouse
+$wareHouseName=Revenue Cloud Warehouse
+
+INSERT_UPDATE Warehouse;code[unique=true];name[lang=en];vendor(code);default;baseStores(uid);;;;
+;$wareHouseCode;$wareHouseName;default;true;$storesUid;;;;
+
+
+
+##################
+#Set up Stocklevel
+##################
+$availableAmount=99999
+
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved;
+;$availableAmount;$wareHouseCode;notSpecified;0;-1;0;0;$productCode;0;
+
+
+###############
+#Set up TaxRow
+###############
+
+$taxCurrency=USD
+$taxValue=0
+$productTaxGroup=rc-defaut-product-tax-group
+
+
+INSERT_UPDATE ProductTaxGroup;code[unique=true];name[lang=en]
+;$productTaxGroup;Revenue Cloud Default Product Tax Group
+
+INSERT_UPDATE TaxRow;tax(code)[unique=true];pg(code)[unique=true];currency(isocode);value
+;rc-defaut-tax;$productTaxGroup;$taxCurrency;$taxValue
+
+INSERT_UPDATE Tax;code[unique=true];name[lang=en];
+;rc-defaut-tax;Revenue Cloud Default Tax;
+
+
+###############
+#Set up Unit
+###############
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name;conversion
+;quantity;each;Each;1
+
+
+##############################################
+#Set up Cronjob and Trigger for Product import
+##############################################
+
+INSERT_UPDATE SapRevenueCloudProductCronjob;code[unique=true];active;job(code);sessionLanguage(isocode)[default=en]
+;sapRevenueCloudProductImportCronJob;true;defaultSapRevenueCloudProductImportJob;
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+;sapRevenueCloudProductImportCronJob;0;0;0;-1;-1;-1;false;true;-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

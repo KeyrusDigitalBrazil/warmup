@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultPaymentService" alias="paymentService"/>
+	<bean name="defaultPaymentService" class="de.hybris.platform.payment.impl.DefaultPaymentServiceImpl" >
+		<property name="cardPaymentService" ref="cardPaymentService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="transactionCodeGenerator" ref="transactionCodeGenerator" />
+		<property name="paymentInfoCreator" ref="paymentInfoCreator" />
+	</bean>
+
+	<bean name="cardPaymentService" class="de.hybris.platform.payment.methods.impl.DefaultCardPaymentServiceImpl">
+		<property name="commandFactoryRegistry" ref="commandFactoryRegistry"/>
+	</bean>	
+	
+	<!-- This service is used by paymentservice to generate 'merchant transaction codes' based on the specified code base (exp.: order code) and the injected keygenerator -->
+	<alias alias="transactionCodeGenerator" name="defaultTransactionCodeGenerator"/>
+	<bean name="defaultTransactionCodeGenerator" class="de.hybris.platform.payment.strategy.impl.DefaultMerchantTransactionCodeGenerator">
+	<property name="keyGenerator" ref="codeGenerator" />
+	</bean>
+	
+	<bean id="PreparePaymentTransactionInterceptor"
+		class="de.hybris.platform.payment.impl.PreparePaymentTransactionInterceptor">
+		<property name="keyGenerator" ref="codeGenerator" />
+	</bean>
+	<bean id="PreparePaymentTransactionEntryInterceptor" class="de.hybris.platform.payment.impl.PreparePaymentTransactionEntryInterceptor"/>
+	
+	<bean id="PreparePaymentTransactionInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PreparePaymentTransactionInterceptor" />
+		<property name="typeCode" value="PaymentTransaction" />
+	</bean>
+	
+	<bean id="PreparePaymentTransactionEntryInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="PreparePaymentTransactionEntryInterceptor" />
+		<property name="typeCode" value="PaymentTransactionEntry" />
+	</bean>	
+	
+	<alias alias="codeGenerator" name="defaultCodeGenerator"/>
+	<bean id="defaultCodeGenerator"
+		class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+		<property name="key" value="${keygen.payment.code.name}"/>
+		<property name="digits" value="${keygen.payment.code.digits}"/>
+		<property name="start" value="${keygen.payment.code.start}"/>
+		<property name="type" value="${keygen.payment.code.type}"/>
+		<property name="template" value="${keygen.payment.code.template}"/>
+	</bean>
+	
+	<!-- checks if a payment authorization transaction is 'successful' respectively 'valid' -->
+	<alias alias="transactionInfoService" name="defaultTransactionInfoService"/>
+	<bean name="defaultTransactionInfoService" class="de.hybris.platform.payment.impl.DefaultTransactionInfoService">
+	</bean>	
+	
+	<bean name="commandFactoryRegistry" class="de.hybris.platform.payment.commands.factory.impl.DefaultCommandFactoryRegistryImpl"/>
+	
+	<bean name="internalCardValidator" class="de.hybris.platform.payment.methods.impl.CardValidatorImpl"/>
+	
+	<!--  Attaches PaymentInfo to the assigned PaymentTransactionModel instance -->
+	<bean name="paymentInfoCreator" class="de.hybris.platform.payment.strategy.impl.DefaultCreditCardPaymentInfoStrategy">
+		<property name="keyGenerator" ref="codeGenerator" />
+		<property name="modelService" ref="modelService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+	
+	<!-- Order Strategies -->
+	<alias name="paymentOrderPartOfMembersCloningStrategy" alias="orderPartOfMembersCloningStrategy"/>
+	<bean id="paymentOrderPartOfMembersCloningStrategy" class="de.hybris.platform.payment.order.strategies.impl.PaymentOrderPartOfMembersCloningStrategy" parent="defaultOrderPartOfMembersCloningStrategy"/>
+	
+	<alias name="paymentCloneOrderStrategy" alias="core.cloneorder.default"/>
+	<bean id="paymentCloneOrderStrategy" class="de.hybris.platform.payment.jalo.PaymentCloneOrderStrategy"/>
+	
+</beans>

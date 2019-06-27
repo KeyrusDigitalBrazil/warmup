@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$storeUid=electronics
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;customersupportagentgroup;;;;;;;;
+;;;;YFormDefinition;+;+;+;+
+;;;;YFormData;+;+;+;+
+$END_USERRIGHTS;;;;;
+
+# Set up retention policy:
+INSERT_UPDATE AfterRetentionCleanupRule;code[unique=true];retirementItemType(code);actionReference;retentionTimeSeconds;retirementDateAttribute(enclosingType(code),qualifier);itemFilterExpression
+# remove form data of form definition 'yforms:contact' older than one month.
+;xyFormDataRule;YFormData;basicRemoveCleanupAction;2592000;YFormData:creationtime;{applicationId}='yforms' and {formId}='contact'
+# remove form datum records that have lost parent form definition
+;orphanXyFormDataRule;YFormData;basicRemoveCleanupAction;1;YFormData:creationtime;{applicationId}=null and {formId}=null
+
+INSERT_UPDATE FlexibleSearchRetentionRule;code[unique=true];actionReference;retentionTimeSeconds;searchQuery
+# simply remove all orphan history recordscd
+;xyFormHistoryRule;basicRemoveCleanupAction;1;select {b.PK}, {b.itemType} from {YFormDataHistory as b} where not exists ({{select * from {YFormData as a} where {a.id} = {b:formDataId}}})
+
+INSERT_UPDATE RetentionJob;code[unique=true];retentionRule(code);batchSize
+;xyFormDataJob;xyFormDataRule;100
+;orphanXyFormDataJob;orphanXyFormDataRule;100
+;xyFormHistoryJob;xyFormHistoryRule;100
+
+INSERT_UPDATE CronJob;code[unique=true];job(code)[forceWrite=true];baseStore(uid);cmsSite(uid);sessionLanguage(isoCode)[default=en]
+;xyFormDataRetentionCronJob;xyFormDataJob;$storeUid;$storeUid
+;orphanXyFormDataRetentionCronJob;orphanXyFormDataJob;$storeUid;$storeUid
+;xyFormHistoryRetentionCronJob;xyFormHistoryJob;$storeUid;$storeUid
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+;xyFormDataRetentionCronJob;0;0;1;1;-1;-1;true;true;-1;
+;orphanXyFormDataRetentionCronJob;0;0;1;1;-1;-1;true;true;-1;
+;xyFormHistoryRetentionCronJob;0;20;1;1;-1;-1;true;true;-1;

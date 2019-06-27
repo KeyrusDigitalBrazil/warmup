@@ -1,0 +1,33 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$facetSearchConfigName=testFacetSearchConfig${testId}
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);active
+;hwcatalog;Online${testId};de,en;TRUE
+
+INSERT_UPDATE Product;code[unique=true];catalogversion(catalog(id),version)[unique=true];name[lang=en];approvalStatus(code);description[lang=en]
+;product1;hwcatalog:Online${testId};red shirt;approved;red shirt
+;product2;hwcatalog:Online${testId};blue shirt;approved;blue shirt
+;product3;hwcatalog:Online${testId};pants;approved;pants
+;product4;hwcatalog:Online${testId};red pants;approved;red pants
+;product5;hwcatalog:Online${testId};blue pants;approved;blue pants
+
+INSERT_UPDATE SolrSearchConfig;description[unique=true];legacyMode
+;testSearchConfig${testId};false
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];catalogVersions(catalog(id),version)
+;$facetSearchConfigName;hwcatalog:Online${testId}
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];ftsQuery
+;testIndexedType${testId};name;true
+;testIndexedType${testId};description;true
+;testIndexedType${testId};manufacturerName;true
+;testIndexedType${testId};categoryName;true

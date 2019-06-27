@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="angularancillary_buildcallbacks">
+
+<!--
+	<patternset id="extension.angularancillary.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+    </patternset>
+
+    <patternset id="extension.angularancillary.source.filter">
+        <patternset refid="extension.source.filter"/>
+    </patternset> 
+-->
+
+    <patternset id="extension.angularancillary.production.filter">
+        <patternset refid="extension.production.filter" />
+        <exclude name="resources/npm/**" />
+    </patternset>
+
+    <property name="ext.angularancillary.node.modules.dir" value="${ext.angularancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" />
+
+    <condition property="angularancillary.ready">
+        <and>
+            <available file="${ext.angularancillary.node.modules.dir}" type="dir"/>
+        </and>
+    </condition>
+
+    <detectOS/>
+    <property file="${ext.npmancillary.path}/resources/ant/${os.family}.properties" />
+
+    <macrodef name="symLinkSubDirs">
+        <attribute name="source.root.dir" default="NOT SET" />
+        <attribute name="target.root.dir" default="NOT SET" />
+        <sequential>
+        	<echo message="creating symlinks for subdirectorys from @{source.root.dir} to @{target.root.dir}" />
+            <if>
+            	<and>
+            		<available file="@{source.root.dir}" type="dir" />
+                	<available file="@{target.root.dir}" type="dir" />
+            	</and>
+                <then>
+                    <if>
+                        <or>
+                            <os family="mac" />
+                            <os family="unix" />
+                        </or>
+                        <then>
+                            <exec executable="sh">
+                                <arg value="-c" />
+                                <arg value="find @{source.root.dir} -maxdepth 1 -mindepth 1 -type d -not -name '.bin' -exec ln -sf '{}' @{target.root.dir}${file.separator} \;" />
+                            </exec>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="clean_angular_addon">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <if>
+                <and>
+                    <available file="@{angular.project.path}" type="dir" />
+                    <equals arg1="${angularancillary.ready}" arg2="true" /> 
+                </and>
+                <then>
+                    <if>
+                        <or>
+                            <os family="mac" />
+                            <os family="unix" />
+                        </or>
+                        <then>
+                            <echo message="b2cangularaddon_before_clean inside then" />
+                            <delete file="@{angular.project.path}/npm" followsymlinks="false" removenotfollowedsymlinks="true" />
+                            <exec executable="rm">
+                                <arg line="-rf @{angular.project.path}/node_modules"/>
+                            </exec>
+                            <delete failonerror="false">
+                                <fileset dir="@{angular.project.path}/acceleratoraddon/web/webroot/_ui/responsive/common/angular" includes="**/build*.js*"/>
+                            </delete>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="restore_npm_and_node_executable_permissions">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <exec executable="chmod">
+                <arg line="a+x @{angular.project.path}/npm"/>
+            </exec>
+            <exec executable="chmod">
+                <arg line="a+x ${angular.project.node.modules.path}/.bin/ng"/>
+            </exec>
+            <exec executable="chmod">
+                <arg line="a+x ${angular.project.node.modules.path}/.bin/ngc"/>
+            </exec>
+            <exec executable="chmod">
+                <arg line="a+x ${angular.project.node.modules.path}/.bin/rollup"/>
+            </exec>
+        </sequential>                          
+    </macrodef>
+
+    <macrodef name="prepare_node_modules_for_build">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <echo message="prepare_node_modules_for_build called" />
+            <if>
+                <and>
+                    <available file="@{angular.project.path}" type="dir" />
+                </and>
+                <then>
+                    <var name="angular.project.node.modules.path" value="@{angular.project.path}${file.separator}node_modules" />
+                	<if>
+                        <or>
+                            <os family="mac" />
+                            <os family="unix" />
+                        </or>
+                        <then>
+                    		<mkdir dir="${angular.project.node.modules.path}" />
+                    		<symLinkSubDirs source.root.dir="${ext.angularancillary.path}/resources/npm/node_modules" target.root.dir="${angular.project.node.modules.path}" />
+
+                            <echo message="Restoring symbolic links and permissions lost in packaging process, for node, ngc and rollup"/>
+                            <exec executable="chmod">
+                                <arg line="755 ${loc.NODE_HOME}/bin/node"/>
+                            </exec>
+                            <mkdir dir="${angular.project.node.modules.path}/.bin" />
+                            <exec executable="rm">
+                                <arg line="-rf ${angular.project.node.modules.path}/.bin/ngc"/>
+                            </exec>
+                            <exec executable="rm">
+                                <arg line="-rf ${angular.project.node.modules.path}/.bin/rollup"/>
+                            </exec>
+                            <exec executable="rm">
+                                <arg line="-rf ${angular.project.node.modules.path}/.bin/ng"/>
+                            </exec>
+
+                            <exec executable="ln">
+                                <arg line="-sf ${angular.project.node.modules.path}/@angular/compiler-cli/src/main.js ${angular.project.node.modules.path}/.bin/ngc"/>
+                            </exec>
+                            <exec executable="ln">
+                                <arg line="-sf ${angular.project.node.modules.path}/rollup/bin/rollup ${angular.project.node.modules.path}/.bin/rollup"/>
+                            </exec>
+                            <exec executable="ln">
+                                <arg line="-sf ${angular.project.node.modules.path}/@angular/cli/bin/ng ${angular.project.node.modules.path}/.bin/ng"/>
+                            </exec>
+
+                            <echo message="Adding symbolic link: npm"/>
+                            <createLink link="@{angular.project.path}/npm" path="${loc.NODE_HOME}/lib/node_modules/npm/bin/npm-cli.js" />
+
+                            <restore_npm_and_node_executable_permissions angular.project.path="@{angular.project.path}" />
+
+                            <property name="foo.dist" value="dist"/>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="build_angular_project">
+        <attribute name="angular.project.path" default="NOT SET" />
+        <sequential>
+            <if>
+                <or>
+                    <os family="mac" />
+                    <os family="unix" />
+                </or>
+                <then>
+                    <echo message="Executing npm run build:all"/>
+                    <exec executable="sh" dir="@{angular.project.path}" failonerror="true">
+                        <env key="PATH" value="${env.PATH}:@{angular.project.path}:${loc.NODE_HOME}/bin"/>
+                        <env key="NODE_PATH" value="${ext.angularancillary.node.modules.dir}"/>
+                        <env key="ANGULAR_ANCILLARY_NODE_MODULES_PATH" value="${ext.angularancillary.node.modules.dir}"/>
+                        <arg value="-c" />
+                        <arg value="./npm run build:all" />
+                    </exec>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+</project>

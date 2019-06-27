@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.secaddon.data.AbstractTicketData" abstract="true">
+		<property name="id" type="String" />
+		<property name="ticketNumber" type="String" />
+		<property name="shortDescription" type="String" />
+		<property name="priorityDescription" type="Object" />
+		<property name="priority" type="String" />
+		<property name="statusDescription" type="Object" />
+		<property name="status" type="String" />
+		<property name="typeDescription" type="Object" />
+		<property name="type" type="String" />
+		<property name="metadata" type="MetaData" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.TicketData" extends="de.hybris.platform.secaddon.data.AbstractTicketData">
+		<property name="transcript" type="java.util.List&lt;Transcript&gt;" />
+		<property name="owner" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.TicketSecData" extends="de.hybris.platform.secaddon.data.AbstractTicketData">
+		<property name="customerId" type="String" />
+		<property name="createdBy" type="String" />
+		<property name="transcript" type="java.util.List&lt;TranscriptSec&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.TicketType">
+		<property name="active" type="Boolean" />
+		<property name="description" type="Object" />
+		<property name="type" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.TicketPriority">
+		<property name="active" type="Boolean" />
+		<property name="description" type="Object" />
+		<property name="type" type="String" />
+	</bean>
+	
+	<bean class="de.hybris.platform.secaddon.data.MetaData">
+		<property name="version" type="String" />
+		<property name="modifiedAt" type="java.util.Date" />
+		<property name="createdAt" type="java.util.Date" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.ErrorData">
+		<property name="status" type="String" />
+		<property name="message" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.AbstractTranscript">
+		<property name="description" type="String" />
+		<property name="createdAt" type="java.util.Date" />
+		<property name="visibility" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.Owner">
+		<property name="createdAt" type="java.util.Date" />
+		<property name="isCustomer" type="Boolean" />
+		<property name="displayName" type="String" />
+
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.OwnerSec" extends="de.hybris.platform.secaddon.data.Owner">
+		<property name="ownerId" type="String" />
+		<property name="email" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.Transcript" extends="de.hybris.platform.secaddon.data.AbstractTranscript">
+		<property name="owner" type="Owner" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.TranscriptSec" extends="de.hybris.platform.secaddon.data.AbstractTranscript">
+		<property name="owner" type="OwnerSec" />
+	</bean>
+	<bean class="de.hybris.platform.secaddon.data.CustomerInfo" >
+		<property name="customerNumber" type="String" />
+		<property name="title" type="String" />
+		<property name="firstName" type="String" />
+		<property name="lastName" type="String" />
+		<property name="contactEmail" type="String" />
+		<property name="mixins" type="AdditionalCode" />
+	</bean>
+
+	<bean class="de.hybris.platform.secaddon.data.AdditionalCode">
+		<property name="hybrisCustomerId" type="String" />
+	</bean>
+
+</beans>

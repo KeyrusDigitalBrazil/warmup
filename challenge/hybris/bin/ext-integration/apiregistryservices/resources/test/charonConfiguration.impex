@@ -1,0 +1,19 @@
+
+$destination_target=kymaDefault
+
+INSERT_UPDATE DestinationTarget;id[unique=true];destinationChannel(code)[default=KYMA]
+                               ;$destination_target;
+
+INSERT_UPDATE ConsumedOAuthCredential;id[unique=true];clientId;clientSecret;oAuthUrl
+;testCredential;testClientId;testPassword;https://api.yaas.io/hybris/oauth2/v1
+
+INSERT_UPDATE BasicCredential;id[unique=true];username;password
+;basicCreds;"username";"pass"
+
+INSERT_UPDATE Endpoint;id[unique=true];version[unique=true];specUrl;name
+;ProfileDataServiceClient;v1;"empty";Profile Data Service Client v1
+
+INSERT_UPDATE ConsumedDestination;id[unique=true];url;additionalProperties(key,value)[map-delimiter=|];endpoint(id);destinationTarget(id)[default=$destination_target];credential(id)
+;ProfileDataServiceClient;https://api.yaas.io/hybris/profile/v1;oauth.scope->hybris.profile_view|clientClassName->ProfileDataServiceClient;ProfileDataServiceClient;;testCredential
+;ProfileDataServiceClient_basicCreds;https://api.yaas.io/hybris/profile/v1;oauth.scope->hybris.profile_view|clientClassName->ProfileDataServiceClient_basicCreds;ProfileDataServiceClient;;basicCreds
+;ProfileDataServiceClient_noScope;https://api.yaas.io/hybris/profile/v1;oauth.scope->|clientClassName->ProfileDataServiceClient_basicCreds;ProfileDataServiceClient;;basicCreds

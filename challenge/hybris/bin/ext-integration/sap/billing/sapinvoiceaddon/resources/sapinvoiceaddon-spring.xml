@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+   
+	<bean id="sapinvoiceaddonCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2C</value>
+				<!--
+								<value>B2B</value>
+				-->
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false"/>
+				<property name="baseExtensionName" value="sapinvoiceaddon"/>
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<!-- Added for invoice  -->
+	<alias name="b2BInvoiceFacadeImpl" alias="b2BInvoiceFacade" />
+	<bean name="b2BInvoiceFacadeImpl" class="de.hybris.platform.sap.sapinvoiceaddon.facade.impl.B2BInvoiceFacadeImpl">
+		<property name="b2BCommerceUnitService" ref="b2bCommerceUnitService"/>
+		<property name="b2BInvoiceService" ref="b2BInvoiceService"/>
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="b2bInvoiceDocumentConverter" ref="b2bInvoiceDocumentConverter" />
+	</bean>
+	
+	<alias name="b2BInvoiceServiceImpl" alias="b2BInvoiceService" />
+	<bean name="b2BInvoiceServiceImpl" class="de.hybris.platform.sap.sapinvoiceaddon.document.service.impl.B2BInvoiceServiceImpl">
+		<property name="b2bInvoiceDao" ref="b2bInvoiceDao"/>
+	</bean>
+	
+	
+	<bean id="sapinvoiceaddonSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener"  >
+		<property name="extensionName" value="sapinvoiceaddon" />
+	</bean>
+	
+	
+	
+	<alias name="defaultB2BInvoiceDocumentConverter" alias="b2bInvoiceDocumentConverter" />
+	<bean id="defaultB2BInvoiceDocumentConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bDocumentData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bInvoiceDocumentPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<alias name="defaultB2BInvoiceDocumentPopulator" alias="b2bInvoiceDocumentPopulator" />
+	<bean id="defaultB2BInvoiceDocumentPopulator" class="de.hybris.platform.sap.sapinvoiceaddon.document.populators.B2BInvoiceDocumentPopulator">
+		<property name="currencyConverter" ref="currencyConverter" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+		<property name="priceFactory" ref="priceDataFactory" />
+		<property name="productService" ref="productService" />	
+		<property name="productConverter" ref="orderEntryProductConverter"/>
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	
+	
+	<alias name="b2bInvoiceDaoImpl" alias="b2bInvoiceDao" />
+	<bean id="b2bInvoiceDaoImpl" class="de.hybris.platform.sap.sapinvoiceaddon.document.dao.impl.B2BInvoiceDaoImpl">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+	
+</beans>

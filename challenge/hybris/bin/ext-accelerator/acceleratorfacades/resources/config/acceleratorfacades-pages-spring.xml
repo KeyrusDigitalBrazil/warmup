@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd 
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Model Populators -->
+	
+	<bean id="emailPageModelPopulator" class="de.hybris.platform.acceleratorfacades.pages.populators.model.EmailPageModelPopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+	
+	
+	<!-- Reverse Populators -->
+	
+	<bean id="emailPageDataPopulator" class="de.hybris.platform.acceleratorfacades.pages.populators.data.EmailPageReversePopulator">
+		<property name="localizedPopulator" ref="cmsLocalizedPopulator" />
+	</bean>
+	
+	
+	<!-- Page Converters -->
+	
+	<alias name="defaultEmailPageModelConverter" alias="emailPageModelConverter" />
+	<bean id="defaultEmailPageModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.EmailPageData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageModelPopulator" />
+				<ref bean="emailPageModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultEmailPageDataConverter" alias="emailPageDataConverter" />
+	<bean id="defaultEmailPageDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.acceleratorservices.model.cms2.pages.EmailPageModel" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="basicPageDataPopulator" />
+				<ref bean="emailPageDataPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	
+	<!-- Page Populators -->
+	
+	<bean depends-on="pageDataPopulatorFactory" parent="mapMergeDirective">
+		<property name="key">
+		 	<value type="java.lang.Class">de.hybris.platform.cmsfacades.data.EmailPageData</value>
+		</property>
+		<property name="value" ref="emailPageDataConverter" />
+	</bean>
+	
+	
+	<!-- Page Populators Map -->
+	
+	<bean depends-on="pageModelConverterFactory" parent="mapMergeDirective">
+		<property name="key">
+		 	<value type="java.lang.Class">de.hybris.platform.acceleratorservices.model.cms2.pages.EmailPageModel</value>
+		</property>
+		<property name="value" ref="emailPageModelConverter" />
+	</bean>
+
+</beans>

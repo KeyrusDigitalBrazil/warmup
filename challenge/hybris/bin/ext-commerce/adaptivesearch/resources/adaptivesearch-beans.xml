@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- beans used for search profile caching/calculation -->
+	
+	<bean class="de.hybris.platform.adaptivesearch.data.AsReference">
+		<property name="pk" type="de.hybris.platform.core.PK" />
+		<property name="version" type="long" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsCatalogVersion">
+		<property name="catalogId" type="String" equals="true" />
+		<property name="version" type="String" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsSearchProfile">
+		<property name="catalogVersion" type="de.hybris.platform.adaptivesearch.data.AsCatalogVersion" />
+		<property name="code" type="String" />
+		<property name="indexType" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSimpleSearchProfile" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSearchProfile">
+		<property name="searchConfiguration" type="de.hybris.platform.adaptivesearch.data.AsConfigurableSearchConfiguration" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsCategoryAwareSearchProfile" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSearchProfile">
+		<property name="searchConfigurations"
+			type="java.util.Map&lt;de.hybris.platform.core.PK,de.hybris.platform.adaptivesearch.data.AsConfigurableSearchConfiguration>" />
+	</bean>
+	
+	<bean class="de.hybris.platform.adaptivesearch.data.AsGenericSearchProfile" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSearchProfile">
+		<property name="qualifierType" type="String" />
+		<property name="availableSearchConfigurations"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsReference>" />
+		<property name="searchConfigurations"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurableSearchConfiguration>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsConfiguration">
+		<property name="catalogVersion" type="de.hybris.platform.adaptivesearch.data.AsCatalogVersion" />
+		<property name="uid" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsSearchConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsConfiguration" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsConfigurableSearchConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSearchConfiguration">
+		<property name="facetsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsFacetsMergeMode" />
+		<property name="promotedFacets" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsPromotedFacet>" />
+		<property name="facets" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacet>" />
+		<property name="excludedFacets" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsExcludedFacet>" />
+		<property name="boostItemsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostItemsMergeMode" />
+		<property name="promotedItems" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsPromotedItem>" />
+		<property name="excludedItems" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsExcludedItem>" />
+		<property name="boostRulesMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostRulesMergeMode" />
+		<property name="boostRules" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsBoostRule>" />
+		<property name="sortsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsSortsMergeMode" />
+		<property name="promotedSorts" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsPromotedSort>" />
+		<property name="sorts" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsSort>" />
+		<property name="excludedSorts" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsExcludedSort>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsConfiguration">
+		<property name="searchProfileCode" type="String" />
+		<property name="searchConfigurationUid" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration"
+		abstract="true">
+		<property name="indexProperty" type="String" />
+		<property name="priority" type="Integer" />
+		<property name="facetType" type="de.hybris.platform.adaptivesearch.enums.AsFacetType" />
+		<property name="valuesSortProvider" type="String" />
+		<property name="valuesDisplayNameProvider" type="String" />
+		<property name="topValuesProvider" type="String" />
+		<property name="promotedValues" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsPromotedFacetValue>" />
+		<property name="excludedValues" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsExcludedFacetValue>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsPromotedFacet" extends="de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsFacet" extends="de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsExcludedFacet" extends="de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsFacetValueConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration"
+		abstract="true">
+		<property name="value" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsPromotedFacetValue" extends="de.hybris.platform.adaptivesearch.data.AbstractAsFacetValueConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsExcludedFacetValue" extends="de.hybris.platform.adaptivesearch.data.AbstractAsFacetValueConfiguration" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration"
+		abstract="true">
+		<property name="itemPk" type="de.hybris.platform.core.PK" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsPromotedItem" extends="de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsExcludedItem" extends="de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsBoostRuleConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration"
+		abstract="true" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsBoostRule" extends="de.hybris.platform.adaptivesearch.data.AbstractAsBoostRuleConfiguration">
+		<property name="indexProperty" type="String" />
+		<property name="operator" type="de.hybris.platform.adaptivesearch.enums.AsBoostOperator" />
+		<property name="value" type="String" />
+		<property name="boostType" type="de.hybris.platform.adaptivesearch.enums.AsBoostType" />
+		<property name="boost" type="java.lang.Float" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration"
+		abstract="true">
+		<property name="code" type="String" />
+		<property name="name" type="java.util.Map&lt;String,String>" />
+		<property name="priority" type="Integer" />
+		<property name="applyPromotedItems" type="boolean" />
+		<property name="highlightPromotedItems" type="boolean" />
+		<property name="expressions" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsSortExpression>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsPromotedSort" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSort" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration" />
+	<bean class="de.hybris.platform.adaptivesearch.data.AsExcludedSort" extends="de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration" />
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSortExpression" extends="de.hybris.platform.adaptivesearch.data.AbstractAsItemConfiguration">
+		<property name="expression" type="String" />
+		<property name="order" type="de.hybris.platform.adaptivesearch.enums.AsSortOrder" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;T, R>">
+		<property name="configuration" type="T" />
+		<property name="replacedConfigurations" type="java.util.List&lt;R>" />
+		<property name="rank" type="int" />
+		<property name="data" type="Object" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSearchProfileResult">
+		<property name="facetsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsFacetsMergeMode" />
+		<property name="facets"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsFacet,de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration>>" />
+		<property name="promotedFacets"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsPromotedFacet,de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration>>" />
+		<property name="excludedFacets"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsExcludedFacet,de.hybris.platform.adaptivesearch.data.AbstractAsFacetConfiguration>>" />
+		<property name="boostItemsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostItemsMergeMode" />
+		<property name="promotedItems"
+			type="java.util.Map&lt;de.hybris.platform.core.PK,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsPromotedItem,de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration>>" />
+		<property name="excludedItems"
+			type="java.util.Map&lt;de.hybris.platform.core.PK,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsExcludedItem,de.hybris.platform.adaptivesearch.data.AbstractAsBoostItemConfiguration>>" />
+		<property name="boostRulesMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostRulesMergeMode" />
+		<property name="boostRules"
+			type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsBoostRule,de.hybris.platform.adaptivesearch.data.AbstractAsBoostRuleConfiguration>>" />
+		<property name="sortsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsSortsMergeMode" />
+		<property name="promotedSorts"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsPromotedSort,de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration>>" />
+		<property name="sorts"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsSort,de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration>>" />
+		<property name="excludedSorts"
+			type="java.util.Map&lt;String,de.hybris.platform.adaptivesearch.data.AsConfigurationHolder&lt;de.hybris.platform.adaptivesearch.data.AsExcludedSort,de.hybris.platform.adaptivesearch.data.AbstractAsSortConfiguration>>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsMergeConfiguration">
+		<property name="facetsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsFacetsMergeMode" />
+		<property name="boostRulesMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostRulesMergeMode" />
+		<property name="boostItemsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostItemsMergeMode" />
+		<property name="sortsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsSortsMergeMode" />
+		<property name="resultFacetsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsFacetsMergeMode" />
+		<property name="resultBoostItemsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostItemsMergeMode" />
+		<property name="resultBoostRulesMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsBoostRulesMergeMode" />
+		<property name="resultSortsMergeMode" type="de.hybris.platform.adaptivesearch.enums.AsSortsMergeMode" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSearchProfileActivationGroup">
+		<property name="mergeConfiguration" type="de.hybris.platform.adaptivesearch.data.AsMergeConfiguration" />
+		<property name="searchProfiles" type="java.util.List&lt;de.hybris.platform.adaptivesearch.model.AbstractAsSearchProfileModel>" />
+		<property name="groups" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsSearchProfileActivationGroup>" />
+	</bean>
+
+	<!-- beans used by strategies/facades -->
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsIndexConfigurationData">
+		<property name="code" type="String" equals="true" />
+		<property name="name" type="String" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsIndexTypeData">
+		<property name="code" type="String" equals="true" />
+		<property name="name" type="String" equals="true" />
+		<property name="itemType" type="String" equals="true" />
+		<property name="catalogVersionAware" type="boolean" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsIndexPropertyData">
+		<property name="code" type="String" equals="true" />
+		<property name="name" type="String" equals="true" />
+		<property name="type" type="Class&lt;?>" equals="true" />
+		<property name="supportedBoostOperators" type="java.util.Set&lt;de.hybris.platform.adaptivesearch.enums.AsBoostOperator>"
+			equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsExpressionData">
+		<property name="expression" type="String" equals="true" />
+		<property name="name" type="String" equals="true" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSearchConfigurationInfoData">
+		<property name="type" type="String" />
+		<property name="contextType" type="String" />
+		<property name="contextLabel" type="String" />
+		<property name="contextDescription" type="String" />
+	</bean>
+
+	<!-- beans used by strategies/facades (search related) -->
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSearchQueryData">
+		<property name="query" type="String" />
+		<property name="activePage" type="int" />
+		<property name="pageSize" type="int" />
+		<property name="facetValues" type="java.util.Map&lt;String,java.util.Set&lt;String>>" />
+		<property name="sort" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSearchResultData">
+		<property name="activePage" type="int" />
+		<property name="pageCount" type="int" />
+		<property name="pageSize" type="int" />
+		<property name="resultCount" type="int" />
+		<property name="results" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsDocumentData>" />
+		<property name="facets" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacetData>" />
+		<property name="currentSort" type="de.hybris.platform.adaptivesearch.data.AsSortData" />
+		<property name="availableSorts" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsSortData>" />
+		<property name="searchProfileResult" type="de.hybris.platform.adaptivesearch.data.AsSearchProfileResult" />
+		<property name="catalogVersions" type="java.util.List&lt;de.hybris.platform.catalog.model.CatalogVersionModel>" />
+		<property name="categoryPath" type="java.util.List&lt;de.hybris.platform.category.model.CategoryModel>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsDocumentData">
+		<property name="fields" type="java.util.Map&lt;String,java.lang.Object>" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsFacetValueData">
+		<property name="value" type="String" />
+		<property name="name" type="String" />
+		<property name="count" type="long" />
+		<property name="selected" type="boolean" />
+        <property name="tags" type="java.util.Set&lt;java.lang.String>" />
+	</bean>
+
+	<enum class="de.hybris.platform.adaptivesearch.data.AsFacetVisibility">
+		<value>HIDDEN</value>
+		<value>SHOW</value>
+		<value>SHOW_TOP_VALUES</value>
+		<value>SHOW_VALUES</value>
+	</enum>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsFacetData">
+		<property name="indexProperty" type="String" />
+		<property name="name" type="String" />
+		<property name="topValues" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacetValueData>" />
+		<property name="values" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacetValueData>" />
+		<property name="selectedValues" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacetValueData>" />
+		<property name="allValues" type="java.util.List&lt;de.hybris.platform.adaptivesearch.data.AsFacetValueData>" />
+		<property name="visibility" type="de.hybris.platform.adaptivesearch.data.AsFacetVisibility" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsSortData">
+		<property name="code" type="String" />
+		<property name="name" type="String" />
+		<property name="applyPromotedItems" type="boolean"/>
+		<property name="highlightPromotedItems" type="boolean"/>
+	</bean>
+
+	<!-- beans used by services -->
+
+	<enum class="de.hybris.platform.adaptivesearch.data.AsRankChangeType">
+		<value>NO_OPERATION</value>
+		<value>MOVE</value>
+	</enum>
+
+	<bean class="de.hybris.platform.adaptivesearch.data.AsRankChange">
+		<property name="type" type="de.hybris.platform.adaptivesearch.data.AsRankChangeType" />
+		<property name="uid" type="String" />
+		<property name="oldRank" type="Integer" />
+		<property name="newRank" type="Integer" />
+	</bean>
+
+	<!-- beans used by converters/populators -->
+	<bean class="de.hybris.platform.adaptivesearch.converters.AsConfigurationConverterContext"/>
+
+	<bean class="de.hybris.platform.adaptivesearch.converters.AsConfigurationReverseConverterContext">
+		<property name="catalogVersion" type="de.hybris.platform.catalog.model.CatalogVersionModel" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.converters.AsItemConfigurationConverterContext" extends="de.hybris.platform.adaptivesearch.converters.AsConfigurationConverterContext">
+		<property name="searchProfileCode" type="String" />
+		<property name="searchConfigurationUid" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.converters.AsItemConfigurationReverseConverterContext" extends="de.hybris.platform.adaptivesearch.converters.AsConfigurationReverseConverterContext">
+		<property name="parentConfiguration" type="de.hybris.platform.adaptivesearch.model.AbstractAsConfigurationModel" />
+	</bean>
+
+	<bean class="de.hybris.platform.adaptivesearch.converters.AsSearchConfigurationConverterContext" extends="de.hybris.platform.adaptivesearch.converters.AsConfigurationConverterContext">
+		<property name="searchProfileCode" type="String" />
+	</bean>
+
+</beans>

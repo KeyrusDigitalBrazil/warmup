@@ -1,0 +1,67 @@
+<div class="se-restriction-management-select">
+    <y-message data-ng-show="$ctrl.selectModel.getRestriction() && !$ctrl.selectModel.isTypeSupported()"
+        data-message-id="yMsgWarningId"
+        data-type="warning"
+        class="se-restriction-management-select--y-message--modal-adjusted">
+        <message-title>{{ 'se.cms.restriction.management.select.type.not.supported.warning' | translate }}</message-title>
+    </y-message>
+
+    <div class="se-restriction-management-select__y-select">
+        <label for=""
+            class="control-label">{{ 'se.cms.restriction.management.select.type.label' | translate }}</label>
+
+        <y-select data-id="restriction-type"
+            data-fetch-strategy="{ fetchAll: $ctrl.selectModel.getRestrictionTypes }"
+            data-item-template="::$ctrl.itemTemplateUrl"
+            data-placeholder="'se.cms.restriction.management.select.type.placeholder'"
+            data-ng-model="$ctrl.selectModel.selectedIds.restrictionType"
+            data-on-change="$ctrl.selectRestrictionType"
+            data-search-enabled="false">
+        </y-select>
+    </div>
+
+    <div data-recompile-dom="$ctrl.resetSelector"
+        class="se-restriction-management-select__restriction">
+        <div data-ng-if="$ctrl.controllerModel.showRestrictionSelector"
+            class="se-restriction-management-select__restriction__info">
+            <label class="control-label se-restriction-management-select__restriction__info__label">
+                {{ 'se.cms.restriction.management.select.restriction.label' | translate }}
+            </label>
+            <y-select data-id="restriction-name"
+                data-fetch-strategy="$ctrl.fetchOptions"
+                data-ng-model="$ctrl.selectModel.selectedIds.restriction"
+                data-placeholder="'se.cms.restriction.management.select.restriction.placeholder'"
+                data-on-change="$ctrl.selectRestriction"
+                data-disable-choice-fn="$ctrl.disableRestrictionChoice"
+                data-item-template="::$ctrl.itemTemplateUrl"
+                data-results-header-template="$ctrl.getResultsHeaderTemplate()"
+                data-results-header-label="::$ctrl.resultsHeaderLabel">
+            </y-select>
+        </div>
+
+        <div data-recompile-dom="$ctrl.resetEditor"
+            class="se-restriction-management-select__restriction__editor"
+            data-ng-if="$ctrl.controllerModel.showRestrictionEditor">
+            <p class="se-restriction-management-select__restriction__editor__instr">
+                {{ $ctrl.editorHeader | translate }}
+            </p>
+            <div data-ng-if="$ctrl.selectModel.isTypeSupported()">
+                <item-manager data-item="$ctrl.selectModel.getRestriction()"
+                    data-mode="$ctrl.controllerModel.mode"
+                    data-structure-api="$ctrl.controllerModel.structureApi"
+                    data-content-api="$ctrl.controllerModel.contentApi"
+                    data-uri-context="$ctrl.uriContext"
+                    data-component-type="$ctrl.selectModel.getRestrictionTypeCode()"
+                    data-submit-function="$ctrl.submitInternal"
+                    data-is-dirty="$ctrl.isDirtyInternal" />
+            </div>
+            <div class="ySERestrictionsList-item"
+                data-ng-if="!$ctrl.selectModel.isTypeSupported()">
+                <p class="ySERestrictionsNameHeader">{{ $ctrl.selectModel.getRestriction().name }}</p>
+                <div class="ySERestrictionsDescription">
+                    {{ $ctrl.selectModel.getRestriction().description }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

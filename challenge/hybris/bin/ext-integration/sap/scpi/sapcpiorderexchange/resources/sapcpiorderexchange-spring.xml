@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+             http://www.springframework.org/schema/util
+		     http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="classpath:/sapcpiorderexchange-scpi-spring.xml"/>
+    <import resource="classpath:/sapcpiorderexchange-persistence-hooks-spring.xml"/>
+
+    <!-- Order Mappers -->
+    <alias name="sapCpiOrderMapperServices" alias="sapCpiOrderMappers"/>
+    <util:list id="sapCpiOrderMapperServices" value-type="de.hybris.platform.sap.sapcpiorderexchange.service.SapCpiOrderMapperService"/>
+
+    <!-- Order Cancellation Mappers -->
+    <alias name="sapCpiOrderCancellationMapperServices" alias="sapCpiOrderCancellationMappers"/>
+    <util:list id="sapCpiOrderCancellationMapperServices" value-type="de.hybris.platform.sap.sapcpiorderexchange.service.SapCpiOrderCancellationMapperService"/>
+
+    <!-- Deprecated -->
+    <!-- Order and Order Cancellation Conversion Service -->
+    <alias name="sapCpiOmmOrderConversionService" alias="sapCpiOrderConversionService"/>
+    <bean id="sapCpiOmmOrderConversionService"
+          class="de.hybris.platform.sap.sapcpiorderexchange.service.impl.SapCpiOmmOrderConversionService">
+        <property name="sapOrderContributor" ref="sapOrderContributor"/>
+        <property name="sapOrderEntryContributor" ref="sapOrderEntryContributor"/>
+        <property name="sapPaymentContributor" ref="sapPaymentContributor"/>
+        <property name="sapPartnerContributor" ref="sapPartnerContributor"/>
+        <property name="sapSalesConditionsContributor" ref="sapSalesConditionsContributor"/>
+        <property name="sapOrderCancelRequestContributor" ref="sapOrderCancelRequestContributor"/>
+        <property name="sapCoreSAPGlobalConfigurationDAO" ref="sapCoreSAPGlobalConfigurationDAO"/>
+    </bean>
+
+    <!-- Deprecated -->
+    <!-- Send Order Action -->
+    <!--<alias name="sapCpiSendOmmOrderToScpiAction" alias="sapSendOrderAction"/>-->
+    <bean id="sapCpiSendOmmOrderToScpiAction" parent="sapOrderexchangeDefaultSendOrderToDataHubAction"
+          class="de.hybris.platform.sap.sapcpiorderexchange.actions.SapCpiSendOmmOrderToScpiAction">
+        <property name="sapCpiOrderService" ref="sapCpiOrderService"/>
+        <property name="sapCpiOrderConversionService" ref="sapCpiOrderConversionService"/>
+    </bean>
+
+    <!-- Deprecated -->
+    <!-- Send Order Cancellation Action -->
+    <!--<alias name="sapCpiSendOmmOrderCancellationToScpiAction" alias="sapSendOrderCancelRequestAsCSVTaskRunner"/>-->
+    <bean id="sapCpiSendOmmOrderCancellationToScpiAction" parent="defaultSapSendOrderCancelRequestAsCSVTaskRunner"
+          class="de.hybris.platform.sap.sapcpiorderexchange.actions.SapCpiSendOmmOrderCancellationToScpiAction">
+        <property name="sapCpiOrderService" ref="sapCpiOrderService"/>
+        <property name="sapCpiOrderConversionService" ref="sapCpiOrderConversionService"/>
+    </bean>
+
+    <!-- OMM Order Mapper -->
+    <alias name="sapCpiOmmOrderMapperService" alias="sapCpiOrderMapperService"/>
+    <bean id="sapCpiOmmOrderMapperService" class="de.hybris.platform.sap.sapcpiorderexchange.service.impl.SapCpiOmmOrderMapperService">
+        <property name="sapCpiOrderConversionService" ref="sapCpiOrderConversionService"/>
+    </bean>
+
+    <!-- Add OMM Order Mapper -->
+    <bean id="sapCpiOmmOrderMapper" depends-on="sapCpiOrderMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiOrderMapperService" />
+    </bean>
+
+    <!-- OMM Order Cancellation Mapper -->
+    <alias name="sapCpiOmmOrderCancellationMapperService" alias="sapCpiOrderCancellationMapperService"/>
+    <bean id="sapCpiOmmOrderCancellationMapperService" class="de.hybris.platform.sap.sapcpiorderexchange.service.impl.SapCpiOmmOrderCancellationMapperService">
+        <property name="sapCpiOrderConversionService" ref="sapCpiOrderConversionService"/>
+    </bean>
+
+    <!-- Add OMM Order Cancellation Mapper -->
+    <bean id="sapCpiOmmOrderCancellationMapper" depends-on="sapCpiOrderCancellationMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiOrderCancellationMapperService" />
+    </bean>
+
+    <!-- OMM Order and Order Cancellation Conversion Service-->
+    <alias name="sapCpiOmmOrderOutboundConversionService" alias="sapCpiOrderOutboundConversionService"/>
+    <bean id="sapCpiOmmOrderOutboundConversionService"
+          class="de.hybris.platform.sap.sapcpiorderexchange.service.impl.SapCpiOmmOrderOutboundConversionService">
+        <property name="sapCpiOrderMappers" ref="sapCpiOrderMappers"/>
+        <property name="sapCpiOrderCancellationMappers" ref="sapCpiOrderCancellationMappers"/>
+    </bean>
+
+    <!-- Send Outbound OMM Order Action -->
+    <alias name="sapCpiOmmOrderOutboundAction" alias="sapSendOrderAction"/>
+    <bean id="sapCpiOmmOrderOutboundAction" parent="sapOrderexchangeDefaultSendOrderToDataHubAction"
+          class="de.hybris.platform.sap.sapcpiorderexchange.actions.SapCpiOmmOrderOutboundAction">
+        <property name="sapCpiOutboundService" ref="sapCpiOutboundService"/>
+        <property name="sapCpiOrderOutboundConversionService" ref="sapCpiOrderOutboundConversionService"/>
+    </bean>
+
+    <!-- Send Outbound OMM Order Cancellation Action -->
+    <alias name="sapCpiOmmOrderOutboundCancellationAction" alias="sapSendOrderCancelRequestAsCSVTaskRunner"/>
+    <bean id="sapCpiOmmOrderOutboundCancellationAction" parent="defaultSapSendOrderCancelRequestAsCSVTaskRunner"
+          class=" de.hybris.platform.sap.sapcpiorderexchange.actions.SapCpiOmmOrderOutboundCancellationAction">
+        <property name="sapCpiOutboundService" ref="sapCpiOutboundService"/>
+        <property name="sapCpiOrderOutboundConversionService" ref="sapCpiOrderOutboundConversionService"/>
+    </bean>
+
+</beans>

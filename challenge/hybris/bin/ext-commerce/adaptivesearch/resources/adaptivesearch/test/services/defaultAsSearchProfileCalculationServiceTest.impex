@@ -1,0 +1,128 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+
+INSERT_UPDATE Catalog ; id[unique=true] ; name[lang=$lang]  ; defaultCatalog
+                      ; hwcatalog       ; Computer hardware ; true          
+
+INSERT_UPDATE CatalogVersion ; catalog(id)[unique=true] ; version[unique=true] ; languages(isocode)
+                             ; hwcatalog                ; Staged               ; en                
+
+INSERT_UPDATE Category ; code[unique=true] ; $catalogVersion[unique=true]
+                       ; cat10             ;                             
+                       ; cat20             ;                             
+
+INSERT_UPDATE CategoryCategoryRelation ; source(code,$catalogVersion)[unique=true] ; target(code,$catalogVersion)[unique=true]
+                                       ; cat10                                     ; cat20                                    
+
+INSERT_UPDATE Product ; code[unique=true] ; $catalogVersion[unique=true]
+                      ; product1          ;                             
+                      ; product2          ;                             
+                      ; product3          ;                             
+
+
+### Simple Search Profile ###
+
+# search profile      
+
+INSERT_UPDATE AsSimpleSearchProfile ; code[unique=true] ; name[lang=$lang]      ; indexType[default=$indexType] ; $catalogVersion[unique=true]
+                                    ; simpleProfile1    ; Simple Search Profile ;                               ;                             
+                                    ; simpleProfile2    ; Simple Search Profile ;                               ;                             
+
+# search configuration              
+
+INSERT_UPDATE AsSimpleSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]     ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                          ; simpleProfile1                                   ; searchConfiguration1 ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+                                          ; simpleProfile2                                   ; searchConfiguration2 ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                     ; indexProperty ; operator(code) ; value ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; searchConfiguration1                                  ; af0d0509-cc0b-4418-b446-6e5f0b696fc1 ; property1     ; EQUAL          ; value ; 1.1   ; MULTIPLICATIVE  ;                             
+                          ; searchConfiguration2                                  ; af0d0509-cc0b-4418-b446-6e5f0b696fc2 ; property1     ; EQUAL          ; value ; 1.1   ; MULTIPLICATIVE  ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; searchConfiguration1                                  ; product1                                                ;                             
+                             ; searchConfiguration2                                  ; product1                                                ;                             
+
+INSERT_UPDATE AsExcludedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; searchConfiguration1                                  ; product2                                                ;                             
+                             ; searchConfiguration2                                  ; product2                                                ;                             
+
+INSERT_UPDATE AsFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+
+INSERT_UPDATE AsPromotedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+                              ; searchConfiguration1                                  ; property1                  ; REFINE          ; 12       ;                             
+                              ; searchConfiguration2                                  ; property1                  ; REFINE          ; 12       ;                             
+
+INSERT_UPDATE AsExcludedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+                              ; searchConfiguration1                                  ; property2                  ; MULTISELECT_OR  ;          ;                             
+                              ; searchConfiguration2                                  ; property2                  ; MULTISELECT_OR  ;          ;                             
+
+
+### Category Aware Search Profile ###
+
+# search profile              
+
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]     ; name[lang=$lang]              ; indexType[default=$indexType] ; $catalogVersion[unique=true]
+                                           ; categoryAwareProfile1 ; Category Aware Search Profile ;                               ;                             
+                                           ; categoryAwareProfile2 ; Category Aware Search Profile ;                               ;                             
+
+# global search configuration              
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]           ; category(code,$catalogVersion) ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; categoryAwareProfile1                            ; globalSearchConfiguration1 ;                                ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+                                                 ; categoryAwareProfile2                            ; globalSearchConfiguration2 ;                                ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                     ; indexProperty ; operator(code) ; value ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; globalSearchConfiguration1                            ; b4d51778-1e45-4d1d-8a6c-4c30f8456e96 ; property1     ; EQUAL          ; value ; 1.3   ; MULTIPLICATIVE  ;                             
+                          ; globalSearchConfiguration2                            ; b4d51778-1e45-4d1d-8a6c-4c30f8456e97 ; property1     ; EQUAL          ; value ; 1.3   ; MULTIPLICATIVE  ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; globalSearchConfiguration1                            ; product1                                                ;                             
+                             ; globalSearchConfiguration2                            ; product1                                                ;                             
+
+INSERT_UPDATE AsExcludedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+
+INSERT_UPDATE AsFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+                      ; globalSearchConfiguration1                            ; property1                  ; REFINE          ; 12       ;                             
+                      ; globalSearchConfiguration2                            ; property1                  ; REFINE          ; 12       ;                             
+
+INSERT_UPDATE AsPromotedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+                              ; globalSearchConfiguration1                            ; property2                  ; REFINE          ;          ;                             
+                              ; globalSearchConfiguration2                            ; property2                  ; REFINE          ;          ;                             
+
+INSERT_UPDATE AsExcludedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+
+# category search configuration
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]             ; category(code,$catalogVersion) ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; categoryAwareProfile1                            ; categorySearchConfiguration1 ; cat10                          ; ADD_BEFORE            ; ADD_BEFORE                ; ADD                       ; ADD_BEFORE           ;                             
+                                                 ; categoryAwareProfile2                            ; categorySearchConfiguration2 ; cat10                          ; ADD_BEFORE            ; ADD_BEFORE                ; ADD                       ; ADD_BEFORE           ;                             
+
+INSERT_UPDATE AsBoostRule ; searchConfiguration(uid,$catalogVersion)[unique=true] ; uid[unique=true]                     ; indexProperty ; operator(code) ; value ; boost ; boostType(code) ; $catalogVersion[unique=true]
+                          ; categorySearchConfiguration1                          ; 0814871a-2972-4aee-8310-da4faec92c0a ; property2     ; EQUAL          ; value ; 1.2   ; MULTIPLICATIVE  ;                             
+                          ; categorySearchConfiguration2                          ; 0814871a-2972-4aee-8310-da4faec92c0b ; property2     ; EQUAL          ; value ; 1.2   ; MULTIPLICATIVE  ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+
+INSERT_UPDATE AsExcludedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; categorySearchConfiguration1                          ; product3                                                ;                             
+                             ; categorySearchConfiguration2                          ; product3                                                ;                             
+
+INSERT_UPDATE AsFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+
+INSERT_UPDATE AsPromotedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+
+INSERT_UPDATE AsExcludedFacet ; searchConfiguration(uid,$catalogVersion)[unique=true] ; indexProperty[unique=true] ; facetType(code) ; priority ; $catalogVersion[unique=true]
+                              ; categorySearchConfiguration1                          ; property3                  ; REFINE          ;          ;                             
+                              ; categorySearchConfiguration2                          ; property3                  ; REFINE          ;          ;                             

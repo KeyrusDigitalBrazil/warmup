@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+	
+	<enumtypes>
+	
+	   <enumtype code="RuleType" autocreate="false" generate="true" dynamic="true">
+			<value code="PRODUCTCONFIG" />
+		</enumtype>
+		
+		<enumtype code="FactContextType"  autocreate="false"
+			generate="false">
+			<value code="PRODUCTCONFIG_DEFAULT_CONFIGURATION" />
+		</enumtype>		
+		
+		<enumtype code="ProductConfigRuleMessageSeverity" autocreate="true" generate="true">
+			<value code="WARNING" />
+			<value code="INFO" />
+		</enumtype>
+	
+	</enumtypes>	
+	
+	<relations>
+		<relation autocreate="true" code="BaseStoreForCPQRule" generate="true" localized="false">
+		   <deployment table="BaseStoreForCPQRule" typecode="9910"/>
+		   <sourceElement cardinality="many" collectiontype="set" qualifier="baseStores" type="BaseStore"/>
+			<targetElement cardinality="many" collectiontype="set" qualifier="productConfigSourceRules" type="ProductConfigSourceRule"/>
+		</relation>
+   </relations>		
+
+	<itemtypes>
+		<itemtype code="ProductConfigSourceRule"
+			extends="SourceRule"
+			jaloclass="de.hybris.platform.sap.productconfig.rules.jalo.ProductConfigSourceRule"
+			autocreate="true"
+			generate="true">
+			<attributes>
+			
+			  <attribute qualifier="stackable" redeclare="true" type="java.lang.Boolean">
+				  <description>whether the rule is stackable</description>
+				  <modifiers optional="false" />
+				  <persistence type="property" />
+				  <defaultvalue>Boolean.TRUE</defaultvalue>
+			  </attribute>	
+			
+			  <attribute qualifier="messageSeverity" autocreate="true" type="ProductConfigRuleMessageSeverity">
+			      <modifiers optional="true" />
+					<description>Severity of the rule related message.</description>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("ProductConfigRuleMessageSeverity","INFO")</defaultvalue>
+				</attribute>
+				
+				<attribute qualifier="messageForCstic" autocreate="true" type="java.lang.String">
+			      <modifiers optional="true" />
+					<description>Message for characteristic</description>
+					<persistence type="property" />
+				</attribute>
+				
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="AbstractRuleEngineRule" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="messageSeverity" type="ProductConfigRuleMessageSeverity"> 
+					<modifiers optional="true" />
+					<persistence type="property" />
+					<description>Severity of the rule related message.</description>
+				</attribute>
+				<attribute qualifier="messageForCstic" type="java.lang.String"> 
+					<modifiers optional="true" />
+					<persistence type="property" />
+					<description>Message for characteristic</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+	
+</items>

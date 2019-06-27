@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2017 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias alias="sapC4cCustomerInterceptor" name="defaultSapC4cCustomerInterceptor" />
+	<bean id="defaultSapC4cCustomerInterceptor"
+		class="com.sap.hybris.c4c.customer.interceptor.DefaultSapC4cCustomerInterceptor">
+		<property name="eventService" ref="eventService" />
+		<property name="customerUtil" ref="sapC4cCustomerUtils" />
+	</bean>
+
+	<alias alias="sapC4cAddressInterceptor" name="defaultSapC4cAddressInterceptor" />
+	<bean id="defaultSapC4cAddressInterceptor"
+		class="com.sap.hybris.c4c.customer.interceptor.DefaultSapC4cAddressInterceptor">
+		<property name="eventService" ref="eventService" />
+		<property name="customerUtil" ref="sapC4cCustomerUtils" />
+		<property name="addressAttributeList" ref="addressAttributeList"/>
+	</bean>
+
+
+	<bean id="sapC4cCustomerInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapC4cCustomerInterceptor" />
+		<property name="typeCode" value="Customer" />
+		<property name="order" value="5000" />
+	</bean>
+
+	<bean id="sapC4cAddressInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapC4cAddressInterceptor" />
+		<property name="typeCode" value="Address" />
+		<property name="order" value="5000" />
+	</bean>
+
+	<alias alias="c4cCustomerPublishAction" name="defaultC4cCustomerPublishAction" />
+	<bean id="defaultC4cCustomerPublishAction"
+		class="com.sap.hybris.c4c.customer.action.SapC4cCustomerPublishAction"
+		parent="abstractAction">
+		<property name="c4cCustomerPublicationService" ref="sapC4cCustomerPublicationService" />
+		<property name="customerUtil" ref="sapC4cCustomerUtils" />
+	</bean>
+
+	<alias alias="sapC4cCustomerPublicationService" name="defaultSapC4cCustomerPublicationService" />
+	<bean id="defaultSapC4cCustomerPublicationService"
+		class="com.sap.hybris.c4c.customer.service.impl.DefaultSapC4cCustomerPublicationService">
+		<property name="cloudPlatformIntegrationConnection" ref="cloudPlatformIntegrationConnection" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias alias="sapC4cCustomerPopulator" name="defaultSapC4cCustomerPopulator" />
+	<bean id="defaultSapC4cCustomerPopulator"
+		class="com.sap.hybris.c4c.customer.populator.DefaultSapC4cCustomerPopulator">
+		<property name="customerNameStrategy" ref="customerNameStrategy" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias alias="sapC4cAddressPopulator" name="defaultSapC4cAddressPopulator" />
+	<bean id="defaultSapC4cAddressPopulator"
+		class="com.sap.hybris.c4c.customer.populator.DefaultSapC4cAddressPopulator">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias alias="sapC4cCustomerRegistrationEventListener" name="defaultSapC4cCustomerRegistrationEventListener" />
+	<bean id="defaultSapC4cCustomerRegistrationEventListener" parent="abstractEventListener"
+		class="com.sap.hybris.c4c.customer.listener.SapC4cCustomerRegistrationEventListener">
+		<property name="modelService" ref="modelService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+	</bean>
+
+	<alias alias="sapC4cCustomerUpdateEventListener" name="defaultSapC4cCustomerUpdateEventListener" />
+	<bean id="defaultSapC4cCustomerUpdateEventListener" parent="abstractEventListener"
+		class="com.sap.hybris.c4c.customer.listener.SapC4cCustomerUpdateEventListener">
+		<property name="c4cCustomerPublicationService" ref="sapC4cCustomerPublicationService" />
+	</bean>
+
+	<alias alias="sapC4cCustomerRegisterProcess" name="defaultSapC4cCustomerRegisterProcess" />
+	<bean id="defaultSapC4cCustomerRegisterProcess"
+		class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/process/c4c-customer-process.xml" />
+	</bean>
+
+	<alias 	alias="sapC4cCustomerUtils" name="defaultSapC4cCustomerUtils" />
+	<bean id="defaultSapC4cCustomerUtils"
+		class="com.sap.hybris.c4c.customer.util.SapC4cCustomerUtils">
+		<property name="addressPopulator" ref="sapC4cAddressPopulator" />
+		<property name="customerPopulator" ref="sapC4cCustomerPopulator" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+	
+	
+	<alias alias="addressAttributeList" name="defaultAddressAttributeList"/>
+	<util:list id="defaultAddressAttributeList" value-type="java.lang.String">
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.EMAIL"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.COUNTRY"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.STREETNAME"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.STREETNUMBER"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.TOWN"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.DISTRICT"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.PHONE1"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.PHONE2"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.CELLPHONE"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.POSTALCODE"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.FAX"/>
+		<util:constant static-field="de.hybris.platform.core.model.user.AddressModel.POBOX"/>
+	</util:list>
+
+</beans>

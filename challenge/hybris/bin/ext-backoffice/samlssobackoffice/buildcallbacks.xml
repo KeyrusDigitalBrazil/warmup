@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="samlssobackoffice_buildcallbacks">
+
+	<property name="samlssobackofficeWebFragmentSrc" value="${ext.samlssobackoffice.path}/resources/web-fragment.xml"/>
+	<property name="samlssobackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_samlssobackoffice.jar"/>
+
+	<macrodef name="samlssobackoffice_after_clean">
+		<sequential>
+			<samlssobackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="samlssobackoffice_after_build">
+		<sequential>
+			<samlssobackoffice_remove_web_fragment/>
+			<samlssobackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="samlssobackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${samlssobackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${samlssobackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="samlssobackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${samlssobackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${samlssobackofficeWebFragmentDestJar}">
+							<metainf file="${samlssobackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<patternset id="samlssobackoffice.localization.pattern">
+		<!-- core and hmc  -->
+		<include name="**/*locales*_en.properties"/>
+		<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*"/>
+		<exclude name="**/unittest/**/*"/>
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties"/>
+		<include name="**/labels_en.properties"/>
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties"/>
+		<include name="**/*messages.properties"/>
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties"/>
+
+		<!-- csv and impex -->
+		<include name="**/*_en.csv"/>
+		<include name="**/*_en.impex"/>
+
+		<include name="**/lang-en.properties"/>
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties"/>
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties"/>
+	</patternset>
+
+</project>

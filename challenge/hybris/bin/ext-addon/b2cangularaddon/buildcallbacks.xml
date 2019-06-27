@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="b2cangularaddon_buildcallbacks" xmlns:if="ant:if">
+
+    <property name="ext.b2cangularaddon.y.main.dir" value="${ext.b2cangularaddon.path}/y-main" />
+
+    <patternset id="extension.b2cangularaddon.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    </patternset>
+
+    <patternset id="extension.b2cangularaddon.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    </patternset>
+
+    <patternset id="extension.b2cangularaddon.production.filter">
+        <patternset refid="extension.production.filter" />
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    </patternset>
+
+    <macrodef name="b2cangularaddon_before_clean" if:true="${angularancillary.ready}">
+        <sequential>
+            <clean_angular_addon angular.project.path="${ext.b2cangularaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="b2cangularaddon_npm_build">
+        <sequential>
+            <prepare_node_modules_for_build angular.project.path="${ext.b2cangularaddon.y.main.dir}" />
+            <build_angular_project angular.project.path="${ext.b2cangularaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="b2cangularaddon_before_build" if:true="${angularancillary.ready}">
+        <sequential>
+            <b2cangularaddon_npm_build />
+        </sequential>
+    </macrodef>
+
+    <target name="build-b2cangularaddon-ymain" description="Build the b2cangularaddon y-main Angular project" if:true="${angularancillary.ready}">
+        <b2cangularaddon_npm_build />
+    </target>
+
+    <macrodef name="b2cangularaddon_before_yunit" if:true="${angulartestancillary.ready}">
+        <sequential>
+           <prepare_and_test_angular_project angular.project.path="${ext.b2cangularaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+
+</project>

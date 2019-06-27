@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Facade -->
+	<bean id="campaignRestrictionPopulatorFacade" class="com.hybris.ymkt.segmentation.facades.CampaignRestrictionPopulatorFacade">
+		<property name="initiativeService" ref="initiativeService" />
+	</bean>
+
+	<!-- Campaign Restriction Evaluator -->
+	<bean id="campaignRestrictionEvaluator" class="com.hybris.ymkt.segmentation.evaluators.CampaignRestrictionEvaluator">
+		<property name="initiativeService" ref="initiativeService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userContextService" ref="userContextService" />
+	</bean>
+
+	<!-- Campaign Restriction Evaluator mapping -->
+	<bean id="cmsYmktCampaignRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping">
+		<property name="restrictionTypeCode" value="CMSYmktCampaignRestriction" />
+		<property name="restrictionEvaluator" ref="campaignRestrictionEvaluator" />
+	</bean>
+
+	<!-- Define custom Campaign Restriction dropdown populator -->
+	<bean id="campaignRestrictionDropdownComponentTypeAttributePopulator" class="com.hybris.ymkt.segmentation.populators.CampaignRestrictionDropdownComponentTypeAttributePopulator" />
+
+	<!-- Define populators for field campaign -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSYmktCampaignRestriction" p:qualifier="campaign">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="campaignRestrictionDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Setup Campaign Restriction boolean field-->
+	<!-- The predicate enables the call to the populator for CMSYmktCampaignRestriction Boolean fields -->
+	<!-- The populator will set the default value to what is defined in the item type -->
+	<bean id="campaignRestrictionBooleanPredicate"
+		class="de.hybris.platform.cmsfacades.types.service.predicate.RegexpStructureTypeAttributePredicate"
+		p:pattern="CMSYmktCampaignRestriction@AtomicType:java.lang.Boolean" />
+
+	<bean id="campaignRestrictionBooleanTypeAttributePopulator" class="com.hybris.ymkt.segmentation.populators.CampaignRestrictionBooleanTypeAttributePopulator" />
+
+	<bean id="campaignRestrictionBooleanMapMergeDirective" depends-on="cmsAttributePredicatePopulatorListMap" parent="mapMergeDirective">
+	    <property name="key" ref="campaignRestrictionBooleanPredicate" />
+	    <property name="value">
+	        <list>
+	            <ref bean="campaignRestrictionBooleanTypeAttributePopulator" />
+	        </list>
+	    </property>
+	</bean>
+
+</beans>

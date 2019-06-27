@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="sapProductConfigDefaultCPSPCIProviderFactory" alias="sapProductConfigCPSPCIProviderFactory" />
+	<bean id="sapProductConfigDefaultCPSPCIProviderFactory" parent="sapProductConfigCPSProviderFactory">
+		<property name="analyticsProvider" ref="sapProductConfigDefaultPCIAnalyticsProvider" />
+	</bean>
+
+	<bean id="sapProductConfigRegisteredProviderFactoriesCPSPCIListMergeDirective"
+		depends-on="sapProductConfigRegisteredProviderFactories" parent="listMergeDirective">
+		<property name="add" value="sapProductConfigCPSPCIProviderFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPCIAnalyticsProvider" alias="sapProductConfigAnalyticsProvider" />
+	<bean id="sapProductConfigDefaultPCIAnalyticsProvider"
+		class="de.hybris.platform.sap.productconfig.runtime.pci.impl.PCIAnalyticsProviderImpl">
+		<property name="analyticsDocumentConverter" ref="sapProductConfigAnalyticsDocumentConverter" />
+		<property name="pciCharonFacade" ref="sapProductConfigPCICharonFacade" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPCICharonFacade" alias="sapProductConfigPCICharonFacade" />
+	<bean id="sapProductConfigDefaultPCICharonFacade"
+		class="de.hybris.platform.sap.productconfig.runtime.pci.impl.PCICharonFacadeImpl">
+		<property name="pciRequestErrorHandler" ref="sapProductConfigPCIRequestErrorHandler" />
+		<property name="yaasServiceFactory" ref="yaasServiceFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPCIRequestErrorHandler" alias="sapProductConfigPCIRequestErrorHandler" />
+	<bean id="sapProductConfigDefaultPCIRequestErrorHandler"
+		class="de.hybris.platform.sap.productconfig.runtime.pci.impl.PCIRequestErrorHandlerImpl">
+	</bean>
+
+	<!-- populators -->
+	<alias name="sapProductConfigDefaultAnalyticsDocumentConverter" alias="sapProductConfigAnalyticsDocumentConverter" />
+	<bean id="sapProductConfigDefaultAnalyticsDocumentConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.interf.analytics.model.AnalyticsDocument" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigAnalyticsDocumentPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="sapProductConfigDefaultAnalyticsDocumentPopulator" alias="sapProductConfigAnalyticsDocumentPopulator" />
+	<bean id="sapProductConfigDefaultAnalyticsDocumentPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.pci.populator.impl.AnalyticsDocumentPopulator">
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersCPS" />
+		<property name="analyticsItemConverter" ref="sapProductConfigAnalyticsItemConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultAnalyticsItemConverter" alias="sapProductConfigAnalyticsItemConverter" />
+	<bean id="sapProductConfigDefaultAnalyticsItemConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.runtime.interf.analytics.model.AnalyticsItem" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigAnalyticsItemPopulator" />
+			</list>
+		</property>
+	</bean>
+	<alias name="sapProductConfigDefaultAnalyticsItemPopulator" alias="sapProductConfigAnalyticsItemPopulator" />
+	<bean id="sapProductConfigDefaultAnalyticsItemPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.pci.populator.impl.AnalyticsItemPopulator">
+	</bean>
+
+</beans>

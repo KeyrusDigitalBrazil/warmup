@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="solrfacetsearchbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/solrfacetsearchbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+
+	<alias alias="facetSortDropdownNamesProvider" name="defaultFacetSortDropdownNamesProvider" />
+	<bean id="defaultFacetSortDropdownNamesProvider" class="de.hybris.platform.solrfacetsearchbackoffice.dropdownproviders.impl.FacetSortDropdownNamesProvider" />
+	
+	<alias alias="beansDropdownValuesProvider" name="defaultBeansDropdownValuesProvider" />
+	<bean id="defaultBeansDropdownValuesProvider" class="de.hybris.platform.solrfacetsearchbackoffice.dropdownproviders.impl.BeansDropdownValuesProvider" />
+	
+	<alias alias="enumDropdownValuesProvider" name="defaultEnumDropdownValuesProvider" />
+	<bean id="defaultEnumDropdownValuesProvider" class="de.hybris.platform.solrfacetsearchbackoffice.dropdownproviders.impl.EnumDropdownValuesProvider" >
+		<property name="platformEnumValueResolver" ref="platformEnumValueResolver"/>
+	</bean>
+
+	<bean id="solrHotUpdateIndexerStepOne" class="de.hybris.platform.solrfacetsearchbackoffice.wizards.hotupdate.SolrHotUpdateIndexerStepOne" scope="prototype">		
+		<property name="solrIndexedTypeCodeResolver" ref="solrIndexedTypeCodeResolver"/>
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="labelService" ref="labelService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="currentObjectPrefix" value="newItem"/>
+	</bean>
+	<bean id="solrHotUpdateIndexerStepTwo" class="de.hybris.platform.solrfacetsearchbackoffice.wizards.hotupdate.SolrHotUpdateIndexerStepTwo" scope="prototype">
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="labelService" ref="labelService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="currentObjectPrefix" value="newItem"/>
+	</bean>
+	
+	<bean id="solrIndexerOperationStepOne" class="de.hybris.platform.solrfacetsearchbackoffice.wizards.indexer.SolrIndexerOperationStepOne" scope="prototype">
+		<property name="cronJobService" ref="cronJobService"/>
+		<property name="labelService" ref="labelService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="currentObjectPrefix" value="newItem"/>
+	</bean>
+	
+	<bean id="solrIndexerQueryCellRenderer" class="de.hybris.platform.solrfacetsearchbackoffice.extendedreferenceeditor.renderers.MultilineCellRenderer">
+		<property name="propertyValueService" ref="propertyValueService"/>
+		<property name="qualifier" value="query"/>
+	</bean>
+
+	<bean id="exportSolrConfigurationPanelRenderer" class="de.hybris.platform.solrfacetsearchbackoffice.panel.renderers.ExportSolrConfigurationPanelRenderer" parent="abstractEditorAreaComponentRenderer">
+		<property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+		<property name="solrSearchProviderFactory" ref="solrSearchProviderFactory"/>
+		<property name="solrIndexService" ref="solrIndexService"/>
+		<property name="notificationService" ref="notificationService"/>
+	</bean>
+
+</beans>

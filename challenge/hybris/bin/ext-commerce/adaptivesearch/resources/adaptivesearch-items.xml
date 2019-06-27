@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="AsFacetsMergeMode" dynamic="false">
+			<value code="ADD_AFTER" />
+			<value code="ADD_BEFORE" />
+			<value code="REPLACE" />
+		</enumtype>
+		<enumtype code="AsFacetType" dynamic="false">
+			<value code="REFINE" />
+			<value code="MULTISELECT_OR" />
+			<value code="MULTISELECT_AND" />
+		</enumtype>
+		<enumtype code="AsBoostItemsMergeMode" dynamic="false">
+			<value code="ADD_AFTER" />
+			<value code="ADD_BEFORE" />
+			<value code="REPLACE" />
+		</enumtype>
+		<enumtype code="AsBoostRulesMergeMode" dynamic="false">
+			<value code="ADD" />
+			<value code="REPLACE" />
+		</enumtype>
+		<enumtype code="AsBoostType" dynamic="false">
+			<value code="MULTIPLICATIVE" />
+			<value code="ADDITIVE" />
+		</enumtype>
+		<enumtype code="AsBoostOperator" dynamic="false">
+			<value code="EQUAL" />
+			<value code="NOT_EQUAL" />
+			<value code="GREATER_THAN" />
+			<value code="GREATER_THAN_OR_EQUAL" />
+			<value code="LESS_THAN" />
+			<value code="LESS_THAN_OR_EQUAL" />
+			<value code="MATCH" />
+		</enumtype>
+		<enumtype code="AsSortsMergeMode" dynamic="false">
+			<value code="ADD_AFTER" />
+			<value code="ADD_BEFORE" />
+			<value code="REPLACE" />
+		</enumtype>
+		<enumtype code="AsSortOrder" dynamic="false">
+			<value code="ASCENDING" />
+			<value code="DESCENDING" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="AsSimpleSearchProfile2SimpleSearchConfiguration" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="searchProfile" type="AsSimpleSearchProfile" cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="searchConfigurations" type="AsSimpleSearchConfiguration" cardinality="many"
+				collectiontype="list">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsCategoryAwareSearchProfile2CategoryAwareSearchConfiguration" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchProfile" type="AsCategoryAwareSearchProfile" cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="searchConfigurations" type="AsCategoryAwareSearchConfiguration" cardinality="many"
+				collectiontype="list">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AbstractAsFacetConfiguration2PromotedFacetValueRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="facetConfiguration" type="AbstractAsFacetConfiguration" cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="promotedValues" type="AsPromotedFacetValue" cardinality="many"
+				collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AbstractAsFacetConfiguration2ExcludedFacetValueRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="facetConfiguration" type="AbstractAsFacetConfiguration" cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="excludedValues" type="AsExcludedFacetValue" cardinality="many"
+				collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2PromotedFacetRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="promotedFacets" type="AsPromotedFacet" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2FacetRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="facets" type="AsFacet" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2ExcludedFacetRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="excludedFacets" type="AsExcludedFacet" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2PromotedItemRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="promotedItems" type="AsPromotedItem" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2ExcludedItemRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="excludedItems" type="AsExcludedItem" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2BoostRuleRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="boostRules" type="AsBoostRule" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2SortRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="sorts" type="AsSort" cardinality="many" collectiontype="list" ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsSortConfiguration2SortExpression" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="sortConfiguration" type="AbstractAsSortConfiguration" cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="expressions" type="AsSortExpression" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2PromotedSortRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="promotedSorts" type="AsPromotedSort" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsConfigurableSearchConfiguration2ExcludedSortRelation" autocreate="true" generate="true"
+			localized="false">
+			<sourceElement qualifier="searchConfiguration" type="AbstractAsConfigurableSearchConfiguration"
+				cardinality="one">
+				<modifiers optional="false" initial="true" write="false" />
+			</sourceElement>
+			<targetElement qualifier="excludedSorts" type="AsExcludedSort" cardinality="many" collectiontype="list"
+				ordered="true">
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="AsSearchProfileActivationSet2SearchProfile" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="activationSet" type="AsSearchProfileActivationSet" cardinality="one" />
+			<targetElement qualifier="searchProfiles" type="AbstractAsSearchProfile" cardinality="many"
+				collectiontype="list" ordered="true" />
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="AbstractAsSearchProfile" extends="GenericItem" abstract="true" autocreate="true" generate="true">
+			<deployment table="AsSearchProf" typecode="2240" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"code"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(100)</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="false" read="true" write="true" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="indexType" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="codeIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="code" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsSimpleSearchProfile" extends="AbstractAsSearchProfile" autocreate="true" generate="true" />
+
+		<itemtype code="AsCategoryAwareSearchProfile" extends="AbstractAsSearchProfile" autocreate="true" generate="true" />
+
+		<itemtype code="AbstractAsConfiguration" extends="GenericItem" abstract="true" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="uid" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="corrupted" type="boolean">
+					<persistence type="dynamic" attributeHandler="asConfigurationCorruptedAttributeHandler" />
+					<modifiers read="true" write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractAsSearchConfiguration" extends="AbstractAsConfiguration" abstract="true" autocreate="true"
+			generate="true">
+			<deployment table="AsSearchConf" typecode="2241" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(101)</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractAsConfigurableSearchConfiguration" extends="AbstractAsSearchConfiguration" abstract="true"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="facetsMergeMode" type="AsFacetsMergeMode">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>de.hybris.platform.adaptivesearch.util.ConfigurationUtils.getDefaultFacetsMergeMode()</defaultvalue>
+				</attribute>
+				<attribute qualifier="boostItemsMergeMode" type="AsBoostItemsMergeMode">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>de.hybris.platform.adaptivesearch.util.ConfigurationUtils.getDefaultBoostItemsMergeMode()</defaultvalue>
+				</attribute>
+				<attribute qualifier="boostRulesMergeMode" type="AsBoostRulesMergeMode">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>de.hybris.platform.adaptivesearch.util.ConfigurationUtils.getDefaultBoostRulesMergeMode()</defaultvalue>
+				</attribute>
+				<attribute qualifier="sortsMergeMode" type="AsSortsMergeMode">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>de.hybris.platform.adaptivesearch.util.ConfigurationUtils.getDefaultSortsMergeMode()</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AsSimpleSearchConfiguration" extends="AbstractAsConfigurableSearchConfiguration" autocreate="true"
+			generate="true" />
+
+		<itemtype code="AsCategoryAwareSearchConfiguration" extends="AbstractAsConfigurableSearchConfiguration"
+			autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="category" type="Category">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" write="false" />
+				</attribute>
+				<attribute qualifier="corrupted" type="boolean" redeclare="true">
+					<persistence type="dynamic" attributeHandler="asCategoryAwareSearchConfigurationCorruptedAttributeHandler" />
+					<modifiers read="true" write="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractAsItemConfiguration" extends="AbstractAsConfiguration" abstract="true" autocreate="true"
+			generate="true">
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"uid"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(102)</value>
+				</property>
+			</custom-properties>
+			<attributes>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractAsFacetConfiguration" extends="AbstractAsItemConfiguration" autocreate="true"
+			generate="true">
+			<deployment table="AsFacetConf" typecode="2242" />
+			<attributes>
+				<attribute qualifier="indexProperty" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="facetType" type="AsFacetType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("AsFacetType","REFINE")</defaultvalue>
+				</attribute>
+				<attribute qualifier="priority" type="java.lang.Integer">
+					<persistence type="property" />
+					<modifiers optional="true" />
+					<defaultvalue>Integer.valueOf(100)</defaultvalue>
+				</attribute>
+				<attribute qualifier="valuesSortProvider" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="valuesDisplayNameProvider" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="topValuesProvider" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="true" />
+				</attribute>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsPromotedFacet" extends="AbstractAsFacetConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsFacet" extends="AbstractAsFacetConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsExcludedFacet" extends="AbstractAsFacetConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AbstractAsFacetValueConfiguration" extends="AbstractAsItemConfiguration" autocreate="true"
+			generate="true">
+			<deployment table="AsFacetValueConf" typecode="2247" />
+			<attributes>
+				<attribute qualifier="value" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="true" />
+				</attribute>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsPromotedFacetValue" extends="AbstractAsFacetValueConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsExcludedFacetValue" extends="AbstractAsFacetValueConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AbstractAsBoostItemConfiguration" extends="AbstractAsItemConfiguration" abstract="true"
+			autocreate="true" generate="true">
+			<deployment table="AsBoostItemConf" typecode="2243" />
+			<attributes>
+				<attribute qualifier="item" type="Item">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+				<attribute qualifier="corrupted" type="boolean" redeclare="true">
+					<persistence type="dynamic" attributeHandler="asBoostItemConfigurationCorruptedAttributeHandler" />
+					<modifiers read="true" write="false" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsPromotedItem" extends="AbstractAsBoostItemConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsExcludedItem" extends="AbstractAsBoostItemConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AbstractAsBoostRuleConfiguration" extends="AbstractAsItemConfiguration" abstract="true"
+			autocreate="true" generate="true">
+			<deployment table="AsBoostRuleConf" typecode="2244" />
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsBoostRule" extends="AbstractAsBoostRuleConfiguration" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="indexProperty" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="operator" type="AsBoostOperator">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("AsBoostOperator","EQUAL")</defaultvalue>
+				</attribute>
+				<attribute qualifier="value" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="boostType" type="AsBoostType">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("AsBoostType","MULTIPLICATIVE")</defaultvalue>
+				</attribute>
+				<attribute qualifier="boost" type="java.lang.Float">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+
+		<itemtype code="AbstractAsSortConfiguration" extends="AbstractAsItemConfiguration" abstract="true"
+			autocreate="true" generate="true">
+			<deployment table="AsSortConf" typecode="2248" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="priority" type="java.lang.Integer">
+					<persistence type="property" />
+					<modifiers optional="true" />
+					<defaultvalue>Integer.valueOf(100)</defaultvalue>
+				</attribute>
+				<attribute qualifier="applyPromotedItems" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="highlightPromotedItems" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsSort" extends="AbstractAsSortConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsPromotedSort" extends="AbstractAsSortConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsExcludedSort" extends="AbstractAsSortConfiguration" autocreate="true" generate="true" />
+
+		<itemtype code="AsSortExpression" extends="AbstractAsItemConfiguration" autocreate="true" generate="true">
+			<deployment table="AsSortExpr" typecode="2249" />
+			<attributes>
+				<attribute qualifier="expression" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="order" type="AsSortOrder">
+					<persistence type="property" />
+					<modifiers optional="false" />
+					<defaultvalue>em().getEnumerationValue("AsSortOrder","ASCENDING")</defaultvalue>
+				</attribute>
+				<attribute qualifier="uniqueIdx" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" read="true" write="true" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uidIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uid" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="uniqueIdx" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AsSearchProfileActivationSet" extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="AsSearchProfActivSet" typecode="2246" />
+			<custom-properties>
+				<property name="catalogItemType">
+					<value>java.lang.Boolean.TRUE</value>
+				</property>
+				<property name="catalogVersionAttributeQualifier">
+					<value>"catalogVersion"</value>
+				</property>
+				<property name="uniqueKeyAttributeQualifier">
+					<value>"indexType"</value>
+				</property>
+				<property name="catalog.sync.default.root.type">
+					<value>Boolean.TRUE</value>
+				</property>
+				<property name="catalog.sync.default.root.type.order">
+					<value>Integer.valueOf(104)</value>
+				</property>
+			</custom-properties>
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<persistence type="property" />
+					<modifiers optional="true" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="indexType" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" initial="true" read="true" write="false" />
+				</attribute>
+				<attribute qualifier="priority" type="java.lang.Integer">
+					<description>priority (higher priority gets applied first)</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Integer.valueOf(0)</defaultvalue>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="versionIdx" unique="false">
+					<key attribute="catalogVersion" />
+				</index>
+				<index name="uniqueIdx" unique="true">
+					<key attribute="catalogVersion" />
+					<key attribute="indexType" />
+				</index>
+			</indexes>
+		</itemtype>
+	</itemtypes>
+</items>

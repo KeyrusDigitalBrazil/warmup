@@ -1,0 +1,71 @@
+
+// the rule is for testing of versioning feature only. Not supposed to be deployed in the drools engine
+package de.hybris.platform.droolsruleengine;
+
+import de.hybris.platform.ruleengineservices.rrd.RuleConfigurationRRD;
+import de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionContext;
+import de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO;
+import de.hybris.platform.ruleengineservices.rao.WebsiteGroupRAO;
+import java.util.Map;
+import de.hybris.platform.ruleengineservices.rao.CategoryRAO;
+import java.math.BigDecimal;
+import de.hybris.platform.ruleengineservices.rao.ProductRAO;
+import de.hybris.platform.ruleengineservices.rao.CartRAO;
+import de.hybris.platform.ruleengineservices.rao.OrderEntryRAO;
+
+global de.hybris.platform.ruleengineservices.rule.evaluation.RuleExecutableAction ruleTargetBundlePriceAction;
+
+query rule_1d1c86c405c04fa1a3b035dfaee8129b_query(OrderEntryRAO $v6, CartRAO $v1, RuleEngineResultRAO $v2, WebsiteGroupRAO $v3, CategoryRAO $v4, ProductRAO $v5)
+   (
+      $v1 := CartRAO()
+      and
+      $v2 := RuleEngineResultRAO()
+      and
+      $v3 := WebsiteGroupRAO(id == "electronicsPromoGrp")
+      and
+      (
+         eval(false)
+         or
+         (
+            $v4 := CategoryRAO(code in ("597", "598"))
+            and
+            $v5 := ProductRAO(categories contains $v4)
+            and
+            $v6 := OrderEntryRAO(product == $v5, quantity >= new Integer(1))
+            and
+            $v1 := CartRAO(entries contains $v6)
+         )
+      )
+   )
+end
+
+rule "1d1c86c4-05c0-4fa1-a3b0-35dfaee8129b"
+@ruleCode("ruleengine/test/versioning/rule4.drl")
+@moduleName("versioningTestModule")
+dialect "mvel" 
+salience 110
+when
+   $config := RuleConfigurationRRD(ruleCode == "product_multibuy_fixed_price")
+   accumulate (
+      rule_1d1c86c405c04fa1a3b035dfaee8129b_query($v6, $v1, $v2, $v3, $v4, $v5;)
+   ;
+      $v6_set : collectSet($v6),
+      $v1_set : collectSet($v1),
+      $v2_set : collectSet($v2),
+      $v3_set : collectSet($v3),
+      $v4_set : collectSet($v4),
+      $v5_set : collectSet($v5),
+      $result_count : count(1)
+   )
+   eval($result_count > 0)
+then
+   Map variables = [
+      "CONTAINER/de.hybris.platform.ruleengineservices.rao.OrderEntryRAO" : $v6_set,
+      "de.hybris.platform.ruleengineservices.rao.CartRAO" : $v1_set,
+      "de.hybris.platform.ruleengineservices.rao.RuleEngineResultRAO" : $v2_set,
+      "de.hybris.platform.ruleengineservices.rao.WebsiteGroupRAO" : $v3_set,
+      "CONTAINER/de.hybris.platform.ruleengineservices.rao.CategoryRAO" : $v4_set,
+      "CONTAINER/de.hybris.platform.ruleengineservices.rao.ProductRAO" : $v5_set
+   ];
+   ruleTargetBundlePriceAction.executeAction(new DefaultDroolsRuleActionContext(variables, kcontext), ["selection_strategy":de.hybris.platform.ruleengineservices.enums.OrderEntrySelectionStrategy.CHEAPEST, "qualifying_containers":["CONTAINER":new Integer(3)], "value":["USD":new BigDecimal(20)]]);
+end

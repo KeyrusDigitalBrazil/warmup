@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:annotation-config />
+	<context:component-scan base-package="de.hybris.platform.chinesepaymentfacades"
+		scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	
+	<bean id="chineseCheckoutFacade" class="de.hybris.platform.chinesepaymentfacades.checkout.impl.DefaultChineseCheckoutFacade" parent="defaultAcceleratorCheckoutFacade">
+		<property name="cartConverter" ref="cartConverter"></property>
+		<property name="chineseCheckoutService" ref="chineseCheckoutService"></property>
+		<property name="chineseOrderService" ref="chineseOrderService"></property>
+		<property name="cartChinesePaymentInfoConverter" ref="cartChinesePaymentInfoConverter"></property>
+		<property name="eventPublishingSubmitOrderStrategy" ref="eventPublishingSubmitOrderStrategy"></property>
+		<property name="configurationService" ref="configurationService"></property>
+		<property name="taskService" ref="taskService" />
+		<property name="scheduleDelay" value="${submitOrderEvent.task.scheduleDelay}" />
+	</bean>		
+	
+	<alias name="defaultCartChinesePaymentInfoConverter" alias="cartChinesePaymentInfoConverter"/>
+	<bean id="defaultCartChinesePaymentInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.order.data.CartData"/>
+		<property name="populators">
+			<list>
+				<ref bean="cartChinesePaymentInfoPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="cartChinesePaymentInfoPopulator" class="de.hybris.platform.chinesepaymentfacades.payment.populator.CartChinesePaymentInfoPopulator">
+		<property name="chinesePaymentServicesStrategy" ref="chinesePaymentServicesStrategy"/>
+		<property name="paymentModeService" ref="paymentModeService"/>
+	</bean>
+			
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="cartConverter"/>
+        <property name="add"  ref="cartChinesePaymentInfoPopulator"/>
+    </bean>		
+	
+	<bean id="chineseOrderPopulator"
+			class="de.hybris.platform.chinesepaymentfacades.order.populator.ChineseOrderPopulator"
+			parent="baseOrderPopulator">
+		<property name="chinesePaymentServicesStrategy" ref="chinesePaymentServicesStrategy"></property>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="storeSessionFacade" ref="storeSessionFacade"/>
+		<property name="paymentModeService" ref="paymentModeService"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="defaultOrderConverter"/>
+        <property name="add"  ref="chineseOrderPopulator"/>
+    </bean>	
+    
+	<bean parent="modifyPopulatorList">
+        <property name="list" ref="defaultOrderConverter"/>
+        <property name="add"  ref="orderPayImmediatelyPopulator"/>
+    </bean>
+			
+	<bean id="submitOrderEventTask" class="de.hybris.platform.chinesepaymentfacades.order.task.SubmitOrderEventTask">
+		<property name="chineseCheckoutService" ref="chineseCheckoutService"></property>
+		<property name="eventPublishingSubmitOrderStrategy" ref="eventPublishingSubmitOrderStrategy"></property>
+		<property name="userService" ref="userService"/>
+		<property name="customerAccountService" ref="customerAccountService"/>
+		<property name="retryDelay" value="${submitOrderEvent.task.retryDelay}"/>
+		<property name="maxRetries" value="${submitOrderEvent.task.maxRetries}"/>
+	</bean>
+</beans>

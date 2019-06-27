@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultCouponCodeModelToVoucherDataPopulator" alias="couponCodeModelToVoucherDataPopulator"/>
+	<bean id="defaultCouponCodeModelToVoucherDataPopulator"
+			class="de.hybris.platform.couponfacades.converters.populator.CouponCodeToVoucherDataPopulator">
+	</bean>
+
+	<alias name="defaultCouponCodeModelConverter" alias="couponCodeModelConverter"/>
+	<bean id="defaultCouponCodeModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.voucher.data.VoucherData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="couponCodeModelToVoucherDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+			
+	<alias name="defaultCouponFacade" alias="voucherFacade"/>
+	<bean id="defaultCouponFacade" class="de.hybris.platform.couponfacades.facades.impl.DefaultCouponFacade">
+		<property name="couponService" ref="couponService"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="couponCodeModelConverter" ref="couponCodeModelConverter"/>
+		<property name="couponModelConverter" ref="couponModelConverter"/>
+	</bean>
+	
+	<alias name="defaultCouponDataFacade" alias="couponDataFacade"/>
+	<bean id="defaultCouponDataFacade"
+			class="de.hybris.platform.couponfacades.facades.impl.DefaultCouponDataFacade">
+		<property name="couponService" ref="couponService"/>
+		<property name="couponConverter" ref="couponConverter"/>
+	</bean>
+	
+	<alias name="defaultCouponConverter" alias="couponConverter"/>
+	<bean id="defaultCouponConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.coupon.data.CouponData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="couponDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCouponDataPopulator" alias="couponDataPopulator"/>
+	<bean id="defaultCouponDataPopulator"
+			class="de.hybris.platform.couponfacades.converters.populator.CouponDataPopulator">
+	</bean>
+	
+	<alias name="defaultCouponModelConverter" alias="couponModelConverter"/>
+	<bean id="defaultCouponModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.voucher.data.VoucherData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="couponModelToVoucherDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCouponModelToVoucherDataPopulator" alias="couponModelToVoucherDataPopulator"/>
+	<bean id="defaultCouponModelToVoucherDataPopulator"
+			class="de.hybris.platform.couponfacades.converters.populator.CouponModelToVoucherDataPopulator">
+	</bean>
+	
+				
+</beans>

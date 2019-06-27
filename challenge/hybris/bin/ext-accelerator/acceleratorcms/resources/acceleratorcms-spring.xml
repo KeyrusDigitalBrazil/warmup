@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+        
+    <context:annotation-config/>
+
+	<bean id="acceleratorCmsSystemSetup" class="de.hybris.platform.acceleratorcms.setup.AcceleratorCmsSystemSetup" parent="abstractCoreSystemSetup" />
+	
+	<!-- Dynamic Attributes -->
+	<bean id="uiExperienceRestrictionDynamicDescription" class="de.hybris.platform.acceleratorcms.model.UiExperienceRestrictionDynamicDescription" >
+		<description>deprecated since 1811</description>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<!-- Restriction Evaluators -->
+	<bean id="cmsUiExperienceRestrictionEvaluator" class="de.hybris.platform.acceleratorcms.evaluator.CMSUiExperienceRestrictionEvaluator" >
+		<description>deprecated since 1811</description>
+		<property name="uiExperienceService" ref="uiExperienceService"/>
+	</bean>
+
+	<!-- Restriction Evaluator Mappings -->
+	<bean id="cmsUiExperienceRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" >
+		<description>deprecated since 1811</description>
+		<property name="restrictionTypeCode" value="CMSUiExperienceRestriction" />
+		<property name="restrictionEvaluator" ref="cmsUiExperienceRestrictionEvaluator" />
+	</bean>
+
+	<alias alias="cmsRestrictionService" name="rankingCMSRestrictionService" />
+	<bean id="rankingCMSRestrictionService" parent="defaultCMSRestrictionService" class="de.hybris.platform.acceleratorcms.services.impl.RankingCMSRestrictionService"/>
+
+	<bean id="cmsActionRestrictionDynamicDescription" class="de.hybris.platform.acceleratorcms.model.CMSActionRestrictionDynamicDescription">
+		<description>deprecated since 1811</description>
+	</bean>
+	
+	<!-- Restriction Evaluators -->
+	<bean id="cmsActionRestrictionEvaluator" class="de.hybris.platform.acceleratorcms.evaluator.CMSActionRestrictionEvaluator" >
+		<description>deprecated since 1811</description>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+	
+	<!-- Restriction Evaluator Mappings -->
+	<bean id="cmsActionRestrictionEvaluatorMapping" class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" >
+		<description>deprecated since 1811</description>
+		<property name="restrictionTypeCode" value="CMSActionRestriction" />
+		<property name="restrictionEvaluator" ref="cmsActionRestrictionEvaluator" />
+	</bean>
+	
+	<!--  Caching -->
+	
+	<alias name="defaultCacheKeyProviders" alias="cacheKeyProviders"/>
+	<util:map id="defaultCacheKeyProviders" key-type="java.lang.String">
+		<entry key="AbstractCMSComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="NavigationBarComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="BannerComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="SimpleBannerComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="RotatingImagesComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="ImageMapComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="ProductCarouselComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="CategoryFeatureComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="ProductFeatureComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="CMSParagraphComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="CMSImageComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="CMSTabParagraphComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="FooterComponent" value-ref="cmsCacheKeyProvider"/>
+		<entry key="ProductReferencesComponent" value-ref="currentProductCmsCacheKeyProvider"/>
+		<entry key="ProductDetailComponent" value-ref="currentProductCmsCacheKeyProvider"/>
+		<entry key="ProductVariantSelectorComponent" value-ref="currentProductCmsCacheKeyProvider"/>
+		<entry key="DynamicBannerComponent" value-ref="currentCategoryCmsCacheKeyProvider"/>
+	</util:map>
+	
+	<alias name="defaultCmsCacheKeyProvider" alias="cmsCacheKeyProvider"/>
+	<bean id="defaultCmsCacheKeyProvider" class="de.hybris.platform.acceleratorcms.component.cache.impl.DefaultCmsCacheKeyProvider"/>
+	
+	<alias name="defaultCurrentCategoryCmsCacheKeyProvider" alias="currentCategoryCmsCacheKeyProvider"/>
+	<bean id="defaultCurrentCategoryCmsCacheKeyProvider" class="de.hybris.platform.acceleratorcms.component.cache.impl.CurrentCategoryCmsCacheKeyProvider" parent="defaultCmsCacheKeyProvider"/>
+	
+	<alias name="defaultCurrentProductCmsCacheKeyProvider" alias="currentProductCmsCacheKeyProvider"/>
+	<bean id="defaultCurrentProductCmsCacheKeyProvider" class="de.hybris.platform.acceleratorcms.component.cache.impl.CurrentProductCmsCacheKeyProvider" parent="defaultCmsCacheKeyProvider"/>
+	
+	<alias name="defaultCurrentUserCmsCacheKeyProvider" alias="currentUserCmsCacheKeyProvider"/>
+	<bean id="defaultCurrentUserCmsCacheKeyProvider" class="de.hybris.platform.acceleratorcms.component.cache.impl.CurrentUserCmsCacheKeyProvider" parent="defaultCmsCacheKeyProvider">
+		<property name="userService" ref="userService"/>
+	</bean>
+	
+	<alias name="defaultCmsCacheService" alias="cmsCacheService"/>
+	<bean id="defaultCmsCacheService" class="de.hybris.platform.acceleratorcms.component.cache.impl.DefaultCmsCacheService">
+		<property name="cacheKeyProviders" ref="cacheKeyProviders"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="cacheController" ref="cacheController"/>
+	</bean>
+
+	<alias name="defaultPreviewRequestStrategiesList" alias="previewRequestStrategiesList" />
+	<util:list id="defaultPreviewRequestStrategiesList">
+		<ref bean="activeBaseSitePreviewStrategy" />
+		<ref bean="catalogVersionsPreviewStrategy" />
+		<ref bean="uiExperienceLevelPreviewStrategy" />
+	</util:list>
+
+	<bean id="activeBaseSitePreviewStrategy"
+		  class="de.hybris.platform.acceleratorcms.preview.strategies.impl.ActiveBaseSitePreviewStrategy">
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+
+	<bean id="catalogVersionsPreviewStrategy"
+		  class="de.hybris.platform.acceleratorcms.preview.strategies.impl.CatalogVersionsPreviewStrategy">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<bean id="uiExperienceLevelPreviewStrategy"
+		  class="de.hybris.platform.acceleratorcms.preview.strategies.impl.UiExperienceLevelPreviewStrategy">
+		<property name="uiExperienceService" ref="uiExperienceService" />
+	</bean>
+	
+	<!-- Product Carousel Renderer Service -->
+	<alias name="defaultProductCarouselRendererService" alias="productCarouselRendererService"></alias>
+	<bean id="defaultProductCarouselRendererService" class="de.hybris.platform.acceleratorcms.productcarousel.impl.DefaultProductCarouselRendererService">
+	  <property name="catalogVersionService" ref="catalogVersionService" />
+	  <property name="productService" ref="productService"/>
+	  <property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultCMSTabParagraphContainerStrategy" alias="cmsTabParagraphContainerStrategy"/>
+	<bean id="defaultCMSTabParagraphContainerStrategy" class="de.hybris.platform.acceleratorcms.component.container.impl.DefaultCMSTabParagraphContainerStategy">
+		<property name="typeService" ref="typeService" />
+		<property name="showContainerForTypes">
+			<list>
+				<value>JspIncludeComponent</value>
+				<value>CMSTabParagraphComponent</value>
+				<value>ProductCarouselComponent</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean depends-on="cmsComponentContainerStrategies" parent="mapMergeDirective">
+		<property name="key" value="CMSTabParagraphContainer" />
+		<property name="value" ref="cmsTabParagraphContainerStrategy" />
+	</bean>
+	
+	<!-- Deep cloning configuration for SimpleResponsiveBannerComponent -->
+	<bean id="accCmsModelCloningContextPartOfPredicates" 
+			depends-on="cmsModelCloningContextPartOfPredicates" parent="listMergeDirective">
+		<property name="add" ref="cmsSimpleResponsiveBannerForMediaAttributePartOfPredicate" />
+	</bean>
+	
+	<alias name="defaultSimpleResponsiveBannerForMediaAttributePartOfPredicate" alias="cmsSimpleResponsiveBannerForMediaAttributePartOfPredicate" />
+	<bean id="defaultSimpleResponsiveBannerForMediaAttributePartOfPredicate" class="de.hybris.platform.acceleratorcms.component.cloning.predicate.SimpleResponsiveBannerForMediaAttributePartOfPredicate" />
+		
+	<!-- Non cloneable components -->
+	<bean id="accCmsTypeNonCloneableList"
+		  depends-on="cmsTypeNonCloneableList" parent="listMergeDirective">
+		<property name="add">
+			<util:constant static-field="de.hybris.platform.acceleratorcms.model.components.NavigationComponentModel._TYPECODE"/>
+		</property>
+    </bean>
+    
+    <!-- Blacklisting page types not supported by SmartEdit -->
+    <bean id="accCmsAbstractPageBlacklistedSubtypes" depends-on="cmsItemSearchTypeBlacklistMap" parent="mapMergeDirective">
+        <property name="key">
+            <util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+        </property>
+        <property name="value">
+            <util:list>
+                <util:constant static-field="de.hybris.platform.acceleratorservices.model.cms2.pages.EmailPageModel._TYPECODE"/>
+                <util:constant static-field="de.hybris.platform.acceleratorservices.model.cms2.pages.DocumentPageModel._TYPECODE"/>
+            </util:list>
+        </property>
+	</bean>
+</beans>

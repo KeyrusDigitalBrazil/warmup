@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!-- ************ name with title format ************ -->
+	<!-- 	<bean id="nameWithTitleFormatStrategy" class="de.hybris.platform.chineseprofilefacades.strategies.impl.ChineseNameWithTitleFormatStrategy">
+		<property name="userService" ref="userService" />
+		<property name="storeSessionFacade" ref="storeSessionFacade" />
+	</bean>
+ 	-->
+
+	<!-- ************ Chinese Customer Facades ************ -->
+	<bean id="chineseCustomerFacade" class="de.hybris.platform.chineseprofilefacades.customer.impl.DefaultChineseCustomerFacade"
+		parent="customerFacade" >
+		<property name="chineseCustomerAccountService" ref="chineseCustomerAccountService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="customerSettingsChangedHooks" ref="customerSettingsChangedHooks"/>
+	</bean>
+
+	<!-- ************ Chinese Customer Populators ************ -->
+	<bean id="chineseCustomerPopulator" class="de.hybris.platform.chineseprofilefacades.populators.ChineseCustomerPopulator" />
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter" />
+		<property name="add" ref="chineseCustomerPopulator" />
+	</bean>
+
+	<alias alias="emailContextFactory" name="chineseEmailContextFactory"/>
+	<bean id="chineseEmailContextFactory"
+	      class="de.hybris.platform.chineseprofilefacades.process.email.context.impl.ChineseEmailContextFactory" parent="defaultEmailContextFactory">
+	</bean>
+
+	<alias name="extOrderNotificationEmailContext" alias="orderNotificationEmailContext" />
+	<bean id="extOrderNotificationEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderNotificationEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="orderConverter" ref="orderConverter" />
+		<property name="commerceCategoryService" ref="commerceCategoryService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+	</bean>
+
+	<alias name="extCustomerEmailContext" alias="customerEmailContext" />
+	<bean id="extCustomerEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.CustomerEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="customerConverter" ref="customerConverter" />
+	</bean>
+
+	<alias name="extForgottenPasswordEmailContext" alias="forgottenPasswordEmailContext" />
+	<bean id="extForgottenPasswordEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.ForgottenPasswordEmailContext"
+		parent="customerEmailContext" scope="prototype">
+		<property name="customerConverter" ref="customerConverter" />
+	</bean>
+
+
+	<alias name="extDeliverySentEmailContext" alias="deliverySentEmailContext" />
+	<bean id="extDeliverySentEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.DeliverySentEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="consignmentConverter" ref="consignmentConverter" />
+	</bean>
+
+	<alias name="extReadyForPickupEmailContext" alias="readyForPickupEmailContext" />
+	<bean id="extReadyForPickupEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.ReadyForPickupEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="consignmentConverter" ref="consignmentConverter" />
+	</bean>
+
+	<alias name="extOrderCancelledEmailContext" alias="orderCancelledEmailContext" />
+	<bean id="extOrderCancelledEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderCancelledEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="orderConverter" ref="orderConverter" />
+	</bean>
+
+	<alias name="extOrderRefundEmailContext" alias="orderRefundEmailContext" />
+	<bean id="extOrderRefundEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderRefundEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="orderConverter" ref="orderConverter" />
+	</bean>
+
+	<alias name="extConsignmentCollectionReminderEmailContext" alias="consignmentCollectionReminderEmailContext" />
+	<bean id="extConsignmentCollectionReminderEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.ConsignmentCollectionReminderEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="consignmentConverter" ref="consignmentConverter" />
+		<property name="formatFactory" ref="formatFactory" />
+		<property name="customerServiceUncollectedConsignmentStrategy" ref="customerServiceUncollectedConsignmentStrategy" />
+		<property name="orderConverter" ref="orderConverter" />
+	</bean>
+
+	<alias name="extOrderPartiallyModifiedEmailContext" alias="orderPartiallyModifiedEmailContext" />
+	<bean id="extOrderPartiallyModifiedEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderPartiallyModifiedEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="orderConverter" ref="orderConverter" />
+		<property name="orderEntryConverter" ref="orderEntryConverter" />
+		<property name="priceDataFactory" ref="priceDataFactory" />
+	</bean>
+
+	<alias name="extOrderPartiallyCanceledEmailContext" alias="orderPartiallyCanceledEmailContext" />
+	<bean id="extOrderPartiallyCanceledEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderPartiallyCanceledEmailContext"
+		parent="orderPartiallyModifiedEmailContext" scope="prototype">
+	</bean>
+
+	<alias name="extOrderPartiallyRefundedEmailContext" alias="orderPartiallyRefundedEmailContext" />
+	<bean id="extOrderPartiallyRefundedEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.OrderPartiallyRefundedEmailContext"
+		parent="orderPartiallyModifiedEmailContext" scope="prototype">
+	</bean>
+
+	<alias name="extNotPickedUpConsignmentCanceledEmailContext" alias="notPickedUpConsignmentCanceledEmailContext" />
+	<bean id="extNotPickedUpConsignmentCanceledEmailContext" class="de.hybris.platform.chineseprofilefacades.process.email.context.NotPickedUpConsignmentCanceledEmailContext"
+		parent="chineseAbstractEmailContext" scope="prototype">
+		<property name="consignmentConverter" ref="consignmentConverter" />
+		<property name="priceDataFactory" ref="priceDataFactory" />
+	</bean>
+
+</beans>

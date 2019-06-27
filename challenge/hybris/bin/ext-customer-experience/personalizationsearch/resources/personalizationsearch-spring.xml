@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultCxSearchProfileActionAffectedObjectKeyAttributeHandler" alias="cxSearchProfileActionAffectedObjectKeyAttributeHandler" />
+	<bean id="defaultCxSearchProfileActionAffectedObjectKeyAttributeHandler" class="de.hybris.platform.personalizationsearch.dynamic.CxSearchProfileActionAffectedObjectKeyAttributeHandler" />
+
+	<alias name="defaultCxSearchProfileActionPerformable" alias="cxSearchProfileActionPerformable" />
+	<bean id="defaultCxSearchProfileActionPerformable" class="de.hybris.platform.personalizationsearch.action.CxSearchProfileActionPerformable" />
+
+	<bean id="cxSearchProfileActionTargetProvider" class="de.hybris.platform.personalizationservices.action.property.ActionTargetProvider">
+		<property name="supportedClass" value="de.hybris.platform.personalizationsearch.model.CxSearchProfileActionModel" />
+		<property name="target" value="cxSearchProfileActionPerformable" />
+	</bean>
+
+	<alias name="defaultCxSearchProfileActivationStrategy" alias="cxSearchProfileActivationStrategy" />
+	<bean id="defaultCxSearchProfileActivationStrategy" class="de.hybris.platform.personalizationsearch.strategies.impl.CxSearchProfileActivationStrategy">
+		<property name="userService" ref="userService" />
+		<property name="asSearchProfileService" ref="asSearchProfileService" />
+		<property name="cxActionResultService" ref="cxActionResultService" />
+	</bean>
+
+	<bean id="defaultCxSearchProfileActivationMapping" parent="asSearchProfileActivationMapping">
+		<property name="priority" value="90" />
+		<property name="activationStrategy" ref="cxSearchProfileActivationStrategy" />
+	</bean>
+</beans>

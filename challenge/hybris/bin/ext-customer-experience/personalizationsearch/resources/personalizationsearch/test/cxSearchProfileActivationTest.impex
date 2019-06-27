@@ -1,0 +1,37 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$cxCatalogVersion=catalogVersion(catalog(id[default=cxCatalog]),version[default=Online])[default=cxCatalog:Online]
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);name
+;cxuser@hybris.com;customergroup;
+
+INSERT_UPDATE Catalog;id[unique=true]
+;cxCatalog
+;summerCatalog
+;winterCatalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);active
+;cxCatalog;Online;en;true
+;summerCatalog;Online;en;true
+;winterCatalog;Online;en;true
+
+INSERT_UPDATE CxCustomizationsGroup;code;$cxCatalogVersion[unique=true]
+;default;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;rank;status(code);group(code,$cxCatalogVersion)[unique=true];$cxCatalogVersion[unique=true]
+;customization1;customization1;200;ENABLED;default;
+;customization2;customization2;100;ENABLED;default;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;rank;status(code);enabled;customization(code,$cxCatalogVersion)[unique=true];$cxCatalogVersion[unique=true]
+;variation1.1;variation1.1;200;ENABLED;true;customization1;
+;variation1.2;variation1.2;100;ENABLED;true;customization1;
+;variation2.1;variation2.1;200;ENABLED;true;customization2;
+;variation2.2;variation2.2;100;ENABLED;true;customization2;

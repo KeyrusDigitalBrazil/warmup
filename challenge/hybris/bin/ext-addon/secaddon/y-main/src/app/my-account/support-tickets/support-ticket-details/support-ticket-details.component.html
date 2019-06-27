@@ -1,0 +1,107 @@
+<div class="back-link border">
+  <a (click)="goBack()">
+    <span class="glyphicon glyphicon-chevron-left"></span>
+  </a>
+  <span class="label">
+      <ng-container i18n="@@text.account.supportTickets.details.request.customer.support">Request Customer Support</ng-container>
+    </span>
+</div>
+<div class="well well-lg well-tertiary" *ngIf="ticket">
+  <div class="col-sm-12 col-no-padding">
+    <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+          <ng-container i18n="@@text.account.supportTickets.details.subject">Subject</ng-container>
+          </span>
+        <span class="item-value" title="{{ticket.shortDescription}}">{{ticket.shortDescription}} </span>
+      </div>
+    </div>
+    <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+          <ng-container i18n="@@text.account.supportTickets.details.dateUpdated">Date Updated</ng-container>
+          </span>
+        <span class="item-value">{{formatDate(ticket.metadata.modifiedAt)}} </span>
+      </div>
+    </div>
+    <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+           <ng-container i18n="@@text.account.supportTickets.details.dateCreated">Date Created</ng-container>
+         </span>
+        <span class="item-value">{{formatDate(ticket.metadata.createdAt)}}</span>
+      </div>
+    </div>
+    <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+          <ng-container i18n="@@text.account.supportTickets.details.status">Status</ng-container>
+          </span>
+        <span class="item-value">{{getStatus(ticket)}}</span>
+      </div>
+    </div>
+        <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+          <ng-container i18n="@@text.account.supportTickets.details.priority">Priority</ng-container>
+          </span>
+        <span class="item-value">{{getPriority(ticket)}}</span>
+      </div>
+    </div>
+    <div class="col-sm-3 item-wrapper">
+      <div class="item-group">
+        <span class="item-label">
+          <ng-container i18n="@@text.account.supportTickets.details.category">Category</ng-container>
+        </span>
+        <span class="item-value">{{getType(ticket)}}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row customer-ticketing-body">
+  <div class="col-xs-12">
+    <div class="account-section-header account-section-header-secondary">
+      <ng-container i18n="@@text.account.supportTickets.details.messages">Messages</ng-container>
+      <div class="account-section-header-add pull-right">
+        <add-ticket-message *ngIf="ticket" [ticket]="ticket" (onMessageAdded)="onMessageAdded($event)"></add-ticket-message>
+      </div>
+    </div>
+    <div class="cts-msg-history" *ngIf="ticket">
+      <div class="row">
+        <div style="display:none" id="ct-overlay-title1">
+          <div class="headline">
+            <span class="headline-text">
+            </span>
+          </div>
+        </div>
+
+
+        <div class="cts-msg-history-item cts-msg-history-item-customer col-md-7 col-sm-9 ct-msg-visible">
+          <div class="cts-msg-history-item-info">
+            <b> {{ticket.owner}}</b>
+            <ng-container i18n="@@text.account.supportTickets.details.on">on</ng-container>
+            &nbsp; {{formatDate(ticket.metadata.createdAt)}}
+
+          </div>
+          <div class="well well-sm well-quaternary">
+            <div class="cts-msg-history-item-msg">     {{ticket.shortDescription}}</div>
+          </div>
+        </div>
+
+
+
+        <div *ngFor="let msg of ticket.transcript"
+             class="cts-msg-history-item cts-msg-history-item-customer col-md-7 col-sm-9 ct-msg-visible">
+          <div class="cts-msg-history-item-info">
+            <b> {{getMessageAuthor(msg.owner)}}</b> on&nbsp; {{formatDate(msg.owner.createdAt)}}
+          </div>
+          <div class="well well-sm well-quaternary">
+            <div class="cts-msg-history-item-msg">{{msg.description}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -1,0 +1,31 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang=en
+
+INSERT_UPDATE RuleConditionDefinitionCategory;id[unique=true];name[lang=$lang];priority;icon(code)
+;general;General;100;
+
+INSERT_UPDATE RuleConditionDefinition;id[unique=true];name[lang=$lang];priority;breadcrumb[lang=$lang];allowsChildren;translatorId;translatorParameters;categories(id)
+;group;Group;200;${operator};true;ruleGroupConditionTranslator;;general
+
+INSERT_UPDATE RuleConditionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;name[lang=$lang];type;value
+;group;operator;100;Operator;Enum(de.hybris.platform.ruleengineservices.definitions.conditions.RuleGroupOperator);"""AND"""
+
+INSERT_UPDATE RuleActionDefinitionCategory;id[unique=true];name[lang=$lang]
+;cart;Cart
+
+INSERT_UPDATE RuleActionDefinition;id[unique=true];name[lang=$lang];breadcrumb[lang=$lang];translatorId;translatorParameters;categories(id)
+#Cart
+;y_order_percentage_discount;Percentage discount on cart;Apply ${value}% discount on the cart total;ruleExecutableActionTranslator;actionId->ruleCartPercentageDiscountAction;cart
+
+INSERT_UPDATE RuleActionDefinitionParameter;definition(id)[unique=true];id[unique=true];name[lang=$lang];type;value
+;y_order_percentage_discount;value;Value;java.math.BigDecimal;

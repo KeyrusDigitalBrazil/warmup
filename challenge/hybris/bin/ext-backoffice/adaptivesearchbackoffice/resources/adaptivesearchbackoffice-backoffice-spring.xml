@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.hybris.com/cockpitng/spring
+           http://www.hybris.com/cockpitng/spring/cng-spring.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="adaptivesearchbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator"
+		scope="singleton" init-method="init" lazy-init="false">
+		<property name="location" value="/adaptivesearchbackoffice-backoffice-labels/" />
+		<property name="name" value="labels" />
+	</bean>
+
+	<!-- Facades -->
+
+	<alias name="defaultAsCategoryFacade" alias="asCategoryFacade" />
+	<bean id="defaultAsCategoryFacade" class="de.hybris.platform.adaptivesearchbackoffice.facades.impl.DefaultAsCategoryFacade">
+		<property name="l10nService" ref="l10nService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+
+	<alias name="defaultAsSearchProfileContextFacade" alias="asSearchProfileContextFacade" />
+	<bean id="defaultAsSearchProfileContextFacade" class="de.hybris.platform.adaptivesearchbackoffice.facades.impl.DefaultAsSearchProfileContextFacade">
+		<property name="searchProfileContextFactory" ref="asSearchProfileContextFactory" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="categoryService" ref="categoryService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias name="defaultAsSearchConfigurationFacade" alias="asSearchConfigurationFacade" />
+	<bean id="defaultAsSearchConfigurationFacade" class="de.hybris.platform.adaptivesearchbackoffice.facades.impl.DefaultAsSearchConfigurationFacade">
+		<property name="asSearchProfileContextFacade" ref="asSearchProfileContextFacade" />
+		<property name="asSearchProfileService" ref="asSearchProfileService" />
+		<property name="asSearchConfigurationService" ref="asSearchConfigurationService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<!-- Data providers -->
+
+	<alias name="defaultAsIndexTypeDataProvider" alias="asIndexTypeDataProvider" />
+	<bean id="defaultAsIndexTypeDataProvider" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.AsIndexTypeDataProvider">
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+	</bean>
+
+	<alias name="defaultAsIndexPropertyDataProvider" alias="asIndexPropertyDataProvider" />
+	<bean id="defaultAsIndexPropertyDataProvider" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.AsIndexPropertyDataProvider">
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+	</bean>
+
+	<alias name="defaultAsFacetIndexPropertyDataProvider" alias="asFacetIndexPropertyDataProvider" />
+	<bean id="defaultAsFacetIndexPropertyDataProvider" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.AsFacetIndexPropertyDataProvider">
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultAsSortExpressionDataProvider" alias="asSortExpressionDataProvider" />
+	<bean id="defaultAsSortExpressionDataProvider" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.AsSortExpressionDataProvider">
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultAsBoostOperatorDataProvider" alias="asBoostOperatorDataProvider" />
+	<bean id="defaultAsBoostOperatorDataProvider" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.AsBoostOperatorDataProvider">
+		<property name="labelService" ref="labelService" />
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+	</bean>
+
+	<bean id="abstractAsDataHandler" abstract="true">
+		<property name="asUidGenerator" ref="asUidGenerator" />
+		<property name="asConfigurationService" ref="asConfigurationService" />
+	</bean>
+
+	<alias name="defaultAsPromotedFacetsDataHandler" alias="asPromotedFacetsDataHandler" />
+	<bean id="defaultAsPromotedFacetsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.promotedfacets.AsPromotedFacetsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="asFacetUtils" ref="asFacetUtils" />
+	</bean>
+
+	<alias name="defaultAsFacetsDataHandler" alias="asFacetsDataHandler" />
+	<bean id="defaultAsFacetsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.facets.AsFacetsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="asFacetUtils" ref="asFacetUtils" />
+	</bean>
+
+	<alias name="defaultAsExcludedFacetsDataHandler" alias="asExcludedFacetsDataHandler" />
+	<bean id="defaultAsExcludedFacetsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.excludedfacets.AsExcludedFacetsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="asFacetUtils" ref="asFacetUtils" />
+	</bean>
+
+	<alias name="defaultAsPromotedItemsDataHandler" alias="asPromotedItemsDataHandler" />
+	<bean id="defaultAsPromotedItemsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.promoteditems.AsPromotedItemsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="labelService" ref="labelService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultAsExcludedItemsDataHandler" alias="asExcludedItemsDataHandler" />
+	<bean id="defaultAsExcludedItemsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.excludeditems.AsExcludedItemsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="labelService" ref="labelService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias name="defaultAsBoostRulesDataHandler" alias="asBoostRulesDataHandler" />
+	<bean id="defaultAsBoostRulesDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.boostrules.AsBoostRulesDataHandler"
+		parent="abstractAsDataHandler" />
+
+	<alias name="defaultAsPromotedSortsDataHandler" alias="asPromotedSortsDataHandler" />
+	<bean id="defaultAsPromotedSortsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.promotedsorts.AsPromotedSortsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultAsSortsDataHandler" alias="asSortsDataHandler" />
+	<bean id="defaultAsSortsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.sorts.AsSortsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultAsExcludedSortsDataHandler" alias="asExcludedSortsDataHandler" />
+	<bean id="defaultAsExcludedSortsDataHandler" class="de.hybris.platform.adaptivesearchbackoffice.editors.excludedsorts.AsExcludedSortsDataHandler"
+		parent="abstractAsDataHandler">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<!-- Renderers -->
+
+	<alias name="defaultAsMultiReferenceItemMasterRenderer" alias="asMultiReferenceItemMasterRenderer" />
+	<bean id="defaultAsMultiReferenceItemMasterRenderer"
+		class="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference.DefaultAsMultiReferenceItemMasterRenderer" />
+
+	<alias name="defaultAsMultiReferenceItemDetailRenderer" alias="asMultiReferenceItemDetailRenderer" />
+	<bean id="defaultAsMultiReferenceItemDetailRenderer"
+		class="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference.DefaultAsMultiReferenceItemDetailRenderer" />
+
+	<alias name="defaultAsFacetValuesRenderer" alias="asFacetValuesRenderer" />
+	<bean id="defaultAsFacetValuesRenderer" class="de.hybris.platform.adaptivesearchbackoffice.editors.facets.AsFacetValuesRenderer" />
+
+	<alias name="defaultAsFacetValuesPanelRenderer" alias="asFacetValuesPanelRenderer" />
+	<bean id="defaultAsFacetValuesPanelRenderer" class="de.hybris.platform.adaptivesearchbackoffice.editors.facets.AsFacetValuesPanelRenderer"
+		parent="abstractEditorAreaComponentRenderer" />
+
+	<!-- Other beans -->
+
+	<alias name="defaultAsFacetUtils" alias="asFacetUtils" />
+	<bean id="defaultAsFacetUtils" class="de.hybris.platform.adaptivesearchbackoffice.common.impl.DefaultAsFacetUtils"
+		scope="prototype">
+		<property name="sessionService" ref="sessionService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="asSearchProviderFactory" ref="asSearchProviderFactory" />
+	</bean>
+
+	<cng:list-extender bean="cloneStrategyRegistry" property="strategies" getter="strategies.get()">
+		<cng:add>
+			<ref bean="backofficeAsCloneStrategy" />
+		</cng:add>
+	</cng:list-extender>
+
+	<alias name="defaultBackofficeAsCloneStrategy" alias="backofficeAsCloneStrategy" />
+	<bean id="defaultBackofficeAsCloneStrategy" class="de.hybris.platform.adaptivesearchbackoffice.strategies.BackofficeAsCloneStrategy">
+		<property name="typeFacade" ref="typeFacade" />
+		<property name="objectFacade" ref="objectFacade" />
+		<property name="asCloneStrategy" ref="asCloneStrategy" />
+	</bean>
+
+</beans>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <bean id="eventpublisherb2bSystemSetup" class="com.sap.hybris.sec.eventpublisher.b2b.setup.Eventpublisherb2bSystemSetup">
+        <!-- constructor arg injection example -->
+        <constructor-arg ref="eventpublisherb2bService"/>
+    </bean>
+
+    <alias name="afterB2BUnitSaveEventHandler" alias="afterB2BUnitSaveEventHandler" />
+    <bean id="afterB2BUnitSaveEventHandler" class="com.sap.hybris.sec.eventpublisher.b2b.handler.impl.AfterB2BUnitSaveEventHandler" parent="defaultSaveEventHandler"/>
+    
+    <alias name="defaultSecB2BUnitRemoveInterceptor" alias="secB2BUnitRemoveInterceptor" />
+    <bean id="defaultSecB2BUnitRemoveInterceptor" class="com.sap.hybris.sec.eventpublisher.b2b.interceptor.DefaultSECB2BUnitRemoveInterceptor">
+        <property name="eventService" ref="eventService" />
+        <property name="configurationService" ref="configurationService" />
+    </bean>
+
+    <bean id="secB2BUnitRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="secB2BUnitRemoveInterceptor"/>
+        <property name="typeCode" value="B2BUnit"/>
+        <property name="order" value="5000"/>
+    </bean>
+
+    <alias name="defaultSecB2BUnitDeleteEventListener" alias="secB2BUnitDeleteEventListener" />
+    <bean id="defaultSecB2BUnitDeleteEventListener" parent="abstractEventListener" class="com.sap.hybris.sec.eventpublisher.b2b.listener.DefaultSecB2BUnitDeleteEventListener">
+        <property name="hciPublisher" ref="hciPublisher" />
+    </bean>
+
+    <alias name="sec.aftersaveevent.handlers.b2b" alias="sec.aftersaveevent.handlers" />
+    <bean id="sec.aftersaveevent.handlers.b2b" parent="sec.aftersaveevent.handlers.common" class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="sourceMap">
+            <map key-type="java.lang.Integer" merge="true">
+                <entry
+                	key="#{T(com.sap.hybris.sec.eventpublisher.b2b.constants.Eventpublisherb2bConstants).B2B_UNIT_MODEL_TYPECODE}"
+                        value-ref="afterB2BUnitSaveEventHandler">
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <alias name="defaultAfterB2BAddressSaveEventHandler" alias="afterAddressSaveEventHandler" />
+	<bean id="defaultAfterB2BAddressSaveEventHandler"
+		class="com.sap.hybris.sec.eventpublisher.b2b.handler.impl.AfterB2BAddressSaveEventHandler" parent="defaultAfterAddressSaveEventHandler">
+	</bean>
+    
+    <alias name="secB2BAddressPopulator" alias="secAddressPopulator" />
+    <bean id="secB2BAddressPopulator"
+                class="com.sap.hybris.sec.eventpublisher.b2b.populator.SECB2BAddressPopulator">
+        <property name="configurationService" ref="configurationService" />
+    </bean>
+
+    <bean id="eventpublisherb2bService" class="com.sap.hybris.sec.eventpublisher.b2b.service.impl.DefaultEventpublisherb2bService">
+        <!-- setter injection example -->
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    
+    <alias name="defaultAfterB2BCustomerSaveEventHandler" alias="afterCustomerSaveEventHandler" />
+	<bean id="defaultAfterB2BCustomerSaveEventHandler"
+		class="com.sap.hybris.sec.eventpublisher.b2b.handler.impl.AfterB2BCustomerSaveEventHandler"
+		parent="defaultAfterCustomerSaveEventHandler">
+
+	</bean>
+	
+	<alias name="defaultSecB2BCustomerRemoveInterceptor" alias="secCustomerRemoveInterceptor" />
+	<bean id="defaultSecB2BCustomerRemoveInterceptor"
+		class="com.sap.hybris.sec.eventpublisher.b2b.interceptor.DefaultSECB2BCustomerRemoveInterceptor"
+		parent="defaultSecCustomerRemoveInterceptor">
+		
+	</bean>
+	
+	<alias name="defaultB2BHciPublisher" alias="hciPublisher" />
+	<bean id="defaultB2BHciPublisher"
+		class="com.sap.hybris.sec.eventpublisher.b2b.publisher.impl.B2BHCIPublisher" parent="defaultHciPublisher">
+		<property name="configurationService" ref="configurationService" />
+		<property name="secHttpConnection" ref="secHttpConnection" />
+	</bean>
+			
+</beans>

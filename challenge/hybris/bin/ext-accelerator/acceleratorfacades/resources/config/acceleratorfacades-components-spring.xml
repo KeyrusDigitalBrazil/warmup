@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd">
+
+   <!-- Rendering Content Converters -->
+
+   <alias name="defaultRenderingMediaContainerToDataContentConverter" alias="accRenderingMediaContainerToDataContentConverter" />
+   <bean id="defaultRenderingMediaContainerToDataContentConverter"
+         class="de.hybris.platform.acceleratorfacades.cmsitems.attributeconverters.MediaContainerAttributeToDataRenderingContentConverter" >
+       <property name="mediaModelConverter" ref="mediaModelConverter" />
+       <property name="permissionCRUDService" ref="permissionCRUDService" />
+   </bean>
+
+   <alias name="defaultRenderingMediaContainerContentConverter" alias="accRenderingMediaContainerContentConverter" />
+   <bean name="defaultRenderingMediaContainerContentConverter" parent="cmsAbstractContentConverter"
+         p:modelToDataConverter-ref="accRenderingMediaContainerToDataContentConverter"
+         p:constrainedBy-ref="accMediaContainerTypeAttributePredicate" />
+
+	<bean id="accMediaContainerTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate"
+			p:typeClass="de.hybris.platform.core.model.media.MediaContainerModel" />
+
+	<bean id="accRenderingAttributeContentConverterList" depends-on="cmsRenderingAttributeContentConverterList"
+			parent="listMergeDirective">
+		<property name="add" ref="accRenderingMediaContainerContentConverter" />
+	</bean>
+
+</beans>

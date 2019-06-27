@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<alias name="defaultRestrictionFacade" alias="restrictionFacade" />
+	<bean id="defaultRestrictionFacade" class="de.hybris.platform.cmsfacades.restrictions.impl.DefaultRestrictionFacade">
+		<property name="cmsAdminRestrictionService" ref="cmsAdminRestrictionService" />
+		<property name="restrictionTypeModelConverter" ref="restrictionTypeModelConverter" />
+	</bean>
+
+	<!-- Page Restriction Facade-->
+	
+	<alias name="defaultPageRestrictionFacade" alias="pageRestrictionFacade" />
+	<bean id="defaultPageRestrictionFacade" class="de.hybris.platform.cmsfacades.pagesrestrictions.impl.DefaultPageRestrictionFacade">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+		<property name="adminRestrictionService" ref="cmsAdminRestrictionService" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="updatePageRestrictionValidator" ref="updatePageRestrictionValidator" />
+		<property name="transactionManager" ref="txManager" />
+		<property name="validatorErrorFactory" ref="validatorErrorFactory" />
+	</bean>
+	
+	<alias name="defaultPageTypeRestrictionTypeFacade" alias="pageTypeRestrictionTypeFacade" />
+	<bean id="defaultPageTypeRestrictionTypeFacade" class="de.hybris.platform.cmsfacades.pagetypesrestrictiontypes.impl.DefaultPageTypeRestrictionTypeFacade">
+		<property name="adminPageService" ref="cmsAdminPageService" />
+	</bean>
+	
+	<!-- Page Restriction Validators -->
+	
+	<alias name="defaultUpdatePageRestrictionValidator" alias="updatePageRestrictionValidator" />
+	<bean id="defaultUpdatePageRestrictionValidator" class="de.hybris.platform.cmsfacades.pagesrestrictions.validator.UpdatePageRestrictionValidator">
+		<property name="restrictionExistsPredicate" ref="restrictionExistsPredicate" />
+		<property name="pageExistsPredicate" ref="pageExistsPredicate" />
+	</bean>
+	
+
+	<!-- Restriction Type populators and converters -->
+	
+	<alias name="defaultRestrictionTypeModelConverter" alias="restrictionTypeModelConverter" />
+	<bean id="defaultRestrictionTypeModelConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.RestrictionTypeData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="composedTypeModelPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>

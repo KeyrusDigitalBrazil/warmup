@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+           
+	<!-- CONDITIONS -->
+
+	<alias alias="ruleOrderThresholdPerfectPartnerConditionTranslator" name="defaultRuleOrderThresholdPerfectPartnerConditionTranslator" />
+	<bean id="defaultRuleOrderThresholdPerfectPartnerConditionTranslator"
+		  class="de.hybris.platform.ruledefinitions.conditions.RuleOrderThresholdPerfectPartnerConditionTranslator" />
+	
+	<alias alias="ruleCartTotalConditionTranslator" name="defaultRuleCartTotalConditionTranslator" />
+	<bean id="defaultRuleCartTotalConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleCartTotalConditionTranslator" />
+
+	<alias alias="ruleQualifyingProductsConditionTranslator" name="defaultRuleQualifyingProductsConditionTranslator" />
+	<bean id="defaultRuleQualifyingProductsConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleQualifyingProductsConditionTranslator" />
+
+	<alias alias="qualifyingCategoriesConditionTranslator" name="defaultQualifyingCategoriesConditionTranslator" />
+	<bean id="defaultQualifyingCategoriesConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleQualifyingCategoriesConditionTranslator" />
+
+	<alias alias="ruleTargetCustomersConditionTranslator" name="defaultRuleTargetCustomersConditionTranslator" />
+	<bean id="defaultRuleTargetCustomersConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleTargetCustomersConditionTranslator">
+		<property name="usePk" value="#{configurationService.configuration.getProperty('ruleengineservices.target.customer.condition.use.pk')}" />
+	</bean>
+	
+	<alias alias="ruleProductPriceConditionTranslator" name="defaultRuleProductPriceConditionTranslator" />
+	<bean id="defaultRuleProductPriceConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleProductPriceConditionTranslator" />
+
+	<alias alias="ruleCustomerSupportConditionTranslator" name="defaultRuleCustomerSupportConditionTranslator" />
+	<bean id="defaultRuleCustomerSupportConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleCustomerSupportConditionTranslator" />
+
+	<alias alias="ruleEntryGroupTypeConditionTranslator" name="defaultRuleEntryGroupTypeConditionTranslator" />
+	<bean id="defaultRuleEntryGroupTypeConditionTranslator" class="de.hybris.platform.ruledefinitions.conditions.RuleEntryGroupTypeConditionTranslator" />
+	
+	<!-- ACTIONS -->
+
+	<alias alias="ruleChangeDeliveryModeAction" name="defaultRuleChangeDeliveryModeAction" />
+	<bean id="defaultRuleChangeDeliveryModeAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleChangeDeliveryModeRAOAction"/>
+	</bean>
+
+	<alias alias="ruleFreeGiftAction" name="defaultRuleFreeGiftAction" />
+	<bean id="defaultRuleFreeGiftAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleFreeGiftRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderEntryFixedDiscountAction" name="defaultRuleOrderEntryFixedDiscountAction" />
+	<bean id="defaultRuleOrderEntryFixedDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderEntryFixedDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderEntryFixedPriceAction" name="defaultRuleOrderEntryFixedPriceAction" />
+	<bean id="defaultRuleOrderEntryFixedPriceAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderEntryFixedPriceRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderEntryPercentageDiscountAction" name="defaultRuleOrderEntryPercentageDiscountAction" />
+	<bean id="defaultRuleOrderEntryPercentageDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderEntryPercentageDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderFixedDiscountAction" name="defaultRuleOrderFixedDiscountAction" />
+	<bean id="defaultRuleOrderFixedDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderFixedDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderPercentageDiscountAction" name="defaultRuleOrderPercentageDiscountAction" />
+	<bean id="defaultRuleOrderPercentageDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderPercentageDiscountRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleAddProductPercentageDiscountAction" name="defaultRuleAddProductPercentageDiscountAction" />
+	<bean id="defaultRuleAddProductPercentageDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleAddProductPercentageDiscountRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleOrderPercentageDiscountExcludedProductsAction" name="defaultRuleOrderPercentageDiscountExcludedProductsAction" />
+	<bean id="defaultRuleOrderPercentageDiscountExcludedProductsAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderPercentageDiscountExcludedProductsRAOAction"/>
+	</bean>
+
+	<alias alias="rulePartnerOrderEntryFixedDiscountAction" name="defaultRulePartnerOrderEntryFixedDiscountAction" />
+	<bean id="defaultRulePartnerOrderEntryFixedDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="rulePartnerOrderEntryFixedDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="rulePartnerOrderEntryFixedPriceAction" name="defaultRulePartnerOrderEntryFixedPriceAction" />
+	<bean id="defaultRulePartnerOrderEntryFixedPriceAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="rulePartnerOrderEntryFixedPriceRAOAction"/>
+	</bean>
+
+	<alias alias="rulePartnerOrderEntryPercentageDiscountAction" name="defaultRulePartnerOrderEntryPercentageDiscountAction" />
+	<bean id="defaultRulePartnerOrderEntryPercentageDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="rulePartnerOrderEntryPercentageDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="ruleTargetBundlePriceAction" name="defaultRuleTargetBundlePriceAction" />
+	<bean id="defaultRuleTargetBundlePriceAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleTargetBundlePriceRAOAction"/>
+	</bean>
+
+	<bean id="ruleTriggerMessageAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleTriggerMessageRAOAction"/>
+	</bean>
+
+	<bean id="ruleHaltAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleHaltRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<bean id="ruleAddFreeProductDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleAddFreeProductDiscountRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<bean id="ruleFreeGiftToBundleAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleFreeGiftToBundleRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<bean id="ruleOrderEntryGroupFixedDiscountAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="ruleOrderEntryGroupFixedDiscountRAOAction"/>
+	</bean>
+
+	<!-- deprecated since 18.11 -->
+	<bean id="ruleOrderEntryPercentageDiscountWithStrategyAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="defaultRuleOrderEntryPercentageDiscountWithStrategyRAOAction"/>
+	</bean>
+	
+	<!-- end ACTIONS declaration -->
+
+    <bean id="rulePercentageParameterValidator" class="de.hybris.platform.ruledefinitions.validation.RulePercentageParameterValidator">
+        <property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+    </bean>
+
+    <bean id="rulePositiveNumberParameterValidator" class="de.hybris.platform.ruledefinitions.validation.RulePositiveNumberParameterValidator">
+        <property name="ruleCompilerProblemFactory" ref="ruleCompilerProblemFactory" />
+    </bean>
+    
+    <bean id="ruleDefinitionsSystemSetup" class="de.hybris.platform.ruledefinitions.setup.impl.RuleDefinitionsSystemSetup" parent="abstractRuleEngineSystemSetup" />
+</beans>

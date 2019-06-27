@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!--
+	The hybris platform provides one single Spring application context for beans located at the jalo layer.
+	Each extension can add beans to this context by specifying them at this configuration file.
+	 
+	You can use and/or redefine beans defined at configuration files of other extensions as well as
+	adding new one.
+		
+	If you want to locate this file at a different location or want to use several files for better,
+	structuring, please use the '<yourextension>.application-context' property at your project.properties file.
+	There you can specify a comma separated list of files where first is tried to find a file per classpath and
+	then per file system.
+
+	
+	If you want to configure beans for your web module please have a look at
+	your web/webroot/WEB-INF/<extname>-web-spring.xml.
+	-->
+	
+	<!--  Example how to override a manager -->
+	<!--
+	<bean id="core.productManager"   class="de.hybris.platform.chinesepaymentservices.jalo.ChinesepaymentservicesProductManager" 	init-method="init"	destroy-method="destroy" />
+	-->
+	
+	
+ 	<!--  Example how to configure the class to use for jalo session creation -->
+	<!--
+	<bean id="jalosession"   class="de.hybris.platform.jalo.JaloSessionFactory">
+		<property name="targetClassName" value="de.hybris.platform.chinesepaymentservices.jalo.ChinesepaymentservicesJaloSession"/>
+	</bean>
+	-->
+
+	
+	<!--  Example how to override an item  -->
+	<!-- 
+	<bean id="de.hybris.platform.jalo.product.Product" class="de.hybris.platform.chinesepaymentservices.jalo.ChinesepaymentservicesProduct" scope="prototype" />		
+ 	-->
+
+	<!--  
+	 Example how to register and use an AOP aspect 
+     Also see http://static.springframework.org/spring/docs/2.5.x/reference/aop.html	
+     -->
+	
+	<!-- 
+	<bean id="chinesepaymentservicesProfBean" class="de.hybris.platform.chinesepaymentservices.aop.ChinesepaymentservicesProfilingAspect"/>
+	<aop:config proxy-target-class="true">
+  		<aop:aspect id="chinesepaymentservicesProfAspect" ref="chinesepaymentservicesProfBean" >
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="execution(* getModificationTime(..))" />  	            
+	   		<aop:around pointcut-ref="profiledMethods" method="profile" />
+  		</aop:aspect>
+	</aop:config>
+	 -->
+
+	
+	<!-- some other examples of a pointcut that matches everything:
+
+    	  <aop:pointcut id="profiledMethods" 
+	      	expression="bean(de.hybris.platform.jalo.user.Customer) &amp;&amp; 
+	      	            !execution(* getPK(..))" />  	            
+	       <aop:pointcut id="profiledMethods" expression="execution(* *(..))" />	
+	  -->
+	<bean id="chineseStockLevelReservationHistoryEntryDao" class="de.hybris.platform.chinesepaymentservices.stocklevel.dao.impl.ChineseStockLevelReservationHistoryEntryDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService"></property>
+	</bean>
+	
+	<bean id="chineseStockLevelReservationHistoryEntryService" class="de.hybris.platform.chinesepaymentservices.stocklevel.impl.ChineseStockLevelReservationHistoryEntryService">
+		<property name="chineseStockLevelReservationHistoryEntryDao" ref="chineseStockLevelReservationHistoryEntryDao"></property>
+	</bean>
+	
+	<bean id="chinesePaymentServicesStrategy" class="de.hybris.platform.chinesepaymentservices.checkout.strategies.impl.DefaultChinesePaymentServicesStrategy"/>
+	
+	<bean id="chineseCheckoutService" class="de.hybris.platform.chinesepaymentservices.checkout.impl.DefaultChineseCheckoutService">
+		<property name="stockService" ref="stockService"></property>
+		<property name="productService" ref="productService"></property>
+		<property name="modelService" ref="modelService"></property>
+		<property name="baseStoreService" ref="baseStoreService"></property>
+		<property name="defaultWarehouseSelectionStrategy" ref="defaultWarehouseSelectionStrategy"></property>
+		<property name="checkoutCustomerStrategy" ref="checkoutCustomerStrategy"></property>
+		<property name="chineseStockLevelReservationHistoryEntryService" ref="chineseStockLevelReservationHistoryEntryService"></property>
+		<property name="chineseOrderDao" ref="chineseOrderDao"></property>
+	</bean>
+			
+	
+	<bean id="chineseCommercePlaceOrderMethodHook" class="de.hybris.platform.chinesepaymentservices.order.ChineseCommercePlaceOrderMethodHook">		
+		<property name="modelService" ref="modelService"></property>
+	</bean>
+
+	<bean id="chinesepaymentCommercePlaceOrderMethodHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective">
+    	<property name="add" ref="chineseCommercePlaceOrderMethodHook"/>
+	</bean>
+
+	<bean id="chineseOrderDao" class="de.hybris.platform.chinesepaymentservices.order.dao.impl.DefaultChineseOrderDao" parent="orderDao">
+	</bean>
+	
+	<bean id="chineseOrderService" class="de.hybris.platform.chinesepaymentservices.order.service.impl.DefaultChineseOrderService" parent="defaultOrderService">
+		<property name="chineseOrderDao" ref="chineseOrderDao"></property>
+		<property name="configurationService" ref="configurationService"></property>
+		<property name="chineseCheckoutService" ref="chineseCheckoutService"></property>
+		<property name="chinesePaymentServicesStrategy" ref="chinesePaymentServicesStrategy"></property>
+	</bean>
+
+	<alias name="chineseCheckAuthorizeOrderPaymentAction" alias="checkAuthorizeOrderPaymentAction"/>
+	<bean id="chineseCheckAuthorizeOrderPaymentAction" class="de.hybris.platform.chinesepaymentservices.action.order.ChineseCheckAuthorizeOrderPaymentAction"/>
+	
+	<alias name="chineseTakePaymentAction" alias="takePaymentAction"/>
+	<bean id="chineseTakePaymentAction" class="de.hybris.platform.chinesepaymentservices.action.order.ChineseTakePaymentAction">
+	</bean>
+	
+	<alias name="chineseFraudCheckOrderInternalAction" alias="fraudCheckOrderInternalAction"/>
+	<bean id="chineseFraudCheckOrderInternalAction" class="de.hybris.platform.chinesepaymentservices.action.order.ChineseFraudCheckOrderInternalAction">
+	</bean>
+</beans>

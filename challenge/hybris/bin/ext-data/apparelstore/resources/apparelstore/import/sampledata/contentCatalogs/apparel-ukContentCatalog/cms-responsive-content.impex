@@ -1,0 +1,1660 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# 
+# ImpEx for Responsive Apparel UK Site CMS Content 
+# 
+$contentCatalog=apparel-ukContentCatalog 
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged] 
+ 
+$productCatalog=apparelProductCatalog 
+$productCatalogName=Apparel Product Catalog 
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged] 
+$picture=media(code, $contentCV) ;
+$siteResource=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/contentCatalogs/$contentCatalog
+$jarResourceCms=jar:de.hybris.platform.apparelstore.constants.ApparelstoreConstants&/apparelstore/import/sampledata/cockpits/cmscockpit
+
+# Load the storefront context root config param
+$storefrontContextRoot=$config-storefrontContextRoot
+
+
+# CMS Site Settings 
+UPDATE CMSSite;uid[unique=true];defaultPreviewCategory(code, $productCV);defaultPreviewProduct(code, $productCV);;;;;
+;apparel-uk;caps;300441142;;;;;
+
+
+# Create components, and put them in the template standard slots (e.g. SiteLogo, HeaderLink etc.)
+# These content slots are used by almost all templates. They are defined in coredata.
+#
+## Site Logo slot: SiteLogoComponent
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;SiteLogoComponent;Site Logo Component;SiteLogoComponent;"/"
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;SiteLogoSlot;SiteLogoComponent
+
+## HeaderLink slot: MyAccountComponent
+INSERT_UPDATE NavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef)
+;;MyAccountComponent;My Account;accNavComponent;MyAccountComponent;MyAccountNavNode
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;HeaderLinksSlot;MyAccountComponent
+
+## SearchBox slot: SearchBox
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SearchBoxSlot;SearchBox
+
+## MiniCart slot: OrderComponent and MiniCart
+INSERT_UPDATE NavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef)
+;;OrderComponent;Order Component;nav-order-tools;OrderComponent;OrderNavNode
+
+INSERT_UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;totalDisplay(code);shownProductCount;;
+;;MiniCart;Mini Cart;MiniCart;SUBTOTAL;3;;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
+;;MiniCartSlot;OrderComponent,MiniCart
+
+## NavigationBar slot: ApparelUKCategoryNavComponent and BredcrumbComponent 
+INSERT_UPDATE CategoryNavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef);wrapAfter
+;;ApparelUKCategoryNavComponent;Apparel-UK Category Navigation Component;;ApparelUKCategoryNavComponent;ApparelUKCategoryNavNode;10
+
+INSERT_UPDATE BreadcrumbComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;breadcrumbComponent;Breadcrumb CMS Component;breadcrumbComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
+;;NavigationBarSlot;ApparelUKCategoryNavComponent,breadcrumbComponent
+
+## Footer slot: Footer FooterNavigationComponent
+INSERT_UPDATE FooterNavigationComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;&componentRef;showLanguageCurrency;navigationNode(&nodeRef)
+;;FooterNavigationComponent;4;FooterNavigationComponent;true;FooterNavNode;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;FooterSlot;FooterNavigationComponent
+
+
+
+# Create components, and put them in the template specific slots (e.g. productList etc.)
+# These content slots are used by the specific templates. They are defined in coredata.
+#
+## components in ProductLeftRefinementsSlot which is specific for productGrid, productList, searchResultList, searchResultGrid templates
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;ProductLeftRefinementsSlot;RefinementFacetComponent
+
+INSERT_UPDATE ProductRefinementComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;RefinementFacetComponent;Product Refinement Facet Component;RefinementFacetComponent
+
+## Components for ProductDetailsPageTemplate specific slots
+INSERT_UPDATE ProductVariantSelectorComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;VariantSelector;Product Variant Selector;VariantSelector
+
+INSERT_UPDATE ProductAddToCartComponent;$contentCV[unique=true];uid[unique=true];name;actions(&actionRef);&componentRef
+;;AddToCart;Product Add To Cart;AddToCartAction,PickUpInStoreAction;AddToCart
+
+# AddToCartAction
+INSERT_UPDATE AddToCartAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;AddToCartAction;/cart/add;Product Add To Cart Action;AddToCartAction
+
+# PickUpInStoreAction
+INSERT_UPDATE PickUpInStoreAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;PickUpInStoreAction;/store-pickup/{productCode}/pointOfServices;Pickup in Store Action;PickUpInStoreAction
+
+INSERT_UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;&componentRef;;
+;;CrossSelling;Cross Selling;CROSSELLING;5;CrossSelling;;
+;;Others;Others;OTHERS;5;Others;;
+;;Similar;Similar;SIMILAR;5;Similar;;
+
+# CMS tabs components
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ProductDetailsTabComponent;Product Details Tab;productDetailsTab.jsp;;ProductDetailsTabComponent
+;;ProductSpecsTabComponent;Product Specification Tab;productSpecsTab.jsp;;ProductSpecsTabComponent
+;;ProductReviewsTabComponent;Product Reviews Tab;productReviewsTab.jsp;;ProductReviewsTabComponent
+
+INSERT_UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];name;visible;&componentRef
+;;deliveryTab;Delivery tab;true;deliveryTab
+
+INSERT_UPDATE CMSTabParagraphContainer;$contentCV[unique=true];uid[unique=true];name;visible;simpleCMSComponents(uid, $contentCV);&componentRef
+;;TabPanelContainer;Tab container;true;ProductDetailsTabComponent,ProductSpecsTabComponent,ProductReviewsTabComponent,deliveryTab;TabPanelContainer
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;VariantSelectorSlot;VariantSelector
+;;AddToCartSlot;AddToCart
+;;UpSellingSlot;Similar,Others
+;;CrossSellingSlot;CrossSelling
+;;TabsSlot;TabPanelContainer
+
+## Components for ProductListPageTemplate specific slots
+INSERT_UPDATE CMSProductListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;ProductListComponent;Product List Component;ListPickUpInStoreAction,ListAddToCartAction,ListOrderFormAction;ProductListComponent
+
+# ListAddToCartAction
+INSERT_UPDATE ListAddToCartAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;ListAddToCartAction;/cart/add;Product Add To Cart Action List;ListAddToCartAction
+
+# ListAddToCartAction
+INSERT_UPDATE ListPickUpInStoreAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;ListPickUpInStoreAction;/store-pickup/{productCode}/pointOfServices;Pickup in Store Action List;ListPickUpInStoreAction
+
+# ListOrderFormAction
+INSERT_UPDATE ListOrderFormAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;ListOrderFormAction;/orderForm;Order Form Action;ListOrderFormAction
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;ProductListSlot;ProductListComponent
+
+## Components for ProductGridPageTemplate specific slots
+INSERT_UPDATE ProductGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;ProductGridComponent;Product Grid Component;ListPickUpInStoreAction,ListAddToCartAction,ListOrderFormAction;ProductGridComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;ProductGridSlot;Product Grid Slot for Product List;true;ProductGridComponent;;;
+
+## Components for SearchResultsListPageTemplate specific slots
+INSERT_UPDATE SearchResultsListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsList;Search Result List Component;ListPickUpInStoreAction,ListAddToCartAction,ListOrderFormAction;SearchResultsList
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SearchResultsListSlot;Search Result List Slot for Search List;true;SearchResultsList;;;
+
+## Components for SearchResultsGridPageTemplate specific slots
+INSERT_UPDATE SearchResultsGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsGrid;Search Result Grid Component;ListPickUpInStoreAction,ListAddToCartAction,ListOrderFormAction;SearchResultsGrid
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SearchResultsGridSlot;Search Result Grid Slot for Search List;true;SearchResultsGrid;;;
+
+## Components in SideContentSlot and TopContentSlot
+#INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink;;;
+#;;FacebookOffersBanner;Facebook Offers Banner;FacebookOffersBanner;http://www.facebook.com/sapcx/;;;
+#;;MobileAppBanner;Mobile App Banner;MobileAppBanner;http://www.hybris.com/hybris/en/e-commerce-software/mobile-commerce-software.html;;;
+
+#INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+#;;SideContentSlot;MobileAppBanner
+#;;TopContentSlot;FacebookOffersBanner
+ 
+
+
+# The following will create stuff for each page, we do the following steps
+#
+#1. create content slot for page
+#2. create relationship from content slot to page
+#3. create components for each slot
+#4. create preview media
+#5. update page to set the preview media
+#
+###### Homepage Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;Section1 Slot for ApparelUKHomepage;true;ApparelUKHomepageSplashBannerComponent,ApparelUKHomepageSaveBannerComponent
+;;Section2ASlot-Homepage;Section2A Slot for ApparelUKHomepage;true;ApparelUKHomepageWomenStreetBannerComponent,ApparelUKHomepageMenStreetBannerComponent
+;;Section2BSlot-Homepage;Section2B Slot for ApparelUKHomepage;true;ApparelUKHomepageStreetYouthBannerComponent,ApparelUKHomepageBrandsBannerComponent
+;;Section2CSlot-Homepage;Section2C Slot for ApparelUKHomepage;true;
+;;Section3Slot-Homepage;Section3 Slot for ApparelUKHomepage;true;ApparelUKHomepageProductCarouselComponent,NewApparelUKHomepageProductCarouselComponent
+;;Section4Slot-Homepage;Section4 Slot for ApparelUKHomepage;true;ApparelUKHomepageSmDiscountBannerComponent,ApparelUKHomepageShopBannerComponent,ApparelUKHomepageShipmentBannerComponent,ApparelUKHomepageServiceBannerComponent
+;;Section5Slot-Homepage;Section5 Slot for ApparelUKHomepage;true;ApparelUKHomepageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-Homepage;Section1;;Section1Slot-Homepage;;;
+;;Section2A-Homepage;Section2A;;Section2ASlot-Homepage;;;
+;;Section2B-Homepage;Section2B;;Section2BSlot-Homepage;;;
+;;Section2C-Homepage;Section2C;;Section2CSlot-Homepage;;;
+;;Section3-Homepage;Section3;;Section3Slot-Homepage;;;
+;;Section4-Homepage;Section4;;Section4Slot-Homepage;;;
+;;Section5-Homepage;Section5;;Section5Slot-Homepage;;;
+
+# components in section1
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKHomepageSplashBannerComponent;ApparelUK Homepage Splash Banner Component;/Collections/Snow/c/snow;ApparelUKHomepageSplashBannerComponent
+;;ApparelUKHomepageSaveBannerComponent;ApparelUK Homepage Discount Banner Component;/Collections/Streetwear/c/streetwear;ApparelUKHomepageSaveBannerComponent
+
+# components in section2A
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKHomepageWomenStreetBannerComponent;ApparelUK Homepage Women Dress Banner Component;/search?q=women%3Arelevance%3Agender%3AFEMALE;ApparelUKHomepageWomenStreetBannerComponent
+;;ApparelUKHomepageMenStreetBannerComponent;ApparelUK Homepage Men Shirt Banner Component;/search?q=men%3Arelevance%3Agender%3AMALE;ApparelUKHomepageMenStreetBannerComponent
+
+# components in section2B
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKHomepageStreetYouthBannerComponent;ApparelUK Homepage Youth Shorts Banner Component;/Categories/Streetwear-youth/c/270000;ApparelUKHomepageStreetYouthBannerComponent
+;;ApparelUKHomepageBrandsBannerComponent;ApparelUK Homepage Brands Banner Component Child;Brands/c/brands;ApparelUKHomepageBrandsBannerComponent
+
+# components in section3
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$productCV);scroll(code);popup;&componentRef
+;;ApparelUKHomepageProductCarouselComponent;Best Selling Products;29533,45572,M33477_B,300310300,300045375,300022356,300047513;allVisible;false;ApparelUKHomepageProductCarouselComponent
+;;NewApparelUKHomepageProductCarouselComponent;What's New ApparelUK Homepage Product Carousel;29531,300046592,300015407,300040462,M27160_B,M33477_B,300310300,300044599,300005449,300441142;allVisible;false;NewApparelUKHomepageProductCarouselComponent
+
+# components in section4
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKHomepageSmDiscountBannerComponent;ApparelUK Homepage Small Discount Banner Component;/Categories/Accessories/Belts/Maguro-Pu-Belt/p/300785814;ApparelUKHomepageSmDiscountBannerComponent
+;;ApparelUKHomepageShopBannerComponent;ApparelUK Homepage Shop Banner Component;/Categories/Bags%2BBoardbags/Backpacks/Airline-Bag/p/300618506;ApparelUKHomepageShopBannerComponent
+;;ApparelUKHomepageShipmentBannerComponent;ApparelUK Homepage Shipment Banner Component;/Categories/Accessories/Caps/Adapt-New-Era/p/300398794;ApparelUKHomepageShipmentBannerComponent
+;;ApparelUKHomepageServiceBannerComponent;ApparelUK Homepage Service Banner Component;/Brands/VonZipper/Shades-Von-Zipper-Papa-Gblack-gloss-black-gloss-grey/p/30404;ApparelUKHomepageServiceBannerComponent
+
+# components in section5
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKHomepageFreeDelBannerComponent;ApparelUK Homepage Free Delivery Banner Component;/faq;ApparelUKHomepageFreeDelBannerComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;homepagePreview;text/png;Homepage.png;$jarResourceCms/preview-images/apparel_uk/Homepage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;homepage;homepagePreview;;;;;
+###### Homepage End ###### 
+
+
+###### Apparel Surf Collection Landing Page Start (this page is not responsive) ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Surf;Section1 Slot for Surf Page;true;SurfImageMapComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='SurfCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Surf;Section1;;Section1Slot-Surf
+
+# component in section1
+INSERT_UPDATE ImageMapComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SurfImageMapComponent;Surf ImageMapComponent;SurfImageMapComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;surfCategoryPagePreviewUK;text/png;surfCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/surfCategoryPage.png
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;Surf-LandingPageRestriction;Restriction for Surf;surf;SurfCategoryPage
+###### Apparel Surf Collection Landing Page End ######
+
+
+###### Product Details Page Start ######
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;productDetailsPagePreview;text/png;ProductDetailsPage.png;$jarResourceCms/preview-images/apparel_uk/ProductDetailsPage.png;;;
+
+UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;productDetails;productDetailsPagePreview;;;;;
+###### Product Details Page End ######
+
+
+###### Product List Page Start ######
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;productListPagePreview;text/png;ProductListPage.png;$jarResourceCms/preview-images/apparel_uk/ProductListPage.png;;;
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;productList;productListPagePreview;;;;;
+###### Product List Page End ######
+
+
+###### Product Grid Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(uid,$contentCV);;;
+#;;Section1Slot-ProductGridPage;Section1 Slot for Product Grid Page;true;DynamicBrandBanner;;;
+;;Section1Slot-ProductGridPage;Section1 Slot for Product Grid Page;true;;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='productGrid'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-ProductGridPage;Section1;;Section1Slot-ProductGridPage;;; 
+
+# component in section1
+#INSERT_UPDATE DynamicBannerComponent;$contentCV[unique=true];uid[unique=true];name;mediaCodePattern
+#;;DynamicBrandBanner;Dynamic brand banner component;apparel-brand-banner-{VARIABLE}
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;productGridPagePreview;text/png;ProductGridPage.png;$jarResourceCms/preview-images/apparel_uk/ProductGridPage.png;;;
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;productGrid;productGridPagePreview;;;;;
+###### Product Grid Page End ######
+
+
+###### Brands Caregory Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section1Slot-Brands;Section1 Slot for Brands Page;true;BrandsImageMapComponent;;;
+ 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='BrandsCategoryPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-Brands;Section1;;Section1Slot-Brands;;;
+
+# component in section1
+INSERT_UPDATE ImageMapComponent;$contentCV[unique=true];uid[unique=true];name;imageMapHTML[lang=en];&componentRef;;;
+;;BrandsImageMapComponent;Brands ImageMapComponent;"<area shape=""rect"" coords=""19,20,289,110"" alt=""vans"" href=""$storefrontContextRoot/Brands/Vans/c/Vans"" /><area shape=""rect"" coords=""20,110,289,190"" alt=""dainese"" href=""$storefrontContextRoot/Brands/Dainese/c/Dainese"" /><area shape=""rect"" coords=""20,190,251,284"" alt=""toko"" href=""$storefrontContextRoot/Brands/Toko/c/Toko"" /><area shape=""rect"" coords=""20,284,271,341"" alt=""dakine"" href=""$storefrontContextRoot/Brands/Dakine/c/Dakine"" /><area shape=""rect"" coords=""20,341,290,447"" alt=""blue tomato"" href=""$storefrontContextRoot/Brands/Blue-Tomato/c/Blue Tomato"" /><area shape=""rect"" coords=""289,20,527,110"" alt=""von zipper"" href=""$storefrontContextRoot/Brands/Von-Zipper/c/Von Zipper"" /><area shape=""rect"" coords=""527,20,767,121"" alt=""playboard"" href=""$storefrontContextRoot/Brands/Playboard/c/Playboard"" /><area shape=""rect"" coords=""289,111,527,190"" alt=""fox"" href=""$storefrontContextRoot/Brands/Fox/c/Fox"" /><area shape=""rect"" coords=""549,122,767,242"" alt=""anon"" href=""$storefrontContextRoot/Brands/Anon/c/Anon"" /><area shape=""rect"" coords=""549,243,767,341"" alt=""f2"" href=""$storefrontContextRoot/Brands/F2-FTWO/c/F2-FTWO"" /><area shape=""rect"" coords=""503,342,767,447"" alt=""quicksilver"" href=""$storefrontContextRoot/Brands/Quiksilver/c/Quiksilver"" /><area shape=""rect"" coords=""291,326,502,446"" alt=""ripcurl"" href=""$storefrontContextRoot/Brands/Rip-Curl/c/Rip Curl"" /><area shape=""rect"" coords=""404,191,548,325"" alt=""roxy"" href=""$storefrontContextRoot/Brands/Roxy/c/Roxy"" /><area shape=""rect"" coords=""260,191,402,325"" alt=""pro-tec"" href=""$storefrontContextRoot/Brands/Pro-Tec/c/Pro Tec"" />";BrandsImageMapComponent;;;
+ 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;brandsCategoryPagePreview;text/png;BrandsCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/BrandsCategoryPage.png;;;
+ 
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;BrandsCategoryPage;brandsCategoryPagePreview;;;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV);;;
+;;Brands-LandingPageRestriction;Restriction for Brands;brands;BrandsCategoryPage;;;
+###### Brands Caregory Page End ######
+
+
+###### Shirt Category Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section1Slot-Shirts;Section1 Slot for Shirts Page;true;ShirtsImageMapComponent;;;
+ 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='ShirtsCategoryPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-Shirts;Section1;;Section1Slot-Shirts;;;
+
+# component in section1
+INSERT_UPDATE ImageMapComponent;$contentCV[unique=true];uid[unique=true];name;imageMapHTML[lang=en];&componentRef;;;
+;;ShirtsImageMapComponent;Shirts ImageMapComponent;<area shape='circle' alt='T-Shirt Men Playboard Logo' coords='284,328,98' href='$storefrontContextRoot/Brands/Playboard/T-Shirt-Men-Playboard-Logo/p/300067375' /><area shape='circle' alt='T-Shirt Men Playboard Raster SS' coords='496,66,93' href='$storefrontContextRoot/Brands/Playboard/T-Shirt-Men-Playboard-Raster-SS/p/300046043' /><area shape='circle' alt='T-Shirt Men Playboard Raster SS' coords='652,410,108' href='$storefrontContextRoot/Brands/Playboard/T-Shirt-Men-Playboard-Raster-SS/p/300046028' /><area shape='circle' alt='T-Shirt Men Playboard Logo' coords='687,92,109' href='$storefrontContextRoot/Brands/Playboard/T-Shirt-Men-Playboard-Logo/p/300147511' /><area shape='circle' alt='T-Shirt Men Playboard Raster SS' coords='710,251,94' href='$storefrontContextRoot/Brands/Playboard/T-Shirt-Men-Playboard-Raster-SS/p/300067366' />;ShirtsImageMapComponent;;;
+ 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;shirtsCategoryPagePreview;text/png;ShirtsCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/ShirtsCategoryPage.png;;;
+ 
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;ShirtsCategoryPage;shirtsCategoryPagePreview;;;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV);;;
+;;Shirts-LandingPageRestriction;Restriction for Shirts;shirts;ShirtsCategoryPage;;;
+###### Shirt Category Page End ######
+
+
+###### Street Category Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Street;Section1 Slot for Street Page;true;StreetImageMapComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='StreetCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Street;Section1;;Section1Slot-Street
+
+# component in section1
+INSERT_UPDATE ImageMapComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;StreetImageMapComponent;Street ImageMapComponent;StreetImageMapComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;streetCategoryPagePreview;text/png;streetCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/streetCategoryPage.png
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;StreetCategoryPage;streetCategoryPagePreview;;;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;Street-LandingPageRestriction;Restriction for Street;streetwear;StreetCategoryPage
+###### Street Category Page End ######
+
+
+###### Search Result Page Start ######
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;searchResultsPagePreview;text/png;SearchResultsPage.png;$jarResourceCms/preview-images/apparel_uk/SearchResultsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;search;searchResultsPagePreview;;;;;
+###### Search Result Page End ######
+
+
+###### Search Empty Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;MiddleContent-searchEmpty;Middle Slot for searchEmpty;true;;;;
+;;SideContent-searchEmpty;Narrow Slot for searchEmpty;true;;;;
+;;TopContent-searchEmpty;Top Slot for searchEmpty;true;;;;
+ 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='searchEmpty'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Middle-searchEmpty;MiddleContent;;MiddleContent-searchEmpty;;;
+;;Side-searchEmpty;SideContent;;SideContent-searchEmpty;;;
+;;Top-searchEmpty;TopContent;;TopContent-searchEmpty;;;
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;searchResultsEmptyPagePreview;text/png;SearchResultsEmptyPage.png;$jarResourceCms/preview-images/apparel_uk/SearchResultsEmptyPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;searchEmpty;searchResultsEmptyPagePreview;;;;;
+###### Search Empty Page End ######
+ 
+
+###### Category Page Start ######
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;defaultCategoryPagePreview;text/png;DefaultCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/DefaultCategoryPage.png;;;
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;category;defaultCategoryPagePreview;;;;;
+###### Category Page End ######
+ 
+ 
+###### Sunglasses Category Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2Slot-Sunglasses;Section2 Slot for Sunglasses Page;true;SunglassesImageMapComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='SunglassesCategoryPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2-Sunglasses;Section2;;Section2Slot-Sunglasses;;;
+
+# component in section2, other sections are empty
+INSERT_UPDATE ImageMapComponent;$contentCV[unique=true];uid[unique=true];name;imageMapHTML[lang=en];&componentRef
+;;SunglassesImageMapComponent;Sunglasses ImageMapComponent;"<area shape=""rect"" coords=""10,51,256,231"" href=""$storefrontContextRoot/Anon/Sonnenbrille-Anon-Convict-black-fade-gray-gradient/p/300044617"" alt=""Sonnenbrille Anon Convict black fade gray gradient"" title=""Sonnenbrille Anon Convict black fade gray gradient ""/>	<area shape=""rect"" coords=""274,54,520,234"" href=""$storefrontContextRoot/Fox/Sonnenbrille-Fox-The-Median-polished-black-warm-gray/p/300024964"" alt=""Sonnenbrille Fox The Median polished black warm gray"" title=""Sonnenbrille Fox The Median polished black warm gray""/>	<area shape=""rect"" coords=""539,50,763,234"" href=""$storefrontContextRoot/Quiksilver/Sonnenbrille-Quiksilver-Dinero-black-white-red-gray/p/300045375"" alt=""Sonnenbrille Quiksilver Dinero black white red gray"" title=""Sonnenbrille Quiksilver Dinero black white red gray""/>	<area shape=""rect"" coords=""131,250,368,444"" href=""$storefrontContextRoot/Roxy/Damen-Sonnenbrille-Roxy-Tee-Dee-Gee-dark-tortoise-brown-gray/p/300047195"" alt=""Damen Sonnenbrille Roxy Tee Dee Gee dark tortoise brown gray "" title=""Damen Sonnenbrille Roxy Tee Dee Gee dark tortoise brown gray""/>	<area shape=""rect"" coords=""400,265,649,444"" href=""$storefrontContextRoot/Von-Zipper/Shades-Von-Zipper-Fernstein-gold-moss-gradient/p/300015407"" alt=""Shades Von Zipper Fernstein gold moss gradient"" title=""Shades Von Zipper Fernstein gold moss gradient""/>";SunglassesImageMapComponent
+ 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;sunglassesCategoryPagePreview;text/png;SunglassesCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/SunglassesCategoryPage.png;;;
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;SunglassesCategoryPage;sunglassesCategoryPagePreview;;;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV);;;
+;;Sunglasses-LandingPageRestriction;Restriction for Sunglasses;sunglasses;SunglassesCategoryPage;;;
+###### Sunglasses Category Page End ######
+
+
+###### Snow Category Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Snow;Section1 Slot for Snow Page;true;ApparelUKSnowSplashBannerComponent,ApparelUKSnowAccessoriesBannerComponent
+;;Section2Slot-Snow;Section2 Slot for Snow Page;true;ApparelUKSnowBeanieBannerComponent,ApparelUKSnowKryptonBannerComponent,ApparelUKSnowAndoverJcktBannerComponent,ApparelUKSnowBeaconJcktBannerComponent,ApparelUKSnowTropeBeanieBannerComponent,ApparelUKSnowSludgeJcktBannerComponent
+;;Section3Slot-Snow;Section3 Slot for Snow Page;true;ApparelUKHomepageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='SnowCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Snow;Section1;;Section1Slot-Snow
+;;Section2-Snow;Section2;;Section2Slot-Snow
+;;Section3-Snow;Section3;;Section3Slot-Snow
+
+# components in section1
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKSnowSplashBannerComponent;Snow Splash Banner Component;;ApparelUKSnowSplashBannerComponent
+;;ApparelUKSnowAccessoriesBannerComponent;Snow Accessories Banner Component;Categories/Accessories/c/220000;ApparelUKSnowAccessoriesBannerComponent
+
+# components in section2
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;ApparelUKSnowBeanieBannerComponent;Apparel UK Snow Beanie Banner Component;Categories/Accessories/Beanies/The-Life-Beanie/p/300476946;ApparelUKSnowBeanieBannerComponent
+;;ApparelUKSnowKryptonBannerComponent;Apparel UK Snow Krypton Banner Component;Categories/Freeski/Ski-Boots/KyrptonRampage-11-12/p/300467248;ApparelUKSnowKryptonBannerComponent
+;;ApparelUKSnowAndoverJcktBannerComponent;Apparel UK Snow Andover Jacket Banner Component;Categories/Snowwear-men/Snow-Jackets/Andover-Jacket/p/300410966;ApparelUKSnowAndoverJcktBannerComponent
+;;ApparelUKSnowBeaconJcktBannerComponent;Apparel UK Snow Beacon Jacket Banner Component;Categories/Snowwear-men/Snow-Jackets/BeaconJacket/p/300441355;ApparelUKSnowBeaconJcktBannerComponent
+;;ApparelUKSnowTropeBeanieBannerComponent;Apparel UK Snow Trop Beanie Banner Component;Categories/Accessories/Beanies/Trope-Beanie/p/300415713;ApparelUKSnowTropeBeanieBannerComponent
+;;ApparelUKSnowSludgeJcktBannerComponent;Apparel UK Snow Sludge Jacket Banner Component;Categories/Snowwear-youth/Snow-Jackets-youth/Sludge-Jacket-youth/p/300410422;ApparelUKSnowSludgeJcktBannerComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;snowCategoryPagePreview;text/png;snowCategoryPage.png;$jarResourceCms/preview-images/apparel_uk/SnowCategoryPage.png
+
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;SnowCategoryPage;snowCategoryPagePreview;;;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;Snow-LandingPageRestriction;Restriction for Snow page;snow;SnowCategoryPage
+###### Snow Category Page End ######
+
+
+###### Faq Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-FAQ;Section2A Slot for FAQ Page;true;FAQMenuParagraph;;;
+;;Section2BSlot-FAQ;Section2B Slot for FAQ Page;true;FAQTextParagraph;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='faq'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-FAQ;Section2A;;Section2ASlot-FAQ;;;
+;;Section2B-FAQ;Section2B;;Section2BSlot-FAQ;;;
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;faqMenuParagraph;FAQ Menu Paragraph;FAQMenuParagraph;;;;
+;;faqTextParagraph;FAQ Text Paragraph;FAQTextParagraph;;;;
+ 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;frequentlyAskedQuestionsPage;text/png;FrequentlyAskedQuestionsPage.png;$jarResourceCms/preview-images/apparel_uk/FrequentlyAskedQuestionsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);linkComponents(uid, $contentCV);;;;;
+;;faq;frequentlyAskedQuestionsPage;FAQLink;;;;;
+###### Faq Page End ######
+
+
+###### Order Expired Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-OrderExpired;Section2A Slot for Order Expired Page;true;OrderExpiredMenuParagraph;;;
+;;Section2BSlot-OrderExpired;Section2B Slot for Order Expired Page;true;OrderExpiredTextParagraph;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orderExpired'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-OrderExpired;Section2A;;Section2ASlot-OrderExpired;;;
+;;Section2B-OrderExpired;Section2B;;Section2BSlot-OrderExpired;;;
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;orderExpiredMenuParagraph;Order Expired Menu Paragraph;OrderExpiredMenuParagraph;;;;
+;;orderExpiredTextParagraph;Order Expired Text Paragraph;OrderExpiredTextParagraph;;;;
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;orderExpiredPagePreview;text/png;OrderExpiredPage.png;$jarResourceCms/preview-images/apparel_uk/OrderExpiredPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;orderExpired;orderExpiredPagePreview;;;;;
+###### Order Expired Page End ######
+
+
+###### Term and Condition Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-TermsAndConditions;Section2A Slot for Terms and Conditions Page;true;TermsAndConditionsMenuParagraph;;;
+;;Section2BSlot-TermsAndConditions;Section2B Slot for Terms and Conditions Page;true;TermsAndConditionsTextParagraph;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='termsAndConditions'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-TermsAndConditions;Section2A;;Section2ASlot-TermsAndConditions;;;
+;;Section2B-TermsAndConditions;Section2B;;Section2BSlot-TermsAndConditions;;;
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;termsAndConditionsMenuParagraph;Terms and Conditions Menu Paragraph;TermsAndConditionsMenuParagraph;;;;
+;;termsAndConditionsTextParagraph;Terms and Conditions Text Paragraph;TermsAndConditionsTextParagraph;;;;
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;termsAndConditionsPage;text/png;TermsAndConditionsPage.png;$jarResourceCms/preview-images/apparel_uk/TermsAndConditionsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);linkComponents(uid, $contentCV);;;;
+;;termsAndConditions;termsAndConditionsPage;TermsAndConditionsLink;;;;
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;TermsAndConditionsLink;Terms and Conditions Link;/termsAndConditions;;;
+###### Term and Condition Page End ######
+
+
+###### Account Address Book Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-address-book;Side Content Slot for Account Address Book;true;;;;
+;;BodyContentSlot-address-book;Body Content Slot for Account Address Book;true;AccountAddressBookComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='address-book'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-address-book;SideContent;;SideContentSlot-address-book;;;
+;;BodyContent-address-book;BodyContent;;BodyContentSlot-address-book;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountAddressBookComponent;Account Address Book Component;accountAddressBookPage.jsp;;AccountAddressBookComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;addressBookPagePreview;text/png;AddressBook.png;$jarResourceCms/preview-images/apparel_uk/AddressBookPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;address-book;addressBookPagePreview;;;;;
+###### Account Address Book Page End ######
+
+
+###### Account Add Edit Address Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-add-edit-address;Side Content Slot for Add Edit Address;true;;;;
+;;BodyContentSlot-add-edit-address;Body Content Slot for Add Edit Address;true;AccountAddEditAddressComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='add-edit-address'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-add-edit-address;SideContent;;SideContentSlot-add-edit-address;;;
+;;BodyContent-add-edit-address;BodyContent;;BodyContentSlot-add-edit-address;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountAddEditAddressComponent;Account Edit Address Component;accountEditAddressPage.jsp;;AccountAddEditAddressComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;addEditAddressPagePreview;text/png;AddEditAddressPage.png;$jarResourceCms/preview-images/apparel_uk/AddEditAddressPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;add-edit-address;addEditAddressPagePreview;;;;;
+###### Account Add Edit Address Page End ######
+ 
+ 
+###### Account Payment Detail Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-payment-details;Side Content Slot for My Account payment-details;true;;;;
+;;BodyContentSlot-payment-details;Body Content Slot for My Account payment-details;true;AccountPaymentDetailsComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='payment-details'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-payment-details;SideContent;;SideContentSlot-payment-details;;;
+;;BodyContent-payment-details;BodyContent;;BodyContentSlot-payment-details;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountPaymentDetailsComponent;Account Payment Details Component;accountPaymentInfoPage.jsp;;AccountPaymentDetailsComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;paymentDetailsPagePreview;text/png;PaymentDetailsPage.png;$jarResourceCms/preview-images/apparel_uk/PaymentDetailsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;payment-details;paymentDetailsPagePreview;;;;;
+###### Account Payment Detail Page End ######
+
+
+###### Account Order Details Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);
+;;SideContentSlot-orderdetail;Side Content Slot for My Account Order Details;true;;;;
+;;BodyContentSlot-orderdetail;Body Content Slot for My Account Order Details;true;AccountOrderDetailsHeadlineComponent,AccountOrderDetailsOverviewComponent,AccountOrderDetailsItemsComponent,AccountOrderDetailsShippingComponent,AccountOrderDetailsTotalsComponent,AccountOrderDetailsActionsComponent;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='order'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orderdetail;SideContent;;SideContentSlot-orderdetail;;;
+;;BodyContent-orderdetail;BodyContent;;BodyContentSlot-orderdetail;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountOrderDetailsHeadlineComponent;Account Order Details Headline Component;accountOrderDetailHeadline.jsp;;AccountOrderDetailsHeadlineComponent
+;;AccountOrderDetailsTotalsComponent;Account Order Details Order Totals Component;accountOrderDetailOrderTotals.jsp;;AccountOrderDetailsTotalsComponent
+;;AccountOrderDetailsShippingComponent;Account Order Details Shipping Info Component;accountOrderDetailShippingInfo.jsp;;AccountOrderDetailsShippingComponent
+;;AccountOrderDetailsItemsComponent;Account Order Details Items Info Component;accountOrderDetailItems.jsp;;AccountOrderDetailsItemsComponent
+;;AccountOrderDetailsActionsComponent;Account Order Details Actions Component;accountOrderDetailActions.jsp;;AccountOrderDetailsActionsComponent
+;;AccountOrderDetailsOverviewComponent;Account Order Details Overview Info Component;accountOrderDetailOverview.jsp;;AccountOrderDetailsOverviewComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;orderDetailsPagePreview;text/png;OrderDetailsPage.png;$jarResourceCms/preview-images/apparel_uk/OrderDetailsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;order;orderDetailsPagePreview;;;;;
+###### Account Order Details Page End ######
+
+
+###### Account Order History Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-orders;Side Content Slot for My Account Order History;true;;;;
+;;BodyContentSlot-orders;Body Content Slot for My Account Order History;true;AccountOrderHistoryComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orders'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orders;SideContent;;SideContentSlot-orders;;;
+;;BodyContent-orders;BodyContent;;BodyContentSlot-orders;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountOrderHistoryComponent;Account History Component;accountOrderHistoryPage.jsp;ViewOrderAction;AccountOrderHistoryComponent
+
+# ViewOrderAction
+INSERT_UPDATE ViewOrderAction;$contentCV[unique=true];uid[unique=true];url;name;&actionRef
+;;ViewOrderAction;/my-account/order/{orderCode};View Order Action;ViewOrderAction
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;orderHistoryPagePreview;text/png;OrderHistoryPage.png;$jarResourceCms/preview-images/apparel_uk/OrderHistoryPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;orders;orderHistoryPagePreview;;;;;
+###### Account Order History Page End ######
+
+
+###### Account Update Password Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-updatePassword;Side Content Slot for Update Password;true;;;;
+;;BodyContentSlot-updatePassword;Body Content Slot for Update Password;true;UpdatePasswordComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='updatePassword'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-updatePassword;SideContent;;SideContentSlot-updatePassword;;;
+;;BodyContent-updatePassword;BodyContent;;BodyContentSlot-updatePassword;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;UpdatePasswordComponent;Update Password Component;accountChangePasswordPage.jsp;;UpdatePasswordComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;updateForgottenPasswordPagePreview;text/png;UpdateForgottenPasswordPage.png;$jarResourceCms/preview-images/apparel_uk/UpdateForgottenPasswordPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;updatePassword;updateForgottenPasswordPagePreview;;;;;
+###### Account Update Password Page Start ######
+
+
+###### Account Update Profile Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-update-profile;Side Content Slot for Update Profile;true;;;;
+;;BodyContentSlot-update-profile;Body Content Slot for Update Profile;true;UpdateProfileComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='update-profile'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-update-profile;SideContent;;SideContentSlot-update-profile;;;
+;;BodyContent-update-profile;BodyContent;;BodyContentSlot-update-profile;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;UpdateProfileComponent;Update Profile Component;accountProfileEditPage.jsp;;UpdateProfileComponent
+###### Account Update Profile Page End ######
+ 
+ 
+###### Account Update Email Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-update-email;Side Content Slot for Update Email;true;;;;
+;;BodyContentSlot-update-email;Body Content Slot for Update Email;true;UpdateEmailComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='update-email'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-update-email;SideContent;;SideContentSlot-update-email;;;
+;;BodyContent-update-email;BodyContent;;BodyContentSlot-update-email;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;UpdateEmailComponent;Update Email Component;accountProfileEmailEditPage.jsp;;UpdateEmailComponent
+###### Account Update Email Page Start ######
+
+
+###### Account Consent Management Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-consents;Side Content Slot for Consent Management;true;;;;
+;;BodyContentSlot-consents;Body Content Slot for Consent Management;true;ConsentManagementComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='consents'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-consents;SideContent;;SideContentSlot-consents;;;
+;;BodyContent-consents;BodyContent;;BodyContentSlot-consents;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ConsentManagementComponent;Consent Management Component;accountConsentManagementPage.jsp;;ConsentManagementComponent
+
+###### Account Consent Management Page End ######
+
+###### Anonymous Consent Management Page/Cookie notification Start ######
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AnonymousConsentManagementComponent;Anonymous Consent Management Component;/WEB-INF/views/responsive/pages/consent/consentmanagement.jsp;;AnonymousConsentManagementComponent
+;;CookieNotificationComponent;Cookie Notification Component;/WEB-INF/views/responsive/pages/consent/cookienotification.jsp;;CookieNotificationComponent
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)[mode=append]
+;;TopHeaderSlot;true;CookieNotificationComponent,AnonymousConsentManagementComponent
+
+###### Anonymous Consent Management Page/Cookie notification End ######
+
+###### Account Close Account Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-close-account;Side Content Slot for Close Account;true;;;;
+;;BodyContentSlot-close-account;Body Content Slot for Close Account;true;CloseAccountComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='close-account'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-close-account;SideContent;;SideContentSlot-close-account;;;
+;;BodyContent-close-account;BodyContent;;BodyContentSlot-close-account;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;CloseAccountComponent;Close Account Component;accountCloseAccountPage.jsp;;CloseAccountComponent
+
+###### Account Close Account Page End ######
+
+###### Account Update Email Page Start ######
+
+
+###### Account Saved Cart Details Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-savedCartDetailsPage;Side Content Slot for Saved Cart Details Page;true;;;;
+;;BodyContentSlot-savedCartDetailsPage;Body Content Slot for Saved Cart Details Page;true;AccountSavedCartDetailsHeadlineComponent,AccountSavedCartDetailsOverviewComponent,AccountSavedCartDetailsItemsComponent,AccountSavedCartDetailsActionComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='savedCartDetailsPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-savedCartDetailsPage;SideContent;;SideContentSlot-savedCartDetailsPage;;;
+;;BodyContent-savedCartDetailsPage;BodyContent;;BodyContentSlot-savedCartDetailsPage;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountSavedCartDetailsHeadlineComponent;Account Saved Cart Details Headline Component;accountSavedCartDetailsHeadline.jsp;;AccountSavedCartDetailsHeadlineComponent
+;;AccountSavedCartDetailsOverviewComponent;Account Saved Cart Details Overview Component;accountSavedCartDetailsOverview.jsp;;AccountSavedCartDetailsOverviewComponent
+;;AccountSavedCartDetailsItemsComponent;Account Saved Cart Details Items Component;accountSavedCartDetailsItems.jsp;;AccountSavedCartDetailsItemsComponent
+;;AccountSavedCartDetailsActionComponent;Account Order Details Action Component;accountSavedCartDetailsAction.jsp;;AccountSavedCartDetailsActionComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;savedCartDetailsPagePreview;text/png;SavedCartDetailsPage.png;$jarResourceCms/preview-images/apparel_uk/SavedCartDetailsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;savedCartDetailsPage;savedCartDetailsPagePreview;;;;;
+###### Account Saved Cart Details Page Start ######
+
+
+###### Account Saved Carts Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-saved-carts;Side Content Slot for Saved Carts;true;;;;
+;;BodyContentSlot-saved-carts;Body Content Slot for Saved Carts;true;SavedCartsComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='saved-carts'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-saved-carts;SideContent;;SideContentSlot-saved-carts;;;
+;;BodyContent-saved-carts;BodyContent;;BodyContentSlot-saved-carts;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;SavedCartsComponent;Saved Carts Component;accountSavedCartsPage.jsp;;SavedCartsComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;savedCartsPagePreview;text/png;SavedCartsPage.png;$jarResourceCms/preview-images/apparel_uk/SavedCartsPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;saved-carts;savedCartsPagePreview;;;;;
+###### Account Saved Carts Page End ######
+
+
+###### Cart Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;TopContentSlot-cartPage;Top Content Slot for Cart Page;true;CartComponent
+;;EmptyCartMiddleContentSlot-cartPage;Middle Slot for Cart Page;true;EmptyCartParagraphComponent
+;;CenterLeftContentSlot-cartPage;Center Left Content Slot for Cart Page;true;PromotionsComponent,PotentialPromotionsComponent
+;;CenterRightContentSlot-cartPage;Center Right Content Slot for Cart Page;true;CartTotalsComponent
+;;BottomContentSlot-cartPage;Bottom Content Slot for Cart Page;true;CheckoutComponent,CartSuggestions
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='cartPage'];contentSlot(uid,$contentCV)[unique=true]
+;;EmptyCartMiddle-Cart;EmptyCartMiddleContent;;EmptyCartMiddleContentSlot-cartPage
+;;TopContent-Cart;TopContent;;TopContentSlot-cartPage
+;;CenterLeftContent-Cart;CenterLeftContentSlot;;CenterLeftContentSlot-cartPage
+;;CenterRightContent-Cart;CenterRightContentSlot;;CenterRightContentSlot-cartPage
+;;BottomContent-Cart;BottomContentSlot;;BottomContentSlot-cartPage
+
+# component in TopContent
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;CartComponent;Cart Display Component;cartDisplay.jsp;;CartComponent
+
+# component in emptyMiddleContent
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;EmptyCartParagraphComponent;Empty Cart Paragraph Component;EmptyCartParagraphComponent;;;;
+
+# component in centerLeft
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;PromotionsComponent;Promotions Component;cartPromotionsDisplay.jsp;;PromotionsComponent
+;;PotentialPromotionsComponent;Potential Promotions Component;potentialPromotionsDisplay.jsp;;PotentialPromotionsComponent
+
+# component in centerRight
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;CartTotalsComponent;Cart Totals Display Component;cartTotalsDisplay.jsp;;CartTotalsComponent
+
+# component in bottomContent
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;CheckoutComponent;Checkout Display Component;checkoutDisplay.jsp;;CheckoutComponent
+
+INSERT_UPDATE CartSuggestionComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;filterPurchased;&componentRef
+;;CartSuggestions;Cart Suggestions;CROSSELLING,DIFF_ORDERUNIT,CONSISTS_OF,FOLLOWUP,OTHERS;20;true;CartSuggestions
+ 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;cartPagePreview;text/png;CartPage.png;$jarResourceCms/preview-images/apparel_uk/CartPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;cartPage;cartPagePreview;;;;;
+###### Cart Page End ######
+
+
+###### Login Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;LeftContentSlot-login;Left Content Slot for Customer Login;true;NewCustomerLoginComponent;;;
+;;RightContentSlot-login;Right Content Slot for Customer Login;true;ReturningCustomerLoginComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='login'];contentSlot(uid,$contentCV)[unique=true];;;
+;;LeftContent-login;LeftContentSlot;;LeftContentSlot-login;;;
+;;RightContent-login;RightContentSlot;;RightContentSlot-login;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;NewCustomerLoginComponent;New Customer Login Component;accountNewCustomerLogin.jsp;;NewCustomerLoginComponent
+;;ReturningCustomerLoginComponent;Returning Customer Login Component;accountReturningCustomerLogin.jsp;;ReturningCustomerLoginComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;loginPagePreview;text/png;LoginPage.png;$jarResourceCms/preview-images/apparel_uk/LoginPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;login;loginPagePreview;;;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];linkComponents(uid, $contentCV)
+;;login;LoginLink
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;LoginLink;Login Link;/login;;;
+###### Login Page End ######
+
+
+###### Checkout Login Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;LeftContentSlot-checkout-login;Left Content Slot for Checkout Login;true;ReturningCustomerCheckoutLoginComponent;;;
+;;CenterContentSlot-checkout-login;Center Content Slot for Checkout Login;true;;;;
+;;RightContentSlot-checkout-login;Right Content Slot for Checkout Login;true;GuestCheckoutLoginComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='checkout-login'];contentSlot(uid,$contentCV)[unique=true];;;
+;;LeftContent-checkout-login;LeftContentSlot;;LeftContentSlot-checkout-login;;;
+;;CenterContent-checkout-login;CenterContentSlot;;CenterContentSlot-checkout-login;;;
+;;RightContent-checkout-login;RightContentSlot;;RightContentSlot-checkout-login;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ReturningCustomerCheckoutLoginComponent;Returning Customer Checkout Login Component;checkouReturningCustomerLogin.jsp;;ReturningCustomerCheckoutLoginComponent
+;;GuestCheckoutLoginComponent;Guest Checkout Login Component;checkoutGuestLogin.jsp;;GuestCheckoutLoginComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;checkoutLoginPagePreview;text/png;CheckoutLoginPage.png;$jarResourceCms/preview-images/apparel_uk/CheckoutLoginPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;checkout-login;checkoutLoginPagePreview;;;;;
+###### Checkout Login Page End ######
+
+
+###### Multi Step Checkout SummaryPage Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-multiStepCheckoutSummaryPage;Side Slot for multiStepCheckoutSummaryPage;true;HelpParagraphComponent;;;
+ 
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-multiStepCheckoutSummaryPage;SideContent;multiStepCheckoutSummaryPage;SideContentSlot-multiStepCheckoutSummaryPage;;;
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;HelpParagraphComponent;Help Paragraph Component;HelpParagraphComponent;;;;
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;multiStepCheckoutSummaryPagePreview;text/png;MultiStepCheckoutSummaryPage.png;$jarResourceCms/preview-images/apparel_uk/MultiStepCheckoutSummaryPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;multiStepCheckoutSummaryPage;multiStepCheckoutSummaryPagePreview;;;;;
+###### Multi Step Checkout SummaryPage End ######
+
+
+###### Order Confirmation Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-orderConfirmation;Side Content Slot for Order Confirmation;true;;;;
+;;BodyContent-orderConfirmation;Body Content Slot for Order Confirmation;true;OrderConfirmationThankMessageComponent,OrderConfirmationOverviewComponent,OrderConfirmationItemsComponent,OrderConfirmationShippingComponent,OrderConfirmationTotalsComponent,OrderConfirmationContinueButtonComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orderConfirmationPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orderConfirmation;SideContent;;SideContent-orderConfirmation;;;
+;;BodyContent-orderConfirmation;BodyContent;;BodyContent-orderConfirmation;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;OrderConfirmationThankMessageComponent;Order Confirmation Thank You Message Component;checkoutConfirmationThankMessage.jsp;;OrderConfirmationThankMessageComponent
+;;OrderConfirmationOverviewComponent;Order Confirmation Overview Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailOverview.jsp;;OrderConfirmationOverviewComponent
+;;OrderConfirmationTotalsComponent;Order Confirmation Totals Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailOrderTotals.jsp;;OrderConfirmationTotalsComponent
+;;OrderConfirmationShippingComponent;Order Confirmation Shipping Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailShippingInfo.jsp;;OrderConfirmationShippingComponent
+;;OrderConfirmationItemsComponent;Order Confirmation Items Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailItems.jsp;;OrderConfirmationItemsComponent
+;;OrderConfirmationContinueButtonComponent;Order Confirmation Continue Button Component;checkoutConfirmationContinueButton.jsp;;OrderConfirmationContinueButtonComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;;
+;;orderConfirmationPagePreview;text/png;OrderConfirmationPage.png;$jarResourceCms/preview-images/apparel_uk/OrderConfirmationPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;orderConfirmationPage;orderConfirmationPagePreview;;;;;
+###### Order Confirmation Page End ######
+
+
+###### Store Finder Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;MiddleContentSlot-StoreFinder;Middle Slot for Store Finder Page;true;StoreFinderComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='storefinderPage'];contentSlot(uid,$contentCV)[unique=true]
+;;MiddleContent-StoreFinder;MiddleContent;;MiddleContentSlot-StoreFinder
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;StoreFinderComponent;Store Finder Component;storeFinderContent.jsp;;StoreFinderComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;storefinderPagePreview;text/png;StoreFinderPage.png;$jarResourceCms/preview-images/apparel_uk/StoreFinderPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;storefinderPage;storefinderPagePreview;;;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];linkComponents(uid, $contentCV)
+;;storefinderPage;StoreFinderLink
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;StoreFinderLink;Store Finder Link;/store-finder;;;
+###### Store Finder Page End ######
+
+
+###### Not Found Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;ApparelUK-MiddleContent-Errorpage;Apparel UK Middle Content Slot for Error Page;true;ApparelUKErrorpageBannerComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='notFound'];contentSlot(uid,$contentCV)[unique=true]
+;;ApparelUK-MiddleContent-Errorpage;MiddleContent;;ApparelUK-MiddleContent-Errorpage
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ApparelUKErrorpageBannerComponent;Apparel UK Error Page Banner Component;ApparelUKErrorpageBannerComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;notFoundPagePreview;text/png;NotFoundPage.png;$jarResourceCms/preview-images/apparel_uk/NotFoundPage.png;;;
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);;;;;
+;;notFound;notFoundPagePreview;;;;;
+###### Not Found Page End ######
+
+
+###### Import CSV SavedCart Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-importCSVSavedCartPage;Side Content Slot for Import CSV as Saved Cart Page;true;;;;
+;;BodyContent-importCSVSavedCartPage;Body Content Slot for Import CSV as Saved Cart Page;true;ImportCSVSavedCartComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='importCSVSavedCartPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-importCSVSavedCartPage;SideContent;;SideContent-importCSVSavedCartPage;;;
+;;BodyContent-importCSVSavedCartPage;BodyContent;;BodyContent-importCSVSavedCartPage;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ImportCSVSavedCartComponent;Import CSV as Saved Cart Component;csv/importCSVSavedCartPage.jsp;;ImportCSVSavedCartComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;importCSVSavedCartPagePreview;text/png;OrderHistoryPage.png;$jarResourceCms/preview-images/apparel_uk/OrderHistoryPage.png
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;importCSVSavedCartPage;importCSVSavedCartPagePreview
+###### Import CSV SavedCart Page End ######
+
+
+###### Quick Order Page Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;TopContent-quickOrderPage;Top Content Slot for Quick Order Page;true;QuickOrderInfoParagraphComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='quickOrderPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;TopContent-quickOrderPage;TopContent;;TopContent-quickOrderPage;;;
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;QuickOrderInfoParagraphComponent;Quick Order Info Paragraph Component;QuickOrderInfoParagraphComponent
+###### Quick Order Page End ######
+
+
+
+###### Restriction Start ######
+# create a user restriction
+INSERT_UPDATE CMSUserRestriction;$contentCV[unique=true];&userRestriction;name;uid[unique=true];users(uid)
+;;anonymousUserRestriction;Anonymous User Restriction;anonymousUserRestriction;anonymous
+
+# create a inverse restriction
+INSERT_UPDATE CMSInverseRestriction;$contentCV[unique=true];name;originalRestriction(&userRestriction)[allownull=true];uid[unique=true];components(&componentRef)
+;;Logged in User;anonymousUserRestriction;loggedInUser;MyAccountComponent
+
+# CMS Action Restrictions
+INSERT_UPDATE CMSActionRestriction;$contentCV[unique=true];uid[unique=true];name;
+;;ActionRestriction;A CMSAction restriction;
+
+###### Restriction End ######
+
+
+
+###### Navigation Tree Start ######
+## navigation is in tree structure ##
+#
+## level 0 -- root ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);children(uid,$contentCV)[mode=append];links(uid, $contentCV);&nodeRef;
+;root;;root;;;;root;
+
+## level 1 -- Site Root: child of root ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);children(uid,$contentCV)[mode=append];links(uid, $contentCV);&nodeRef;
+;SiteRootNode;;SiteRootNode;root;;;SiteRootNode;
+
+## level 2 -- Apparel UK Site: child of SiteRootNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);children(uid,$contentCV)[mode=append];links(uid, $contentCV);&nodeRef;
+;ApparelUKNavNode;;Apparel UK Site;SiteRootNode;;;ApparelUKNavNode;
+
+## level 3 -- My Account, Order, Categories, Footer Pages: children of ApparelUKNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;MyAccountNavNode;;My Account;ApparelUKNavNode;;MyAccountNavNode
+;OrderNavNode;;Order;ApparelUKNavNode;;OrderNavNode
+;ApparelUKCategoryNavNode;;Categories;ApparelUKNavNode;;ApparelUKCategoryNavNode
+;FooterNavNode;;Footer Pages;ApparelUKNavNode;;FooterNavNode
+
+## level 4 -- Personal Details etc. : children of MyAccountNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;PersonalDetailsNavNode;;Personal Details;MyAccountNavNode;;PersonalDetailsNavNode
+;UpdateEmailNavNode;;Update Email;MyAccountNavNode;;UpdateEmailNavNode
+;PaymentDetailsNavNode;;Payment Details;MyAccountNavNode;;PaymentDetailsNavNode
+;ChangePasswordNavNode;;Change Password;MyAccountNavNode;;ChangePasswordNavNode
+;OrderHistoryNavNode;;Order History;MyAccountNavNode;;OrderHistoryNavNode
+;AddressBookNavNode;;Address Book;MyAccountNavNode;;AddressBookNavNode
+;SavedCartsNavNode;;Saved Carts;MyAccountNavNode;;SavedCartsNavNode
+;ConsentManagementNavNode;;Consent Management;MyAccountNavNode;;ConsentManagementNavNode
+;CloseAccountNavNode;;Close Account;MyAccountNavNode;;CloseAccountNavNode
+
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;PersonalDetailsNavNodeEntry;;PersonalDetailsNavNodeEntry;PersonalDetailsNavNode;PersonalDetailsLink;
+;UpdateEmailNavNodeEntry;;UpdateEmailNavNodeEntry;UpdateEmailNavNode;UpdateEmailLink;
+;ChangePasswordNavNodeEntry;;ChangePasswordNavNodeEntry;ChangePasswordNavNode;UpdatePasswordLink;
+;AddressBookNavNodeEntry;;AddressBookNavNodeEntry;AddressBookNavNode;AddressBookLink;
+;PaymentDetailsNavNodeEntry;;PaymentDetailsNavNodeEntry;PaymentDetailsNavNode;PaymentDetailsLink;
+;OrderHistoryNavNodeEntry;;OrderHistoryNavNodeEntry;OrderHistoryNavNode;OrderHistoryLink;
+;SavedCartsNavNodeEntry;;SavedCartsNavNodeEntry;SavedCartsNavNode;SavedCartsLink;
+;ConsentManagementNavNodeEntry;;ConsentManagementNavNodeEntry;ConsentManagementNavNode;ConsentManagementLink;
+;CloseAccountNavNodeEntry;;CloseAccountNavNodeEntry;CloseAccountNavNode;CloseAccountLink;
+
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;target(code)[default='sameWindow']
+;;PersonalDetailsLink;PersonalDetailsLink;/my-account/update-profile;PersonalDetailsLink;
+;;UpdateEmailLink;UpdateEmailLink;/my-account/update-email;UpdateEmailLink;
+;;UpdatePasswordLink;UpdatePasswordLink;/my-account/update-password;UpdatePasswordLink;
+;;AddressBookLink;AddressBookLink;/my-account/address-book;AddressBookLink;
+;;PaymentDetailsLink;PaymentDetailsLink;/my-account/payment-details;PaymentDetailsLink;
+;;OrderHistoryLink;OrderHistoryLink;/my-account/orders;OrderHistoryLink;
+;;SavedCartsLink;SavedCartsLink;/my-account/saved-carts;SavedCartsLink;
+;;ConsentManagementLink;ConsentManagementLink;/my-account/consents;ConsentManagementLink;
+;;CloseAccountLink;CloseAccountLink;/my-account/close-account;CloseAccountLink;
+
+## level 4 -- Quick Order, Import Saved Cart : children of OrderNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;QuickOrderNavNode;;Quick Order;OrderNavNode;;QuickOrderNavNode
+;ImportSavedCartNavNode;;Import Saved Cart;OrderNavNode;;ImportSavedCartNavNode
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;QuickOrderNavNodeEntry;;QuickOrderNavNodeEntry;QuickOrderNavNode;QuickOrderLink;
+;ImportSavedCartNavNodeEntry;;ImportSavedCartNavNodeEntry;ImportSavedCartNavNode;ImportSavedCartLink;
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;styleAttributes;&linkRef;target(code)[default='sameWindow']
+;;QuickOrderLink;Quick Order Link;/quickOrder;;QuickOrderLink;;
+;;ImportSavedCartLink;Import Saved Cart Link;/import/csv/saved-cart;;ImportSavedCartLink;;
+
+## level 4 -- Brands, Streetwear menu etc. : children of ApparelUKCategoryNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;BrandsNavNode;;All Brands;ApparelUKCategoryNavNode;;BrandsNavNode
+;StreetwearNavigationNode;;Streetwear Menu;ApparelUKCategoryNavNode;;StreetwearNavigationNode
+;SnowNavigationNode;;Snow Menu;ApparelUKCategoryNavNode;;SnowNavigationNode
+;AccessoriesNavigationNode;;Accessories Menu;ApparelUKCategoryNavNode;;AccessoriesNavigationNode
+;StreetwearYouthNavNode;;Youth Menu;ApparelUKCategoryNavNode;;StreetwearYouthNavNode
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;BrandsNavNodeEntry;;Brands Navigation Node Entry;BrandsNavNode;AllBrandsLink;
+;StreetwearNavigationNodeEntry;;Streetwear Navigation Node Entry;StreetwearNavigationNode;StreetwearLink;
+;SnowNavigationNodeEntry;;Snow Navigation Node Entry;SnowNavigationNode;SnowLink;
+;AccessoriesNavigationNodeEntry;;Accessories Navigation Node Entry;AccessoriesNavigationNode;AccessoriesLink;
+;StreetwearYouthNavNodeEntry;;StreetwearYouth Navigation Node Entry;StreetwearYouthNavNode;YouthLink;
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;AllBrandsLink;All Brands Link;;brands;;;
+;;StreetwearLink;Streetwear;;streetwear;;;
+;;SnowLink;Snow;;snow;;;
+;;AccessoriesLink;Accessories Link;;220000;;;
+;;YouthLink;Youth Link;;270000;;;
+
+## level 5 -- children of above NavNodes ## (the following order of children is the display order on the site)
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);&nodeRef;children(uid,$contentCV);links(&linkRef);
+# children of BrandsNavNode 
+;AllBrandsNavNode;;Brand Links;BrandsNavNode;AllBrandsNavNode;667NavNode,686NavNode,69SlamNavNode,adidasOriginalsNavNode,AlMerrickNavNode,AlienWorkshopNavNode,AnalogNavNode,AnonNavNode,ArmadaNavNode,BenchNavNode,BillabongNavNode,BlueTomatoNavNode,BurtonNavNode,CarharttNavNode,DCNavNode,DaineseNavNode,DakineNavNode,DalbelloNavNode,droidNavNode,ElementNavNode,ElmNavNode,F2-FTWONavNode,FemipleasureNavNode,FoursquareNavNode,FoxNavNode,HorsefeathersNavNode,HurleyNavNode,LandingNavNode,NikeNavNode,Nike6.0NavNode,NixonNavNode,OakleyNavNode,OrageNavNode,PYUANavNode,PlayboardNavNode,ProTecNavNode,QuiksilverNavNode,RedNavNode,ReefNavNode,RipCurlNavNode,RoxyNavNode,SessionsNavNode,SpecialBlendNavNode,TokoNavNode,VIVONavNode,VansNavNode,VolcomNavNode,VonZipperNavNode,WLDNavNode,ZimtsternNavNode
+# children of StreetwearNavigationNode 
+;StreetwearMenNavNodeMenu;;Streetwear Men Menu;StreetwearNavigationNode;StreetwearMenNavNodeMenu;StreetwearMenBagsNavNode,StreetwearMensBeltsNavNode,StreetwearMenShortsNavNode,StreetwearMenTShirtsNavNode
+;StreetwearWomenNavNodeMenu;;Streetwear Women Menu;StreetwearNavigationNode;StreetwearWomenNavNodeMenu;StreetwearWomenBagsNavNode,StreetwearWomenPantsNavNode,StreetwearWomenTShirtsNavNode,StreetwearWomenTopsNavNode,StreetwearWomenSkirtsNavNode
+;StreetwearYouthNavNodeMenu;;Streetwear Youth Menu;StreetwearNavigationNode;StreetwearYouthNavNodeMenu;StreetwearYouthBoardshortsNavNodeMenu,StreetwearYouthTShirtNavNodeMenu
+# children of SnowNavigationNode 
+;SnowwearMenNavNodeMenu;;Snowwear Men Menu;SnowNavigationNode;SnowwearMenNavNodeMenu;SnowwearMensJacketsNavNode,SnowwearMenPantsNavNode
+;SnowwearWomenNavNodeMenu;;Snowwear Women Menu;SnowNavigationNode;SnowwearWomenNavNodeMenu;SnowwearWomensJacketsNavNode,SnowwearWomensPantsNavNode
+;SnowwearYouthNavNodeMenu;;Snowwear Youth Menu;SnowNavigationNode;SnowwearYouthNavNodeMenu;SnowwearYouthJacketsNavNode,SnowwearYouthPantsNavNode
+;SnowKitNavNodeMenu;;Snowwear Kit Menu;SnowNavigationNode;SnowKitNavNodeMenu;SnowboardsNavNode,BindingsNavNode,HelmetsNavNode,ToolsNavNode
+# children of AccessoriesNavigationNode 
+;AccessoriesMenNavNodeMenu;;Accessories Men Menu;AccessoriesNavigationNode;AccessoriesMenNavNodeMenu;AccessoriesBandanasNavNode,AccessoriesBeaniesNavNode,AccessoriesBeltsNavNode,AccessoriesCapsNavNode,AccessoriesGlovesNavNode,AccessoriesSocksNavNode,AccessoriesWatchesNavNode,BrowseAllAccessoriesNavNode
+;AccessoriesWomenNavNodeMenu;;Accessories Women Menu;AccessoriesNavigationNode;AccessoriesWomenNavNodeMenu;AccessoriesWomenBagsNavNode,AccessoriesWomenBeltsNavNode,AccessoriesWomenWatchesNavNode,BrowseAllAccessoriesWomenNavNode
+# children of StreetwearYouthNavNode 
+;StreetwearYouthBoardshortsNavNode;;Youth Board Shorts;StreetwearYouthNavNode;StreetwearYouthBoardshortsNavNode;StreetwearYouthBoardshortsBillabongNavNode,StreetwearYouthBoardshorts69SlamNavNode,StreetwearYouthBoardshortsQuiksilverNavNode,StreetwearYouthBoardshortsVolcomNavNode,BrowseAllStreetwearYouthBoardshortsNavNode
+;StreetwearYouthTShirtNavNode;;Youth TShirt;StreetwearYouthNavNode;StreetwearYouthTShirtNavNode;StreetwearYouthTShirtsBillabongNavNode,StreetwearYouthTShirtsBlueTomatoNavNode,StreetwearYouthTShirtsBurtonNavNode,StreetwearYouthTShirtsDCNavNode,StreetwearYouthTShirtsQuiksilverNavNode,BrowseAllStreetwearYouthTShirtsNavNode
+
+## level 6 -- children of above NavNodes ## (the following order of children is the display order on the site)
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;links(&linkRef);
+# Brands -- all brands
+;667NavNode;;667 Link;667NavNode
+;686NavNode;;686 Link;686NavNode
+;69SlamNavNode;;69 Slam Link;69SlamNavNode
+;adidasOriginalsNavNode;;adidas Originals Link;adidasOriginalsNavNode
+;AlMerrickNavNode;;Al Merrick Link;AlMerrickNavNode
+;AlienWorkshopNavNode;;Alien Workshop Link;AlienWorkshopNavNode
+;AnalogNavNode;;Analog Link;AnalogNavNode
+;AnonNavNode;;Anon Link;AnonNavNode
+;ArmadaNavNode;;Armada Link;ArmadaNavNode
+;BenchNavNode;;Bench Link;BenchNavNode
+;BillabongNavNode;;Billabong Link;BillabongNavNode
+;BlueTomatoNavNode;;Blue Tomato Link;BlueTomatoNavNode
+;BurtonNavNode;;Burton Link;BurtonNavNode
+;CarharttNavNode;;Carhartt Link;CarharttNavNode
+;DCNavNode;;DC Link;DCNavNode
+;DaineseNavNode;;Dainese Link;DaineseNavNode
+;DakineNavNode;;Dakine Link;DakineNavNode
+;DalbelloNavNode;;Dalbello Link;DalbelloNavNode
+;droidNavNode;;droid Link;droidNavNode
+;ElementNavNode;;Element Link;ElementNavNode
+;ElmNavNode;;Elm Link;ElmNavNode
+;F2-FTWONavNode;;F2-FTWO Link;F2-FTWONavNode
+;FemipleasureNavNode;;Femipleasure Link;FemipleasureNavNode
+;FoursquareNavNode;;Foursquare Link;FoursquareNavNode
+;FoxNavNode;;Fox Link;FoxNavNode
+;HorsefeathersNavNode;;Horsefeathers Link;HorsefeathersNavNode
+;HurleyNavNode;;Hurley Link;HurleyNavNode
+;LandingNavNode;;Landing Link;LandingNavNode
+;NikeNavNode;;Nike Link;NikeNavNode
+;Nike6.0NavNode;;Nike6.0 Link;Nike6.0NavNode
+;NixonNavNode;;Nixon Link;NixonNavNode
+;OakleyNavNode;;Oakley Link;OakleyNavNode
+;OrageNavNode;;Orage Link;OrageNavNode
+;PYUANavNode;;PYUA Link;PYUANavNode
+;PlayboardNavNode;;Playboard Link;PlayboardNavNode
+;ProTecNavNode;;ProTec Link;ProTecNavNode
+;QuiksilverNavNode;;Quiksilver Link;QuiksilverNavNode
+;RedNavNode;;Red Link;RedNavNode
+;ReefNavNode;;Reef Link;ReefNavNode
+;RipCurlNavNode;;Rip Curl Link;RipCurlNavNode
+;RoxyNavNode;;Roxy Link;RoxyNavNode
+;SessionsNavNode;;Sessions Link;SessionsNavNode
+;SpecialBlendNavNode;;Special Blend Link;SpecialBlendNavNode
+;TokoNavNode;;Toko Link;TokoNavNode
+;VIVONavNode;;VIVO Link;VIVONavNode
+;VansNavNode;;Vans Link;VansNavNode
+;VolcomNavNode;;Volcom Link;VolcomNavNode
+;VonZipperNavNode;;Von Zipper Link;VonZipperNavNode
+;WLDNavNode;;WLD Link;WLDNavNode
+;ZimtsternNavNode;;Zimtstern Link;ZimtsternNavNode
+# Streetwear Men NavNodeMenu
+;StreetwearMenBagsNavNode;;Streetwear Men Bags Link;StreetwearMenBagsNavNode
+;StreetwearMensBeltsNavNode;;Streetwear Mens Belts Link;StreetwearMensBeltsNavNode
+;StreetwearMenShortsNavNode;;Streetwear Men Shorts Link;StreetwearMenShortsNavNode
+;StreetwearMenTShirtsNavNode;;Streetwear Men TShirts Link;StreetwearMenTShirtsNavNode
+# Streetwear Women NavNodeMenu
+;StreetwearWomenBagsNavNode;;Streetwear Women Bags Link;StreetwearWomenBagsNavNode
+;StreetwearWomenPantsNavNode;;Streetwear Women Pants Link;StreetwearWomenPantsNavNode
+;StreetwearWomenTShirtsNavNode;;Streetwear Women TShirts Link;StreetwearWomenTShirtsNavNode
+;StreetwearWomenTopsNavNode;;Streetwear Women Tops Link;StreetwearWomenTopsNavNode
+;StreetwearWomenSkirtsNavNode;;Streetwear Women Skirts Link;StreetwearWomenSkirtsNavNode
+## Streetwear Youth NavNodeMenu
+;StreetwearYouthBoardshortsNavNodeMenu;;Streetwear Youth Boardshorts Link;StreetwearYouthBoardshortsNavNodeMenu
+;StreetwearYouthTShirtNavNodeMenu;;Streetwear Youth TShirt Link;StreetwearYouthTShirtNavNodeMenu
+# Snowwear Men NavNodeMenu
+;SnowwearMensJacketsNavNode;;Snowwear Mens Jackets Link;SnowwearMensJacketsNavNode
+;SnowwearMenPantsNavNode;;Snowwear Men Pants Link;SnowwearMenPantsNavNode
+# Snowwear Women NavNodeMenu
+;SnowwearWomensJacketsNavNode;;Snowwear Womens Jackets Link;SnowwearWomensJacketsNavNode
+;SnowwearWomensPantsNavNode;;Snowwear Womens Pants Link;SnowwearWomensPantsNavNode
+# Snowwear Youth NavNodeMenu
+;SnowwearYouthJacketsNavNode;;Snowwear Youth Jackets Link;SnowwearYouthJacketsNavNode
+;SnowwearYouthPantsNavNode;;Snowwear Youth Pants Link;SnowwearYouthPantsNavNode
+# Snowwear Kit NavNodeMenu
+;SnowboardsNavNode;;Snowboards Link;SnowboardsNavNode
+;BindingsNavNode;;Bindings Link;BindingsNavNode
+;HelmetsNavNode;;Helmets Link;HelmetsNavNode
+;ToolsNavNode;;Tools Link;ToolsNavNode
+# Accessories Men NavNodeMenu
+;AccessoriesBandanasNavNode;;Accessories Bandanas Link;AccessoriesBandanasNavNode
+;AccessoriesBeaniesNavNode;;Accessories Beanies Link;AccessoriesBeaniesNavNode
+;AccessoriesBeltsNavNode;;Accessories Belts Link;AccessoriesBeltsNavNode
+;AccessoriesCapsNavNode;;Accessories Caps Link;AccessoriesCapsNavNode
+;AccessoriesGlovesNavNode;;Accessories Gloves Link;AccessoriesGlovesNavNode
+;AccessoriesSocksNavNode;;Accessories Socks Link;AccessoriesSocksNavNode
+;AccessoriesWatchesNavNode;;Accessories Watches Link;AccessoriesWatchesNavNode
+;BrowseAllAccessoriesNavNode;;Browse All Accessories Link;BrowseAllAccessoriesNavNode
+# Accessories Women NavNodeMenu
+;AccessoriesWomenBagsNavNode;;Accessories Women Bags Link;AccessoriesWomenBagsNavNode
+;AccessoriesWomenBeltsNavNode;;Accessories Women Belts Link;AccessoriesWomenBeltsNavNode
+;AccessoriesWomenWatchesNavNode;;Accessories Women Watches Link;AccessoriesWomenWatchesNavNode
+;BrowseAllAccessoriesWomenNavNode;;Browse All Accessories Women Link;BrowseAllAccessoriesWomenNavNode
+# Streetwear Youth BoardshortsNavNode
+;StreetwearYouthBoardshortsBillabongNavNode;;Streetwear Youth Boardshorts Billabong Link;StreetwearYouthBoardshortsBillabongNavNode
+;StreetwearYouthBoardshorts69SlamNavNode;;Streetwear Youth Boardshorts 69 Slam Link;StreetwearYouthBoardshorts69SlamNavNode
+;StreetwearYouthBoardshortsQuiksilverNavNode;;Streetwear Youth Boardshorts Quiksilver Link;StreetwearYouthBoardshortsQuiksilverNavNode
+;StreetwearYouthBoardshortsVolcomNavNode;;Streetwear Youth Boardshorts Volcom Link;StreetwearYouthBoardshortsVolcomNavNode
+;BrowseAllStreetwearYouthBoardshortsNavNode;;Browse All Streetwear Youth Boardshorts Link;BrowseAllStreetwearYouthBoardshortsNavNode
+# Streetwear Youth TShirtNavNode
+;StreetwearYouthTShirtsBillabongNavNode;;Streetwear Youth TShirts Billabong Link;StreetwearYouthTShirtsBillabongNavNode
+;StreetwearYouthTShirtsBlueTomatoNavNode;;Streetwear Youth TShirts Blue Tomato Link;StreetwearYouthTShirtsBlueTomatoNavNode
+;StreetwearYouthTShirtsBurtonNavNode;;Streetwear Youth TShirts Burton Link;StreetwearYouthTShirtsBurtonNavNode
+;StreetwearYouthTShirtsDCNavNode;;Streetwear Youth TShirts DC Link;StreetwearYouthTShirtsDCNavNode
+;StreetwearYouthTShirtsQuiksilverNavNode;;Streetwear Youth TShirts Quiksilver Link;StreetwearYouthTShirtsQuiksilverNavNode
+;BrowseAllStreetwearYouthTShirtsNavNode;;Browse All Streetwear Youth TShirts Link;BrowseAllStreetwearYouthTShirtsNavNode
+
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+# Brands -- all brands
+;667NavNodeEntry;;667 Navigation Node Entry;667NavNode;667Link
+;686NavNodeEntry;;686 Navigation Node Entry;686NavNode;686Link
+;69SlamNavNodeEntry;;69 Slam Navigation Node Entry;69SlamNavNode;69SlamLink
+;adidasOriginalsNavNodeEntry;;adidas Originals Navigation Node Entry;adidasOriginalsNavNode;adidasOriginalsLink
+;AlMerrickNavNodeEntry;;Al Merrick Navigation Node Entry;AlMerrickNavNode;AlMerrickLink
+;AlienWorkshopNavNodeEntry;;Alien Workshop Navigation Node Entry;AlienWorkshopNavNode;AlienWorkshopLink
+;AnalogNavNodeEntry;;Analog Navigation Node Entry;AnalogNavNode;AnalogLink
+;AnonNavNodeEntry;;Anon Navigation Node Entry;AnonNavNode;AnonLink
+;ArmadaNavNodeEntry;;Armada Navigation Node Entry;ArmadaNavNode;ArmadaLink
+;BenchNavNodeEntry;;Bench Navigation Node Entry;BenchNavNode;BenchLink
+;BillabongNavNodeEntry;;Billabong Navigation Node Entry;BillabongNavNode;BillabongLink
+;BlueTomatoNavNodeEntry;;Blue Tomato Navigation Node Entry;BlueTomatoNavNode;BlueTomatoLink
+;BurtonNavNodeEntry;;Burton Navigation Node Entry;BurtonNavNode;BurtonLink
+;CarharttNavNodeEntry;;Carhartt Navigation Node Entry;CarharttNavNode;CarharttLink
+;DCNavNodeEntry;;DC Navigation Node Entry;DCNavNode;DCLink
+;DaineseNavNodeEntry;;Dainese Navigation Node Entry;DaineseNavNode;DaineseLink
+;DakineNavNodeEntry;;Dakine Navigation Node Entry;DakineNavNode;DakineLink
+;DalbelloNavNodeEntry;;Dalbello Navigation Node Entry;DalbelloNavNode;DalbelloLink
+;droidNavNodeEntry;;droid Navigation Node Entry;droidNavNode;droidLink
+;ElementNavNodeEntry;;Element Navigation Node Entry;ElementNavNode;ElementLink
+;ElmNavNodeEntry;;Elm Navigation Node Entry;ElmNavNode;ElmLink
+;F2-FTWONavNodeEntry;;F2-FTWO Navigation Node Entry;F2-FTWONavNode;F2-FTWOLink
+;FemipleasureNavNodeEntry;;Femipleasure Navigation Node Entry;FemipleasureNavNode;FemipleasureLink
+;FoursquareNavNodeEntry;;Foursquare Navigation Node Entry;FoursquareNavNode;FoursquareLink
+;FoxNavNodeEntry;;Fox Navigation Node Entry;FoxNavNode;FoxLink
+;HorsefeathersNavNodeEntry;;Horsefeathers Navigation Node Entry;HorsefeathersNavNode;HorsefeathersLink
+;HurleyNavNodeEntry;;Hurley Navigation Node Entry;HurleyNavNode;HurleyLink
+;LandingNavNodeEntry;;Landing Navigation Node Entry;LandingNavNode;LandingLink
+;NikeNavNodeEntry;;Nike Navigation Node Entry;NikeNavNode;NikeLink
+;Nike6.0NavNodeEntry;;Nike 6.0 Navigation Node Entry;Nike6.0NavNode;Nike6.0Link
+;NixonNavNodeEntry;;Nixon Navigation Node Entry;NixonNavNode;NixonLink
+;OakleyNavNodeEntry;;Oakley Navigation Node Entry;OakleyNavNode;OakleyLink
+;OrageNavNodeEntry;;Orage Navigation Node Entry;OrageNavNode;OrageLink
+;PYUANavNodeEntry;;PYUA Navigation Node Entry;PYUANavNode;PYUALink
+;PlayboardNavNodeEntry;;Playboard Navigation Node Entry;PlayboardNavNode;PlayboardLink
+;ProTecNavNodeEntry;;ProTec Navigation Node Entry;ProTecNavNode;ProTecLink
+;QuiksilverNavNodeEntry;;Quiksilver Navigation Node Entry;QuiksilverNavNode;QuiksilverLink
+;RedNavNodeEntry;;Red Navigation Node Entry;RedNavNode;RedLink
+;ReefNavNodeEntry;;Reef Navigation Node Entry;ReefNavNode;ReefLink
+;RipCurlNavNodeEntry;;Rip Curl Navigation Node Entry;RipCurlNavNode;RipCurlLink
+;RoxyNavNodeEntry;;Roxy Navigation Node Entry;RoxyNavNode;RoxyLink
+;SessionsNavNodeEntry;;Sessions Navigation Node Entry;SessionsNavNode;SessionsLink
+;SpecialBlendNavNodeEntry;;Special Blend Navigation Node Entry;SpecialBlendNavNode;SpecialBlendLink
+;TokoNavNodeEntry;;Toko Navigation Node Entry;TokoNavNode;TokoLink
+;VIVONavNodeEntry;;VIVO Navigation Node Entry;VIVONavNode;VIVOLink
+;VansNavNodeEntry;;Vans Navigation Node Entry;VansNavNode;VansLink
+;VolcomNavNodeEntry;;Volcom Navigation Node Entry;VolcomNavNode;VolcomLink
+;VonZipperNavNodeEntry;;Von Zipper Navigation Node Entry;VonZipperNavNode;VonZipperLink
+;WLDNavNodeEntry;;WLD Navigation Node Entry;WLDNavNode;WLDLink
+;ZimtsternNavNodeEntry;;Zimtstern Navigation Node Entry;ZimtsternNavNode;ZimtsternLink
+# Streetwear Men NavNodeMenu
+;StreetwearMenBagsNavNodeEntry;;Streetwear Men Bags Navigation Node Entry;StreetwearMenBagsNavNode;StreetwearMenBagsLink
+;StreetwearMensBeltsNavNodeEntry;;Streetwear Mens Belts Navigation Node Entry;StreetwearMensBeltsNavNode;StreetwearMensBeltsLink
+;StreetwearMenShortsNavNodeEntry;;Streetwear Men Shorts Navigation Node Entry;StreetwearMenShortsNavNode;StreetwearMenShortsLink
+;StreetwearMenTShirtsNavNodeEntry;;Streetwear Men TShirts Navigation Node Entry;StreetwearMenTShirtsNavNode;StreetwearMenTShirtsLink
+# Streetwear Women NavNodeMenu
+;StreetwearWomenBagsNavNodeEntry;;Streetwear Women Bags Navigation Node Entry;StreetwearWomenBagsNavNode;StreetwearWomenBagsLink
+;StreetwearWomenPantsNavNodeEntry;;Streetwear Women Pants Navigation Node Entry;StreetwearWomenPantsNavNode;StreetwearWomenPantsLink
+;StreetwearWomenTShirtsNavNodeEntry;;Streetwear Women TShirts Navigation Node Entry;StreetwearWomenTShirtsNavNode;StreetwearWomenTShirtsLink
+;StreetwearWomenTopsNavNodeEntry;;Streetwear Women Tops Navigation Node Entry;StreetwearWomenTopsNavNode;StreetwearWomenTopsLink
+;StreetwearWomenSkirtsNavNodeEntry;;Streetwear Women Skirts Navigation Node Entry;StreetwearWomenSkirtsNavNode;StreetwearWomenSkirtsLink
+# Streetwear Youth NavNodeMenu
+;StreetwearYouthBoardshortsNavNodeMenuEntry;;Streetwear Youth Boardshorts Navigation Node Menu Entry;StreetwearYouthBoardshortsNavNodeMenu;StreetwearYouthBoardshortsLink
+;StreetwearYouthTShirtNavNodeMenuEntry;;Streetwear Youth TShirt Navigation Node Menu Entry;StreetwearYouthTShirtNavNodeMenu;StreetwearYouthTShirtsLink
+# Snowwear Men NavNodeMenu
+;SnowwearMensJacketsNavNodeEntry;;Snowwear Mens Jackets Navigation Node Entry;SnowwearMensJacketsNavNode;SnowwearMensJacketsLink
+;SnowwearMenPantsNavNodeEntry;;Snowwear Men Pants Navigation Node Entry;SnowwearMenPantsNavNode;SnowwearMenPantsLink
+# Snowwear Women NavNodeMenu
+;SnowwearWomensJacketsNavNodeEntry;;Snowwear Womens Jackets Navigation Node Entry;SnowwearWomensJacketsNavNode;SnowwearWomensJacketsLink
+;SnowwearWomensPantsNavNodeEntry;;Snowwear Womens Pants Navigation Node Entry;SnowwearWomensPantsNavNode;SnowwearWomensPantsLink
+# Snowwear Youth NavNodeMenu
+;SnowwearYouthJacketsNavNodeEntry;;Snowwear Youth Jackets Navigation Node Entry;SnowwearYouthJacketsNavNode;SnowwearYouthJacketsLink
+;SnowwearYouthPantsNavNodeEntry;;Snowwear Youth Pants Navigation Node Entry;SnowwearYouthPantsNavNode;SnowwearYouthPantsLink
+# Snowwear Kit NavNodeMenu
+;SnowboardsNavNodeEntry;;Snowboards Navigation Node Entry;SnowboardsNavNode;SnowboardsLink
+;BindingsNavNodeEntry;;Bindings Navigation Node Entry;BindingsNavNode;BindingsLink
+;HelmetsNavNodeEntry;;Helmets Navigation Node Entry;HelmetsNavNode;HelmetsLink
+;ToolsNavNodeEntry;;Tools Navigation Node Entry;ToolsNavNode;ToolsLink
+# Accessories Men NavNodeMenu
+;AccessoriesBandanasNavNodeEntry;;Accessories Bandanas Navigation Node Entry;AccessoriesBandanasNavNode;AccessoriesBandanasLink
+;AccessoriesBeaniesNavNodeEntry;;Accessories Beanies Navigation Node Entry;AccessoriesBeaniesNavNode;AccessoriesBeaniesLink
+;AccessoriesBeltsNavNodeEntry;;Accessories Belts Navigation Node Entry;AccessoriesBeltsNavNode;AccessoriesBeltsLink
+;AccessoriesCapsNavNodeEntry;;Accessories Caps Navigation Node Entry;AccessoriesCapsNavNode;AccessoriesCapsLink
+;AccessoriesGlovesNavNodeEntry;;Accessories Gloves Navigation Node Entry;AccessoriesGlovesNavNode;AccessoriesGlovesLink
+;AccessoriesSocksNavNodeEntry;;Accessories Socks Navigation Node Entry;AccessoriesSocksNavNode;AccessoriesSocksLink
+;AccessoriesWatchesNavNodeEntry;;Accessories Watches Navigation Node Entry;AccessoriesWatchesNavNode;AccessoriesWatchesLink
+;BrowseAllAccessoriesNavNodeEntry;;Browse All Accessories Navigation Node Entry;BrowseAllAccessoriesNavNode;BrowseAllAccessoriesLink
+# Accessories Women NavNodeMenu
+;AccessoriesWomenBagsNavNodeEntry;;Accessories Women Bags Navigation Node Entry;AccessoriesWomenBagsNavNode;AccessoriesWomenBagsLink
+;AccessoriesWomenBeltsNavNodeEntry;;Accessories Women Belts Navigation Node Entry;AccessoriesWomenBeltsNavNode;AccessoriesWomenBeltsLink
+;AccessoriesWomenWatchesNavNodeEntry;;Accessories Women Watches Navigation Node Entry;AccessoriesWomenWatchesNavNode;AccessoriesWomenWatchesLink
+;BrowseAllAccessoriesWomenNavNodeEntry;;Browse All Accessories Women Navigation Node Entry;BrowseAllAccessoriesWomenNavNode;BrowseAllAccessoriesWomenLink
+# Streetwear Youth BoardshortsLink
+;StreetwearYouthBoardshortsBillabongNavNodeEntry;;Streetwear Youth Boardshorts Billabong Navigation Node Entry;StreetwearYouthBoardshortsBillabongNavNode;StreetwearYouthBoardshortsBillabongLink
+;StreetwearYouthBoardshorts69SlamNavNodeEntry;;Streetwear Youth Boardshorts 69 Slam Navigation Node Entry;StreetwearYouthBoardshorts69SlamNavNode;StreetwearYouthBoardshorts69SlamLink
+;StreetwearYouthBoardshortsQuiksilverNavNodeEntry;;Streetwear Youth Boardshorts Quiksilver Navigation Node Entry;StreetwearYouthBoardshortsQuiksilverNavNode;StreetwearYouthBoardshortsQuiksilverLink
+;StreetwearYouthBoardshortsVolcomNavNodeEntry;;Streetwear Youth Boardshorts Volcom Navigation Node Entry;StreetwearYouthBoardshortsVolcomNavNode;StreetwearYouthBoardshortsVolcomLink
+;BrowseAllStreetwearYouthBoardshortsNavNodeEntry;;Browse All Streetwear Youth Boardshorts Navigation Node Entry;BrowseAllStreetwearYouthBoardshortsNavNode;BrowseAllStreetwearYouthBoardshortsLink
+# Streetwear Youth TShirtLink
+;StreetwearYouthTShirtsBillabongNavNodeEntry;;Streetwear Youth TShirts Billabong Navigation Node Entry;StreetwearYouthTShirtsBillabongNavNode;StreetwearYouthTShirtsBillabongLink
+;StreetwearYouthTShirtsBlueTomatoNavNodeEntry;;Streetwear Youth TShirts Blue Tomato Navigation Node Entry;StreetwearYouthTShirtsBlueTomatoNavNode;StreetwearYouthTShirtsBlueTomatoLink
+;StreetwearYouthTShirtsBurtonNavNodeEntry;;Streetwear Youth TShirts Burton Navigation Node Entry;StreetwearYouthTShirtsBurtonNavNode;StreetwearYouthTShirtsBurtonLink
+;StreetwearYouthTShirtsDCNavNodeEntry;;Streetwear Youth TShirts DC Navigation Node Entry;StreetwearYouthTShirtsDCNavNode;StreetwearYouthTShirtsDCLink
+;StreetwearYouthTShirtsQuiksilverNavNodeEntry;;Streetwear Youth TShirts Quiksilver Navigation Node Entry;StreetwearYouthTShirtsQuiksilverNavNode;StreetwearYouthTShirtsQuiksilverLink
+;BrowseAllStreetwearYouthTShirtsNavNodeEntry;;Browse All Streetwear Youth TShirts Navigation Node Entry;BrowseAllStreetwearYouthTShirtsNavNode;BrowseAllStreetwearYouthTShirtsLink
+
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+# Brands -- all brands
+;;667Link;667 Link;;667;;;
+;;686Link;686 Link;;686;;;
+;;69SlamLink;69 Slam Link;;69 Slam;;;
+;;adidasOriginalsLink;adidas Originals Link;;adidas Originals;;;
+;;AlMerrickLink;Al Merrick Link;;Al Merrick;;;
+;;AlienWorkshopLink;Alien Workshop Link;;Alien Workshop;;;
+;;AnalogLink;Analog Link;;Analog;;;
+;;AnonLink;Anon Link;;Anon;;;
+;;ArmadaLink;Armada Link;;Armada;;;
+;;BenchLink;Bench Link;;Bench;;;
+;;BillabongLink;Billabong Link;;Billabong;;;
+;;BlueTomatoLink;Blue Tomato Link;;Blue Tomato;;;
+;;BurtonLink;Burton Link;;Burton;;;
+;;CarharttLink;Carhartt Link;;Carhartt;;;
+;;DCLink;DC Link;;DC;;;
+;;DaineseLink;Dainese Link;;Dainese;;;
+;;DakineLink;Dakine Link;;Dakine;;;
+;;DalbelloLink;Dalbello Link;;Dalbello;;;
+;;droidLink;droidLink;;droid;;;
+;;ElementLink;Element Link;;Element;;;
+;;ElmLink;Elm Link;;Elm;;;
+;;F2-FTWOLink;F2-FTWO Link;;F2-FTWO;;;
+;;FemipleasureLink;Femipleasure Link;;Femipleasure;;;
+;;FoursquareLink;Foursquare Link;;Foursquare;;;
+;;FoxLink;Fox Link;;Fox;;;
+;;HorsefeathersLink;Horsefeathers Link;;Horsefeathers;;;
+;;HurleyLink;Hurley Link;;Hurley;;;
+;;LandingLink;Landing Link;;Landing;;;
+;;NikeLink;Nike Link;;Nike;;;
+;;Nike6.0Link;Nike 6.0 Link;;Nike 6.0;;;
+;;NixonLink;Nixon Link;;Nixon;;;
+;;OakleyLink;Oakley Link;;Oakley;;;
+;;OrageLink;Orage Link;;Orage;;;
+;;PYUALink;PYUA Link;;PYUA;;;
+;;PlayboardLink;Playboard Link;;Playboard;;;
+;;ProTecLink;Pro Tec Link;;Pro Tec;;;
+;;QuiksilverLink;Quiksilver Link;;Quiksilver;;;
+;;RedLink;Red Link;;Red;;;
+;;ReefLink;Reef Link;;Reef;;;
+;;RipCurlLink;Rip Curl Link;;Rip Curl;;;
+;;RoxyLink;Roxy Link;;Roxy;;;
+;;SessionsLink;Sessions Link;;Sessions;;;
+;;SpecialBlendLink;Special Blend Link;;Special Blend;;;
+;;TokoLink;Toko Link;;Toko;;;
+;;VIVOLink;VIVO Link;;VIVO;;;
+;;VansLink;Vans Link;;Vans;;;
+;;VolcomLink;Volcom Link;;Volcom;;;
+;;VonZipperLink;Von Zipper Link;;Von Zipper;;;
+;;WLDLink;WLD Link;;WLD;;;
+;;ZimtsternLink;Zimtstern Link;;Zimtstern;;;
+# Streetwear Men NavNodeMenu
+;;StreetwearMenBagsLink;Streetwear Men Bags Link;;160700;;;
+;;StreetwearMensBeltsLink;Streetwear Mens Belts Link;/Collections/Streetwear/c/streetwear?q=:topRated:category:251100;;;;
+;;StreetwearMenShortsLink;Streetwear Men Shorts Link;;250600;;;
+;;StreetwearMenTShirtsLink;Streetwear Men T-Shirts Link;;250100;;;
+# Streetwear Women NavNodeMenu
+;;StreetwearWomenBagsLink;Streetwear Women Bags Link;;160400;;;
+;;StreetwearWomenPantsLink;Streetwear Women Pants Link;;260900;;;
+;;StreetwearWomenTShirtsLink;Streetwear Women T-Shirts Link;;260100;;;
+;;StreetwearWomenTopsLink;Streetwear Women Tops Link;;261800;;;
+;;StreetwearWomenSkirtsLink;Streetwear Women Skirts & Dresses Link;;260700;;;
+# Streetwear Youth NavNodeMenu
+;;StreetwearYouthBoardshortsLink;Streetwear Youth Boardshorts Link;;270600;;;
+;;StreetwearYouthTShirtsLink;Streetwear Youth T-Shirts Link;;270100;;;
+# Snowwear Men NavNodeMenu
+;;SnowwearMensJacketsLink;Snowwear Men Jackets Link;;190100;;;
+;;SnowwearMenPantsLink;Snowwear Men Pants Link;;190300;;;
+# Snowwear Women NavNodeMenu
+;;SnowwearWomensJacketsLink;Snowwear Womens Jackets Link;;200100;;;
+;;SnowwearWomensPantsLink;Snowwear Womens Pants Link;;200300;;;
+# Snowwear Youth NavNodeMenu
+;;SnowwearYouthJacketsLink;Snowwear Youth Jackets Link;;330100;;;
+;;SnowwearYouthPantsLink;Snowwear Youth Pants Link;;330700;;;
+# Snowwear Kit NavNodeMenu
+;;SnowboardsLink;Snowboards Link;;10000;;;
+;;BindingsLink;Bindings Link;;50100;;;
+;;HelmetsLink;Helmets Link;;450000;;;
+;;ToolsLink;Tools Link;;100200;;;
+# Accessories Men NavNodeMenu
+;;AccessoriesBandanasLink;Bandanas Link;;221600;;;
+;;AccessoriesBeaniesLink;Beanies Link;;220500;;;
+;;AccessoriesBeltsLink;Belts Link;;251100;;;
+;;AccessoriesCapsLink;Caps Link;;220600;;;
+;;AccessoriesGlovesLink;Gloves Link;;190700;;;
+;;AccessoriesSocksLink;Socks Link;;221100;;;
+;;AccessoriesWatchesLink;Watches Link;;340000;;;
+;;BrowseAllAccessoriesLink;All Accessories Link;;220000;;;
+# Accessories Women NavNodeMenu
+;;AccessoriesWomenBagsLink;Women Bag Link;;160400;;;
+;;AccessoriesWomenBeltsLink;Women Belts Link;;370900;;;
+;;AccessoriesWomenWatchesLink;Women Watches Link;;370700;;;
+;;BrowseAllAccessoriesWomenLink;Accessories Women Link;;370000;;;
+# Streetwear Youth BoardshortsLink
+;;StreetwearYouthBoardshortsBillabongLink;Billabong Streetwear Youth Boardshorts Link;/Categories/Streetwear-youth/Boardshorts-youth/c/270600?q=:relevance:brand:Billabong;;;;
+;;StreetwearYouthBoardshorts69SlamLink;69Slam Billabong Streetwear Youth Boardshorts Link;/Categories/Streetwear-youth/Boardshorts-youth/c/270600?q=:relevance:brand:69+Slam;;;;
+;;StreetwearYouthBoardshortsQuiksilverLink;Quiksilver Streetwear Youth Boardshorts Link;/Categories/Streetwear-youth/Boardshorts-youth/c/270600?q=:relevance:brand:Quiksilver;;;;
+;;StreetwearYouthBoardshortsVolcomLink;Volcom Streetwear Youth Boardshorts Link;/Categories/Streetwear-youth/Boardshorts-youth/c/270600?q=:relevance:brand:Volcom;;;;
+;;BrowseAllStreetwearYouthBoardshortsLink;All Streetwear Youth Boardshorts Link;;270600;;;
+# Streetwear Youth TShirtLink
+;;StreetwearYouthTShirtsBillabongLink;Billabong Streetwear Youth T-Shirts Link;/Categories/Streetwear-youth/T-Shirts-youth/c/270100?q=:relevance:brand:Billabong;;;;
+;;StreetwearYouthTShirtsBlueTomatoLink;BlueTomato Streetwear Youth T-Shirts Link;/Categories/Streetwear-youth/T-Shirts-youth/c/270100?q=:relevance:brand:Blue+Tomato;;;;
+;;StreetwearYouthTShirtsBurtonLink;Burton Streetwear Youth T-Shirts Link;/Categories/Streetwear-youth/T-Shirts-youth/c/270100?q=:relevance:brand:Burton;;;;
+;;StreetwearYouthTShirtsDCLink;DC Streetwear Youth T-Shirts Link;/Categories/Streetwear-youth/T-Shirts-youth/c/270100?q=:relevance:brand:DC;;;;
+;;StreetwearYouthTShirtsQuiksilverLink;Quiksilver Streetwear Youth T-Shirts Link;/Categories/Streetwear-youth/T-Shirts-youth/c/270100?q=:relevance:brand:Quiksilver;;;;
+;;BrowseAllStreetwearYouthTShirtsLink;All Streetwear Youth T-Shirts Link;;270100;;;
+
+## level 4 -- Accelerator Pages, Hybris Pages, Follow Us Pages : children of FooterNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SAPCommerceNavNode;;SAP Commerce Cloud Pages;FooterNavNode;;SAPCommerceNavNode
+;SAPCustomerExperienceNavNode;;SAP Customer Experience Pages;FooterNavNode;;SAPCustomerExperienceNavNode
+;FollowUsNavNode;;Follow Us Pages;FooterNavNode;;FollowUsNavNode
+
+## level 5 -- About SAP Commerce Cloud Page, FAQ: children of SAPCommerceNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;AboutSAPCommerceNavNode;;About SAP Commerce Cloud Page;SAPCommerceNavNode;;AboutSAPCommerceNavNode
+;FAQNavNode;;FAQ Page;SAPCommerceNavNode;;FAQNavNode
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;AboutSAPCommerceNavNodeEntry;;About SAP Commerce Cloud Navigation Node Entry;AboutSAPCommerceNavNode;AboutSAPCommerceLink;
+;FAQNavNodeEntry;;FAQ Navigation Node Entry;FAQNavNode;FAQLink;
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;AboutSAPCommerceLink;About SAP Commerce Cloud Link;http://www.cx.sap.com/products/commerce;;newWindow;;
+;;FAQLink;FAQ Link;/faq;;;
+
+## level 5 -- About SAP Customer Experience Page, Contact Us Page: children of SAPCustomerExperienceNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;AboutSAPCustomerExperienceNavNode;;About SAP Customer Experience Page;SAPCustomerExperienceNavNode;;AboutSAPCustomerExperienceNavNode
+;ContactUsNavNode;;Contact Us Page;SAPCustomerExperienceNavNode;;ContactUsNavNode
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;AboutSAPCustomerExperienceNavNodeEntry;;About SAP Customer Experience Navigation Node Entry;AboutSAPCustomerExperienceNavNode;VisitSAPLink;
+;ContactUsNavNodeEntry;;Contact Us Navigation Node Entry;ContactUsNavNode;ContactUsLink;
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;VisitSAPLink;Visit SAP;http://www.cx.sap.com/;;newWindow;;
+;;ContactUsLink;Contact Us Link;http://www.cx.sap.com/contact;;newWindow;;
+
+## level 5 -- Agile Cobmbmerce Blog, LinkedIn, Facebook, Twitter: children of FollowUsNavNode ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;AgileCommerceBlogNavNode;;Agile Commerce Blog Page;FollowUsNavNode;;AgileCommerceBlogNavNode
+;LinkedInNavNode;;LinkedIn Page;FollowUsNavNode;;LinkedInNavNode
+;FacebookNavNode;;Facebook Page;FollowUsNavNode;;FacebookNavNode
+;TwitterNavNode;;Twitter Page;FollowUsNavNode;;TwitterNavNode
+# entries of the above navigation nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;AgileCommerceBlogNavNodeEntry;;Agile Commerce Blog Navigation Node Entry;AgileCommerceBlogNavNode;AgileCommerceBlogLink;
+;LinkedInNavNodeEntry;;LinkedIn Navigation Node Entry;LinkedInNavNode;LinkedInLink;
+;FacebookNavNodeEntry;;Facebook Navigation Node Entry;FacebookNavNode;FacebookLink;
+;TwitterNavNodeEntry;;Twitter Navigation Node Entry;TwitterNavNode;TwitterLink;
+# links of the above navigation entries
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+;;AgileCommerceBlogLink;Agile Commerce Blog Link;http://www.agile-commerce.com/;;newWindow;;
+;;LinkedInLink;Linked In Link;http://www.linkedin.com/groups/5063400;;newWindow;;
+;;FacebookLink;Facebook Link;http://www.facebook.com/sapcx/;;newWindow;;
+;;TwitterLink;Twitter Link;http://www.twitter.com/SAP_CX;;newWindow;;
+
+
+
+# Brand banners 
+# Media 
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;apparel-category-banner;;apparel-category-banner.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-category-banner.jpg;;;
+;;apparel-brand-banner-69 Slam;;apparel-brand-banner_69slam.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_69slam.jpg;;;
+;;apparel-brand-banner-667;;apparel-brand-banner_667.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_667.jpg;;;
+;;apparel-brand-banner-686;;apparel-brand-banner_686.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_686.jpg;;;
+;;apparel-brand-banner-adidas;;apparel-brand-banner_adidas.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_adidas.jpg;;;
+;;apparel-brand-banner-Alien Workshop;;apparel-brand-banner_alienworkshop.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_alienworkshop.jpg;;;
+;;apparel-brand-banner-Al Merrick;;apparel-brand-banner_almerrick.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_almerrick.jpg;;;
+;;apparel-brand-banner-Analog;;apparel-brand-banner_analog.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_analog.jpg;;;
+;;apparel-brand-banner-Anon;;apparel-brand-banner_anon.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_anon.jpg;;;
+;;apparel-brand-banner-Armada;;apparel-brand-banner_armada.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_armada.jpg;;;
+;;apparel-brand-banner-Bench;;apparel-brand-banner_bench.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_bench.jpg;;;
+;;apparel-brand-banner-Billabong;;apparel-brand-banner_billabong.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_billabong.jpg;;;
+;;apparel-brand-banner-Blue Tomato;;apparel-brand-banner_bluetomato.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_bluetomato.jpg;;;
+;;apparel-brand-banner-Burton;;apparel-brand-banner_burton.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_burton.jpg;;;
+;;apparel-brand-banner-Carhartt;;apparel-brand-banner_carhartt.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_carhartt.jpg;;;
+;;apparel-brand-banner-Dainese;;apparel-brand-banner_dainese.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_dainese.jpg;;;
+;;apparel-brand-banner-Dalbello;;apparel-brand-banner_dalbello.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_dalbello.jpg;;;
+;;apparel-brand-banner-DC;;apparel-brand-banner_dc.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_dc.jpg;;;
+;;apparel-brand-banner-droid;;apparel-brand-banner_droid.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_droid.jpg;;;
+;;apparel-brand-banner-Element;;apparel-brand-banner_element.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_element.jpg;;;
+;;apparel-brand-banner-Elm;;apparel-brand-banner_elm.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_elm.jpg;;;
+;;apparel-brand-banner-Femipleasure;;apparel-brand-banner_femipleasure.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_femipleasure.jpg;;;
+;;apparel-brand-banner-Foursquare;;apparel-brand-banner_foursquare.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_foursquare.jpg;;;
+;;apparel-brand-banner-Fox;;apparel-brand-banner_fox.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_fox.jpg;;;
+;;apparel-brand-banner-F2-FTWO;;apparel-brand-banner_ftwo.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_ftwo.jpg;;;
+;;apparel-brand-banner-Horsefeathers;;apparel-brand-banner_horsefeathers.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_horsefeathers.jpg;;;
+;;apparel-brand-banner-Hurley;;apparel-brand-banner_hurley.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_hurley.jpg;;;
+;;apparel-brand-banner-Landing;;apparel-brand-banner_landing.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_landing.jpg;;;
+;;apparel-brand-banner-Nike;;apparel-brand-banner_nike.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_nike.jpg;;;
+;;apparel-brand-banner-Nike 6.0;;apparel-brand-banner_nike6.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_nike6.jpg;;;
+;;apparel-brand-banner-Nixon;;apparel-brand-banner_nixon.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_nixon.jpg;;;
+;;apparel-brand-banner-Oakley;;apparel-brand-banner_oakley.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_oakley.jpg;;;
+;;apparel-brand-banner-Orage;;apparel-brand-banner_orage.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_orage.jpg;;;
+;;apparel-brand-banner-Playboard;;apparel-brand-banner_playboard.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_playboard.jpg;;;
+;;apparel-brand-banner-Pro Tec;;apparel-brand-banner_protec.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_protec.jpg;;;
+;;apparel-brand-banner-PYUA;;apparel-brand-banner_pyua.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_pyua.jpg;;;
+;;apparel-brand-banner-Quiksilver;;apparel-brand-banner_quicksilver.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_quicksilver.jpg;;;
+;;apparel-brand-banner-Red;;apparel-brand-banner_red.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_red.jpg;;;
+;;apparel-brand-banner-Reef;;apparel-brand-banner_reef.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_reef.jpg;;;
+;;apparel-brand-banner-Rip Curl;;apparel-brand-banner_ripcurl.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_ripcurl.jpg;;;
+;;apparel-brand-banner-Roxy;;apparel-brand-banner_roxy.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_roxy.jpg;;;
+;;apparel-brand-banner-Sessions;;apparel-brand-banner_sessions.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_sessions.jpg;;;
+;;apparel-brand-banner-Special Blend;;apparel-brand-banner_specialblend.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_specialblend.jpg;;;
+;;apparel-brand-banner-Toko;;apparel-brand-banner_toko.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_toko.jpg;;;
+;;apparel-brand-banner-Vans;;apparel-brand-banner_vans.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_vans.jpg;;;
+;;apparel-brand-banner-VIVO;;apparel-brand-banner_vivo.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_vivo.jpg;;;
+;;apparel-brand-banner-Volcom;;apparel-brand-banner_volcom.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_volcom.jpg;;;
+;;apparel-brand-banner-Von Zipper;;apparel-brand-banner_vonzipper.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_vonzipper.jpg;;;
+;;apparel-brand-banner-WeSC;;apparel-brand-banner_wesc.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_wesc.jpg;;;
+;;apparel-brand-banner-WLD;;apparel-brand-banner_wld.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_wld.jpg;;;
+;;apparel-brand-banner-Zimtstern;;apparel-brand-banner_zimtstern.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_zimtstern.jpg;;;
+;;apparel-brand-banner-Aesthetiker;;apparel-brand-banner_aesthetiker.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_aesthetiker.jpg;;;
+;;apparel-brand-banner-Dakine;;apparel-brand-banner_dakine.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_dakine.jpg;;;
+;;apparel-brand-banner-GoPro Cam;;apparel-brand-banner_gopro.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_gopro.jpg;;;
+;;apparel-brand-banner-Nikita;;apparel-brand-banner_nikita.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_nikita.jpg;;;
+;;apparel-brand-banner-Periplus AC+Ion Guides;;apparel-brand-banner_periplus.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_periplus.jpg;;;
+;;apparel-brand-banner-Ride;;apparel-brand-banner_ride.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_ride.jpg;;;
+;;apparel-brand-banner-Skim One;;apparel-brand-banner_skmone.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_skmone.jpg;;;
+;;apparel-brand-banner-Skullcandy;;apparel-brand-banner_skullcandy.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_skullcandy.jpg;;;
+;;apparel-brand-banner-Southpoint;;apparel-brand-banner_southpoint.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_southpoint.jpg;;;
+;;apparel-brand-banner-Spy;;apparel-brand-banner_spy.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_spy.jpg;;;
+;;apparel-brand-banner-Surftech;;apparel-brand-banner_surftech.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_surftech.jpg;;;
+;;apparel-brand-banner-adidas eyewear;;apparel-brand-banner_adidas-eyewear.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_adidas-eyewear.jpg;;;
+;;apparel-brand-banner-TSG;;apparel-brand-banner_tsg.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_tsg.jpg;;;
+;;apparel-brand-banner-adidas Originals;;apparel-brand-banner_adidas-originals.jpg;$jarResourceCms/brand-images/apparel_uk/apparel-brand-banner_adidas-originals.jpg;;;
+
+
+#INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;category(code, $productCV);target(code)[default='sameWindow'];;
+#;;AccessoriesBeachTowelsLink;Beach Towels Link;;221200;;;
+#;;AccessoriesCamerasLink;Cameras Link;;221900;;;
+#;;AccessoriesElectronicLink;Electronic Link;;221800;;;
+#;;AccessoriesHeadphonesLink;Headphones Link;;221300;;;
+#;;AccessoriesJewelleryLink;Jewellery Link;;221500;;;
+#;;AccessoriesOthersLink;Others Link;;371200;;;
+#;;AccessoriesWomenStickerLink;Sticker Link;;221400;;;
+#;;AccessoriesVideocameraLink;Videocamera Link;;222000;;;
+#;;AccessoriesWalletsLink;Wallets Link;;220700;;;
+#;;AccessoriesWomenLink;Accessories Women Link;;370000;;;
+#;;AccessoriesWomenBandanasLink;Women Bandanas Link;;371600;;;
+#;;AccessoriesWomenBeachTowelsLink;Women Beach Towels Link;;370800;;;
+#;;AccessoriesWomenBeaniesLink;Women Beanies Link;;370200;;;
+#;;AccessoriesWomenCapsLink;Women Caps Link;;370100;;;
+#;;AccessoriesWomenGlovesLink;Women Gloves Link;;371100;;;
+#;;AccessoriesWomenJewelleryLink;Women Jewellery Link;;371800;;;
+#;;AccessoriesWomenOthersLink;Women Others Link;;371200;;;
+#;;AccessoriesWomenScarvesLink;Women Scarves Link;;371700;;;
+#;;AccessoriesWomenSocksLink;Women Socks Link;;370600;;;
+#;;AccessoriesWomenUnderwearLink;Women Underwear Link;;371000;;;
+#;;AccessoriesWomenWalletsLink;Women Wallets Link;;370300;;;
+#;;BrandsBrowseAllLink;Browse All Brands;;brands;;;
+#;;AllCategoriesLink;All Categories Link;/Categories/c/categories;;;;
+#;;AnonSunglassesLink;Anon Sunglasses Link;/Brands/Anon/c/Anon?q=:relevance:category:sunglasses;;;;
+#;;BackpacksLink;Backpacks Link;;backpack;;;
+#;;BillabongYouthTShirtsLink;Billabong Youth T-Shirts Link;/Brands/Billabong/c/Billabong?q=:relevance:category:270100;;;;
+#;;BlueTomatoYouthTShirtsLink;BlueTomato Youth T-Shirts Link;/Brands/BlueTomato/c/BlueTomato?q=:relevance:category:270100;;;;
+#;;CapsLink;Caps Link;;caps;;;
+#;;ClothesLink;Clothes Link;;clothes;;;
+#;;DaineseShirtsLink;Dainese Shirts Link;/Brands/Dainese/c/Dainese?q=:relevance:category:shirts;;;;
+#;;DakineBackpacksLink;Dakine Backpacks Link;/Brands/Dakine/c/Dakine?q=:relevance:category:backpack;;;;
+#;;DocumentationLink;Documentation Link;https://help.hybris.com;;newWindow;;
+#;;F2-FTWOShoesLink;F2-FTWO Shoes Link;/Brands/F2-FTWO/c/F2-FTWO?q=:relevance:category:shoes;;;;
+#;;FoxSunglassesLink;Fox Sunglasses Link;/Brands/Fox/c/Fox?q=:relevance:category:sunglasses;;;;
+#;;GogglesLink;Goggles Link;;goggles;;;
+#;;GuidesLink;Guides Link;;guides;;;
+#;;HelmetLink;Helmet Link;;helmet;;;
+#;;HomepageNavLink;Home Page Nav Link;/;;;;
+#;;OthersLink;Others Link;;others;;;
+#;;PlayboardShirtsLink;Playboard Shirts Link;/Brands/Playboard/c/Playboard?q=:relevance:category:shirts;;;;
+#;;QuiksilverSunglassesLink;Quiksilver Sunglasses Link;/Brands/Quiksilver/c/Quiksilver?q=:relevance:category:sunglasses;;;;
+#;;RoxySunglassesLink;Roxy Sunglasses Link;/Brands/Roxy/c/Roxy?q=:relevance:category:sunglasses;;;;
+#;;ShirtsLink;Shirts Link;;shirts;;;
+#;;ShoesLink;Shoes Link;;shoes;;;
+#;;SkiGearLink;Ski Gear Link;;skigear;;;
+#;;SnowwearMensLink;Snowwear Men Link;;190000;;;
+#;;SnowwearWomensLink;Snowwear Women Link;;"200000	";;;
+#;;SnowwearYouthLink;Snowwear Youth Link;;330000;;;
+#;;SpecialOffersLink;Special Offers Link;/Open-Catalogue/c/categories?q=:relevance:allPromotions:BOGOFApparel:allPromotions:10DiscountShoes:allPromotions:MultiBuyApparel:allPromotions:PerfectPartnerApparel:allPromotions:ProductBundleApparel;;;;
+#;;StreetwearMenLink;Streetwear Men Link;;250000;;;
+#;;StreetwearMenTShirtsAlienWorkshopLink;Streetwear Men T-Shirts Alien Workshop Link;;250100;;;
+#;;StreetwearWomenLink;Streetwear Women Link;;260000;;;
+#;;StreetwearYouthLink;Streetwear Youth Link;;270000;;;
+#;;SunglassesLink;Sunglasses Link;;sunglasses;;;
+#;;SurfLink;Surf Link;;surf;;;
+#;;VansShoesLink;Vans Shoes Link;/Brands/Vans/c/Vans?q=:relevance:category:shoes;;;;
+#;;VonZipperSunglassesLink;Von Zipper Sunglasses Link;/Brands/Von-Zipper/c/Von%20Zipper?q=:relevance:category:sunglasses;;;;
+#;;SandalsLink;Sandals Link;;sandals;;; 
+#;;BrowseAllSandalsLink;Browse Sandals Link;;sandals;;;
+#;;SandalsReefLink;Sandals Reef Link;/Collections/Surf/Sandals/c/sandals?q=:relevance:brand:Reef;;;;
+#;;SandalsRoxyLink;Sandals Roxy Link;/Collections/Surf/Sandals/c/sandals?q=:relevance:brand:Roxy;;;;
+#;;SandalsVolcomLink;Sandals Volcom Link;/Collections/Surf/Sandals/c/sandals?q=:relevance:brand:Volcom;;;;
+#;;ShadesBrowseAllLink;Shades Link;;210100;;; 
+#;;ShadesAnonLink;Shades Anon Link;/Collections/Surf/Shades/c/210100?q=:relevance:brand:Anon;;;; 
+#;;ShadesFoxLink;Shades Fox Link;/Collections/Surf/Shades/c/210100?q=:relevance:brand:Fox;;;; 
+#;;ShadesRoxyLink;Shades Roxy Link;/Collections/Surf/Shades/c/210100?q=:relevance:brand:Roxy;;;; 
+#;;ShadesQuiksilverLink;Shades Quiksilver Link;/Collections/Surf/Shades/c/210100?q=:relevance:brand:Quiksilver;;;; 
+#;;ShadesVonZipperLink;Shades VonZipper Link;/Collections/Surf/Shades/c/210100?q=:relevance:brand:Von+Zipper;;;; 
+#;;BoardsBrowseAllLink;Browse all Boards Link;;boards;;;
+#;;BoardsAlMerrickLink;Boards Al Merrick Link;Collections/Surf/Boards/c/boards?q=:relevance:brand:Al+Merrick;;;; 
+#;;BoardsSkimOneLink;Boards SkimOne Link;/Collections/Surf/Boards/c/boards?q=:relevance:brand:Skim+One;;;; 
+#;;BoardsSouthpointLink;Boards Southpoint Link;/Collections/Surf/Boards/c/boards?q=:relevance:brand:Southpoint;;;; 
+#;;BoardsSurftechLink;Boards Surftech Link;/Collections/Surf/Boards/c/boards?q=:relevance:brand:Surftech;;;; 
+#;;TShirtsLink;T-Shirts Link;;tshirts;;;
+#;;TShirtsBrowseAllLink;Browse T-Shirts Link;;tshirts;;;
+#;;TShirtsAlienWorkshopLink;T-Shirts Alien Workshop Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Alien+Workshop;;;; 
+#;;TShirtsBillabongLink;T-Shirts Billabong Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Billabong;;;; 
+#;;TShirtsBurtonLink;T-Shirts Burton Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Burton;;;; 
+#;;TShirtsBlueTomatoLink;T-Shirts Blue Tomato Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Blue+Tomato;;;; 
+#;;TShirtsCarharttLink;T-Shirts Carhartt Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Carhartt;;;; 
+#;;TShirtsDCLink;T-Shirts DC Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:DC;;;; 
+#;;TShirtsElementLink;T-Shirts Element Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Element;;;; 
+#;;TShirtsHorsefeathersLink;T-Shirts Horsefeathers Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Horsefeathers;;;;   
+#;;TShirtsQuiksilverLink;T-Shirts Quiksilver Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Quiksilver;;;;
+#;;TShirtsRoxyLink;T-Shirts Roxy Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Roxy;;;;
+#;;TShirtsVolcomLink;T-Shirts Volcom Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Volcom;;;; 
+#;;TShirtsZimtsternLink;T-Shirts Zimtstern Link;/Collections/Surf/T-Shirts/c/tshirts?q=:relevance:brand:Zimtstern;;;

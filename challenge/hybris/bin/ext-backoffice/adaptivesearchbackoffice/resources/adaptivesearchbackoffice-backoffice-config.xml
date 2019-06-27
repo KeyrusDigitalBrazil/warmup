@@ -1,0 +1,1358 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config" xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+	<!-- Explorer Tree configuration -->
+	<context merge-by="module" parent="auto" component="explorer-tree">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:navigation-node id="hmc_treenode_system" merge-mode="append">
+				<explorer-tree:navigation-node id="hmc.solrfacetsearch">
+					<explorer-tree:type-node code="AbstractAsSearchProfile" id="hmc_type_tree_searchprofile" />
+					<explorer-tree:type-node code="AsSearchProfileActivationSet" id="hmc_type_tree_searchprofileactivationset" />
+				</explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="AbstractAsSearchProfile">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>code + ' - ' + @labelService.getObjectLabel(itemtype)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+				refresh-after-object-creation="true">
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="name" />
+				<list-view:column qualifier="indexType" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="itemtype" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="code" selected="false" />
+					<advanced-search:field name="name" selected="false" />
+					<advanced-search:field name="indexType" selected="false" />
+					<advanced-search:field name="catalogVersion" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="name" />
+						<editorArea:attribute qualifier="indexType"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProvider</editorArea:name>
+								<editorArea:value>asIndexTypeDataProvider</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="catalogVersion" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+				<editorArea:tab name="tab.configuration.assearchprofile">
+					<editorArea:section name="sec.configuration.assearchprofile.details">
+						<editorArea:attribute qualifier="activationSet">
+							<editorArea:editor-parameter>
+								<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_catalogVersion</editorArea:name>
+								<editorArea:value>{parentObject.catalogVersion}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_indexType</editorArea:name>
+								<editorArea:value>{parentObject.indexType}</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="editorareaactions" merge-by="type" parent="auto">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject" />
+					<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="currentObject" />
+					<y:action action-id="com.hybris.cockpitng.action.clone" property="currentObject" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="collectioneditorareaactions" merge-by="type" parent="auto">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject" />
+					<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="currentObject" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-search-profile-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.assearchprofile.essential.label" sublabel="create.assearchprofile.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="code" />
+							<wz:property qualifier="name" />
+							<wz:property qualifier="indexType" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asIndexTypeDataProvider</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="catalogVersion" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.code != null AND newItem.indexType != null">
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+		<context component="create-wizard-with-parent">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-search-profile-create-wizard-with-parent"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.indexType" value="ctx.parentObject.indexType" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.assearchprofile.essential.label" sublabel="create.assearchprofile.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="code" />
+							<wz:property qualifier="name" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.code != null AND newItem.indexType != null">
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+	</context>
+
+	<context type="AsSimpleSearchProfile">
+		<context merge-by="type" parent="AbstractAsSearchProfile" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.assearchprofile" merge-mode="append">
+					<editorArea:section name="sec.configuration.assearchprofile.details">
+						<editorArea:attribute qualifier="searchConfigurations" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="AsCategoryAwareSearchProfile">
+		<context merge-by="type" parent="AbstractAsSearchProfile" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.assearchprofile" merge-mode="append">
+					<editorArea:section name="sec.configuration.assearchprofile.details">
+						<editorArea:attribute qualifier="searchConfigurations" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="AbstractAsSearchConfiguration">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>uid + ' - ' + @labelService.getObjectLabel(catalogVersion)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="uid" />
+				<list-view:column qualifier="catalogVersion" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="uid" selected="false" />
+					<advanced-search:field name="catalogVersion" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.general">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.properties">
+						<editorArea:attribute qualifier="uid" />
+						<editorArea:attribute qualifier="catalogVersion" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="AbstractAsConfigurableSearchConfiguration">
+		<context merge-by="type" parent="AbstractAsSearchConfiguration" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.facets">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.facets">
+						<editorArea:attribute qualifier="facetsMergeMode" />
+						<editorArea:attribute qualifier="promotedFacets" />
+						<editorArea:attribute qualifier="facets" />
+						<editorArea:attribute qualifier="excludedFacets" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.boosts">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.boostrules">
+						<editorArea:attribute qualifier="boostRulesMergeMode" />
+						<editorArea:attribute qualifier="boostRules" />
+					</editorArea:section>
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.boostitems">
+						<editorArea:attribute qualifier="boostItemsMergeMode" />
+						<editorArea:attribute qualifier="promotedItems" />
+						<editorArea:attribute qualifier="excludedItems" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.sorts">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.sorts">
+						<editorArea:attribute qualifier="sortsMergeMode" />
+						<editorArea:attribute qualifier="promotedSorts" />
+						<editorArea:attribute qualifier="sorts" />
+						<editorArea:attribute qualifier="excludedSorts" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context merge-by="type" parent="AbstractAsSearchConfiguration" component="as-editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.facets">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.facets">
+						<editorArea:attribute qualifier="facetsMergeMode" />
+						<editorArea:attribute qualifier="promotedFacets"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asPromotedFacetsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>itemDetailRenderer</editorArea:name>
+								<editorArea:value>asFacetValuesRenderer</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-promoted-facets-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="facets"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asFacetsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>itemDetailRenderer</editorArea:name>
+								<editorArea:value>asFacetValuesRenderer</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-facets-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>inlineEditingParams</editorArea:name>
+								<editorArea:value>priority</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="excludedFacets"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asExcludedFacetsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-excluded-facets-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.boosts">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.boostrules">
+						<editorArea:attribute qualifier="boostRulesMergeMode" />
+						<editorArea:attribute qualifier="boostRules"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asBoostRulesDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-boost-rules-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.boostitems">
+						<editorArea:attribute qualifier="boostItemsMergeMode" />
+						<editorArea:attribute qualifier="promotedItems"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asPromotedItemsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-promoted-items-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="excludedItems"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asExcludedItemsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-excluded-items-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.sorts">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.sorts">
+						<editorArea:attribute qualifier="sortsMergeMode" />
+						<editorArea:attribute qualifier="promotedSorts"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asPromotedSortsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-promoted-sorts-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="sorts"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asSortsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-sorts-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>inlineEditingParams</editorArea:name>
+								<editorArea:value>priority</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="excludedSorts"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurablemultireference">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandler</editorArea:name>
+								<editorArea:value>asExcludedSortsDataHandler</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataHandlerParameters</editorArea:name>
+								<editorArea:value>searchProfile={parentObject.searchProfile}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>context</editorArea:name>
+								<editorArea:value>as-excluded-sorts-editor</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>sortable</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="editorareaactions" merge-by="type" parent="auto">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletesearchconfiguration"
+						property="currentObject" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-promoted-facets-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="facetFiltersCount" />
+			</list-view:list-view>
+		</context>
+
+		<context component="as-promoted-facets-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.overridefacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.removefacetfilters" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.resetfacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-facets-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="facetFiltersCount" />
+				<list-view:column qualifier="priority" />
+			</list-view:list-view>
+		</context>
+
+		<context component="as-facets-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.overridefacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.removefacetfilters" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.promotefacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.excludefacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.rankfacetup" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.rankfacetdown" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-excluded-facets-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" />
+		</context>
+
+		<context component="as-excluded-facets-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.overridefacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.resetfacet" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-promoted-items-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" />
+		</context>
+
+		<context component="as-promoted-items-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.boostitems.overrideboostitem" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-excluded-items-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" />
+		</context>
+
+		<context component="as-excluded-items-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.boostitems.overrideboostitem" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-boost-rules-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="boostTypeSymbol" />
+				<list-view:column qualifier="boost" />
+			</list-view:list-view>
+		</context>
+
+		<context component="as-boost-rules-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-promoted-sorts-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" />
+		</context>
+
+		<context component="as-promoted-sorts-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.overridesort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.resetsort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-sorts-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="priority" />
+			</list-view:list-view>
+		</context>
+
+		<context component="as-sorts-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.overridesort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.promotesort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.excludesort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.ranksortup" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.ranksortdown" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="as-excluded-sorts-editor">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView" />
+		</context>
+
+		<context component="as-excluded-sorts-editor-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.editreference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.overridesort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.sorts.resetsort" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deleteoverridereference" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.deletereference" />
+				</y:group>
+			</y:actions>
+		</context>
+	</context>
+
+	<context type="AsSimpleSearchConfiguration">
+		<context merge-by="type" parent="AbstractAsConfigurableSearchConfiguration" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.general">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.properties"
+						merge-mode="replace">
+						<editorArea:attribute qualifier="searchProfile" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="uid" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="AsCategoryAwareSearchConfiguration">
+		<context merge-by="type" parent="AbstractAsConfigurableSearchConfiguration" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asconfigurablesearchconfiguration.general">
+					<editorArea:section name="sec.configuration.asconfigurablesearchconfiguration.properties"
+						merge-mode="replace">
+						<editorArea:attribute qualifier="searchProfile" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="uid" />
+						<editorArea:attribute qualifier="category" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+	</context>
+
+	<context type="AbstractAsFacetConfiguration">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>indexProperty + ' (' + facetType + ')'</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="indexProperty" />
+				<list-view:column qualifier="facetType" />
+				<list-view:column qualifier="priority" />
+				<list-view:column qualifier="searchConfiguration" />
+				<list-view:column qualifier="catalogVersion" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asfacetconfiguration">
+					<editorArea:section name="hmc.essential">
+						<editorArea:attribute qualifier="indexProperty" />
+						<editorArea:attribute qualifier="facetType" />
+					</editorArea:section>
+					<editorArea:section name="sec.configuration.asfacetconfiguration.details" merge-mode="append">
+						<editorArea:attribute qualifier="priority" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="tab.configuration.asfacetvalues">
+					<editorArea:section name="tab.configuration.asfacetvalues.configure" merge-mode="append">
+						<editorArea:attribute qualifier="valuesDisplayNameProvider"
+							editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValueClassTypes</editorArea:name>
+								<editorArea:value>de.hybris.platform.solrfacetsearch.provider.FacetDisplayNameProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValuesProvider</editorArea:name>
+								<editorArea:value>beansDropdownValuesProvider</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+
+						<editorArea:attribute qualifier="valuesSortProvider"
+							editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValueClassTypes</editorArea:name>
+								<editorArea:value>de.hybris.platform.solrfacetsearch.config.FacetSortProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValuesNameProvider</editorArea:name>
+								<editorArea:value>facetSortDropdownNamesProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValuesProvider</editorArea:name>
+								<editorArea:value>beansDropdownValuesProvider</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+
+						<editorArea:attribute qualifier="topValuesProvider"
+							editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValueClassTypes</editorArea:name>
+								<editorArea:value>de.hybris.platform.solrfacetsearch.provider.FacetTopValuesProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dropDownValuesProvider</editorArea:name>
+								<editorArea:value>beansDropdownValuesProvider</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+
+					<editorArea:section name="tab.configuration.asfacetvalues.valueOnStoreFront" merge-mode="append">
+						<editorArea:panel name="panel" colspan="4">
+							<editorArea:attribute qualifier="promotedValues"
+								editor="de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference" />
+							<editorArea:attribute qualifier="excludedValues"
+								editor="de.hybris.platform.adaptivesearchbackoffice.editors.facetvaluesmultireference" />
+						</editorArea:panel>
+						<editorArea:customPanel name="facetValuePanel" colspan="4" spring-bean="asFacetValuesPanelRenderer" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-facet-configuration-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.searchConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.asfacetconfiguration.essential.label" sublabel="create.asfacetconfiguration.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="indexProperty" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asFacetIndexPropertyDataProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dataProviderParameters</wz:name>
+									<wz:value>indexType={parentObject.searchConfiguration.searchProfile.indexType}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="facetType" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:next visible="newItem.indexProperty != null AND newItem.facetType != null" />
+						<wz:done visible="newItem.indexProperty != null AND newItem.facetType != null" />
+					</wz:navigation>
+				</wz:step>
+				<wz:step id="step2" label="create.asfacetconfiguration.optional.label" sublabel="create.asfacetconfiguration.optional.sublabel">
+					<wz:content id="step2.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="priority" />
+							<wz:property qualifier="valuesSortProvider"
+								editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+								<wz:editor-parameter>
+									<wz:name>dropDownValueClassTypes</wz:name>
+									<wz:value>de.hybris.platform.solrfacetsearch.config.FacetSortProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dropDownValuesNameProvider</wz:name>
+									<wz:value>facetSortDropdownNamesProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dropDownValuesProvider</wz:name>
+									<wz:value>beansDropdownValuesProvider</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="valuesDisplayNameProvider"
+								editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+								<wz:editor-parameter>
+									<wz:name>dropDownValueClassTypes</wz:name>
+									<wz:value>de.hybris.platform.solrfacetsearch.provider.FacetDisplayNameProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dropDownValuesProvider</wz:name>
+									<wz:value>beansDropdownValuesProvider</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="topValuesProvider"
+								editor="de.hybris.platform.solrfacetsearchbackoffice.editor.configurabledropdowneditor">
+								<wz:editor-parameter>
+									<wz:name>dropDownValueClassTypes</wz:name>
+									<wz:value>de.hybris.platform.solrfacetsearch.provider.FacetTopValuesProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dropDownValuesProvider</wz:name>
+									<wz:value>beansDropdownValuesProvider</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step2.navigation">
+						<wz:cancel />
+						<wz:back />
+						<wz:done visible="newItem.indexProperty != null AND newItem.facetType != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+
+		<context component="as-facet-values-panel-actions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.promotefacetvalue" />
+					<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.facets.excludefacetvalue" />
+				</y:group>
+			</y:actions>
+		</context>
+	</context>
+
+	<context type="AbstractAsFacetValueConfiguration">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>'[' + value + ']'</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="value" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asfacetValueConfiguration">
+					<editorArea:section name="hmc.essential">
+						<editorArea:attribute qualifier="value" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-facet-value-configuration-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.facetConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.asfacetconfiguration.essential.label" sublabel="create.asfacetconfiguration.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="value" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1-navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.value != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="AbstractAsBoostItemConfiguration">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>labelService.getObjectLabel(item)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="item" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.asboostitemconfiguration">
+					<editorArea:section name="hmc.essential">
+						<editorArea:attribute qualifier="item"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-boost-item-configuration-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.searchConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.asboostitemconfiguration.essential.label" sublabel="create.asboostitemconfiguration.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="item" editor="de.hybris.platform.adaptivesearchbackoffice.editors.boostitemreference" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.item != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="AsBoostRule">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>indexProperty + ' ' + @labelService.getObjectLabel(operator) + ' ' + value + ' -> [' + boostType + ' ' +
+						boost + ']'
+					</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="indexProperty" />
+				<list-view:column qualifier="operator" />
+				<list-view:column qualifier="value" />
+				<list-view:column qualifier="boostType" />
+				<list-view:column qualifier="boost" />
+				<list-view:column qualifier="searchConfiguration" />
+				<list-view:column qualifier="catalogVersion" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="indexProperty" />
+						<editorArea:attribute qualifier="operator"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProvider</editorArea:name>
+								<editorArea:value>asBoostOperatorDataProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProviderParameters</editorArea:name>
+								<editorArea:value>indexType={parentObject.searchConfiguration.searchProfile.indexType};indexProperty={parentObject.indexProperty}
+								</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="value"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue">
+							<editorArea:editor-parameter>
+								<editorArea:name>indexType</editorArea:name>
+								<editorArea:value>{parentObject.searchConfiguration.searchProfile.indexType}</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="boostType" />
+						<editorArea:attribute qualifier="boost" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+				<editorArea:tab name="tab.configuration.asboostrule">
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-boost-rule-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.searchConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.asboostrule.essential.label" sublabel="create.asboostrule.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="indexProperty" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asIndexPropertyDataProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dataProviderParameters</wz:name>
+									<wz:value>indexType={parentObject.searchConfiguration.searchProfile.indexType}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:next visible="newItem.indexProperty != null" />
+					</wz:navigation>
+				</wz:step>
+				<wz:step id="step2" label="create.asboostrule.essential.label" sublabel="create.asboostrule.essential.sublabel">
+					<wz:content id="step2.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="indexProperty" readonly="true" />
+							<wz:property qualifier="operator" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asBoostOperatorDataProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dataProviderParameters</wz:name>
+									<wz:value>indexType={parentObject.searchConfiguration.searchProfile.indexType};indexProperty={parentObject.indexProperty}
+									</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="value" editor="de.hybris.platform.adaptivesearchbackoffice.editors.boostrulevalue">
+								<wz:editor-parameter>
+									<wz:name>indexType</wz:name>
+									<wz:value>{parentObject.searchConfiguration.searchProfile.indexType}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="boostType" />
+							<wz:property qualifier="boost" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step2.navigation">
+						<wz:cancel />
+						<wz:back />
+						<wz:done
+							visible="newItem.indexProperty != null AND newItem.operator != null AND newItem.value != null AND newItem.boostType != null AND newItem.boost != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="AbstractAsSortConfiguration">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="name" />
+				<list-view:column qualifier="priority" />
+				<list-view:column qualifier="applyPromotedItems" />
+				<list-view:column qualifier="highlightPromotedItems" />
+				<list-view:column qualifier="searchConfiguration" />
+				<list-view:column qualifier="catalogVersion" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="name" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+				<editorArea:tab name="tab.configuration.assort">
+					<editorArea:section name="sec.configuration.assort.details" merge-mode="append">
+						<editorArea:attribute qualifier="priority" />
+						<editorArea:attribute qualifier="expressions" />
+					</editorArea:section>
+					<editorArea:section name="sec.configuration.assort.promoteditems" merge-mode="append">
+						<editorArea:attribute qualifier="applyPromotedItems" />
+						<editorArea:attribute qualifier="highlightPromotedItems" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-sort-create-wizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.searchConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.assort.essential.label" sublabel="create.assort.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="code" />
+							<wz:property qualifier="name" />
+							<wz:property qualifier="priority" />
+							<wz:property qualifier="expressions">
+								<wz:editor-parameter>
+									<wz:name>isNestedObjectCreationDisabled</wz:name>
+									<wz:value>false</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:next visible="newItem.code != null" />
+						<wz:done visible="newItem.code != null" />
+					</wz:navigation>
+				</wz:step>
+				<wz:step id="step2" label="create.assort.promoteditems.label" sublabel="create.assort.promoteditems.sublabel">
+					<wz:content id="step2.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="applyPromotedItems" />
+							<wz:property qualifier="highlightPromotedItems" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step2.navigation">
+						<wz:cancel />
+						<wz:back />
+						<wz:done visible="newItem.code != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="AsSortExpression">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>expression + ' (' + order + ')'</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="referenceListView">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="expression" />
+				<list-view:column qualifier="order" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="expression"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProvider</editorArea:name>
+								<editorArea:value>asSortExpressionDataProvider</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProviderParameters</editorArea:name>
+								<editorArea:value>indexType={parentObject.sortConfiguration.searchConfiguration.searchProfile.indexType}
+								</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="order" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-sort-create-wizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.sortConfiguration" value="ctx.parentObject" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.assort.essential.label" sublabel="create.assort.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="expression" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asSortExpressionDataProvider</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>dataProviderParameters</wz:name>
+									<wz:value>indexType={parentObject.sortConfiguration.searchConfiguration.searchProfile.indexType}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="order" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.expression != null" />
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="AsSearchProfileActivationSet">
+		<context merge-by="type" parent="GenericItem" component="base">
+			<y:base>
+				<y:labels>
+					<y:label>indexType + ' - ' + @labelService.getObjectLabel(catalogVersion)</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+				refresh-after-object-creation="true">
+				<list-view:column qualifier="indexType" />
+				<list-view:column qualifier="catalogVersion" />
+			</list-view:list-view>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="indexType" selected="false" />
+					<advanced-search:field name="catalogVersion" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+
+		<context merge-by="type" parent="GenericItem" component="editor-area">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:essentials>
+					<editorArea:essentialSection name="hmc.essential">
+						<editorArea:attribute qualifier="indexType"
+							editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+							<editorArea:editor-parameter>
+								<editorArea:name>dataProvider</editorArea:name>
+								<editorArea:value>asIndexTypeDataProvider</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="catalogVersion" />
+					</editorArea:essentialSection>
+				</editorArea:essentials>
+				<editorArea:tab name="tab.configuration.assearchprofileactivationset">
+					<editorArea:section name="sec.configuration.assearchprofileactivationset.details" merge-mode="append">
+						<editorArea:attribute qualifier="searchProfiles">
+							<editorArea:editor-parameter>
+								<editorArea:name>isNestedObjectCreationDisabled</editorArea:name>
+								<editorArea:value>true</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_catalogVersion</editorArea:name>
+								<editorArea:value>{parentObject.catalogVersion}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_indexType</editorArea:name>
+								<editorArea:value>{parentObject.indexType}</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<context component="editorareaactions" merge-by="type" parent="auto">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject" />
+					<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="currentObject" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="collectioneditorareaactions" merge-by="type" parent="auto">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.delete" property="currentObject" />
+					<y:action action-id="com.hybris.backoffice.widgets.actions.sync" property="currentObject" />
+				</y:group>
+			</y:actions>
+		</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="as-search-profile-activation-set-create-wizard"
+				title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="prepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.assearchprofileactivationset.essential.label" sublabel="create.assearchprofileactivationset.essential.sublabel">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem">
+							<wz:property qualifier="indexType" editor="de.hybris.platform.adaptivesearchbackoffice.editors.configurabledropdown">
+								<wz:editor-parameter>
+									<wz:name>dataProvider</wz:name>
+									<wz:value>asIndexTypeDataProvider</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="catalogVersion" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel />
+						<wz:done visible="newItem.indexType != null">
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<!-- Search Result Browser Actions -->
+	<context component="as-promoted-results-actions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.discardoverridepromoteditem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.overridepromoteditem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.unpromoteitem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.rankitemfirst" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.rankitemup" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.rankitemdown" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.rankitemlast" property="currentObject" />
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context component="as-default-results-actions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.discardoverridepromoteditem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.overridepromoteditem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.promoteitem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.unpromoteitem" property="currentObject" />
+				<y:action action-id="de.hybris.platform.adaptivesearchbackoffice.actions.results.excludeitem" property="currentObject" />
+			</y:group>
+		</y:actions>
+	</context>
+</config>

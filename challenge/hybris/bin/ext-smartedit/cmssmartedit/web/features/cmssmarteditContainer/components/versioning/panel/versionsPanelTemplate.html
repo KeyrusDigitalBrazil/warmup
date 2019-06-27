@@ -1,0 +1,29 @@
+<div class="se-toolbar-menu-content--wrapper">
+    <div class="se-toolbar-menu-content--header">
+        <div class="se-toolbar-menu-content--header__title se-version-toolbar-menu-content--header__title"
+            data-translate="se.cms.actionitem.page.versions">
+        </div>
+    </div>
+    <div class="se-version-toolbar-menu-content--body">
+        <versions-search data-versions-found="$ctrl.versionsFound"
+            data-on-search-term-changed="$ctrl.onSearchTermChanged(newSearchTerm)"
+            data-show-search-controls="$ctrl.pageHasVersions()"></versions-search>
+        <div>
+            <y-infinite-scrolling data-page-size="$ctrl.pageSize"
+                data-mask="$ctrl.searchTerm"
+                data-fetch-page="$ctrl.loadVersions"
+                data-context="$ctrl"
+                data-ng-if="$ctrl.pageHasVersionsOrIsLoading()"
+                class="se-version-panel--infinite-scroll">
+
+                <div data-ng-repeat="item in $ctrl.items track by $index">
+                    <version-item data-page-version="item"></version-item>
+                </div>
+            </y-infinite-scrolling>
+            <div data-ng-if="!$ctrl.pageHasVersionsOrIsLoading()"
+                class="se-version-panel--empty-version-list">
+                <span>{{ 'se.cms.toolbaritem.versioning.noversionsfound' | translate }}</span>
+            </div>
+        </div>
+    </div>
+</div>

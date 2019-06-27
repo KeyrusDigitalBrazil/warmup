@@ -1,0 +1,31 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.
+# All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# OMS velocity template for printing label
+
+$contentCatalog=contentCatalog_online
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$lang=en
+$picture=media(code, $contentCV);
+
+# CMS components and Email velocity templates
+UPDATE RendererTemplate;code[unique=true];description[lang=$lang];templateScript[lang=$lang,translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;pick-slip-template;"pick-slip-template";jar:/warehousingwebservices/test/impex/test-pickLayout.vm
+;consolidated-pick-slip-template;"consolidated-pick-slip-template";jar:/warehousingwebservices/test/impex/test-consolidatedPickLayout.vm
+;pack-template;"pack-template";jar:/warehousingwebservices/test/impex/test-packLayout.vm
+;shipping-label-template;"shipping-label-template";jar:/warehousingwebservices/test/impex/test-shippingLayout.vm
+;return-shipping-label-template;"return-shipping-label-template";jar:/warehousingwebservices/test/impex/test-returnShippingLayout.vm
+;export-form-template;"export-form-template";jar:/warehousingwebservices/test/impex/test-exportFormLayout.vm
+;return-form-template;"return-form-template";jar:/warehousingwebservices/test/impex/test-returnFormLayout.vm
+
+# Import config properties into impex macros for modulegen
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$emailResource=$config-emailResourceValue

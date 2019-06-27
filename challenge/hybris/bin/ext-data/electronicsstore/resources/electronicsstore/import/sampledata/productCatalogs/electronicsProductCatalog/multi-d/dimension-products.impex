@@ -1,0 +1,43 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#PRODUCTS
+
+# Macros / Replacement Parameter definitions
+$productCatalog=electronicsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='approved']
+
+# Insert Variant Category
+INSERT_UPDATE VariantCategory      ; code[unique=true] ; name       ; $supercategories ; hasImage ; $catalogVersion ; allowedPrincipals(uid)[default='customergroup']
+                                   ; B2C_Color         ; Color      ;                  ; true
+
+
+#Insert Variant Value Category
+INSERT_UPDATE VariantValueCategory ; code[unique=true] ; name       ; $supercategories ; sequence ; $catalogVersion ; allowedPrincipals(uid)[default='customergroup']
+                                   ; B2C_Red           ; Red        ; B2C_Color        ; 1
+                                   ; B2C_Green         ; Green      ; B2C_Color        ; 2
+                                   ; B2C_Blue          ; Blue       ; B2C_Color        ; 3
+
+
+# Insert Products
+INSERT_UPDATE Product ; code[unique=true] ; $supercategories            ; manufacturerName    ;manufacturerAID  ; variantType(code)     ; unit(code)[default=pieces] ; $catalogVersion
+                      ; 1978440_md        ; 576, brand_5, B2C_Color     ; Sony				  ;DSC-H20          ; GenericVariantProduct ; pieces
+                      
+
+
+#Updating product information
+INSERT_UPDATE GenericVariantProduct ; code[unique=true]   ; $baseProduct ;$catalogVersion ; ean           ; $supercategories  ; $approved                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                    ; 1978440_md_red      ; 1978440_md      ; 				  ; 4905524593235 ; B2C_Red           ; approved  
+                                    ; 1978440_md_green    ; 1978440_md      ; 				  ; 4905524593235 ; B2C_Green         ; approved  
+                                    ; 1978440_md_blue     ; 1978440_md      ; 				  ; 4905524593235 ; B2C_Blue          ; approved
+                                    

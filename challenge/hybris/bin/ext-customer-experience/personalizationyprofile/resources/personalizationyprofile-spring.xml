@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+           	
+	<beans>	
+		<!--YaaS Client -->
+		<bean id="cxAbstractClientAdapter" class="de.hybris.platform.personalizationyprofile.yaas.client.AbstractClientAdapter" abstract="true" >
+			<property name="apiRegistryClientService" ref="apiRegistryClientService" />
+		</bean>
+
+		<alias name="defaultCxProfileServiceClientAdapter" alias="cxProfileServiceClient"/>	
+		<bean id="defaultCxProfileServiceClientAdapter" class="de.hybris.platform.personalizationyprofile.yaas.client.CxProfileServiceClientAdapter" parent="cxAbstractClientAdapter">
+		</bean>
+
+		<alias name="defaultCxIdentityServiceClientAdapter" alias="cxIdentityServiceClient"/>	
+		<bean id="defaultCxIdentityServiceClientAdapter" class="de.hybris.platform.personalizationyprofile.yaas.client.CxIdentityServiceClientAdapter" parent="cxAbstractClientAdapter">
+		</bean>
+	</beans>
+
+	<beans>
+		<!-- Mappers mechanism -->
+		<alias name="defaultConsumptionLayerIntegrationConverter" alias="consumptionLayerIntegrationConverter"/>
+		<bean id="defaultConsumptionLayerIntegrationConverter" parent="faultTolerantConverter">
+			<property name="targetClass" value="de.hybris.platform.personalizationintegration.mapping.MappingData"/>
+			<property name="populators">
+				<list>
+					<ref bean="cxFixedSegmentsConsumptionLayerMapper"/>
+					<ref bean="cxScriptConsumptionLayerMapper"/>
+					<ref bean="cxCatalogConsumptionLayerMapper"/>
+					<ref bean="cxProductConsumptionLayerMapper"/>
+					<ref bean="cxLocationConsumptionLayerMapper"/>
+					<ref bean="cxOrderMapper"/>
+					<ref bean="cxSegmentMapper" />
+				</list>
+			</property>
+		</bean>
+	
+		<bean depends-on="cxIntegrationConvertersMap" parent="mapMergeDirective">
+			<property name="key" value="consumptionLayerIntegrationConverter" />
+			<property name="value" ref="consumptionLayerIntegrationConverter" />
+		</bean>
+
+
+		<alias name="defaultCxSegmentMapper" alias="cxSegmentMapper"/>
+		<bean id="defaultCxSegmentMapper" class="de.hybris.platform.personalizationyprofile.mapper.impl.CxSegmentMapper" >
+			<property name="cxConfigurationService" ref="cxConfigurationService" />
+            <property name="configurationService" ref="configurationService" />
+            <property name="prefix" value="${personalizationyprofile.mapper.segment.prefix}" />
+		</bean>
+
+		<alias name="defaultCxOrderMapper" alias="cxOrderMapper"/>
+		<bean id="defaultCxOrderMapper" class="de.hybris.platform.personalizationyprofile.mapper.impl.CxOrderMapper" >
+		    <property name="cxConfigurationService" ref="cxConfigurationService" />
+            <property name="configurationService" ref="configurationService" />
+        </bean>
+
+		<alias name="defaultCxCatalogConsumptionLayerMapper" alias="cxCatalogConsumptionLayerMapper" />
+		<bean id="defaultCxCatalogConsumptionLayerMapper"
+			class="de.hybris.platform.personalizationyprofile.mapper.impl.CxCategoryConsumptionLayerMapper">
+			<property name="configurationService" ref="configurationService" />
+			<property name="affinityStrategy" ref="cxConsumptionLayerSumAffinityStrategy" />
+			<property name="prefix" value="${personalizationyprofile.mapper.catalog.prefix}" />
+		</bean>
+
+		<alias name="defaultCxProductConsumptionLayerMapper" alias="cxProductConsumptionLayerMapper" />
+		<bean id="defaultCxProductConsumptionLayerMapper"
+			class="de.hybris.platform.personalizationyprofile.mapper.impl.CxProductConsumptionLayerMapper">
+			<property name="configurationService" ref="configurationService" />
+			<property name="affinityStrategy" ref="cxConsumptionLayerSumAffinityStrategy" />
+			<property name="prefix" value="${personalizationyprofile.mapper.product.prefix}" />
+		</bean>
+
+		<alias name="defaultCxLocationConsumptionLayerMapper" alias="cxLocationConsumptionLayerMapper" />
+		<bean id="defaultCxLocationConsumptionLayerMapper"
+			class="de.hybris.platform.personalizationyprofile.mapper.impl.CxLocationConsumptionLayerMapper">
+			<property name="configurationService" ref="configurationService" />
+			<property name="affinityStrategy" ref="cxConsumptionLayerSumAffinityStrategy" />
+			<property name="prefix" value="${personalizationyprofile.mapper.location.prefix}" />
+		</bean>
+
+
+		<alias name="defaultCxFixedSegmentsConsumptionLayerMapper" alias="cxFixedSegmentsConsumptionLayerMapper"/>
+		<bean id="defaultCxFixedSegmentsConsumptionLayerMapper" class="de.hybris.platform.personalizationyprofile.mapper.impl.DefaultCxFixedSegmentsConsumptionLayerMapper" parent="cxFixedSegmentsProfileMapper"/>
+	
+		<alias name="defaultCxScriptConsumptionLayerMapper" alias="cxScriptConsumptionLayerMapper"/>
+		<bean id="defaultCxScriptConsumptionLayerMapper" class="de.hybris.platform.personalizationyprofile.mapper.impl.DefaultCxScriptConsumptionLayerMapper"  parent="cxScriptProfileMapper">
+			<property name="scriptGroup" value="consumptionLayer"/>
+		</bean>
+	
+		<bean id="cxScriptMapperInterceptor" class="de.hybris.platform.personalizationyprofile.interceptor.CxScriptMapperInterceptor">
+			<property name="consumptionLayerUserSegmentsProvider" ref="consumptionLayerUserSegmentsProvider"/>
+		</bean>          
+
+		<bean id="cxScriptMapperInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+			<property name="interceptor" ref="cxScriptMapperInterceptor" />
+			<property name="typeCode" value="CxMapperScript" />
+		</bean>
+	
+		<bean id="cxConsumptionLayerCurrentAffinityStrategy" class="de.hybris.platform.personalizationyprofile.mapper.affinity.impl.CxConsumptionLayerCurrentAffinityStrategy" />
+		<bean id="cxConsumptionLayerPreviousAffinityStrategy" class="de.hybris.platform.personalizationyprofile.mapper.affinity.impl.CxConsumptionLayerPreviousAffinityStrategy" />
+		<bean id="cxConsumptionLayerSumAffinityStrategy" class="de.hybris.platform.personalizationyprofile.mapper.affinity.impl.CxConsumptionLayerSumAffinityStrategy" />
+
+
+		<!-- cx process parameter strategies -->
+		<alias name="defaultCxProcessParameterConsentReferenceStrategy" alias="CxProcessParameterConsentReferenceStrategy"/>
+		<bean id="defaultCxProcessParameterConsentReferenceStrategy" class="de.hybris.platform.personalizationyprofile.strategy.impl.CxProcessParameterConsentReferenceStrategy" parent="abstractCxProcessParameterStrategy">
+			<property name="sessionService" ref="sessionService"/>
+			<property name="supportedParameters" value="PROFILE_ID" />
+		</bean>
+
+		<bean id="consentReferenceEventDataHandler" class="de.hybris.platform.personalizationyprofile.event.ConsentReferenceEventDataHandler" >
+			<property name="sessionService" ref="sessionService" />
+		</bean>
+
+		<bean id="consentReferenceEventDataProviderListMergeDirective" depends-on="anonymousConsentChangeEventDataProviders" parent="listMergeDirective">
+			<property name="add" ref="consentReferenceEventDataHandler"/>
+		</bean>
+
+	</beans>
+
+	<beans>
+		<!-- Segment provider -->
+	
+		<bean id="consumptionLayerUserSegmentsProvider"
+			class="de.hybris.platform.personalizationyprofile.segment.ConsumptionLayerUserSegmentsProvider">
+			<property name="cxProfileServiceClient" ref="cxProfileServiceClient"/>
+			<property name="cxProfileIdentifierStrategy" ref="cxProfileIdentifierStrategy"/>
+			<property name="cxIntegrationMappingService" ref="cxIntegrationMappingService"/>
+		</bean>
+	
+		<alias name="defaultCxProfileIdentifierStrategy" alias="cxProfileIdentifierStrategy"/>
+		<bean id="defaultCxProfileIdentifierStrategy" class="de.hybris.platform.personalizationyprofile.strategy.impl.DefaultCxProfileIdentifierStrategy">
+			<property name="sessionService" ref="sessionService"/>
+			<property name="userService" ref="userService"/>
+			<property name="defaultSessionTokenService" ref="defaultSessionTokenService"/>
+			<property name="cxIdentityServiceClient" ref="cxIdentityServiceClient"/>
+			<property name="pauseConsentReferenceUseParameters">
+				<util:list>
+					<value>ASM</value>
+					<value>profile.tracking.pause</value>
+				</util:list>
+			</property>
+		</bean>
+
+		<!-- cx occ personalization process interceptor -->
+		<bean id="cdsCxOccInterceptor" class="de.hybris.platform.personalizationyprofile.occ.CdsCxOccInterceptor" >
+			<property name="sessionService" ref="sessionService"/>
+			<property name="baseSiteService" ref="baseSiteService" />
+		</bean>
+
+	</beans>
+</beans>

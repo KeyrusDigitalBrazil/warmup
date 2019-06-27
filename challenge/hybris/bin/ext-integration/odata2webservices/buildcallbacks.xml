@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<project name="odata2webservices_buildcallbacks">
+
+	<macrodef name="odata2webservices_clean_classpath_file">
+		<sequential>
+			<copy file="${ext.odata2webservices.path}/.classpath" tofile="${ext.odata2webservices.path}/.classpath.edit"
+				  overwrite="true"
+				  failonerror="true">
+				<filterchain>
+					<linecontainsregexp negate="true">
+						<regexp pattern="^(\t\t\t\t|)$" />  <!-- added by script -->
+					</linecontainsregexp>
+				</filterchain>
+			</copy>
+			<move file="${ext.odata2webservices.path}/.classpath.edit" tofile="${ext.odata2webservices.path}/.classpath"
+				  overwrite="true"
+				  failonerror="true" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="odata2webservices_after_clean">
+		<sequential>
+			<echo level="info" message="Generating .classpath file for odata2webservices" />
+			<create_extension_classpath_file extname="odata2webservices" />
+			<odata2webservices_clean_classpath_file />
+		</sequential>
+	</macrodef>
+
+</project>

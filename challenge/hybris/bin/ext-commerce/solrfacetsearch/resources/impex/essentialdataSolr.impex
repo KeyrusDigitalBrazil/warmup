@@ -1,0 +1,43 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Create cron job templates
+INSERT_UPDATE ServicelayerJob ; code[unique=true]               ; springid                       
+                              ; solrQueryStatisticsCollectorJob ; solrQueryStatisticsCollectorJob
+                              ; solrUpdateSynonymsJob           ; solrUpdateSynonymsJob          
+
+# Creates the Solr server configurations
+INSERT_UPDATE SolrServerConfig ; name[unique=true] ; mode(code) ; username   ; password  ; indexingUsername   ; indexingPassword 
+                               ; Default           ; standalone ; solrclient ; client123 ; solrindexingclient ; indexingclient123
+                               ; Local Standalone  ; standalone ; solrclient ; client123 ; solrindexingclient ; indexingclient123
+                               ; Local Cloud       ; cloud      ; solrclient ; client123 ; solrindexingclient ; indexingclient123
+
+# Updates the endpoints for the Solr server configurations
+INSERT_UPDATE SolrEndpointUrl ; solrServerConfig(name)[unique=true] ; url[unique=true]            ; master
+                              ; Default                             ; http://localhost:8983/solr  ; false 
+                              ; Default                             ; https://localhost:8983/solr ; true  
+                              ; Local Standalone                    ; http://localhost:8983/solr  ; false 
+                              ; Local Standalone                    ; https://localhost:8983/solr ; true  
+                              ; Local Cloud                         ; localhost:9983              ;       
+                              
+# Removes old http endpoints
+REMOVE SolrEndpointUrl ; solrServerConfig(name)[unique=true] ; url[unique=true]          
+                       ; Default                             ; http://localhost:8983/solr
+                       ; Local Standalone                    ; http://localhost:8983/solr
+
+# Updates the indexer configurations
+INSERT_UPDATE SolrIndexConfig ; name[unique=true] ; batchSize ; numberOfThreads
+                              ; Default           ; 100       ; 5              
+                              ; Direct            ; 100       ; 5              
+                              ; Two-Phase         ; 100       ; 5              
+
+# Updates the search configurations
+INSERT_UPDATE SolrSearchConfig ; description[unique=true] ; pageSize
+                               ; Default                  ; 20      

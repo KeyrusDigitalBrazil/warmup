@@ -1,0 +1,56 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndexedType${testId}
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online${testId}'])[unique=true,default='hwcatalog:Online${testId}']
+$supercategories=supercategories(code,catalogversion(catalog(id[default='hwcatalog']),version[default='Online${testId}']))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);active
+;hwcatalog;Online${testId};en;true
+
+INSERT_UPDATE Category;code[unique=true];$catalogVersion;name[lang=en];$supercategories;description[lang=en]
+;category1;;Category 1;;Category 1
+;category2;;Category 2;;Category 2
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;name[lang=en];name[lang=de];$supercategories;description[lang=en];$prices;approvalStatus(code);manufacturerName;unit(code)
+;product1;;Product 1;Product 1;category1;Product1;157,95 EUR;approved;Manufacturer Name;pieces
+;product2;;Product 2;Product 2;category2;Product2;422 EUR;approved;Manufacturer Name;pieces
+
+INSERT_UPDATE SolrIndexConfig;name[unique=true];indexMode(code);batchSize
+;testIndexConfig${testId};DIRECT;100
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];catalogversions(catalog(id),version)
+;testFacetSearchConfig${testId};hwcatalog:Online${testId}
+
+# search profile
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name;indexType[default=$indexType];$catalogVersion[unique=true] 
+;simpleProfile;Simple Search Profile;;
+
+# search configuration
+INSERT_UPDATE AsSimpleSearchConfiguration;searchProfile(code,$catalogVersion)[unique=true];uid[unique=true];facetsMergeMode(code);boostItemsMergeMode(code);boostRulesMergeMode(code);$catalogVersion[unique=true]
+;simpleProfile;searchConfiguration;REPLACE;REPLACE;REPLACE;
+
+INSERT_UPDATE AsBoostRule;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];indexProperty;operator(code);value;boost;boostType(code);$catalogVersion[unique=true]
+;searchConfiguration;17e96a5b-8fcc-47f2-8503-5b3937a5979b;code;MATCH;product1;2.0;MULTIPLICATIVE;
+;searchConfiguration;af0d0509-cc0b-4418-b446-6e5f0b696fc1;priceValue;GREATER_THAN;400;5.0;MULTIPLICATIVE;
+
+INSERT_UPDATE AsPromotedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;categoryCode;MULTISELECT_OR;100;
+
+INSERT_UPDATE AsFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;manufacturerName;REFINE;120;
+;searchConfiguration;price;MULTISELECT_OR;100;
+
+INSERT_UPDATE AsExcludedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;categoryName;MULTISELECT_AND;90;
+
+INSERT_UPDATE AsSearchProfileActivationSet;indexType[default=$indexType][unique=true];$catalogVersion[unique=true];searchProfiles(code,$catalogVersion)
+;;;simpleProfile

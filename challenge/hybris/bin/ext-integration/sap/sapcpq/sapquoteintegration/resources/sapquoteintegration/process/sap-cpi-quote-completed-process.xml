@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkQuoteState" name="sap-cpi-quote-completed-process"
+	processClass="de.hybris.platform.commerceservices.model.process.QuoteProcessModel">
+
+	<action id="checkQuoteState" bean="sapCheckQuoteStateAction">
+		<transition name="OK" to="waitForERPOrderConfirmation" />
+		<transition name="NOK" to="sendQuoteStatusToScpi" />
+	</action>
+	
+	<wait id="waitForERPOrderConfirmation" then="sendQuoteStatusToScpi" prependProcessCode="false">
+		<event>ERPOrderConfirmationEventForQuote_${process.orderCode}</event>
+	</wait>
+	
+	<action id="sendQuoteStatusToScpi" bean="sapSendQuoteStatusAction">
+		<transition name="OK" to="success" />
+		<transition name="NOK" to="failed" />
+	</action>
+	
+	<end id="failed" state="FAILED" />
+    <end id="success" state="SUCCEEDED" />
+
+</process>

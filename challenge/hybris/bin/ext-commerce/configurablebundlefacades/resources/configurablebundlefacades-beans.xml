@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<bean class="de.hybris.platform.configurablebundlefacades.data.BundleTemplateData">
+		<property name="id" type="String"/> 
+		<property name="name" type="String"/>
+		<property name="type" type="String"/>
+        <property name="version" type="String"/>
+        <property name="bundleTemplates" type="java.util.List&lt;de.hybris.platform.configurablebundlefacades.data.BundleTemplateData>"/>
+        <property name="products" type="java.util.List&lt;de.hybris.platform.commercefacades.product.data.ProductData>"/>
+        <property name="maxItemsAllowed" type="int"/>
+		<property name="rootBundleTemplateName" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.product.data.ProductData">		
+		<property name="soldIndividually" type="boolean"/>
+		<property name="lowestBundlePrice" type="de.hybris.platform.commercefacades.product.data.PriceData"/>
+		<property name="bundleTemplates" type="java.util.List&lt;de.hybris.platform.configurablebundlefacades.data.BundleTemplateData>"/>		
+		<property name="disabled" type="boolean" deprecated="Deprecated since 6.5, please use the ProductData.addToCartDisabled attribute instead."/>
+	</bean>
+	
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderEntryData">
+        <property name="bundleNo" type="int">
+            <description>Deprecated since 6.4 - use entryGroupNumber.</description>
+            <annotations>@Deprecated</annotations>
+        </property>
+		<property name="component" type="de.hybris.platform.configurablebundlefacades.data.BundleTemplateData">
+            <description>Deprecated since 6.4 - obtain the bundle from Order through entryGroupNumber</description>
+            <annotations>@Deprecated</annotations>
+        </property>
+		<property name="rootBundleTemplate" type="de.hybris.platform.configurablebundlefacades.data.BundleTemplateData">
+            <description>Deprecated since 6.4 - obtain the bundle from Order through entryGroupNumber</description>
+            <annotations>@Deprecated</annotations>
+        </property>
+		<property name="removeable" type="boolean"/>
+		<property name="editable" type="boolean"/>
+		<property name="valid" type="boolean"/>
+		<property name="addable" type="boolean"/>
+	</bean>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.CartData" extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="firstIncompleteBundleComponentsMap" type="java.util.Map&lt;Integer, de.hybris.platform.configurablebundlefacades.data.BundleTemplateData>"/>
+		<property name="cartInvalidMessage" type="String"/>
+		<property name="allEntriesCount" type="Integer"/>
+	</bean>	
+	
+	<!-- Add configurable bundle facades specific product options -->
+	<enum class="de.hybris.platform.commercefacades.product.ProductOption">
+		<value>BUNDLE</value>		
+		<value>BUNDLE_DISABLERULES</value>
+		<value>STARTING_BUNDLES</value>
+	</enum>
+
+	<bean class="de.hybris.platform.commercefacades.order.data.AddToCartParams">
+		<property name="BundleTemplateId" type="java.lang.String">
+			<description>The bundle component id. User for starting new bundle in cart.</description>
+		</property>
+	</bean>
+</beans>

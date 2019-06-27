@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="collaborationViewSwitcher">
+
+		<widget id="workflowSelectorMultiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+				slotId="cockpitWidgetChildrenInvisible">
+			<setting key="default_output" type="String" value="defaultOutput"/>
+			<setting key="workflowSelected_expression" type="String" value="#root instanceof T(de.hybris.platform.workflow.model.WorkflowModel)"/>
+			<virtual-sockets>
+				<output id="defaultOutput" type="java.lang.Object" visibility="external"/>
+				<output id="workflowSelected" type="de.hybris.platform.workflow.model.WorkflowModel" visibility="external"/>
+			</virtual-sockets>
+		</widget>
+
+		<widget id="collaborationCenter-workflowDetails-view" widgetDefinitionId="com.hybris.cockpitng.listlayout"
+				title="collaboration.workflow.details" slotId="views">
+			<widget id="workflowDetails-manager" widgetDefinitionId="com.hybris.backoffice.widgets.workflowdetailsmanager"
+					slotId="cockpitWidgetChildrenInvisible">
+				<widget id="workflowDetails-view-selected-filter" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+						slotId="cockpitWidgetChildrenInvisible">
+					<setting key="expression" type="String" value="#root?.contains('collaborationCenter-workflowDetails-view')"/>
+					<setting key="socketDataType_$T" type="String">java.util.Collection</setting>
+					<virtual-sockets/>
+					<widget id="workflowDetails-manager-reset"
+							widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+							slotId="cockpitWidgetChildrenInvisible">
+						<setting key="expression" type="String" value="null"/>
+						<setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowModel</setting>
+						<virtual-sockets/>
+					</widget>
+				</widget>
+			</widget>
+
+			<widget id="workflowDetails-editorArea"
+					widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea"
+					slotId="children">
+				<widget id="workflowDetails-summaryView" widgetDefinitionId="com.hybris.cockpitng.summaryView"
+						slotId="staticSectionSlot">
+					<setting key="summaryViewConfigCtx" type="String" value="workflowDetails-summaryView"/>
+					<virtual-sockets>
+						<output id="workflowActionSelected" type="de.hybris.platform.workflow.model.WorkflowActionModel" />
+					</virtual-sockets>
+				</widget>
+				<setting key="widgetStyleAttribute" type="String"/>
+				<setting key="viewModeBtnVisible" type="Boolean" value="false"/>
+				<setting key="widgetStyleClass" type="String" value="yw-collaboration-center-details-workflow-details yw-centered-panel-editor-area"/>
+				<setting key="initViewMode" type="String" value="fluid"/>
+				<setting key="fluidViewCode" type="String" value="fluid"/>
+				<setting key="editorAreaConfigCtx" type="String" value="workflowDetails-editorArea"/>
+				<setting key="bottomToolbar" type="Boolean" value="false"/>
+				<setting key="redirectReferenceSelectedToParentWidgetSocket" type="String"
+						 value="referenceSelected"/>
+				<setting key="toolbarDisabled" type="Boolean" value="true"/>
+				<setting key="dynamicForms.componentName" type="String" value="workflowEditorAreaDynamicForms"/>
+				<virtual-sockets/>
+			</widget>
+
+			<widget id="workflowDetails-attachmentsExtractor"
+					widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+					slotId="cockpitWidgetChildrenInvisible">
+				<setting key="expression" type="String">#root instanceof
+					T(de.hybris.platform.workflow.model.WorkflowModel) ? #root.getAttachments():#root
+				</setting>
+				<setting key="socketDataType_$T" type="String">java.util.Collection</setting>
+				<virtual-sockets/>
+			</widget>
+
+			<widget id="workflowDetails-tasks-collectionbrowser" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+					slotId="children">
+
+				<widget id="workflowDetails-task-search-workflow-extractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+						slotId="cockpitWidgetChildrenInvisible" template="false">
+					<setting key="expression" type="String">
+						new com.hybris.backoffice.navigation.impl.SimpleNode("workflow", #root)
+					</setting>
+					<setting key="socketDataType_$T" type="String">com.hybris.backoffice.navigation.impl.SimpleNode</setting>
+				</widget>
+
+				<widget id="workflowDetails-task-search-init" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine.genericinitializer"
+						slotId="cockpitWidgetChildrenInvisible" template="false">
+					<setting key="handlerBeanId" type="String">workflowActionsForWorkflowAdvancedSearchInitializer</setting>
+					<setting key="navigationNodeId" type="String">workflow</setting>
+					<setting key="requiredTypeCode" type="String">WorkflowAction</setting>
+					<virtual-sockets/>
+				</widget>
+
+				<widget id="workflowDetails-tasks-fulltext-search" widgetDefinitionId="com.hybris.cockpitng.fulltextsearch"
+						slotId="toolbarCenter">
+					<setting key="fulltextSearchConfigCtxCode" type="String">workflowDetails-tasks-fulltext-search</setting>
+					<virtual-sockets/>
+				</widget>
+
+				<widget id="workflowDetails-tasks-advancedsearchengine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+						slotId="cockpitWidgetChildrenInvisible">
+					<setting key="defaultPageSize" type="Integer">5</setting>
+					<virtual-sockets/>
+				</widget>
+
+				<setting key="actionSlotComponentId"></setting>
+				<setting key="pagingPosition">bottom</setting>
+				<setting key="hyperlinks" type="Boolean">false</setting>
+				<setting key="collectionBrowserConfigCtx" type="String">workflowOverview-collectionbrowser</setting>
+				<setting key="listTitle" type="String">overview.tasks.listTitle</setting>
+				<setting key="colConfigCtxCode" type="String">workflowDetails-browser-listview</setting>
+				<setting key="widgetStyleClass" type="String">yw-collaboration-center-details-tasks yw-collaboration-center-browser</setting>
+				<setting key="refreshAfterObjectCreation" type="Boolean">true</setting>
+				<setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowActionModel</setting>
+				<virtual-sockets>
+					<output id="selectedItemsToEdit" type="java.lang.Object"/>
+				</virtual-sockets>
+			</widget>
+
+			<widget id="workflowDetails-attachments" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+					slotId="children">
+
+				<setting key="pageSize" type="Integer">5</setting>
+				<setting key="fallbackTypeCode" type="String">WorkflowItemAttachment</setting>
+				<setting key="pagingPosition">bottom</setting>
+				<setting key="listTitle" type="String">attachments.listTitle</setting>
+				<setting key="colConfigCtxCode" type="String">workflowDetails-browser-listview</setting>
+				<setting key="maxCharsInCell" type="Integer">120</setting>
+				<setting key="widgetStyleClass" type="String">yw-collaboration-center-details-tasks yw-collaboration-center-browser</setting>
+				<setting key="collectionBrowserConfigCtx" type="String">workflowDetails-attachments</setting>
+				<setting key="asyncLoading" type="Boolean">false</setting>
+				<setting key="actionSlotComponentId" type="String">workflowDetails-attachments-actions</setting>
+				<setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowItemAttachmentModel</setting>
+				<virtual-sockets>
+					<input id="selectedWorkflow" type="java.lang.Object" visibility="external"/>
+					<output id="editWorkflowAttachment" type="java.lang.Object" visibility="external"/>
+				</virtual-sockets>
+			</widget>
+
+			<setting key="widgetStyleClass" type="String" value="yw-collaboration-center-details"/>
+			<virtual-sockets/>
+		</widget>
+
+		<setting key="selectWorkflowDetails_eval" type="String" value="'collaborationCenter-workflowDetails-view'"/>
+		<virtual-sockets>
+			<input id="selectWorkflowDetails" type="java.lang.Object"/>
+		</virtual-sockets>
+		<widget id="collaborationNavigationHistory-back-toOverview-labelProvider" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+				slotId="cockpitWidgetChildrenInvisible" title="Collaboration Label Provider" template="false">
+			<setting key="expression" type="String">'collaboration.workflow.details.label'</setting>
+			<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+			<virtual-sockets/>
+		</widget>
+	</widget-extension>
+
+	<widget-extension widgetId="collaborationCenter-sidebar-header">
+		<virtual-sockets>
+			<input id="selectedWorkflow" type="de.hybris.platform.workflow.model.WorkflowModel"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="collaborationCenter-sidebar-header-actions-multiplexer">
+		<setting key="workflowDetailsActions_expression" type="String">#root.contains('collaborationCenter-workflowDetails-view')</setting>
+		<setting key="workflowDetailsActions_eval" type="String">'workflowDetailsActions'</setting>
+
+		<virtual-sockets>
+			<output id="workflowDetailsActions" type="java.lang.String" visibility="external"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="collaborationNavigationHistory">
+		<setting key="workflowSelectedFromOverview_output">backToDetails</setting>
+		<setting key="workflowSelectedFromSidebar_output">backToDetails</setting>
+		<setting key="workflowSelectedFromDashboard_output">backToDetails</setting>
+		<virtual-sockets>
+			<input id="workflowSelectedFromOverview" type="java.lang.Object" visibility="external" />
+			<input id="workflowSelectedFromSidebar" type="java.lang.Object" visibility="external" />
+			<input id="workflowSelectedFromDashboard" type="java.lang.Object" visibility="external" />
+			<output id="backToDetails" type="java.lang.Object" visibility="external" />
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="backofficeGlobalNotificationMultiplexer-workflowExtractor" outputId="genericOutput"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="workflowSelected"
+					   targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="closeSidebar"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowSelected"
+					   targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="closeSidebar"/>
+	<!-- Navigation history -->
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="workflowSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="workflowSelectedFromSidebar"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="workflowSelectedFromSidebar"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="workflowSelectedFromDashboard"/>
+
+	<widget-connection sourceWidgetId="workflowOverview-workflows-collectionbrowser" outputId="selectedItem"
+					   targetWidgetId="collaborationNavigationHistory" inputId="workflowSelectedFromOverview"/>
+
+	<widget-connection sourceWidgetId="workflowOverview-workflows-collectionbrowser" outputId="selectedItem"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+
+	<widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="backToDetails"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+
+
+	<widget-connection sourceWidgetId="workflowDetails-manager" outputId="selectedWorkflowDeleted"
+					   targetWidgetId="collaborationNavigationHistory" inputId="doBack"/>
+
+	<!-- Navigation end -->
+
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+
+	<widget-connection sourceWidgetId="collaborationViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="workflowDetails-view-selected-filter" inputId="input"/>
+	<widget-connection sourceWidgetId="workflowDetails-view-selected-filter" outputId="false"
+					   targetWidgetId="workflowDetails-manager-reset" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="workflowDetails-manager-reset" outputId="genericOutput"
+					   targetWidgetId="workflowDetails-manager" inputId="showWorkflow"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-manager" outputId="selectedWorkflowUpdated"
+					   targetWidgetId="workflowSelectorMultiplexer" inputId="element"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-summaryView" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="collaborationViewSwitcher" inputId="selectWorkflowDetails"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-editorArea" inputId="inputObject"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-attachmentsExtractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-attachmentsExtractor" outputId="genericOutput"
+					   targetWidgetId="workflowDetails-attachments" inputId="list"/>
+
+	<!-- Sidebar header actions -->
+	<widget-connection sourceWidgetId="collaborationCenter-sidebar-header-actions-multiplexer" outputId="workflowDetailsActions"
+					   targetWidgetId="collaborationCenter-sidebar-header" inputId="toolbarActions" />
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="collaborationCenter-sidebar-header" inputId="selectedWorkflow"/>
+
+	<widget-connection sourceWidgetId="STUB_com.hybris.backoffice.widgets.actions.addworkflowattachment" outputId="referenceSearchCtx"
+					   targetWidgetId="referenceadvancedsearchgroup" inputId="referenceSearchCtx"/>
+
+	<widget-connection sourceWidgetId="referenceadvancedsearchgroup" outputId="selectedReferencesOutput"
+					   targetWidgetId="STUB_com.hybris.backoffice.widgets.actions.addworkflowattachment" inputId="referenceSearchResult"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-manager" outputId="selectedWorkflowUpdated"
+					   targetWidgetId="workflowDetails-attachments" inputId="selectedWorkflow"/>
+
+	<widget-connection sourceWidgetId="workflowSelectorMultiplexer" outputId="workflowSelected"
+					   targetWidgetId="workflowDetails-task-search-workflow-extractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-task-search-workflow-extractor" outputId="genericOutput"
+					   targetWidgetId="workflowDetails-task-search-init" inputId="nodeSelected"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-task-search-init" outputId="outContext"
+					   targetWidgetId="workflowDetails-tasks-fulltext-search" inputId="initContext"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-tasks-fulltext-search" outputId="searchData"
+					   targetWidgetId="workflowDetails-tasks-advancedsearchengine" inputId="searchData"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-tasks-fulltext-search" outputId="searchContextChanged"
+					   targetWidgetId="workflowDetails-tasks-advancedsearchengine" inputId="changeSearchContext"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-tasks-advancedsearchengine" outputId="pageable"
+					   targetWidgetId="workflowDetails-tasks-collectionbrowser" inputId="pageable"/>
+
+	<widget-connection sourceWidgetId="workflowDetails-attachments" outputId="editWorkflowAttachment"
+					   targetWidgetId="notificationEA" inputId="inputObject"/>
+
+</widgets>

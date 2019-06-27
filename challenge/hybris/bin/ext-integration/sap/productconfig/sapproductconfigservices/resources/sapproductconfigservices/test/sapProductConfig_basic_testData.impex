@@ -1,0 +1,186 @@
+$defaultCurrency=EUR
+$lang=en
+$defaultLanguage=en
+$deliveryCountries=US
+$catalog-id=testConfigureCatalog
+$contentCatalog-id=testConfigureContentCatalog
+$catalog-version=Online
+$testCategory-id=CPQConfigurableCategory
+$testSubCategory-id=CPQConfigurableSubCategory
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+$approved=approvalstatus(code)[default='approved']
+$storeClassification=cpqTestClassification
+$systemVersion=1.0
+
+#################################################################################
+# Language, Currency and Units
+#################################################################################
+INSERT_UPDATE Language;isocode[unique=true];active;
+;de;true;
+;en;true;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];
+;de;Deutsch;German;
+;en;Englisch;English;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+;USD;US-Dollar;US Dollar;true;false;1,38;2;$
+;CAD;Canadian Dollar;Canadian Dollar;true;false;1,4;2;C$
+
+INSERT_UPDATE Currency;isocode[unique=true];sapCode
+;EUR;EUR
+;USD;USD
+;CAD;CAD
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=de];name[lang=en];conversion;
+;pieces;PCE;PCE;PCE;1;
+
+INSERT_UPDATE Unit;code[unique=true];sapcode
+;pieces;ST
+;PCE;ST
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=de];name[lang=en];active;
+;DE;Deutschland;Germany;true;
+;US;Vereinigte Staaten von Amerika;United States of America;true;
+
+INSERT_UPDATE Title;code[unique=true];name[lang=de];name[lang=en];
+;dr;Dr.;dr.;
+;prof;Prof.;prof.;
+
+
+#################################################################################
+# SAP Configuration, Sales Area and Distribution Channel
+#################################################################################
+INSERT_UPDATE sapconfiguration;core_name[unique=true];sapcommon_salesOrganization;sapcommon_distributionChannel;sapcommon_division;sapproductconfig_enable_pricing;sapproductconfig_show_baseprice_and_options;sapproductconfig_show_deltaprices
+;RR4910;1010;10;00;TRUE;TRUE;TRUE
+
+INSERT_UPDATE ReferenceDistributionChannelMapping;salesOrganization[unique=true];distChannel[unique=true];distChannelName[lang=en];refDistChannelConditions;refDistChannelConditionsName[lang=en];refDistChannelCustMat;refDistChannelCustMatName[lang=en];
+;1000;10;"Distribution Channel 10";10;"Distribution Channel 10";10;"Distribution Channel 10"
+;1010;10;"Distribution Channel 10";10;"Distribution Channel 10";10;"Distribution Channel 10"
+;3020;30;"Distribution Channel 30";30;"Distribution Channel 30";30;"Distribution Channel 30"
+
+INSERT_UPDATE ReferenceDivisionMapping;salesOrganization[unique=true];division[unique=true];divisionName[lang=en];refDivisionConditions;refDivisionConditionsName[lang=en];refDivisionCustomer;refDivisionCustomerName[lang=en]
+;1000;00;"Produktdivision 00";00;"Produktdivision 00";00;"Product Division 00"
+;1010;00;"Produktdivision 00";00;"Produktdivision 00";00;"Product Division 00"
+;3020;00;"Produktdivision 00";00;"Produktdivision 00";00;"Product Division 00"
+
+
+#################################################################################
+# Conent Catalog
+#################################################################################
+# Create Content Catalog
+INSERT_UPDATE ContentCatalog;id[unique=true];name[lang=$lang]
+;$contentCatalog-id;$contentCatalog-id
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];
+;$contentCatalog-id;$catalog-version;
+
+
+#################################################################################
+# Product Catalog
+#################################################################################
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;
+;$catalog-id;$catalog-id;true;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;defaultCurrency(isocode);
+;$catalog-id;$catalog-version;true;EUR;
+
+INSERT_UPDATE cpqconfiguratorsettings;$catalogversion[unique=true];id[unique=true];configuratortype(code);configurationcategory(code,$catalogversion);qualifier
+;;CPQConfiguratorSettings;CPQCONFIGURATOR;$testCategory-id;CPQCONFIGURATORSETTINGS
+
+INSERT_UPDATE configurationcategory;$catalogversion[unique=true];code[unique=true];name[lang=$lang];configuratorsettings(id,$catalogversion)
+;;$testCategory-id;CPQ Configurable Category;CPQConfiguratorSettings
+
+INSERT_UPDATE Category;code[unique=true];$catalogversion;name[lang=en];$supercategories;
+;$testSubCategory-id;;$testSubCategory-id,$testCategory-id;
+
+
+#################################################################################
+# Classification System
+#################################################################################
+INSERT_UPDATE ClassificationSystem; id[unique=true]; name[lang=en];
+;$storeClassification;$storeClassification;
+
+INSERT_UPDATE ClassificationSystemversion;catalog(id)[unique=true];version[unique=true];active;writeprincipals(uid);languages(isocode);inclPacking[virtual=true,default=true];inclDuty[virtual=true,default=true];inclFreight[virtual=true,default=true];inclAssurance[virtual=true,default=true]
+;$storeClassification;$systemVersion;true;;en;;;;
+
+
+#################################################################################
+# Basestore, Basesite
+#################################################################################
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode;paymentProvider;checkoutFlowGroup;sapconfiguration(core_name);cmsSites(uid);
+;testConfigureStore;$catalog-id,$storeClassification;$defaultCurrency;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;order-process;Mockup;defaultCheckoutGroup;RR4910;testConfigureSite;
+
+INSERT_UPDATE CMSSite;uid[unique=true];stores(uid);channel(code);contentCatalogs(id);defaultCatalog(id);defaultLanguage(isoCode);locale[lang=$lang];active;
+;testConfigureSite;testConfigureStore;B2C;$contentCatalog-id;$catalog-id;$lang;en_GB;true;
+
+
+#################################################################################
+# Products
+#################################################################################
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=en];description[lang=en];summary[lang=en];$prices;$approved;
+;YSAP_SIMPLE_POC;$testCategory-id;SAP;;;;PCE;;SAP simple product for POC;This is an example for a very simple product to be used for the POC. Modelled as configurable product with dependencies.;SAP simple product for POC;1 PCE = 199 EUR N;
+;WEC_DRAGON_BUS;$testCategory-id;SAP;;;;PCE;;Dragon Bus;Dragon Bus;Dragon Bus;1 PCE = 199 EUR N;
+;KD990SOL;$testCategory-id;SAP;;;;PCE;;KD990SOL;KD990SOL;KD990SOL;1 PCE = 199 EUR N;
+;YSAP_NOCFG;;SAP;;;;PCE;;SAP simple product;This is an example for a very simple product ;SAP simple product;1 PCE = 199 EUR N;
+;YSAP_NOSTOCK;;SAP;;;;PCE;;SAP simple product;This is an example for a very simple produc;SAP simple product;1 PCE = 199 EUR N;
+;CPQ_HOME_THEATER;$testCategory-id;SAP;;;;PCE;;CPQ_HOME_THEATER;Home Theater;Home Theater;1 PCE = 934 USD N;
+;000000000000056227;$testCategory-id;SAP;;;;PCE;;Greenhouse product numerical ;Numerical product id;Greenhouse product ;1 PCE = 99 USD N;
+;CPQ_LAPTOP;$testCategory-id;SAP;;;ERPVariantProduct;PCE;;CPQ_LAPTOP;This is an example for a configurable laptop;SAP simple product;1 PCE = 999 EUR N;
+;AK_CAMERA_KIT;$testCategory-id;SAP;;;;PCE;;AK_CAMERA_KIT;This is an example for the cloud engine service;AK_CAMERA_KIT product;1 PCE = 2999 EUR N;
+;CONF_PIPE;$testCategory-id;SAP;;;ERPVariantProduct;PCE;;CONF_PIPE;This is an example for configurable variants;CONF_PIPE product;1 PCE = 123 EUR N;
+
+
+#################################################################################
+# Products for Variants
+#################################################################################
+INSERT_UPDATE VariantAttributeDescriptor;qualifier[unique=true];attributeType(code);name[lang=en];generate;enclosingType(code)[unique=true];partOf;extensionName;search;readable;writable
+;product_name;java.lang.String;;true;ERPVariantProduct;false;;false;true;true
+
+
+INSERT_UPDATE ERPVariantProduct;code[unique=true];baseproduct(code,$catalogversion);$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=$lang];description[lang=$lang];$prices;$approved;
+;CPQ_LAPTOP_HOME;CPQ_LAPTOP;$testCategory-id;SAP;;;;PCE;;Laptop Home;Laptop Home;1 PCE = 639 USD N;;
+;CPQ_LAPTOP_GAME;CPQ_LAPTOP;$testCategory-id;SAP;;;;PCE;;Laptop Game;Laptop Game;1 PCE = 1999 USD N;;
+;CPQ_LAPTOP_PROF;CPQ_LAPTOP;$testCategory-id;SAP;;;;PCE;;Laptop Professional;Laptop Professional;1 PCE = 939 USD N;;
+;CPQ_LAPTOP_MUSIC;CPQ_LAPTOP;$testCategory-id;SAP;;;;PCE;;Laptop Music;Laptop Music;1 PCE = 969 USD N,1 PCE = 800 EUR N;;
+;CPQ_LAPTOP_MUZAC;CPQ_LAPTOP;$testCategory-id;SAP;;;;PCE;;Laptop Music Edition ;Laptop Music Edition;1 PCE = 969 USD N,1 PCE = 800 EUR N;;
+
+#################################################################################
+# Products for Changeable Variants
+#################################################################################
+INSERT_UPDATE ERPVariantProduct;code[unique=true];changeable[default=false];baseproduct(code,$catalogversion);$supercategories;manufacturerName;manufacturerAID;ean;variantType(code);unit(code)[default=PCE];$catalogversion;name[lang=$lang];description[lang=$lang];$prices;$approved;
+;CONF_PIPE-40-15-ST;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Pipe 40-15 Steel;Pipe 40-15 Steel;1 PCE = 30 EUR N;;
+;CONF_PIPE-30-15-PL;true;CONF_PIPE;$testCategory-id;SAP;;;;PCE;;Pipe 30-15 Plastic;Pipe 40-15 Plastic;1 PCE = 30 EUR N;;
+
+
+#################################################################################
+# Availability
+#################################################################################
+# Vendor
+INSERT_UPDATE Vendor;code[unique=true];name
+;default;Default Vendor
+
+# Warehouse
+INSERT_UPDATE Warehouse;code[unique=true];name;baseStores(uid);vendor(code)[default=default];default[default=true]
+;default;Default Warehouse;testConfigureStore;
+;pw_warehouse_s;;testConfigureStore;
+
+INSERT_UPDATE StockLevel;productCode[unique=true];warehouse(code)[unique=true,default=default];available;inStockStatus(code);maxPreOrder[default=1];maxStockLevelHistoryCount[default=-1];overSelling[default=0];preOrder[default=0];reserved[default=0]
+;YSAP_SIMPLE_POC;pw_warehouse_s;222;forceInStock;
+;WEC_DRAGON_BUS;pw_warehouse_s;222;forceInStock;
+;YSAP_NOCFG;pw_warehouse_s;222;forceInStock;
+;KD990SOL;pw_warehouse_s;333;forceInStock;
+;CPQ_HOME_THEATER;pw_warehouse_s;333;forceInStock;
+;000000000000056227;pw_warehouse_s;333;forceInStock;
+;CPQ_LAPTOP;pw_warehouse_s;333;forceInStock;
+;CPQ_LAPTOP_HOME;pw_warehouse_s;222;forceInStock;
+;CPQ_LAPTOP_GAME;pw_warehouse_s;222;forceInStock;
+;CPQ_LAPTOP_PROF;pw_warehouse_s;222;forceInStock;
+;CPQ_LAPTOP_MUSIC;pw_warehouse_s;222;forceInStock;
+;CPQ_LAPTOP_MUZAC;pw_warehouse_s;222;forceInStock;
+;CONF_PIPE;pw_warehouse_s;222;forceInStock;
+;CONF_PIPE-40-15-ST;pw_warehouse_s;222;forceInStock;
+;CONF_PIPE-30-15-PL;pw_warehouse_s;222;forceInStock;

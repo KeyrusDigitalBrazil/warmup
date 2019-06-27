@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications">
+
+	<context component="explorer-tree" merge-by="module">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:navigation-node id="hmc_treenode_system" merge-mode="append">
+				<explorer-tree:navigation-node id="hmc_treenode_apiregistry">
+					<explorer-tree:type-node code="EventConfiguration" id="EventConfiguration"/>
+					<explorer-tree:type-node code="ProcessEventConfiguration" id="ProcessEventConfiguration"/>
+					<explorer-tree:navigation-node id="treenode_destination">
+						<explorer-tree:type-node code="ExposedDestination" id="ExposedDestination"/>
+						<explorer-tree:type-node code="ConsumedDestination" id="ConsumedDestination"/>
+					</explorer-tree:navigation-node>
+					<explorer-tree:navigation-node id="treenode_credential">
+						<explorer-tree:type-node code="BasicCredential" id="BasicCredential"/>
+						<explorer-tree:type-node code="ConsumedCertificateCredential" id="ConsumedCertificateCredential"/>
+						<explorer-tree:type-node code="ConsumedOAuthCredential" id="ConsumedOAuthCredential"/>
+						<explorer-tree:type-node code="ExposedOAuthCredential" id="ExposedOAuthCredential"/>
+					</explorer-tree:navigation-node>
+					<explorer-tree:type-node code="Endpoint" id="Endpoint"/>
+					<explorer-tree:type-node code="DestinationTarget" id="DestinationTarget"/>
+					<explorer-tree:type-node code="EventExportDeadLetter" id="EventExportDeadLetter"/>
+				</explorer-tree:navigation-node>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context component="notification-area" merge-by="module">
+		<na:notification-area>
+			<na:notifications eventType="JustMessage" level="FAILURE">
+				<na:message>apiregestrybackoffice.notification.message</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="SUCCESS">
+				<na:message>apiregestrybackoffice.notification.message</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="INFO">
+				<na:message>apiregestrybackoffice.notification.message</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+			<na:notifications eventType="JustMessage" level="WARNING">
+				<na:message>apiregestrybackoffice.notification.message</na:message>
+				<!-- Expected exception or any other displayable object -->
+				<na:references linksEnabled="false">
+					<na:reference placeholder="0" label="#root instanceof T(java.lang.Throwable) ? @exceptionTranslationService.toString(#root) : #root"/>
+				</na:references>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context type="EventConfiguration" component="simple-search" merge-by="type" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="eventClass"/>
+			<simple-search:sort-field name="eventClass" asc="false" />
+		</simple-search:simple-search>
+	</context>
+
+	<context type="AbstractDestination" component="simple-search" merge-by="type" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="id" />
+			<simple-search:sort-field name="id" asc="false" />
+		</simple-search:simple-search>
+	</context>
+
+	<context type="Endpoint" component="simple-search" merge-by="type" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="id"/>
+		</simple-search:simple-search>
+	</context>
+
+	<context type="AbstractCredential" component="simple-search" merge-by="type" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="id"/>
+		</simple-search:simple-search>
+	</context>
+
+	<context type="EventExportDeadLetter" component="simple-search" merge-by="type" parent="GenericItem">
+		<simple-search:simple-search>
+			<simple-search:field name="id"/>
+			<simple-search:field name="eventType"/>
+			<simple-search:field name="destinationTarget"/>
+			<simple-search:field name="destinationChannel"/>
+			<simple-search:field name="timestamp"/>
+			<simple-search:field name="payload"/>
+			<simple-search:sort-field name="timestamp" asc="false" />
+		</simple-search:simple-search>
+	</context>
+
+	<context type="EventConfiguration" component="advanced-search" merge-by="type" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="eventClass"/>
+				<advanced-search:field name="destinationTarget"/>
+				<advanced-search:field name="version"/>
+				<advanced-search:field name="exportFlag" selected="true"/>
+				<advanced-search:field name="exportName"/>
+				<advanced-search:field name="priority"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="AbstractDestination" component="advanced-search" merge-by="type" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="id"/>
+				<advanced-search:field name="destinationTarget"/>
+				<advanced-search:field name="active"/>
+				<advanced-search:field name="url"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="AbstractCredential" component="advanced-search" merge-by="type" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="id"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="Endpoint" component="advanced-search" merge-by="type" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="id"/>
+				<advanced-search:field name="version"/>
+				<advanced-search:field name="specUrl"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="DestinationTarget" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="id"/>
+			<list-view:column qualifier="destinationChannel" />
+		</list-view:list-view>
+	</context>
+
+	<context type="EventExportDeadLetter" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="id"/>
+			<list-view:column qualifier="eventType"/>
+			<list-view:column qualifier="destinationTarget.id" />
+			<list-view:column qualifier="destinationChannel" />
+			<list-view:column qualifier="timestamp" />
+		</list-view:list-view>
+	</context>
+
+	<context type="EventExportDeadLetter" component="advanced-search" merge-by="type" parent="GenericItem">
+		<advanced-search:advanced-search>
+			<advanced-search:field-list>
+				<advanced-search:field name="id"/>
+				<advanced-search:field name="eventType"/>
+				<advanced-search:field name="destinationTarget"/>
+				<advanced-search:field name="destinationChannel"/>
+				<advanced-search:field name="timestamp"/>
+			</advanced-search:field-list>
+		</advanced-search:advanced-search>
+	</context>
+
+	<context type="EventConfiguration" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="eventClass"  width="35%"/>
+			<list-view:column qualifier="exportName" />
+			<list-view:column qualifier="destinationTarget.id" />
+			<list-view:column qualifier="version" />
+			<list-view:column qualifier="exportFlag" />
+		</list-view:list-view>
+	</context>
+
+	<context type="ProcessEventConfiguration" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="eventClass"  width="35%"/>
+			<list-view:column qualifier="exportName" />
+			<list-view:column qualifier="destinationTarget.id" />
+			<list-view:column qualifier="version" />
+			<list-view:column qualifier="exportFlag" />
+			<list-view:column qualifier="process" />
+		</list-view:list-view>
+	</context>
+
+	<context type="EventPropertyConfiguration" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="eventConfiguration" />
+			<list-view:column qualifier="propertyName" />
+			<list-view:column qualifier="type" />
+			<list-view:column qualifier="title" />
+			<list-view:column qualifier="description" />
+		</list-view:list-view>
+	</context>
+
+	<context type="AbstractCredential" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="id" />
+			<list-view:column qualifier="itemtype"/>
+		</list-view:list-view>
+	</context>
+
+	<context type="AbstractDestination" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="id" />
+			<list-view:column qualifier="url"/>
+			<list-view:column qualifier="active"/>
+			<list-view:column qualifier="destinationTarget.id"/>
+			<list-view:column qualifier="endpoint.id"/>
+			<list-view:column qualifier="credential" spring-bean="nullSafeListCellRenderer"/>
+		</list-view:list-view>
+	</context>
+
+	<context type="ExposedDestination" component="listview">
+		<list-view:list-view >
+			<list-view:column qualifier="id" />
+			<list-view:column qualifier="targetId"/>
+			<list-view:column qualifier="url"/>
+			<list-view:column qualifier="active"/>
+			<list-view:column qualifier="destinationTarget.id"/>
+			<list-view:column qualifier="endpoint.id"/>
+			<list-view:column qualifier="credential" spring-bean="nullSafeListCellRenderer" />
+		</list-view:list-view>
+	</context>
+
+	<context type="Endpoint" component="listview">
+		<list-view:list-view >
+			<list-view:column qualifier="id" />
+			<list-view:column qualifier="version" />
+			<list-view:column qualifier="specUrl" />
+		</list-view:list-view>
+	</context>
+
+	<context type="EventConfiguration" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="eventConfiguration_tab_ec" tooltipText="eventConfiguration_tab_ec" position="0">
+				<editorArea:section name="eventConfiguration_section_essential">
+					<editorArea:attribute qualifier="eventClass" description="field.eventconfiguration.eventClass.description"/>
+					<editorArea:attribute qualifier="destinationTarget" description="field.eventconfiguration.destinationTarget.description"/>
+					<editorArea:attribute qualifier="version" description="field.eventconfiguration.version.description"/>
+					<editorArea:attribute qualifier="description" description="field.eventconfiguration.description.description"/>
+				</editorArea:section>
+				<editorArea:section name="eventConfiguration_section_export_settings">
+					<editorArea:attribute qualifier="exportFlag" description="field.eventconfiguration.exportFlag.description"/>
+					<editorArea:attribute qualifier="priority" description="field.eventconfiguration.priority.description"/>
+					<editorArea:attribute qualifier="exportName" description="field.eventconfiguration.exportName.description"/>
+				</editorArea:section>
+				<editorArea:section name="eventConfiguration_section_configuration">
+					<editorArea:attribute qualifier="mappingType" description="field.eventconfiguration.mappingType.description"/>
+					<editorArea:attribute qualifier="converterBean" description="field.eventconfiguration.converterBean.description"/>
+					<editorArea:attribute qualifier="extensionName" description="field.eventconfiguration.extensionName.description"/>
+					<editorArea:attribute qualifier="eventPropertyConfigurations" description="field.eventconfiguration.eventPropertyConfigurations.description" >
+						<editorArea:editor-parameter>
+							<editorArea:name>createOnly</editorArea:name>
+							<editorArea:value>true</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>disableRemoveReference</editorArea:name>
+							<editorArea:value>true</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="ProcessEventConfiguration" component="editor-area" merge-by="type" parent="EventConfiguration">
+		<editorArea:editorArea>
+			<editorArea:tab name="eventConfiguration_tab_ec" position="0" merge-mode="append">
+				<editorArea:section name="eventConfiguration_section_essential" merge-mode="append">
+					<editorArea:attribute qualifier="process" description="field.processeventconfiguration.process.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="EventPropertyConfiguration" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="eventPropertyConfiguration_tab" tooltipText="eventPropertyConfiguration_tab" position="0">
+				<editorArea:section name="">
+					<editorArea:attribute qualifier="eventConfiguration" description="field.eventpropertyconfiguration.eventConfiguration.description"/>
+					<editorArea:attribute qualifier="propertyName" description="field.eventpropertyconfiguration.propertyName.description"/>
+					<editorArea:attribute qualifier="propertyMapping" description="field.eventpropertyconfiguration.propertyMapping.description"/>
+					<editorArea:attribute qualifier="delimiter" description="field.eventpropertyconfiguration.delimeter.description"/>
+					<editorArea:attribute qualifier="type" description="field.eventpropertyconfiguration.type.description"/>
+					<editorArea:attribute qualifier="description" description="field.eventpropertyconfiguration.description.description"/>
+					<editorArea:attribute qualifier="title" description="field.eventpropertyconfiguration.title.description"/>
+					<editorArea:attribute qualifier="examples" description="field.eventpropertyconfiguration.examples.description"/>
+					<editorArea:attribute qualifier="required" description="field.eventpropertyconfiguration.required.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="AbstractDestination" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="destination_tab" tooltipText="destination_tab" position="0">
+				<editorArea:section name="destination_section_essential">
+					<editorArea:attribute qualifier="id" description="field.abstractdestination.id.description"/>
+					<editorArea:attribute qualifier="url" description="field.abstractdestination.url.description"/>
+					<editorArea:attribute qualifier="destinationTarget" description="field.abstractdestination.destinationTarget.description"/>
+					<editorArea:attribute qualifier="active" description="field.abstractdestination.active.description"/>
+					<editorArea:attribute qualifier="endpoint" description="field.abstractdestination.endpoint.description"/>
+					<editorArea:attribute qualifier="credential" description="field.abstractdestination.credential.description"/>
+					<editorArea:attribute qualifier="additionalProperties" description="field.abstractdestination.additionalProperties.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="DestinationTarget" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="destination_target_tab" tooltipText="destination_target_tab" position="0">
+				<editorArea:section name="destination_target_section_essential">
+					<editorArea:attribute qualifier="id" description="field.destinationtarget.id.description"/>
+					<editorArea:attribute qualifier="destinationChannel" description="field.destinationtarget.destinationChannel.description"/>
+					<editorArea:attribute qualifier="destinations" description="field.destinationtarget.destinations.description"/>
+					<editorArea:attribute qualifier="eventConfigurations" description="field.destinationtarget.eventConfigurations.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="EventExportDeadLetter" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="event_dlq_tab" tooltipText="event_dlq_tab" position="0">
+				<editorArea:section name="event_dlq_section_essential">
+					<editorArea:attribute qualifier="id" description="field.eventexportdeadletter.id.description" readonly="true"/>
+					<editorArea:attribute qualifier="eventType" description="field.eventexportdeadletter.eventType.description" readonly="true"/>
+					<editorArea:attribute qualifier="destinationTarget" description="field.eventexportdeadletter.destinationTarget.description" readonly="true"/>
+					<editorArea:attribute qualifier="destinationChannel" description="field.eventexportdeadletter.destinationChannel.description" readonly="true"/>
+					<editorArea:attribute qualifier="timestamp" description="field.eventexportdeadletter.timestamp.description" readonly="true"/>
+					<editorArea:attribute qualifier="payload" description="field.eventexportdeadletter.payload.description" readonly="true">
+						<editorArea:editor-parameter>
+							<editorArea:name>rows</editorArea:name>
+							<editorArea:value>8</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+					<editorArea:attribute qualifier="error" description="field.eventexportdeadletter.error.description" readonly="true">
+						<editorArea:editor-parameter>
+							<editorArea:name>rows</editorArea:name>
+							<editorArea:value>8</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="ExposedDestination" component="editor-area" merge-by="type" parent="AbstractDestination">
+		<editorArea:editorArea>
+			<editorArea:tab name="destination_tab" tooltipText="destination_tab" position="0">
+				<editorArea:section name="destination_section_essential">
+					<editorArea:attribute qualifier="targetId" description="field.abstractdestination.targetId.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="Endpoint" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="endpoint_tab" tooltipText="endpoint_tab" position="0">
+				<editorArea:section name="endpoint_section_essential">
+					<editorArea:attribute qualifier="id" description="field.endpoint.id.description"/>
+					<editorArea:attribute qualifier="name" description="field.endpoint.name.description"/>
+					<editorArea:attribute qualifier="version" description="field.endpoint.version.description"/>
+				</editorArea:section>
+				<editorArea:section name="endpoint_section_configuration">
+					<editorArea:attribute qualifier="description" description="field.endpoint.description.description"/>
+ 				</editorArea:section>
+				<editorArea:section name="endpoint_section_specification">
+					<editorArea:attribute qualifier="specUrl" description="field.endpoint.specUrl.description"/>
+					<editorArea:attribute qualifier="specData" description="field.endpoint.specData.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="AbstractCredential" component="editor-area" merge-by="type" parent="GenericItem">
+		<editorArea:editorArea>
+			<editorArea:tab name="credential_tab" tooltipText="credential_tab" position="0">
+				<editorArea:section name="credential_section_essential">
+					<editorArea:attribute qualifier="id" description="field.abstractcredential.id.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="BasicCredential" component="editor-area" merge-by="type" parent="AbstractCredential">
+		<editorArea:editorArea>
+			<editorArea:tab name="credential_tab" tooltipText="credential_tab">
+				<editorArea:section name="credential_section_auth">
+					<editorArea:attribute qualifier="username" description="field.basiccredentail.username.description"/>
+					<editorArea:attribute qualifier="password" readonly="true" description="field.basiccredentail.password.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="ExposedOAuthCredential" component="editor-area" merge-by="type" parent="AbstractCredential">
+		<editorArea:editorArea>
+			<editorArea:tab name="credential_tab" tooltipText="credential_tab">
+				<editorArea:section name="credential_section_auth">
+					<editorArea:attribute qualifier="oAuthClientDetails" description="field.exposedoauthcredential.oAuthClientDetails.description"/>
+					<editorArea:attribute qualifier="password" readonly="true" description="field.exposedoauthcredential.password.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="ConsumedOAuthCredential" component="editor-area" merge-by="type" parent="AbstractCredential">
+		<editorArea:editorArea>
+			<editorArea:tab name="credential_tab" tooltipText="credential_tab">
+				<editorArea:section name="credential_section_auth">
+					<editorArea:attribute qualifier="clientId" description="field.consumedoauthcredential.clientId.description"/>
+					<editorArea:attribute qualifier="oAuthUrl" description="field.consumedoauthcredential.oAuthUrl.description"/>
+					<editorArea:attribute qualifier="clientSecret" description="field.consumedoauthcredential.clientSecret.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="ConsumedCertificateCredential" component="editor-area" merge-by="type" parent="AbstractCredential">
+		<editorArea:editorArea>
+			<editorArea:tab name="credential_tab" tooltipText="credential_tab">
+				<editorArea:section name="credential_section_auth">
+					<editorArea:attribute qualifier="privateKey" readonly="true" description="field.consumedcertificatecredential.privateKey.description"/>
+					<editorArea:attribute qualifier="certificateData" readonly="true" description="field.consumedcertificatecredential.certificateData.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="OAuthClientDetails" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="field.oauthclient.clientSecret.description">
+					<editorArea:attribute qualifier="oAuthUrl" description="field.oauthclientdetails.oAuthUrl.description"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="EventConfiguration" component="create-wizard" merge-by="module">
+		<wz:flow id="EventConfigurationWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="name.your(EventConfiguration)" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="converterBean" description="field.eventconfiguration.converterBean.description"/>
+						<wz:property qualifier="eventPropertyConfigurations" description="field.eventconfiguration.eventPropertyConfigurations.description"/>
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="ConsumedOAuthCredential" component="create-wizard" merge-by="module">
+		<wz:flow id="ConsumedOAuthCredentialWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:step id="step1" label="flow.allmanadatory" >
+				<wz:content id="step1.content" >
+					<wz:property-list root="newObject" >
+						<wz:property qualifier="id" description="field.abstractcredential.id.description"/>
+						<wz:property qualifier="clientId" description="field.consumedoauthcredential.clientId.description"/>
+						<wz:property qualifier="oAuthUrl" description="field.consumedoauthcredential.oAuthUrl.description"/>
+						<wz:property qualifier="clientSecret" readonly="true" description="field.consumedoauthcredential.clientSecret.description"/>
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="Endpoint" component="create-wizard" merge-by="module">
+		<wz:flow id="EndpointWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject">
+						<wz:property qualifier="id"/>
+						<wz:property qualifier="name"/>
+						<wz:property qualifier="version"/>
+						<wz:property qualifier="description"/>
+						<wz:property qualifier="specUrl"/>
+						<wz:property qualifier="specData"/>
+						<wz:property qualifier="extensionName"/>
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="EventPropertyConfiguration" component="create-wizard" merge-by="module">
+		<wz:flow id="EventPropertyConfigurationWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="ExposedDestination" component="create-wizard" merge-by="module">
+		<wz:flow id="ExposedDestinationWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="ConsumedDestination" component="create-wizard" merge-by="module">
+		<wz:flow id="ConsumedDestinationWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="BasicCredential" component="create-wizard" merge-by="module">
+		<wz:flow id="BasicCredentialWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="ExposedOAuthCredential" component="create-wizard" merge-by="module">
+		<wz:flow id="ExposedOAuthCredentialWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="ConsumedCertificateCredential" component="create-wizard" merge-by="module">
+		<wz:flow id="ConsumedCertificateCredentialWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="DestinationTarget" component="create-wizard" merge-by="module">
+		<wz:flow id="DestinationTargetWizard" title="create.title(ctx.TYPE_CODE)" merge-mode="append">
+			<wz:step id="step1" label="flow.allmanadatory" merge-mode="append">
+				<wz:content id="step1.content" merge-mode="append">
+					<wz:property-list root="newObject" merge-mode="append">
+						<wz:property qualifier="creationtime" exclude="true"/>
+					</wz:property-list>
+				</wz:content>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="EventConfiguration" component="base" merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>exportName+ '.v' +version+ ' - ' +destinationTarget.id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="ProcessEventConfiguration" component="base" merge-by="type" parent="EventConfiguration">
+		<y:base>
+			<y:labels>
+				<y:label>exportName+ '.v' +version+ ' - ' +destinationTarget.id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="EventPropertyConfiguration" component="base" merge-by="type" parent="GenericItem" >
+		<y:base>
+			<y:labels>
+				<y:label>title + ' - ' +  propertyName</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="AbstractDestination" merge-by="type" parent="GenericItem" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="Endpoint" merge-by="type" parent="GenericItem" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="AbstractCredential" merge-by="type" parent="GenericItem" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="DestinationTarget" merge-by="type" parent="GenericItem" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>id</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="ExposedDestination" component="editorareaactions" >
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.DeleteExposedDestinationAction"  property="currentObject" />
+				<y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.RegisterExposedDestinationAction" property="currentObject"/>
+				<y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.UnregisterExposedDestinationAction" property="currentObject"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="ExposedDestination" component="listviewactions" >
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.DeleteExposedDestinationAction" property="selectedObjects"/>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="EventConfiguration" component="listviewactions" merge-by="type">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.event.export" />
+			</y:group>
+		</y:actions>
+	</context>
+
+    <context type="ExposedOAuthCredential" component="listviewactions" merge-by="type">
+        <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <y:action action-id="de.hybris.platform.apiregistrybackoffice.actions.credentials.reset" property="pageable.typeCode"/>
+            </y:group>
+        </y:actions>
+    </context>
+
+    <context type="EventExportDeadLetter" component="listviewactions" merge-by="type">
+        <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:group qualifier="common">
+                <y:action action-id="com.hybris.cockpitng.action.create" merge-mode="REMOVE" />
+            </y:group>
+        </y:actions>
+    </context>
+
+	<context component="reset-credentials-wizard" type="ExposedOAuthCredential">
+	<wz:flow id="ResetCredentialsWizard" title="apiregistry_backoffice_resetCredentialsForm.title" >
+			<wz:prepare id="ResetCredentialsPrepare">
+				<wz:initialize property="apiregistry_backoffice_resetCredentialsForm" template-bean="apiregistryResetCredentialsForm"/>
+			</wz:prepare>
+		<wz:step id="step1" label="apiregistry_backoffice_resetCredentialsForm.selectCredential">
+			<wz:content id="step1.content">
+				<wz:property-list root="apiregistry_backoffice_resetCredentialsForm">
+					<wz:property qualifier="credential" type="Reference(ExposedOAuthCredential)"
+								 editor="com.hybris.cockpitng.editor.defaultreferenceeditor"
+								 description="field.resetCredentialsForm.converterBean.description"/>
+				</wz:property-list>
+
+			</wz:content>
+			<wz:navigation id="step1.navigation">
+				<wz:cancel/>
+				<wz:custom visible="apiregistry_backoffice_resetCredentialsForm.credential!=null" label="apiregistry_backoffice_resetCredentialsForm.next" handler="resetCredentialsHandler"/>
+			</wz:navigation>
+		</wz:step>
+		<wz:step id="step2" label="apiregistry_backoffice_resetCredentialsForm.impactedDestinationsAndCredentials">
+			<wz:content id="step2.content">
+				<wz:property-list root="apiregistry_backoffice_resetCredentialsForm">
+					<wz:property qualifier="impactedDestinations" type="MultiReference-SET(ExposedDestination)"
+								 editor="com.hybris.cockpitng.editor.defaultmultireferenceeditor"
+								 description="field.resetCredentialsForm.impactedDestinations.description" readonly="true">
+						<wz:editor-parameter>
+							<wz:name>isNestedObjectCreationDisabled</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>disableDisplayingDetails</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+					<wz:property qualifier="impactedCredentials" type="MultiReference-SET(ExposedOAuthCredential)"
+								 editor="com.hybris.cockpitng.editor.defaultmultireferenceeditor"
+								 description="field.resetCredentialsForm.impactedCredentials.description" readonly="true">
+						<wz:editor-parameter>
+							<wz:name>isNestedObjectCreationDisabled</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+						<wz:editor-parameter>
+							<wz:name>disableDisplayingDetails</wz:name>
+							<wz:value>true</wz:value>
+						</wz:editor-parameter>
+					</wz:property>
+				</wz:property-list>
+			</wz:content>
+			<wz:navigation id="step2.navigation">
+				<wz:cancel/>
+				<wz:custom visible="apiregistry_backoffice_resetCredentialsForm.credential!=null" label="apiregistry_backoffice_resetCredentialsForm.next" handler="resetCredentialsHandler"/>
+			</wz:navigation>
+		</wz:step>
+		<wz:step id="step3"
+				 label="apiregistry_backoffice_resetCredentialsForm.createNewClient">
+				<wz:content id="step3.content">
+					<wz:property-list root="apiregistry_backoffice_resetCredentialsForm">
+						<wz:property qualifier="clientId" type="java.lang.String"
+									 description="field.resetCredentialsForm.clientId.description" readonly="false"/>
+						<wz:property qualifier="clientSecret" type="java.lang.String"
+									 description="field.resetCredentialsForm.clientSecret.description"/>
+						<wz:property qualifier="gracePeriod" type="java.lang.Integer"
+									 editor="com.hybris.cockpitng.editor.defaultinteger"
+									 description="field.resetCredentialsForm.gracePeriod.description"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step3.navigation">
+					<wz:back/>
+					<wz:cancel/>
+					<wz:custom label="apiregistry_backoffice_resetCredentialsForm.done" handler="resetCredentialsHandler"
+							   visible="!#empty(apiregistry_backoffice_resetCredentialsForm.clientId) AND !#empty(apiregistry_backoffice_resetCredentialsForm.clientSecret) AND apiregistry_backoffice_resetCredentialsForm.gracePeriod>=0 "/>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+</config>

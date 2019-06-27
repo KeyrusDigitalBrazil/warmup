@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="ConsignmentStatus" autocreate="false" generate="true" dynamic="true">
+			<!-- Extend the ConsignmentStatus with values used during shipping -->
+			<value code="IN_TRANSIT" />
+			<value code="DELIVERING" />
+			<value code="DELIVERY_COMPLETED" />
+			<value code="DELIVERY_REJECTED" />
+		</enumtype>
+	</enumtypes>
+
+	<itemtypes>
+		<typegroup name="Consignment">
+			<itemtype code="Carrier" autocreate="true" generate="true">
+				<deployment table="Carrier" typecode="9866" />
+				<attributes>
+					<attribute autocreate="true" qualifier="code" type="java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="false" unique="true" />
+					</attribute>
+					<attribute autocreate="true" qualifier="name" type="localized:java.lang.String">
+						<persistence type="property" />
+						<modifiers optional="true" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			<itemtype code="Consignment" autocreate="false" generate="false">
+				<description>Extending Consignment type with additional attributes.</description>
+				<attributes>
+					<attribute type="Carrier" qualifier="carrierDetails">
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+			<itemtype code="ConsignmentTrackingIdValidConstraint" autocreate="true" generate="true" extends="TypeConstraint"
+				jaloclass="de.hybris.platform.consignmenttrackingservices.jalo.ConsignmentTrackingIdValidConstraint">
+				<description>Checking If The Consignment TrackingID Is Valid</description>
+				<attributes>
+					<attribute qualifier="annotation" type="java.lang.Class" redeclare="true">
+						<modifiers write="false" initial="true" />
+						<defaultvalue>de.hybris.platform.consignmenttrackingservices.validation.annotations.ConsignmentTrackingIdValid.class</defaultvalue>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

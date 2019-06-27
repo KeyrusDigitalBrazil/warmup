@@ -1,0 +1,49 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+INSERT_UPDATE Catalog ; id[unique=true] ; name              ; defaultCatalog
+                      ; hwcatalog       ; Computer hardware ; true          
+
+INSERT_UPDATE CatalogVersion ; catalog(id)[unique=true] ; version[unique=true] ; languages(isocode)
+                             ; hwcatalog                ; Staged               ; en                
+
+INSERT_UPDATE Product ; code[unique=true] ; $catalogVersion[unique=true]
+                      ; product1          ;                             
+                      ; product2          ;                             
+                      ; product3          ;                             
+                      ; product4          ;                             
+
+
+### Simple Search Profile ###
+
+# search profile      
+
+INSERT_UPDATE AsSimpleSearchProfile ; code[unique=true] ; name                          ; indexType[default=$indexType] ; $catalogVersion[unique=true]
+                                    ; simpleProfile     ; Category Aware Search Profile ;                               ;                             
+
+# search configuration              
+
+INSERT_UPDATE AsSimpleSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                     ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                          ; simpleProfile                                    ; fd7d8009-df2f-4b78-9747-5b50efb244df ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; fd7d8009-df2f-4b78-9747-5b50efb244df                  ; product1                                                ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; fd7d8009-df2f-4b78-9747-5b50efb244df                  ; product2                                                ;                             
+
+INSERT_UPDATE AsExcludedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; fd7d8009-df2f-4b78-9747-5b50efb244df                  ; product3                                                ;                             
+
+INSERT_UPDATE AsExcludedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; fd7d8009-df2f-4b78-9747-5b50efb244df                  ; product4                                                ;                             

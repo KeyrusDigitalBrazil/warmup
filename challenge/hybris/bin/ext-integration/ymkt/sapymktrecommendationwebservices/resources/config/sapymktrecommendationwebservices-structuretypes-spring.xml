@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Custom populator for filling dropdown controls -->
+	<bean id="recoDropdownComponentTypeAttributePopulator" class="com.hybris.ymkt.recommendationwebservices.populators.RecommendationDropdownComponentTypeAttributePopulator" />
+	<bean id="offerRecoDropdownComponentTypeAttributePopulator" class="com.hybris.ymkt.recommendationwebservices.populators.OfferRecommendationDropdownComponentTypeAttributePopulator" />
+
+	<!-- Define attributes order on UI -->
+	<bean id="CMSSAPRecommendationComponentFieldsOrder" parent="cmsStructureTypeModeAttributeFilter">
+		<property name="constrainedBy">
+			<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSSAPRecommendationComponent" p:mode="DEFAULT"/>
+		</property>
+		<property name="order">
+			<list>
+				<value>title</value>
+				<value>recotype</value>
+				<value>leadingitemtype</value>
+				<value>leadingitemdstype</value>
+				<value>cartitemdstype</value>
+				<value>includecart</value>
+				<value>includerecent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="CMSSAPOfferRecoComponentFieldsOrder" parent="cmsStructureTypeModeAttributeFilter">
+		<property name="constrainedBy">
+			<bean parent="cmsEqualsTypeAndModeBiPredicate" p:typeCode="CMSSAPOfferRecoComponent" p:mode="DEFAULT"/>
+		</property>
+		<property name="order">
+			<list>
+				<value>recotype</value>
+				<value>contentposition</value>
+				<value>leadingitemtype</value>
+				<value>leadingitemdstype</value>
+				<value>cartitemdstype</value>
+				<value>includecart</value>
+				<value>includerecent</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Add fields order beans to cmsfacades defaultCmsStructureTypeModeAttributeFilterList -->
+	<bean id="CMSSAPRecommendationComponentFieldsOrderListMergeDirective" depends-on="cmsStructureTypeModeAttributeFilterList" parent="listMergeDirective">
+		<property name="add" ref="CMSSAPRecommendationComponentFieldsOrder"/>
+	</bean>
+
+	<bean id="CMSSAPOfferRecoComponentFieldsOrderListMergeDirective" depends-on="cmsStructureTypeModeAttributeFilterList" parent="listMergeDirective">
+		<property name="add" ref="CMSSAPOfferRecoComponentFieldsOrder"/>
+	</bean>
+		
+	<!-- Expose Product Recommendation component attributes in the CMS Structure API -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="title">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="shortStringComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="recotype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="leadingitemtype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="leadingitemdstype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="cartitemdstype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="includecart">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="booleanComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPRecommendationComponent" p:qualifier="includerecent">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="booleanComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Expose Offer Recommendation component attributes in the CMS Structure API -->
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="recotype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="offerRecoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="leadingitemtype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="leadingitemdstype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="cartitemdstype">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="recoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="contentposition">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="dropdownComponentTypeAttributePopulator" />
+				<ref bean="offerRecoDropdownComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+	
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="includecart">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="booleanComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" p:typecode="CMSSAPOfferRecoComponent" p:qualifier="includerecent">
+		<property name="populators">
+			<set>
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+				<ref bean="booleanComponentTypeAttributePopulator" />
+			</set>
+		</property>
+	</bean>
+		
+</beans>

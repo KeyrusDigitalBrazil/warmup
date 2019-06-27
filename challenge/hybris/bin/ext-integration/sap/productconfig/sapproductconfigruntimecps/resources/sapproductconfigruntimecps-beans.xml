@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<enum class="de.hybris.platform.sap.productconfig.runtime.cps.masterdata.service.KnowledgebaseBuildSyncStatus">
+		<value>IN_SYNC</value>
+		<value>OUTDATED_RUNTIME</value>
+		<value>OUTDATED_MASTER_DATA</value>
+	</enum>
+	<!-- common models that serve as base classes -->
+	<!-- master data common -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgebaseKey">
+		<property name="logsys" type="String" />
+		<property name="name" type="String" />
+		<property name="version" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicCommon">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+		<property name="description" type="String" />
+		<property name="type" type="String" />
+		<property name="multiValued" type="boolean" />
+		<property name="length" type="Integer" />
+		<property name="numberDecimals" type="Integer" />
+		<property name="caseSensitive" type="boolean" />
+		<property name="entryFieldMask" type="String" />
+		<property name="unitOfMeasure" type="String" />
+		<property name="additionalValues" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicGroupCommon">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicSpecificCommon">
+		<property name="id" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataClassCommon">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKBHeaderInfo">
+		<property name="id" type="Integer" />
+		<property name="key" type="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgebaseKey" />
+		<property name="validFromDate" type="String" />
+		<property name="build" type="Integer" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgeBaseCommon">
+		<property name="language" type="String" />
+		<property name="headerInfo" type="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKBHeaderInfo" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataProductCommon">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+		<property name="multilevel" type="boolean" />
+		<property name="unitOfMeasure" type="String" />
+	</bean>
+
+	<!-- runtime common -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSCharacteristicCommon">
+		<property name="id" type="String" />
+		<property name="required" type="boolean" />
+		<property name="visible" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSConfigurationCommon">
+		<property name="kbId" type="String" />
+		<property name="kbBuild" type="Integer" />
+		<property name="kbKey" type="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgebaseKey" />
+		<property name="consistent" type="boolean" />
+		<property name="complete" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSItemCommon">
+		<property name="id" type="String" />
+		<property name="bomPosition" type="String" />
+		<property name="quantity" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSQuantity" />
+		<property name="consistent" type="boolean" />
+		<property name="complete" type="boolean" />
+		<property name="variantConditions"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariantCondition&gt;" />
+		<property name="salesRelevant" type="boolean" />
+		<property name="fixedQuantity" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSValueCommon">
+		<property name="author" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSContextInfo">
+		<property name="name" type="String" />
+		<property name="value" type="String" />
+	</bean>
+
+	<!-- models for kb determination -->
+
+	<!-- models for pricing -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.pricing.CPSMasterDataVariantPriceKey"
+		template="resources/beanTemplate/productConfigCPS-equalsTemplate.vm">
+		<property name="productId" type="String" />
+		<property name="variantConditionKey" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.pricing.CPSValuePrice">
+		<property name="valuePrice" type="java.math.BigDecimal" />
+		<property name="obsoleteValuePrice" type="java.math.BigDecimal" />
+		<property name="currency" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.pricing.CPSValuePriceInfo">
+		<property name="valuePrice" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.pricing.CPSValuePrice" />
+		<property name="deltaPrice" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.pricing.CPSValuePrice" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.AccessDate">
+		<property name="name" type="String" />
+		<property name="value" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.AlternateProductUnit">
+		<property name="alternateUnitName" type="String" />
+		<property name="numerator" type="Integer" />
+		<property name="denominator" type="Integer" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.Attribute">
+		<property name="name" type="String" />
+		<property name="values" type="java.util.List&lt;String&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ConditionPurpose">
+		<property name="purpose" type="String" />
+		<property name="value" type="Double" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ConditionResult">
+		<property name="stepNo" type="Integer" />
+		<property name="conditionCounter" type="Integer" />
+		<property name="conditionType" type="String" />
+		<property name="conditionTypeDescription" type="String" />
+		<property name="purpose" type="String" />
+		<property name="value" type="Double" />
+		<property name="conditionBase" type="Double" />
+		<property name="conditionRate" type="Double" />
+		<property name="conditionValue" type="Double" />
+		<property name="conditionCurrency" type="String" />
+		<property name="conditionUnitValue" type="Double" />
+		<property name="conditionUnit" type="String" />
+		<property name="statistical" type="boolean" />
+		<property name="varcondKey" type="String" />
+		<property name="inactiveFlag" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingDocumentInput">
+		<property name="docCurrency" type="String" />
+		<property name="locCurrency" type="String" />
+		<property name="pricingProcedure" type="String" />
+		<property name="groupCondition" type="boolean" />
+		<property name="itemConditionsRequired" type="boolean" />
+		<property name="items" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemInput&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingDocumentResult">
+		<property name="id" type="String" />
+		<property name="documentCurrencyUnit" type="String" />
+		<property name="netValue" type="Double" />
+		<property name="taxValue" type="Double" />
+		<property name="grossValue" type="Double" />
+		<property name="freightValue" type="Double" />
+		<property name="conditionsWithPurpose" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ConditionPurpose&gt;" />
+		<property name="conditions" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ConditionResult&gt;" />
+		<property name="items" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemResult&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemInput">
+		<property name="itemId" type="String" />
+		<property name="externalId" type="String" />
+		<property name="quantity" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSPricingQuantity" />
+		<property name="grossWeight" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSQuantity" />
+		<property name="netWeight" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSQuantity" />
+		<property name="volume" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSQuantity" />
+		<property name="exchRateType" type="String" />
+		<property name="exchRateDate" type="String" />
+		<property name="productDetails" type="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ProductInfo" />
+		<property name="statistical" type="boolean" />
+		<property name="attributes" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.Attribute&gt;" />
+		<property name="accessDateList" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.AccessDate&gt;" />
+		<property name="variantConditions"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariantCondition&gt;" />
+		<property name="subItems " type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemInput&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemResult">
+		<property name="itemId" type="String" />
+		<property name="externalId" type="String" />
+		<property name="netValue" type="Double" />
+		<property name="taxValue" type="Double" />
+		<property name="grossValue" type="Double" />
+		<property name="freightValue" type="Double" />
+		<property name="netPrice" type="Double" />
+		<property name="netPriceUnit" type="String" />
+		<property name="subtotals" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.Subtotal&gt;" />
+		<property name="conditions" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ConditionResult&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.ProductInfo">
+		<property name="productId" type="String" />
+		<property name="baseUnit" type="String" />
+		<property name="alternateProductUnits"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.AlternateProductUnit&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.Subtotal">
+		<property name="flag" type="String" />
+		<property name="value" type="String" />
+	</bean>
+
+	<!-- models for external configuration -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalCharacteristic" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSCharacteristicCommon">
+		<property name="values" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalValue&gt;" />
+		<property name="parentItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalConfiguration" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSConfigurationCommon">
+		<property name="rootItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem" />
+		<property name="context"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSContextInfo&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSCommerceExternalConfiguration">
+		<property name="externalConfiguration" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalConfiguration" />
+		<property name="unitCodes" type="java.util.Map&lt;String,String&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSItemCommon">
+		<property name="objectKey" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalObjectKey" />
+		<property name="objectKeyAuthor" type="String" />
+		<property name="bomPositionObjectKey" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalObjectKey" />
+		<property name="bomPositionAuthor" type="String" />
+		<property name="characteristics"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalCharacteristic&gt;" />
+		<property name="subItems" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem&gt;" />
+		<property name="parentItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSFlatListContainer" >
+		<property name="items"  type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem&gt;" />
+		<property name="subItems" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalItem&gt;" />
+		<property name="values" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalValue&gt;" />
+	    <property name="conditions" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariantCondition&gt;" />
+	</bean>
+
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalObjectKey">
+		<property name="id" type="String" />
+		<property name="type" type="String" />
+		<property name="classType" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalValue" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSValueCommon">
+		<property name="value" type="String" />
+		<property name="parentCharacteristic" type="de.hybris.platform.sap.productconfig.runtime.cps.model.external.CPSExternalCharacteristic" />
+	</bean>
+
+	<!-- models for runtime configuration -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCreateConfigInput">
+		<property name="productKey" type="String" />
+		<property name="date" type="String" />
+		<property name="context"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSContextInfo&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristicInput">
+		<property name="values" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSValueInput&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSValueInput">
+		<property name="value" type="String" />
+		<property name="selected" type="boolean" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariantCondition">
+		<property name="key" type="String" />
+		<property name="factor" type="String" />
+		<property name="parentItemId" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristic" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSCharacteristicCommon">
+		<property name="readOnly" type="boolean" />
+		<property name="consistent" type="boolean" />
+		<property name="complete" type="boolean" />
+		<property name="possibleValues" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSPossibleValue&gt;" />
+		<property name="values" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSValue&gt;" />
+		<property name="parentItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristicGroup">
+		<property name="id" type="String" />
+		<property name="consistent" type="boolean" />
+		<property name="complete" type="boolean" />
+		<property name="parentItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSConfiguration" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSConfigurationCommon">
+		<property name="id" type="String" />
+		<property name="eTag" type="String" />
+		<property name="productKey" type="String" />
+		<property name="productType" type="String" />
+		<property name="rootItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem" />
+		<property name="conflicts" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSConflict&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSQuantity">
+		<property name="value" type="Double" />
+		<property name="unit" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSPricingQuantity">
+		<property name="value" type="java.math.BigDecimal" />
+		<property name="unit" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSItemCommon">
+		<property name="key" type="String" />
+		<property name="type" type="String" />
+		<property name="characteristicGroups"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristicGroup&gt;" />
+		<property name="subItems" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem&gt;" />
+		<property name="characteristics" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristic&gt;" />
+		<property name="parentConfiguration" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSConfiguration" />
+		<property name="parentItem" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSItem" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSPossibleValue">
+		<property name="valueLow" type="String" />
+		<property name="valueHigh" type="String" />
+		<property name="intervalType" type="String" />
+		<property name="selectable" type="boolean" />
+		<property name="parentCharacteristic" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristic" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSValue" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.common.CPSValueCommon">
+		<property name="value" type="String" />
+		<property name="selected" type="boolean" />
+		<property name="parentCharacteristic" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSCharacteristic" />
+	</bean>
+	<!-- models for master data -->
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristic" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicCommon">
+		<property name="possibleValues"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValue&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicGroup"
+		extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicGroupCommon">
+		<property name="characteristicIDs" type="java.util.List&lt;String&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicSpecific"
+		extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicSpecificCommon">
+		<property name="possibleValueSpecifics"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValueSpecific&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataClass" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataClassCommon">
+		<property name="characteristicSpecifics"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicSpecific&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataDependency">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataKnowledgeBase" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgeBaseCommon">
+		<property name="products"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataProduct&gt;" />
+		<property name="classes"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataClass&gt;" />
+		<property name="characteristics"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristic&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValue">
+		<property name="id" type="String" />
+		<property name="name" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValueSpecific">
+		<property name="id" type="String" />
+		<property name="variantConditionKey" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataProduct" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataProductCommon">
+		<property name="characteristicSpecifics"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicSpecific&gt;" />
+		<property name="characteristicGroups"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicGroup&gt;" />
+	</bean>
+
+	<!-- models for master data cache -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicContainer"
+		extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicCommon">
+		<property name="possibleValueGlobals"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValue&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicSpecificContainer"
+		extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataCharacteristicSpecificCommon">
+		<property name="possibleValueSpecifics"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataPossibleValueSpecific&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataClassContainer" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataClassCommon">
+		<property name="characteristicSpecifics"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicSpecificContainer&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataKnowledgeBaseContainer"
+		extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataKnowledgeBaseCommon">
+		<property name="products"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataProductContainer&gt;" />
+		<property name="classes"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataClassContainer&gt;" />
+		<property name="characteristics"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicContainer&gt;" />
+		<property name="rootUnitOfMeasure" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataProductContainer" extends="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.common.CPSMasterDataProductCommon">
+		<property name="cstics"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicSpecificContainer&gt;" />
+		<property name="groups"
+			type="java.util.Map&lt;String,de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.CPSMasterDataCharacteristicGroup&gt;" />
+	</bean>
+
+
+	<!-- Bean definitions for conflict handling -->
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSConflict">
+		<property name="id" type="String" />
+		<property name="type" type="Integer" />
+		<property name="name" type="String" />
+		<property name="itemIds" type="java.util.List&lt;String&gt;" />
+		<property name="variables" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariable&gt;" />
+		<property name="explanation" type="String" />
+		<property name="nogoods" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSNogood&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSVariable">
+		<property name="itemId" type="String" />
+		<property name="characteristicId" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSNogood">
+		<property name="id" type="String" />
+		<property name="choices" type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSChoice&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSChoice">
+		<property name="itemId" type="String" />
+		<property name="characteristicId" type="String" />
+		<property name="value" type="de.hybris.platform.sap.productconfig.runtime.cps.model.runtime.CPSValue" />
+	</bean>
+
+	<bean class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.MasterDataContext">
+		<property name="kbCacheContainer"
+			type="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataKnowledgeBaseContainer" />
+		<property name="discountList"
+			type="java.util.List&lt;de.hybris.platform.sap.productconfig.runtime.interf.impl.ProductConfigurationDiscount&gt;" />
+		<property name="pricingProduct" type="String" />
+	</bean>
+
+</beans>

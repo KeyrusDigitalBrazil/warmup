@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="backofficeFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain" lazy-init="true">
+		<constructor-arg ref="backofficeFilters"/>
+	</bean>
+
+	<util:list id="backofficeFilters">
+		<ref bean="backofficeResponseHeadersFilter" />
+		<ref bean="log4jFilter"/>
+		<ref bean="tenantActivationFilter"/>
+		<ref bean="backofficeRedirectFilter"/>
+		<ref bean="backofficeContextClassloaderFilter"/>
+		<ref bean="hybrisSpringSessionFilter"/>
+		<ref bean="sessionFilter"/>
+		<ref bean="backofficeDataSourceSwitchingFilter"/>
+		<ref bean="backofficeCatalogVersionActivationFilter"/>
+	</util:list>
+
+	<bean id="backofficeRedirectFilter" class="de.hybris.platform.servicelayer.web.RedirectWhenSystemIsNotInitializedFilter">
+		<constructor-arg>
+  			<value><!-- nothing - redirect to default maintenance page --></value>
+  		</constructor-arg>
+	</bean>
+
+	<bean id="backofficeContextClassloaderFilter" class="com.hybris.cockpitng.modules.spring.filter.ExternalModuleContextClassLoaderFilter">
+		<property name="componentDefinitionService" ref="moduleComponentDefinitionService"/>
+	</bean>
+
+	<bean id="backofficeDataSourceSwitchingFilter" class="de.hybris.platform.servicelayer.web.DataSourceSwitchingFilter">
+	</bean>
+
+	<bean id="backofficeCatalogVersionActivationFilter" class="com.hybris.backoffice.security.BackofficeDynamicCatalogVersionActivationFilter">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="catalogService" ref="catalogService"/>
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="availableCatalogVersionsTag" ref="availableCatalogVersionsTag"/>
+	</bean>
+
+	<bean id="backofficeAppMediaFilter" class="de.hybris.platform.servicelayer.web.WebAppMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="addContextPath" value="false"/>
+	</bean>
+
+	<bean id="backofficeResponseHeadersFilter" class="com.hybris.backoffice.filter.responseheaders.BackofficeResponseHeadersFilter">
+		<property name="backofficeResponseHeadersHandler" ref="backofficeResponseHeadersHandler"/>
+	</bean>
+
+	<alias name="defaultBackofficeSecurityHeadersHandler" alias="backofficeResponseHeadersHandler" />
+	<bean id="defaultBackofficeSecurityHeadersHandler" class="com.hybris.backoffice.filter.responseheaders.BackofficeResponseHeadersHandler" >
+		<property name="cockpitProperties" ref="cockpitProperties"/>
+	</bean>
+
+</beans>

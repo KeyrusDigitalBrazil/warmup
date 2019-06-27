@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<config xmlns="http://www.hybris.com/cockpit/config" xmlns:na="http://www.hybris.com/cockpitng/config/notifications">
+	<context component="datahub-explorer-tree" perspective="datahubBackofficePerspective">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		                             title="datahub.title">
+			<explorer-tree:navigation-node id="Datahub_Dashboard" position="0" expanded-by-default="true"/>
+			<explorer-tree:navigation-node id="QuickUpload"/>
+			<explorer-tree:navigation-node id="Errors_And_Failures">
+				<explorer-tree:navigation-node id="Datahub_DataLoadsInError"/>
+				<explorer-tree:navigation-node id="Datahub_CompositionsInError"/>
+				<explorer-tree:navigation-node id="Datahub_PublicationsInError"/>
+			</explorer-tree:navigation-node>
+			<explorer-tree:navigation-node id="Datahub_Pool"/>
+			<explorer-tree:navigation-node id="Datahub_Feed"/>
+		</explorer-tree:explorer-tree>
+	</context>
+	<context component="collection-browser">
+		<cb:collection-browser xmlns:cb="http://www.hybris.com/cockpitng/config/collectionbrowser">
+			<cb:available-molds>
+				<cb:mold spring-bean="treeViewCollectionBrowserMoldStrategy"/>
+			</cb:available-molds>
+		</cb:collection-browser>
+	</context>
+
+	<!-- DataHubPoolAction -->
+	<context type="Datahub_DataHubPoolAction" component="advanced-search" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND"
+		                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		                    xsi:schemaLocation="http://www.hybris.com/cockpitng/config/advancedsearch">
+			<as:field-list includeSubtypes="false"/>
+			<as:field-list>
+				<as:field name="pool" operator="equals" selected="true"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+	<context type="Datahub_DataHubPoolAction" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column label="datahub.attribute.type" qualifier="type"/>
+			<list:column label="datahub.attribute.startTime" qualifier="startTime"/>
+			<list:column label="datahub.attribute.actionId" qualifier="actionId"/>
+			<list:column label="datahub.attribute.poolName" qualifier="poolName"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_DataHubPoolAction" component="editor-area" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea" name="Default">
+			<ea:tab name="Poolhistory">
+				<ea:section columns="4" name="section.general">
+					<ea:attribute qualifier="type"/>
+					<ea:attribute qualifier="actionId"/>
+					<ea:attribute qualifier="startTime"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="Datahub_DataHubPoolAction" component="base" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>actionId + " - " + type</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<!--Feed config-->
+	<context type="Datahub_Feed" component="base" perspective="datahubBackofficePerspective" module="DataHubUI">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>name</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+	<context type="Datahub_Feed" component="simple-search" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<ss:simple-search xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch">
+			<ss:field name="name"/>
+			<ss:sort-field name="feedId" asc="true"/>
+		</ss:simple-search>
+	</context>
+	<context type="Datahub_Feed" component="advanced-search" perspective="datahubBackofficePerspective">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:sort-field name="feedId" asc="true"/>
+			<as:field-list>
+				<as:field name="name" operator="equals" selected="true"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+	<context type="Datahub_Feed" component="listview" perspective="datahubBackofficePerspective" tree-context="_root_">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView"
+		                refresh-after-object-creation="true">
+			<list:column label="datahub.attribute.feed.feedId" qualifier="feedId"/>
+			<list:column label="datahub.attribute.feed.name" qualifier="name"/>
+			<list:column label="datahub.attribute.feed.description" qualifier="description"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_Feed" component="editor-area" perspective="datahubBackofficePerspective" module="DataHubUI">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea" name="Default">
+			<ea:tab name="FeedTab">
+				<ea:section columns="3" name="section.general">
+					<ea:attribute qualifier="poolingStrategy" readonly="true"/>
+					<ea:attribute qualifier="poolingCondition" readonly="true"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="Datahub_Feed" component="create-wizard" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="Dathub_Feed"
+		         title="create.feed.title">
+			<wz:prepare id="feedPrepare">
+				<wz:initialize property="newFeed" type="Datahub_Feed"/>
+				<wz:initialize property="storage" type="Datahub_Feed"/>
+			</wz:prepare>
+			<wz:step id="step1" label="create.feed.essential.label" sublabel="create.feed.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newFeed">
+						<wz:property qualifier="name"/>
+						<wz:property qualifier="description"/>
+						<wz:property editor="de.hybris.platform.datahubbackoffice.datahubdropdown"
+						             qualifier="poolingStrategy">
+							<wz:editor-parameter>
+								<wz:name>availableValues</wz:name>
+								<wz:value>i18n.GLOBAL_POOL,i18n.NAMED_POOL</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+						<wz:property editor="de.hybris.platform.datahubbackoffice.datahubdropdown"
+						             qualifier="poolingCondition">
+							<wz:editor-parameter>
+								<wz:name>availableValuesProvider</wz:name>
+								<wz:value>dataPoolsProvider</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:done
+							visible="newFeed.name.length() != 0 and (newFeed.poolingStrategy eq 'GLOBAL_POOL' || newFeed.poolingCondition.length() != 0)">
+						<wz:save property="newFeed"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context type="Datahub_Feed" component="configurableFlowDynamicForms">
+		<df:dynamicForms xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms" modelProperty="newFeed">
+			<df:attribute id="poolingCondition_disabled" qualifier="poolingCondition" triggeredOn="poolingStrategy"
+			              disabledIf="poolingStrategy != 'NAMED_POOL'"
+			              computedValue="poolingStrategy != 'NAMED_POOL' ? '' : poolingCondition"/>
+		</df:dynamicForms>
+	</context>
+
+	<context type="Datahub_Feed" component="datahub_listviewactions"
+	         perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<!--Pool config-->
+	<context type="Datahub_Pool" component="simple-search" perspective="datahubBackofficePerspective">
+		<ss:simple-search xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch">
+			<ss:field name="poolName"/>
+			<ss:sort-field name="poolId" asc="true"/>
+		</ss:simple-search>
+	</context>
+	<context type="Datahub_Pool" component="advanced-search" perspective="datahubBackofficePerspective">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list>
+				<as:field name="poolName" operator="equals" selected="true"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+	<context type="Datahub_Pool" component="listview" perspective="datahubBackofficePerspective" tree-context="_root_">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView"
+		                refresh-after-object-creation="true">
+			<list:column label="datahub.attribute.pool.poolId" qualifier="poolId"/>
+			<list:column label="datahub.attribute.pool.poolName" qualifier="poolName"/>
+			<list:column label="datahub.attribute.pool.compositionStrategy" qualifier="compositionStrategy"/>
+			<list:column label="datahub.attribute.pool.publicationStrategy" qualifier="publicationStrategy"/>
+			<list:column label="datahub.attribute.pool.deletable" qualifier="deletable"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_Pool" component="datahub_listviewactions" perspective="datahubBackofficePerspective">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:label>actiongroup.common</y:label>
+				<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode"/>
+			</y:group>
+		</y:actions>
+	</context>
+	<context type="Datahub_Pool" component="editor-area" perspective="datahubBackofficePerspective" module="DataHubUI">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea" name="Default">
+			<ea:tab name="Basic">
+				<ea:section columns="5" name="section.general">
+					<ea:attribute label="datahub.attribute.pool.poolId" qualifier="poolId"/>
+					<ea:attribute label="datahub.attribute.pool.poolName" qualifier="poolName"/>
+					<ea:attribute label="datahub.attribute.pool.compositionStrategy" qualifier="compositionStrategy"/>
+					<ea:attribute label="datahub.attribute.pool.publicationStrategy" qualifier="publicationStrategy"/>
+					<ea:attribute label="datahub.attribute.pool.deletable" qualifier="deletable"
+					              editor="com.hybris.cockpitng.editor.boolean.checkbox"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="Datahub_Pool" component="base" perspective="datahubBackofficePerspective" module="DataHubUI">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>poolId + " - " + poolName</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+	<context type="Datahub_Pool" component="create-wizard" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="DataHubPoolWizard"
+		         title="datahub.create.pool.title">
+			<wz:prepare id="datahubPoolPrepare">
+				<wz:initialize property="newPool" type="Datahub_Pool"/>
+				<wz:assign property="newPool.deletable" value="true"/>
+			</wz:prepare>
+			<wz:step id="step1" label="datahub.create.pool.step1.label">
+				<wz:content id="step1.content">
+					<wz:property-list root="newPool">
+						<wz:property qualifier="poolName"/>
+						<wz:property qualifier="deletable" editor="com.hybris.cockpitng.editor.boolean.checkbox"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:done visible="newPool.poolName.length() != 0">
+						<wz:save property="newPool"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<!-- Publication Errors -->
+	<context type="Datahub_PublicationsInError" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<!-- for more complex scenarios, LabelProvider or custom cell renderer can be used -->
+			<list:column label="datahub.attribute.status" qualifier="(status=='COMPLETE_W_ERRORS')?'Error':'Failure'"/>
+			<list:column label="datahub.attribute.targetSystem" qualifier="targetSystemName"/>
+			<list:column label="datahub.attribute.dataPool" qualifier="poolName"/>
+			<list:column label="datahub.attribute.startTime" qualifier="startTime"/>
+			<list:column label="datahub.attribute.endTime" qualifier="endTime"/>
+			<list:column label="datahub.attribute.publicationId" qualifier="publicationId"/>
+			<list:column label="datahub.attribute.numberOfErrors" qualifier="numberOfErrors"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_PublicationsInError" component="advanced-search" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list includeSubtypes="false"/>
+			<as:field-list>
+				<as:field editor="de.hybris.platform.datahubbackoffice.datahubdropdown" name="status" operator="equals"
+				          selected="true"
+				          sortable="false">
+					<as:editor-parameter>
+						<as:name>availableValues</as:name>
+						<as:value>i18n.COMPLETE_W_ERRORS,i18n.FAILURE</as:value>
+					</as:editor-parameter>
+				</as:field>
+				<as:field name="pool" operator="equals" selected="true" sortable="false"/>
+				<as:field name="targetSystem" operator="equals" selected="true" sortable="false"/>
+				<as:field name="startTime" operator="lessOrEquals" selected="true" sortable="false"/>
+				<as:field name="endTime" operator="lessOrEquals" selected="true" sortable="false"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+
+	<context type="Datahub_DataLoadsInError" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column label="datahub.attribute.status" qualifier="status"/>
+			<list:column label="datahub.attribute.feedName" qualifier="feed==null?'' : feed.name"/>
+			<list:column label="datahub.attribute.startTime" qualifier="startTime"/>
+			<list:column label="datahub.attribute.actionId" qualifier="actionId"/>
+			<list:column label="datahub.attribute.numberOfItems" qualifier="count"/>
+			<list:column label="datahub.attribute.failureDescription" qualifier="message"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_DataLoadsInError" component="advanced-search" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list includeSubtypes="false"/>
+		</as:advanced-search>
+	</context>
+
+	<context type="Datahub_CompositionsInError" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<!-- for more complex scenarios, LabelProvider or custom cell renderer can be used -->
+			<list:column label="datahub.attribute.status" qualifier="(status=='COMPLETE_W_ERRORS')?'Error':'Failure'"/>
+			<list:column label="datahub.attribute.dataPool" qualifier="poolName"/>
+			<list:column label="datahub.attribute.startTime" qualifier="startTime"/>
+			<list:column label="datahub.attribute.endTime" qualifier="endTime"/>
+			<list:column label="datahub.attribute.actionId" qualifier="actionId"/>
+			<list:column label="datahub.attribute.numberOfItems" qualifier="count"/>
+		</list:list-view>
+	</context>
+	<context type="Datahub_CompositionsInError" component="advanced-search" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list includeSubtypes="false"/>
+			<as:field-list>
+				<as:field editor="de.hybris.platform.datahubbackoffice.datahubdropdown" name="status" operator="equals"
+				          selected="true"
+				          sortable="false">
+					<as:editor-parameter>
+						<as:name>availableValues</as:name>
+						<as:value>i18n.COMPLETE_W_ERRORS,i18n.FAILURE</as:value>
+					</as:editor-parameter>
+				</as:field>
+				<as:field name="pool" operator="equals" selected="true" sortable="false"/>
+				<as:field name="startTime" operator="lessOrEquals" selected="true" sortable="false"/>
+				<as:field name="endTime" operator="lessOrEquals" selected="true" sortable="false"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+
+	<context type="Datahub_TargetSystem" component="base" perspective="datahubBackofficePerspective" module="DataHubUI">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>targetSystemName</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context type="Datahub_TargetSystem" component="advanced-search" perspective="datahubBackofficePerspective">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list>
+				<as:field name="targetSystemName" operator="equals" selected="true"/>
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+
+	<context type="Datahub_TargetSystem" component="listview" perspective="datahubBackofficePerspective"
+	         tree-context="_root_">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column label="datahub.attribute.targetSystem" qualifier="targetSystemName"/>
+		</list:list-view>
+	</context>
+
+	<context type="Datahub_PublicationError" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column label="datahub.attribute.itemType" qualifier="itemType"/>
+			<list:column label="datahub.attribute.code" qualifier="code"/>
+			<list:column label="datahub.attribute.message" qualifier="message"/>
+			<list:column label="datahub.attribute.integrationKey" qualifier="integrationKey"/>
+		</list:list-view>
+	</context>
+
+	<context type="Datahub_CompositionError" component="listview" perspective="datahubBackofficePerspective"
+	         module="DataHubUI">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column label="datahub.attribute.canonicalItemId" qualifier="canonicalItemId"/>
+			<list:column label="datahub.attribute.integrationKey" qualifier="integrationKey"/>
+			<list:column label="datahub.attribute.message" qualifier="message"/>
+			<list:column label="datahub.attribute.itemType" qualifier="itemType"/>
+		</list:list-view>
+	</context>
+
+	<context component="dashboard">
+		<dsb:dashboard xmlns:dsb="http://www.hybris.com/cockpitng/config/dashboard" defaultGridId="regular">
+			<dsb:grid id="small" maxScreenWidth="700" minScreenWidth="1" unassigned="append"/>
+			<dsb:grid id="regular" minScreenWidth="701" unassigned="append">
+				<dsb:placement height="1" widgetId="widget1" width="2" x="0" y="0"/>
+				<dsb:placement height="1" widgetId="widget2" width="2" x="0" y="1"/>
+				<dsb:placement height="1" widgetId="widget5" width="1" x="0" y="2"/>
+				<dsb:placement height="1" widgetId="widget6" width="1" x="1" y="2"/>
+			</dsb:grid>
+		</dsb:dashboard>
+	</context>
+
+	<context component="notification-area" source="datahubInstanceSelector" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="datahub.selector.error.no.instances" level="FAILURE">
+				<na:message>datahub.selector.error.no.instances</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="datahubSelectionAdapter" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="datahub.selection.adapter.error.bean.not.found" level="FAILURE">
+				<na:message>datahub.selection.adapter.error.bean.not.found</na:message>
+			</na:notifications>
+			<na:notifications eventType="datahub.selection.adapter.error.invalid.bean" level="FAILURE">
+				<na:message>datahub.selection.adapter.error.invalid.bean</na:message>
+			</na:notifications>
+			<na:notifications eventType="datahub.selection.adapter.error.not.configured" level="WARNING">
+				<na:message>datahub.selection.adapter.error.not.configured</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="defaultMenuSelectionAdapter" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="please.select.datahub.instance" level="FAILURE">
+				<na:message>please.select.datahub.instance</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area" source="datahubQuikUploadTab" merge-by="source">
+		<na:notification-area>
+			<na:notifications eventType="datahub.quickupload.finished.composition" level="INFO">
+				<na:message>datahub.quickupload.finished.composition</na:message>
+			</na:notifications>
+			<na:notifications eventType="datahub.quickupload.finished.import" level="INFO">
+				<na:message>datahub.quickupload.finished.import</na:message>
+			</na:notifications>
+			<na:notifications eventType="datahub.quickupload.finished.publication" level="INFO">
+				<na:message>datahub.quickupload.finished.publication</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+
+	<context component="notification-area">
+		<na:notification-area>
+			<na:notifications eventType="datahub.configurable.dropdown.failure" level="FAILURE">
+				<na:message>datahub.configurable.dropdown.failure</na:message>
+			</na:notifications>
+			<na:notifications eventType="datahub.error.connecting.to.server" level="FAILURE">
+				<na:message>datahub.error.connecting.to.server</na:message>
+			</na:notifications>
+		</na:notification-area>
+	</context>
+</config>

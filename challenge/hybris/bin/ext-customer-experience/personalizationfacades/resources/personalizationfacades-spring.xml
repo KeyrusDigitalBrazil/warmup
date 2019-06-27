@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="personalizationfacades-converters-spring.xml"/>
+
+    <!-- action code generator -->
+    <bean id="cxActionCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.cxaction.code.name}"/>
+        <property name="digits" value="${keygen.cxaction.code.digits}"/>
+        <property name="start" value="${keygen.cxaction.code.start}"/>
+        <property name="type" value="${keygen.cxaction.code.type}"/>
+        <property name="template" value="${keygen.cxaction.code.template}"/>
+    </bean>
+
+    <!-- trigger code generator -->
+    <bean id="cxTriggerCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.cxtrigger.code.name}"/>
+        <property name="digits" value="${keygen.cxtrigger.code.digits}"/>
+        <property name="start" value="${keygen.cxtrigger.code.start}"/>
+        <property name="type" value="${keygen.cxtrigger.code.type}"/>
+        <property name="template" value="${keygen.cxtrigger.code.template}"/>
+    </bean>
+
+    <!-- customization code generator -->
+    <bean id="cxCustomizationCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.cxcustomization.code.name}"/>
+        <property name="digits" value="${keygen.cxcustomization.code.digits}"/>
+        <property name="start" value="${keygen.cxcustomization.code.start}"/>
+        <property name="type" value="${keygen.cxcustomization.code.type}"/>
+        <property name="template" value="${keygen.cxcustomization.code.template}"/>
+    </bean>
+
+    <!-- variation code generator -->
+    <bean id="cxVariationCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.cxvariation.code.name}"/>
+        <property name="digits" value="${keygen.cxvariation.code.digits}"/>
+        <property name="start" value="${keygen.cxvariation.code.start}"/>
+        <property name="type" value="${keygen.cxvariation.code.type}"/>
+        <property name="template" value="${keygen.cxvariation.code.template}"/>
+    </bean>
+
+    <!-- facades for controllers -->
+
+    <alias name="defaultCxActionFacade" alias="cxActionFacade"/>
+    <bean name="defaultCxActionFacade" class="de.hybris.platform.personalizationfacades.action.impl.DefaultActionFacade"
+          p:actionService-ref="cxActionService"
+          p:variationService-ref="cxVariationService"
+          p:actionConverter-ref="cxActionConverter"
+          p:actionReverseConverter-ref="cxActionReverseConverter"
+          p:modelService-ref="modelService"
+          p:actionCodeGenerator-ref="cxActionCodeGenerator"
+          p:catalogVersionService-ref="catalogVersionService"
+          p:customizationService-ref="cxCustomizationService"
+          p:actionFullConverter-ref="defaultCxActionFullConverter"
+    />
+
+    <alias name="defaultCxCustomizationFacade" alias="cxCustomizationFacade"/>
+    <bean name="defaultCxCustomizationFacade" class="de.hybris.platform.personalizationfacades.customization.impl.DefaultCustomizationFacade"
+          p:customizationService-ref="cxCustomizationService"
+          p:customizationConverter-ref="cxCustomizationConfigurableConverter"
+          p:customizationReverseConverter-ref="cxCustomizationReverseConverter"
+          p:triggerFacade-ref="cxTriggerFacade"
+          p:variationFacade-ref="cxVariationFacade"
+          p:modelService-ref="modelService"
+          p:catalogVersionService-ref="catalogVersionService"
+          p:customizationCodeGenerator-ref="cxCustomizationCodeGenerator"
+    />
+
+    <alias name="defaultCxVariationFacade" alias="cxVariationFacade"/>
+    <bean name="defaultCxVariationFacade" class="de.hybris.platform.personalizationfacades.variation.impl.DefaultVariationFacade"
+          p:variationService-ref="cxVariationService"
+          p:customizationService-ref="cxCustomizationService"
+          p:variationConverter-ref="cxVariationConfigurableConverter"
+          p:variationReverseConverter-ref="cxVariationReverseConverter"
+          p:modelService-ref="modelService"
+          p:catalogVersionService-ref="catalogVersionService"
+          p:variationCodeGenerator-ref="cxVariationCodeGenerator"
+    />
+
+    <alias name="defaultCxSegmentFacade" alias="cxSegmentFacade"/>
+    <bean name="defaultCxSegmentFacade" class="de.hybris.platform.personalizationfacades.segment.impl.DefaultSegmentFacade"
+          p:segmentService-ref="cxSegmentService"
+          p:segmentConverter-ref="cxSegmentConverter"
+          p:modelService-ref="modelService"
+          p:segmentReverseConverter-ref="cxSegmentReverseConverter"
+          p:catalogVersionService-ref="catalogVersionService"
+    />
+
+    <alias name="defaultCxCustomerSegmentationFacade" alias="cxCustomerSegmentationFacade"/>
+    <bean name="defaultCxCustomerSegmentationFacade" class="de.hybris.platform.personalizationfacades.customersegmentation.impl.DefaultCustomerSegmentationFacade"
+          p:segmentService-ref="cxSegmentService"
+          p:userService-ref="userService"
+          p:baseSiteService-ref="baseSiteService"
+          p:segmentationHelper-ref="cxSegmentationHelper"
+          p:modelService-ref="modelService"
+          p:segmentationConverter-ref="cxCustomerSegmentationConfigurableConverter"
+          p:segmentationReverseConverter-ref="cxCustomerSegmentationReverseConverter"
+          p:catalogVersionService-ref="catalogVersionService"
+          p:segmentConverter-ref="cxSegmentConverter"
+          p:cxConfigurationService-ref="cxConfigurationService"
+    />
+
+    <alias name="defaultCxTriggerFacade" alias="cxTriggerFacade"/>
+    <bean name="defaultCxTriggerFacade" class="de.hybris.platform.personalizationfacades.trigger.impl.DefaultTriggerFacade"
+          p:cxTriggerService-ref="cxTriggerService"
+          p:cxVariationService-ref="cxVariationService"
+          p:cxCustomizationService-ref="cxCustomizationService"
+          p:modelService-ref="modelService"
+          p:catalogVersionService-ref="catalogVersionService"
+          p:triggerCodeGenerator-ref="cxTriggerCodeGenerator"
+          p:cxTriggerConfigurableConverter-ref="cxTriggerConfigurableConverter"
+          p:cxTriggerReverseConverter-ref="cxTriggerReverseConverter"
+    />
+
+    <alias name="defaultCxSegmentationHelper" alias="cxSegmentationHelper"/>
+    <bean name="defaultCxSegmentationHelper" class="de.hybris.platform.personalizationfacades.segmentation.impl.DefaultSegmentationHelper"/>
+
+</beans>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- [y] hybris Platform Copyright (c) 2017 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace 
+	items or managers you have to do this from the extensions core configuration 
+	file (merchandisingcmswebservices/resources/merchandisingcmswebservices-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<import resource="merchandisingcmswebservices-spring-security-config.xml" />
+	<mvc:default-servlet-handler />
+	<mvc:annotation-driven />
+	<context:annotation-config />
+	<context:component-scan base-package="com.hybris.merchandising" />
+	<context:property-placeholder
+		properties-ref="hybrisProperties" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter">
+					<property name="writeAcceptCharset" value="false" />
+				</bean>
+				<bean
+					class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="siteLanguageInterceptor"
+		class="com.hybris.merchandising.interceptors.SiteLanguageInterceptor">
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="adminSiteService" ref="cmsAdminSiteService" />
+	</bean>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/v1/*/strategies/**" />
+			<ref bean="siteLanguageInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+
+	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="merchandisingcmswebservicesPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<ref bean="log4jFilter" />
+				<ref bean="sessionFilter" />
+				<ref bean="springSecurityFilterChain" />
+				<ref bean="merchandisingcmswebservicesMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<!-- This filter is responsible for all media and secure-media handling -->
+	<bean id="merchandisingcmswebservicesMediaFilter" class="de.hybris.platform.servicelayer.web.WebAppMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="addContextPath" value="false" />
+	</bean>
+
+	<alias name="defaultStrategyService" alias="strategyService"/>
+	<bean id="defqultStrategyService" class="com.hybris.merchandising.service.impl.DefaultStrategyService"/>
+</beans>

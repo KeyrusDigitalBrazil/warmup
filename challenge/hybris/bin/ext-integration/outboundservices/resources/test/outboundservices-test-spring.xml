@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="outboundServiceFacade1" parent="outboundServiceFacade">
+		<property name="outboundRequestDecorators">
+			<bean parent="outboundRequestDecoratorList" class="org.springframework.beans.factory.config.ListFactoryBean">
+				<property name="sourceList">
+					<list merge="true">
+						<bean class="de.hybris.platform.outboundservices.decorator.impl.FailingRequestDecorator" />
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="outboundServiceFacade2" parent="outboundServiceFacade">
+		<property name="outboundRequestDecorators">
+			<bean parent="outboundRequestDecoratorList" class="org.springframework.beans.factory.config.ListFactoryBean">
+				<property name="sourceList">
+					<list merge="true">
+						<bean class="de.hybris.platform.outboundservices.decorator.impl.SapPassportRemoverRequestDecorator" />
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

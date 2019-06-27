@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="testSellerQuoteFacade" class="de.hybris.platform.commercefacades.order.impl.DefaultQuoteFacade">
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCartService" ref="commerceCartService" />
+		<property name="commerceQuoteService" ref="testSellerCommerceQuoteService" />
+		<property name="quoteService" ref="quoteService" />
+		<property name="modelService" ref="modelService" />
+		<property name="quoteConverter" ref="quoteConverter"/>
+		<property name="cartConverter" ref="cartConverter"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="commerceCommentService" ref="commerceCommentService"/>
+		<property name="quoteUserIdentificationStrategy" ref="quoteUserIdentificationStrategy"/>
+    </bean>
+    
+	<bean id="testSellerCommerceQuoteService" class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceQuoteService">
+		<property name="commerceQuoteDao" ref="commerceQuoteDao"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceSaveCartService" ref="commerceSaveCartService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="commerceCartService" ref="commerceCartService"/>
+		<property name="quoteStateSelectionStrategy" ref="testSellerQuoteStateSelectionStrategy"/>
+		<property name="quoteActionValidationStrategy" ref="testSellerQuoteActionValidationStrategy"/>
+		<property name="quoteUpdateStateStrategy" ref="testSellerQuoteUpdateStateStrategy"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="quoteService" ref="quoteService" />
+		<property name="eventService" ref="eventService" />
+		<property name="updateQuoteFromCartStrategy" ref="updateQuoteFromCartStrategy"/>
+		<property name="quoteAssignmentValidationStrategy" ref="quoteAssignmentValidationStrategy"/>
+		<property name="quoteSnapshotStateTransitionMap" ref="quoteSnapshotStateTransitionMap"/>
+		<property name="quoteSellerApproverAutoApprovalStrategy" ref="quoteSellerApproverAutoApprovalStrategy"/>
+		<property name="quoteCartValidationStrategy" ref="quoteCartValidationStrategy"/>
+		<property name="quoteUserTypeIdentificationStrategy" ref="testSellerQuoteUserTypeIdentificationStrategy"/>
+		<property name="quoteExpirationTimeValidationStrategy" ref="quoteExpirationTimeValidationStrategy"/>
+		<property name="quoteUpdateExpirationTimeStrategy" ref="quoteUpdateExpirationTimeStrategy"/>
+		<property name="quoteMetadataValidationStrategy" ref="quoteMetadataValidationStrategy"/>
+		<property name="requoteStrategy" ref="requoteStrategy"/>
+		<property name="orderQuoteDiscountValuesAccessor" ref="orderQuoteDiscountValuesAccessor"/>
+		<property name="userService" ref="userService" />
+		<property name="commerceQuoteUtils" ref="commerceQuoteUtils"/>
+	</bean>
+	
+	<bean id="testSellerQuoteStateSelectionStrategy"
+		  class="de.hybris.platform.commerceservices.order.strategies.impl.DefaultQuoteStateSelectionStrategy">
+		<property name="userTypeActionStateMap" ref="quoteUserTypeActionStateMap"/>
+		<property name="userTypeActionStateTransitionMap" ref="quoteUserTypeActionStateTransitionMap"/>
+		<property name="quoteUserTypeIdentificationStrategy" ref="testSellerQuoteUserTypeIdentificationStrategy"/>
+	</bean>
+	
+	<bean id="testSellerQuoteUserTypeIdentificationStrategy"
+		  class="de.hybris.platform.commerceservices.order.strategies.impl.DefaultQuoteUserTypeIdentificationStrategy">
+		<property name="userService" ref="userService"/>
+		<property name="buyerGroup" value="customergroup" />
+		<property name="sellerGroup" value="customergroup" />
+		<property name="sellerApproverGroup" value="salesapprovergroup" />
+	</bean>
+	
+	<bean id="testSellerQuoteUpdateStateStrategy"
+		  class="de.hybris.platform.commerceservices.order.strategies.impl.DefaultQuoteUpdateStateStrategy">
+		<property name="quoteStateSelectionStrategy" ref="testSellerQuoteStateSelectionStrategy"/>
+	</bean>
+	
+	<bean id="testSellerQuoteActionValidationStrategy"
+		  class="de.hybris.platform.commerceservices.order.strategies.impl.DefaultQuoteActionValidationStrategy">
+		<property name="quoteStateSelectionStrategy" ref="testSellerQuoteStateSelectionStrategy"/>
+	</bean>
+
+</beans>

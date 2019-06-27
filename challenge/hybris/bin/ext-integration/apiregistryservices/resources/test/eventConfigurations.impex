@@ -1,0 +1,23 @@
+
+$destination_target=kymaDefault
+
+INSERT_UPDATE DestinationTarget;id[unique=true];destinationChannel(code)[default=KYMA]
+                               ;$destination_target;
+
+insert_update EventConfiguration;eventClass[unique=true];destinationTarget(id)[default=$destination_target];version[unique=true];exportFlag;priority(code);exportName;mappingType(code);&ec
+;de.hybris.RegisterEvent;;1;true;HIGH;ECRegisterEvent;GENERIC;
+;de.hybris.RegisterEvent;;2;true;HIGH;ECRegisterEvent;GENERIC;
+;de.hybris.SubmitOrderEvent;;1;true;CRITICAL;ECSubmitOrderEvent;GENERIC;
+;de.hybris.SubmitOrderEvent;;3;true;CRITICAL;ECSubmitOrderEvent;GENERIC;
+;de.hybris.ForgottenPwdEvent;;1;true;MEDIUM;ECForgottenPwdEvent;GENERIC;
+;de.hybris.AfterCronJobFinishedEvent;;1;true;HIGH;ECAfterCronJobFinishedEvent;GENERIC;
+;de.hybris.AfterCronJobFinishedEvent;;2;true;HIGH;ECAfterCronJobFinishedEvent;GENERIC;
+;de.hybris.AfterCronJobFinishedEvent;;3;true;HIGH;ECAfterCronJobFinishedEvent;GENERIC;
+;de.hybris.Inactive;;1;false;MEDIUM;ECForgottenPwdEvent;GENERIC;
+
+INSERT_UPDATE EventConfiguration;&ecref;eventClass[unique=true];destinationTarget(id)[default=$destination_target];version[unique=true];exportFlag;priority(code);exportName;mappingType(code);converterBean;description
+;orderv1;de.hybris.platform.order.events.SubmitOrderEvent;;1;true;CRITICAL;orderCreated;GENERIC;;"Submit Order Event"
+;;de.hybris.platform.servicelayer.event.events.AfterCronJobFinishedEvent;;1;true;CRITICAL;cronCreated;BEAN;bean;""
+
+INSERT_UPDATE EventPropertyConfiguration;propertyName[unique=true];eventConfiguration(&ecref)[unique=true];propertyMapping;title[default='title'];description;examples(key,value)[map-delimiter=|];required[default=true];type[default='string'];
+;"orderCode";orderv1;"event.order.code";"Order code";"Code of an Order.";orderCode->76272727;false

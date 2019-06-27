@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<context:annotation-config/>
+
+	<alias name="defaultYProfileAffinityFacade" alias="yProfileAffinityFacade"/>
+	<bean id="defaultYProfileAffinityFacade" class="de.hybris.platform.assistedserviceyprofilefacades.impl.DefaultYProfileAffinityFacade">
+		<property name="asmProfileDataServiceClientAdapter" ref="asmProfileDataServiceClientAdapter"/>
+		<property name="asmProfileIdentityServiceClientAdapter" ref="asmProfileIdentityServiceClientAdapter"/>
+		<property name="categoryAffinityConverter" ref="categoryAffinityConverter"/>
+		<property name="productAffinityConverter" ref="productAffinityConverter"/>
+		<property name="deviceAffinityConverter" ref="deviceAffinityConverter"/>
+		<property name="userService" ref="userService"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<!-- Product Affinity section starts -->
+	
+	<alias name="defaultProductAffinityProvider" alias="productAffinityProvider"/>
+	<bean id="defaultProductAffinityProvider"
+		  class="de.hybris.platform.assistedserviceyprofilefacades.data.provider.ProductAffinityProvider">
+		<property name="yProfileAffinityFacade" ref="yProfileAffinityFacade"/>
+	</bean>
+	
+	<alias name="defaultProductAffinityConverter" alias="productAffinityConverter"/>
+	<bean id="defaultProductAffinityConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedserviceyprofilefacades.data.ProductAffinityData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="productAffinityPopulator"/>
+				<ref bean="affinityPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultProductAffinityPopulator" alias="productAffinityPopulator"/>
+	<bean id="defaultProductAffinityPopulator" class="de.hybris.platform.assistedserviceyprofilefacades.populator.ProductAffinityPopulator">
+		<property name="productFacade" ref="productFacade"/>
+	</bean>
+	<!-- Product Affinity section ends -->
+	<!-- Cateogry Affinity section starts -->
+
+	<alias name="defaultCategoryAffinityProvider" alias="categoryAffinityProvider"/>
+	<bean id="defaultCategoryAffinityProvider"
+		  class="de.hybris.platform.assistedserviceyprofilefacades.data.provider.CategoryAffinityProvider">
+		<property name="yProfileAffinityFacade" ref="yProfileAffinityFacade"/>
+	</bean>
+	
+	
+	<alias name="defaultCategoryAffinityConverter" alias="categoryAffinityConverter"/>
+	<bean id="defaultCategoryAffinityConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedserviceyprofilefacades.data.CategoryAffinityData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="categoryAffinityPopulator"/>
+				<ref bean="affinityPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCategoryAffinityPopulator" alias="categoryAffinityPopulator"/>
+	<bean id="defaultCategoryAffinityPopulator" class="de.hybris.platform.assistedserviceyprofilefacades.populator.CategoryAffinityPopulator">
+		<property name="categoryUrlConverter" ref="categoryUrlConverter"/>
+		<property name="categoryService" ref="categoryService"/>
+		<property name="productSearchFacade" ref="productSearchFacade"/>
+	</bean>
+	<!-- Category Affinity section ends -->
+
+	<!-- Profile Overview section starts -->
+
+	<alias name="defaultProfileSalesStatsProvider" alias="profileSalesStatsProvider"/>
+	<bean id="defaultProfileSalesStatsProvider"
+		  class="de.hybris.platform.assistedserviceyprofilefacades.data.provider.SalesStatsProvider">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<alias name="defaultProfileTechnologyUsedProvider" alias="profileTechnologyUsedProvider"/>
+	<bean id="defaultProfileTechnologyUsedProvider"
+		  class="de.hybris.platform.assistedserviceyprofilefacades.data.provider.TechnologyUsedProvider">
+		<property name="yProfileAffinityFacade" ref="yProfileAffinityFacade"/>
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<alias name="defaultDeviceAffinityConverter" alias="deviceAffinityConverter"/>
+	<bean id="defaultDeviceAffinityConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedserviceyprofilefacades.data.TechnologyUsedData"/>
+		<property name="populators">
+			<list merge="true">
+				<ref bean="deviceAffinityPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDeviceAffinityPopulator" alias="deviceAffinityPopulator"/>
+	<bean id="defaultDeviceAffinityPopulator" class="de.hybris.platform.assistedserviceyprofilefacades.populator.DeviceAffinityPopulator"/>
+
+	<!-- Profile Overview section ends -->
+	
+	<alias name="defaultAffinityPopulator" alias="affinityPopulator"/>
+	<bean id="defaultAffinityPopulator" class="de.hybris.platform.assistedserviceyprofilefacades.populator.AffinityPopulator"/>
+		
+</beans>

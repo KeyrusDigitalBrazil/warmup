@@ -1,0 +1,89 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Sample data for configurable product with product variants option 1:
+#
+# Variant's category inherits configuration and overrides some settings. The parent category is also assigned to the
+# base product, so by default product variants have the base product's configuration set.
+#
+# product "Photosmart E317 Digital Camera"
+
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='approved']
+$taxGroup=Europe1PriceFactory_PTG(code)[default=jp-vat-full]
+$lang=en
+
+INSERT_UPDATE Product;code[unique=true];variantType(code);$catalogVersion
+;300938;ElectronicsColorVariantProduct
+
+INSERT_UPDATE ElectronicsColorVariantProduct;code[unique=true];$baseProduct;ean;unit(code);color;$supercategories;approvalstatus(code)[default='approved'];$catalogVersion
+;300938_red;300938;0829160974095;pieces;Red;
+;300938_green;300938;0829160974095;pieces;Green;
+;300938_blue;300938;0829160974095;pieces;Blue;
+
+INSERT_UPDATE ConfigurationCategory;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;300938_engraving;configurations
+;300938_engraving_largeFont;300938_engraving
+;300938_engraving_extraLargeFont;300938_engraving
+;300938_engraving_smallFont;300938_engraving
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, $catalogVersion);qualifier
+;300938_Engraved_Text;;;300938_engraving;300938_engravedText
+;300938_Font_Type;;;300938_engraving;300938_fontType
+;300938_Font_Size;;;300938_engraving;300938_fontSize
+;300938_LargeFont;;;300938_engraving_largeFont;300938_fontSize
+;300938_ExtraLargeFont;;;300938_engraving_extraLargeFont;300938_fontSize
+;300938_SmallFont;;;300938_engraving_smallFont;300938_fontSize
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;textFieldLabel[lang=$lang];textFieldDefaultValue[lang=$lang]
+;300938_Engraved_Text;;Engraved Text;
+;300938_Font_Type;;Font Type;Webdings
+;300938_Font_Size;;Font Size;14
+;300938_LargeFont;;Font Size;24
+;300938_ExtraLargeFont;;Font Size;48
+;300938_SmallFont;;Font Size;10
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;$supercategories[mode='append']
+;300938;;300938_engraving
+;300938_red;;300938_engraving_largeFont
+;300938_blue;;300938_engraving_smallFont
+;300938_green;;300938_engraving_extraLargeFont
+
+UPDATE Product;code[unique=true];$approved;$catalogVersion;$taxGroup
+;300938_red
+;300938_green
+;300938_blue
+
+INSERT_UPDATE PriceRow;productId[unique=true];unit(code[unique=true,default=pieces]);currency(isocode)[unique=true];price;minqtd;unitFactor;net
+;300938_red;pieces;USD;114;1;1;false
+;300938_red;pieces;JPY;9720;1;1;false
+;300938_green;pieces;USD;114;1;1;false
+;300938_green;pieces;JPY;9720;1;1;false
+;300938_blue;pieces;USD;114;1;1;false
+;300938_blue;pieces;JPY;9720;1;1;false
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;31;warehouse_e;notSpecified;1;0;0;0;300938_red;0
+;31;warehouse_e;notSpecified;1;0;0;0;300938_green;0
+;31;warehouse_e;notSpecified;1;0;0;0;300938_blue;0
+
+INSERT_UPDATE ProductTaxCode;productCode[unique=true];taxCode;taxArea[unique=true]
+;300938_red;P0000000;US
+;300938_green;P0000000;US
+;300938_blue;P0000000;US
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang]
+;300938_red;;Photosmart E317 Digital Camera Red;Point and shoot simplicity in a 5 MP camera.;Get point and shoot simplicity plus crisp, true-to-life photos with this stylish and easy-to-use camera.<br/><br/>Get close in with 4x digital zoom, review via the clear 3.8 cm LCD then print great 10 × 15 cm photos and enlargements up to poster size.
+;300938_green;;Photosmart E317 Digital Camera Green;Point and shoot simplicity in a 5 MP camera.;Get point and shoot simplicity plus crisp, true-to-life photos with this stylish and easy-to-use camera.<br/><br/>Get close in with 4x digital zoom, review via the clear 3.8 cm LCD then print great 10 × 15 cm photos and enlargements up to poster size.
+;300938_blue;;Photosmart E317 Digital Camera Blue;Point and shoot simplicity in a 5 MP camera.;Get point and shoot simplicity plus crisp, true-to-life photos with this stylish and easy-to-use camera.<br/><br/>Get close in with 4x digital zoom, review via the clear 3.8 cm LCD then print great 10 × 15 cm photos and enlargements up to poster size.

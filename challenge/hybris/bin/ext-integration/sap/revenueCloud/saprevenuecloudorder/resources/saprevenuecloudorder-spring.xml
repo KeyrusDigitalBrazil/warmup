@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+    <!-- Process Actions -->
+    <import resource="/saprevenuecloudorder/process/sap-subscription-order-process-spring.xml"/>    
+    
+    <!-- SAP Subscription Process Definitions -->
+    <alias name="sapDefaultSubscriptionProcessDefinitionResource" alias="sapSubscriptionProcessDefinitionResource" />
+    <bean id="sapDefaultSubscriptionProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource" >
+        <property name="resource" value="classpath:/saprevenuecloudorder/process/sap-subscription-order-process.xml"/>
+    </bean>   
+
+	<alias name="defaultSapSubscriptionConfigurationService" alias="sapSubscriptionConfigurationService"/>
+	<bean name="defaultSapSubscriptionConfigurationService" class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.DefaultSapRevenueCloudSubscriptionConfigurationService">
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="yaasServiceFactory" ref="yaasServiceFactory"/>
+		<property name="yaasConfigurationService" ref="yaasConfigurationService" />
+	</bean>
+
+	<alias name="defaultSapSubscriptionService" alias="sapSubscriptionService"/>
+	<bean id="defaultSapSubscriptionService"  class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.DefaultSapRevenueCloudSubscriptionService">
+		<property name="sapSubscriptionConfigurationService" ref="sapSubscriptionConfigurationService"/>
+	</bean>
+
+	<!-- SAP Subscription Facade -->
+	<alias name="sapDefaultSubscriptionFacade" alias="subscriptionFacade" />
+	<bean id="sapDefaultSubscriptionFacade"
+		class="de.hybris.platform.sap.saprevenuecloudorder.facade.impl.DefaultSapRevenueCloudSubscriptionFacade"
+		parent="defaultSubscriptionFacade">
+		<property name="sapSubscriptionService" ref="sapSubscriptionService" />
+		<property name="userService" ref="userService" />
+		<property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="sapSubscriptionConverter" ref="sapSubscriptionConverter"/>
+		<property name="sapSubscriptionDetailConverter" ref="sapSubscriptionDetailConverter"/>
+		<property name="sapSubscriptionBillsConverter" ref="sapSubscriptionBillsConverter"/>
+		<property name="sapSubscriptionBillDetailConverter" ref="sapSubscriptionBillDetailConverter"/>
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+	</bean>
+	
+	<alias name="defaultPerUnitUsageChargePopulator" alias="perUnitUsageChargePopulator"/>
+	<bean id="defaultPerUnitUsageChargePopulator" class="de.hybris.platform.subscriptionfacades.product.converters.populator.PerUnitUsageChargePopulator" parent="abstractUsageChargePopulator" >
+	    <property name="usageChargeTypeConverter" ref="usageChargeTypeConverter"/>
+	</bean>	
+	
+	<alias name="sapDefaultSubscriptionOrderPopulator" alias="sapSubscriptionOrderPopulator"/>
+	<bean name="sapDefaultSubscriptionOrderPopulator" class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudSubscriptionOrderPopulator">
+	   <property name="commercePriceService" ref="subscriptionCommercePriceService"/>
+	   <property name="cmsSiteService" ref="cmsSiteService"/>
+	   <property name="sapRevenueCloudSubscriptionService" ref="sapSubscriptionService"/>
+	   <property name="sapCatalogToMarketMappingGenericDao" ref="sapCatalogToMarketMappingGenericDao"/>
+	   <property name="configurationService" ref="configurationService"/>
+	   <property name="commonI18NService" ref="commonI18NService"/>
+	</bean>  
+	 
+	 <bean name="sapCatalogToMarketMappingGenericDao"
+          class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+        <constructor-arg value="SAPMarketToCatalogMapping"/>        
+    </bean>
+    
+    
+	<alias name="sendDefaultOrderToSCPIHelper" alias="sendOrderToSCPIHelper"/>
+	<bean id="sendDefaultOrderToSCPIHelper"
+		class="de.hybris.platform.sap.saprevenuecloudorder.outbound.SendSubscriptionOrderToSCPIHelper">
+		<property name="defaultCloudPlatformIntegrationConnection"
+			ref="cloudPlatformIntegrationConnection" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="sapSubscriptionOrderPopulator" ref="sapSubscriptionOrderPopulator" />
+	</bean>
+
+	<!-- process action beans -->
+
+	<!-- Check Customer Is Replicated Action -->
+	<alias name="checkCustomerIsReplicatedAction" alias="checkCustomerIsReplicatedAction" />
+	<bean id="checkCustomerIsReplicatedAction"
+		class="de.hybris.platform.sap.saprevenuecloudorder.actions.CheckCustomerIsReplicatedAction"
+		parent="abstractAction">
+		<property name="sapRevenueCloudCustomerOutboundService" ref="sapRevenueCloudCustomerOutboundService" />
+	</bean>
+
+	<!-- SAP Subscription Order Process Action -->
+	<alias name="sapDefaultSubscriptionOrderSendAction" alias="sapSubscriptionOrderSendAction" />
+	<bean id="sapDefaultSubscriptionOrderSendAction"
+		class="de.hybris.platform.sap.saprevenuecloudorder.actions.SendSubscriptionOrderAction"
+		parent="abstractAction">
+		<property name="businessProcessService" ref="businessProcessService" />
+		<property name="sapRevenueCloudOrderOutboundService" ref="sapRevenueCloudOrderOutboundService" />	
+	</bean>
+
+	<!-- SAP Subscription Confirmation Action -->
+	<alias name="sapDefaultSubscriptionOrderConfirmationAction"
+		alias="sapSubscriptionOrderConfirmationAction" />
+	<bean id="sapDefaultSubscriptionOrderConfirmationAction"
+		class="de.hybris.platform.sap.saprevenuecloudorder.actions.SapRevenueCloudOrderConfirmationAction"
+		parent="abstractAction">
+	</bean>
+	
+	
+	<alias name="sapDefaultPerUnitUsageChargePopulator" alias="perUnitUsageChargePopulator" />
+	<bean id="sapDefaultPerUnitUsageChargePopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudPerUnitUsageChargePopulator"
+		parent="defaultPerUnitUsageChargePopulator">
+		<property name="perUnitUsageChargeEntryConverter" ref="perUnitUsageChargeEntryConverter"/>
+	</bean>
+	
+	<alias name="sapDefaultPerUnitUsageChargeEntryPopulator" alias="perUnitUsageChargeEntryPopulator" />
+	<bean id="sapDefaultPerUnitUsageChargeEntryPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudPerUnitUsageChargeEntryPopulator"
+		parent="defaultAbstractUsageChargeEntryPopulator">
+	
+	</bean>
+	
+	<bean id="perUnitUsageChargeEntryData" class="de.hybris.platform.subscriptionfacades.data.PerUnitUsageChargeEntryData" scope="prototype"/>
+	
+	<alias name="defaultPerUnitUsageChargeEntryConverter" alias="perUnitUsageChargeEntryConverter"/>
+	<bean id="defaultPerUnitUsageChargeEntryConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="perUnitUsageChargeEntryData"/>
+		<property name="populators">
+			<list>
+				<ref bean="perUnitUsageChargeEntryPopulator"/>
+			</list>
+		</property>
+	</bean>	
+	
+	<alias name="defaultSAPRevenueCloudFixedPriceUsageChargeEntryPopulator" alias="sapRevenueCloudFixedPriceUsageChargeEntryPopulator" />
+	<bean id="defaultSAPRevenueCloudFixedPriceUsageChargeEntryPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudFixedPriceUsageChargeEntryPopulator">
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="overageUsageChargeEntryConverter"/>
+		<property name="add" ref="sapRevenueCloudFixedPriceUsageChargeEntryPopulator"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="tierUsageChargeEntryConverter"/>
+		<property name="add" ref="sapRevenueCloudFixedPriceUsageChargeEntryPopulator"/>
+	</bean>	
+	
+	
+	<!--  Populators  -->
+	
+	<alias name="defaultSapRevenueCloudSubscriptionPopulator" alias="sapRevenueCloudSubscriptionPopulator"/>
+	<bean id="defaultSapRevenueCloudSubscriptionPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudSubscriptionPopulator">
+		<property name="userService" ref="userService" />
+		<property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"/>
+		<property name="productUrlPopulator" ref="productUrlPopulator" />
+		<property name="cmsSiteService" ref="cmsSiteService" />
+	</bean>
+	
+	<alias name="defaultSapSubscriptionConverter" alias="sapSubscriptionConverter"/>
+	<bean id="defaultSapSubscriptionConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.subscriptionfacades.data.SubscriptionData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapRevenueCloudSubscriptionPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudSubscriptionDetailPopulator" alias="sapRevenueCloudSubscriptionDetailPopulator"/>
+	<bean id="defaultSapRevenueCloudSubscriptionDetailPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudSubscriptionDetailPopulator">
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="sapRevenueCloudSubscriptionService" ref="sapSubscriptionService" />
+		<property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"/>
+		<property name="productUrlPopulator" ref="productUrlPopulator" />
+		<property name="subscriptionProductPricePlanPopulator" ref="subscriptionProductPricePlanPopulator"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+	</bean>
+
+	
+	<alias name="defaultSapSubscriptionDetailConverter" alias="sapSubscriptionDetailConverter"/>
+	<bean id="defaultSapSubscriptionDetailConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.subscriptionfacades.data.SubscriptionData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapRevenueCloudSubscriptionDetailPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudSubscriptionBillsPopulator" alias="sapRevenueCloudSubscriptionBillsPopulator"/>
+	<bean id="defaultSapRevenueCloudSubscriptionBillsPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudSubscriptionBillsPopulator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+	</bean>
+	
+	<alias name="defaultSapSubscriptionBillsConverter" alias="sapSubscriptionBillsConverter"/>
+	<bean id="defaultSapSubscriptionBillsConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingData"/>
+		<property name="populators">
+			<list>
+				<ref bean="defaultSapRevenueCloudSubscriptionBillsPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudSubscriptionBillDetailPopulator" alias="sapRevenueCloudSubscriptionBillDetailPopulator"/>
+	<bean id="defaultSapRevenueCloudSubscriptionBillDetailPopulator" 
+		class="de.hybris.platform.sap.saprevenuecloudorder.populators.DefaultSAPRevenueCloudBillDetailPopulator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="priceDataFactory" ref="priceDataFactory"/>
+		<property name="sapRevenueCloudProductService" ref="sapRevenueCloudProductService"/>
+		<property name="cmsSiteService" ref="cmsSiteService" />
+		<property name="productUrlPopulator" ref="productUrlPopulator" />
+	</bean>
+	
+	<alias name="defaultSapSubscriptionBillDetailConverter" alias="sapSubscriptionBillDetailConverter"/>
+	<bean id="defaultSapSubscriptionBillDetailConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.subscriptionfacades.data.SubscriptionBillingData"/>
+		<property name="populators">
+			<list>
+				<ref bean="sapRevenueCloudSubscriptionBillDetailPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultSapRevenueCloudOrderOutboundService" alias="sapRevenueCloudOrderOutboundService" />
+	<bean id="defaultSapRevenueCloudOrderOutboundService"
+		class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.DefaultSapRevenueCloudOrderOutboundService">
+		<property name="sapRevenueCloudOrderConversionService" ref="sapRevenueCloudOrderConversionService"/>
+		<property name="outboundServiceFacade" ref="sapCpiOutboundServiceFacade" />
+	</bean> 
+	
+	<alias name="defaultSapRevenueCloudOrderConversionService" alias="sapRevenueCloudOrderConversionService"/>
+    <bean id="defaultSapRevenueCloudOrderConversionService"
+          class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.SapRevenueCloudOrderConversionService">
+       <property name="commercePriceService" ref="subscriptionCommercePriceService"/>
+	   <property name="cmsSiteService" ref="cmsSiteService"/>
+	   <property name="configurationService" ref="configurationService"/>
+	   <property name="commonI18NService" ref="commonI18NService"/>
+	   <property name="b2bUnitService" ref="b2bUnitService"/>    
+    </bean>
+	
+	 <!-- Send Revenue Cloud Outbound Order Action -->
+    <alias name="sapCpiRCOmsOrderOutboundAction" alias="sapOmsSendOrderAction"/>
+    <bean id="sapCpiRCOmsOrderOutboundAction" parent="sapCpiOmsOrderOutboundAction"
+          class="de.hybris.platform.sap.saprevenuecloudorder.actions.SapCpiSendRevenueCloudOrderOutboundAction">
+         <property name="sapRevenueCloudOrderOutboundService" ref="sapRevenueCloudOrderOutboundService"/>
+    </bean>
+    
+     <!-- Allocation Service -->
+    <alias name="defaultSapRCAllocationService" alias="allocationService"/>
+    <bean id="defaultSapRCAllocationService" parent="defaultAllocationService" 
+          class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.DefaultRevenueCloudAllocationService">
+    </bean>
+    
+     <!-- Allocation Service -->
+    <alias name="defaultSapRevenueCloudSplitOrderService" alias="sapRevenueCloudSplitOrderService"/>
+    <bean id="defaultSapRevenueCloudSplitOrderService" 
+          class="de.hybris.platform.sap.saprevenuecloudorder.service.impl.DefaultSapRevenueCloudSplitOrderService">
+    
+    </bean>
+	
+</beans>

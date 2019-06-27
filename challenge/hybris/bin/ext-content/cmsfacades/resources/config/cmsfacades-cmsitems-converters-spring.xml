@@ -1,0 +1,245 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- ## CONVERTERS ## --> 
+	
+	<!-- default attribute converter -->
+	<alias name="defaultCmsDefaultAttributeToDataContentConverter" alias="cmsDefaultAttributeToDataContentConverter"/>
+	<bean name="defaultCmsDefaultAttributeToDataContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.DefaultAttributeToDataContentConverter"/>
+	
+	<bean id="abstractDefaultCmsDataToAttributeContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.DefaultDataToAttributeContentConverter" abstract="true"/>
+	
+	<!-- unique identifier attribute converter -->
+	<alias name="defaultCmsUniqueIdentifierAttributeToDataContentConverter" alias="cmsUniqueIdentifierAttributeToDataContentConverter"/>
+	<bean id="defaultCmsUniqueIdentifierAttributeToDataContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.UniqueIdentifierAttributeToDataContentConverter">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+
+	<alias name="defaultCmsUniqueIdentifierDataToAttributeContentConverter" alias="cmsUniqueIdentifierDataToAttributeContentConverter"/>
+	<bean id="defaultCmsUniqueIdentifierDataToAttributeContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.UniqueIdentifierDataToAttributeContentConverter" abstract="true">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+	
+	<alias name="defaultCmsItemDataToAttributeContentConverter" alias="cmsItemDataToAttributeContentConverter"/>
+	<bean id="defaultCmsItemDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.cms2.model.contents.CMSItemModel" />
+	</bean>
+	
+	<alias name="defaultCmsMediaDataToAttributeContentConverter" alias="cmsMediaDataToAttributeContentConverter"/>
+	<bean id="defaultCmsMediaDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.core.model.media.MediaModel" />
+	</bean>
+	
+	<alias name="defaultCmsProductDataToAttributeContentConverter" alias="cmsProductDataToAttributeContentConverter"/>
+	<bean id="defaultCmsProductDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.core.model.product.ProductModel" />
+	</bean>
+	
+	<alias name="defaultCmsCategoryDataToAttributeContentConverter" alias="cmsCategoryDataToAttributeContentConverter"/>
+	<bean id="defaultCmsCategoryDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.category.model.CategoryModel" />
+	</bean>
+	
+	<alias name="defaultCmsUserGroupDataToAttributeContentConverter" alias="cmsUserGroupDataToAttributeContentConverter"/>
+	<bean id="defaultCmsUserGroupDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.core.model.user.UserGroupModel" />
+	</bean>
+	
+	<alias name="defaultCmsCatalogDataToAttributeContentConverter" alias="cmsCatalogDataToAttributeContentConverter"/>
+	<bean id="defaultCmsCatalogDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.catalog.model.CatalogModel" />
+	</bean>
+
+	<alias name="defaultCmsCatalogVersionDataToAttributeContentConverter" alias="cmsCatalogVersionDataToAttributeContentConverter"/>
+	<bean id="defaultCmsCatalogVersionDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.catalog.model.CatalogVersionModel" />
+	</bean>
+	
+	<alias name="defaultCMSPageTypeDataToAttributeContentConverter" alias="cmsPageTypeDataToAttributeContentConverter"/>
+	<bean id="defaultCMSPageTypeDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.cms2.model.CMSPageTypeModel" />
+	</bean>
+
+	<alias name="defaultCmsNavigationEntryDataToAttributeContentConverter" alias="cmsNavigationEntryDataToAttributeContentConverter"/>
+	<bean id="defaultCmsNavigationEntryDataToAttributeContentConverter" parent="cmsUniqueIdentifierDataToAttributeContentConverter">
+		<property name="modelClass" value="de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel" />
+	</bean>
+
+	<!-- primitive specific converters -->
+	<alias name="defaultCmsDateAttributeToDataContentConverter" alias="cmsDateAttributeToDataContentConverter"/>
+	<bean id="defaultCmsDateAttributeToDataContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.DateAttributeToDataContentConverter"/>
+	
+	<alias name="defaultCmsDateDataToAttributeContentConverter" alias="cmsDateDataToAttributeContentConverter"/>
+	<bean id="defaultCmsDateDataToAttributeContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.DateDataToAttributeContentConverter"/>
+	
+	<alias name="defaultCmsBooleanDataToAttributeContentConverter" alias="cmsBooleanDataToAttributeContentConverter"/>
+	<bean id="defaultCmsBooleanDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.Boolean" />
+	</bean>
+	
+	<alias name="defaultCmsDoubleDataToAttributeContentConverter" alias="cmsDoubleDataToAttributeContentConverter"/>
+	<bean id="defaultCmsDoubleDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.Double" />
+	</bean>
+	
+	<alias name="defaultCmsFloatDataToAttributeContentConverter" alias="cmsFloatDataToAttributeContentConverter"/>
+	<bean id="defaultCmsFloatDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.Float" />
+	</bean>
+
+	<alias name="defaultCmsIntegerDataToAttributeContentConverter" alias="cmsIntegerDataToAttributeContentConverter"/>
+	<bean id="defaultCmsIntegerDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.Integer" />
+	</bean>
+	
+	<alias name="defaultCmsLongDataToAttributeContentConverter" alias="cmsLongDataToAttributeContentConverter"/>
+	<bean id="defaultCmsLongDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.Long" />
+	</bean>
+
+	<alias name="defaultCmsStringDataToAttributeContentConverter" alias="cmsStringDataToAttributeContentConverter"/>
+	<bean id="defaultCmsStringDataToAttributeContentConverter" parent="abstractDefaultCmsDataToAttributeContentConverter">
+		<property name="primitiveType" value="java.lang.String" />
+	</bean>
+
+	<!-- ## CONTENT CONVERTERS ## -->
+	
+	<alias name="defaultCmsLinkTargetContentConverter" alias="cmsLinkTargetContentConverter"/>
+	<bean name="defaultCmsLinkTargetContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.LinkTargetAttributeContentConverter"
+		  p:predicate-ref="cmsLinkTargetAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsEnumContentConverter" alias="cmsEnumContentConverter"/>
+	<bean name="defaultCmsEnumContentConverter" class="de.hybris.platform.cmsfacades.cmsitems.attributeconverters.EnumAttributeContentConverter"
+		p:isEnumPredicate-ref="isEnumPredicate"
+		p:attributeDescriptorModelHelperService-ref="attributeDescriptorModelHelperService"
+		p:enumerationService-ref="enumerationService">
+	</bean>
+
+	<alias name="defaultCmsItemContentConverter" alias="cmsItemContentConverter"/>
+	<bean name="defaultCmsItemContentConverter" parent="cmsAbstractContentConverter" 
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsItemDataToAttributeContentConverter"
+	      p:constrainedBy-ref="cmsItemAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsMediaContentConverter" alias="cmsMediaContentConverter"/>
+	<bean name="defaultCmsMediaContentConverter" parent="cmsAbstractContentConverter" 
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsMediaDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsMediaTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsProductContentConverter" alias="cmsProductContentConverter"/>
+	<bean name="defaultCmsProductContentConverter" parent="cmsAbstractContentConverter" 
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsProductDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsProductTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsCategoryContentConverter" alias="cmsCategoryContentConverter"/>
+	<bean name="defaultCmsCategoryContentConverter" parent="cmsAbstractContentConverter" 
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsCategoryDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsCategoryTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsUserGroupContentConverter" alias="cmsUserGroupContentConverter"/>
+	<bean name="defaultCmsUserGroupContentConverter" parent="cmsAbstractContentConverter" 
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsUserGroupDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsUserGroupTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsCatalogVersionContentConverter" alias="cmsCatalogVersionContentConverter"/>
+	<bean name="defaultCmsCatalogVersionContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsCatalogVersionDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsCatalogVersionTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCMSPageTypeContentConverter" alias="cmsPageTypeContentConverter"/>
+	<bean name="defaultCMSPageTypeContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsPageTypeDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsPageTypeTypeAttributePredicate">
+	</bean>
+
+	<!-- primitive content converters -->
+	<alias name="defaultCmsBooleanContentConverter" alias="cmsBooleanContentConverter"/>
+	<bean name="defaultCmsBooleanContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsBooleanDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsBooleanTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsDateContentConverter" alias="cmsDateContentConverter"/>
+	<bean name="defaultCmsDateContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDateAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsDateDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsDateTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsDoubleContentConverter" alias="cmsDoubleContentConverter"/>
+	<bean name="defaultCmsDoubleContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsDoubleDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsDoubleTypeAttributePredicate">
+	</bean>
+	
+	<alias name="defaultCmsFloatContentConverter" alias="cmsFloatContentConverter"/>
+	<bean name="defaultCmsFloatContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsFloatDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsFloatTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsIntegerContentConverter" alias="cmsIntegerContentConverter"/>
+	<bean name="defaultCmsIntegerContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsIntegerDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsIntegerTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsLongContentConverter" alias="cmsLongContentConverter"/>
+	<bean name="defaultCmsLongContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsLongDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsLongTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsStringContentConverter" alias="cmsStringContentConverter"/>
+	<bean name="defaultCmsStringContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsDefaultAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsStringDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsStringTypeAttributePredicate">
+	</bean>
+
+	<alias name="defaultCmsNavigationEntryContentConverter" alias="cmsNavigationEntryContentConverter"/>
+	<bean name="defaultCmsNavigationEntryContentConverter" parent="cmsAbstractContentConverter"
+		  p:modelToDataConverter-ref="cmsUniqueIdentifierAttributeToDataContentConverter"
+		  p:dataToModelConverter-ref="cmsNavigationEntryDataToAttributeContentConverter"
+		  p:constrainedBy-ref="cmsNavigationEntryTypeAttributePredicate">
+	</bean>
+
+</beans>

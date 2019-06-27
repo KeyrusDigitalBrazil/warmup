@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultClassificationFullNameExtractor" alias="classificationFullNameExtractor"/>
+	<bean name="defaultClassificationFullNameExtractor"
+		  class="com.hybris.backoffice.excel.template.populator.extractor.ClassificationFullNameExtractor"/>
+
+	<alias name="defaultClassificationAttributeNameFormatter" alias="classificationAttributeNameFormatter"/>
+	<bean id="defaultClassificationAttributeNameFormatter"
+		  class="com.hybris.backoffice.excel.template.ClassificationAttributeNameFormatter">
+		<property name="classificationFullNameExtractor" ref="classificationFullNameExtractor"/>
+		<property name="appenders">
+			<util:list>
+				<ref bean="mandatoryExcelMarkAppender"/>
+				<ref bean="multivalueExcelMarkAppender"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelClassificationAttributeFactory" alias="excelClassificationAttributeFactory"/>
+	<bean name="defaultExcelClassificationAttributeFactory"
+		  class="com.hybris.backoffice.excel.classification.ExcelClassificationAttributeFactory">
+		<property name="classificationFullNameExtractor" ref="classificationFullNameExtractor"/>
+	</bean>
+	<alias name="defaultClassificationTypeSystemSheetCompressor" alias="classificationTypeSystemSheetCompressor"/>
+	<bean id="defaultClassificationTypeSystemSheetCompressor"
+		  class="com.hybris.backoffice.excel.template.populator.ClassificationTypeSystemSheetCompressor">
+		<property name="collectionFormatter" ref="excelCollectionFormatter"/>
+	</bean>
+
+	<alias name="excelCollectionFormatter" alias="collectionFormatter"/>
+	<bean id="excelCollectionFormatter" class="com.hybris.backoffice.excel.template.ExcelCollectionFormatter"/>
+
+	<alias name="defaultClassificationAttributeHeaderValueCreator" alias="classificationAttributeHeaderValueCreator"/>
+	<bean id="defaultClassificationAttributeHeaderValueCreator"
+		  class="com.hybris.backoffice.excel.translators.classification.DefaultClassificationAttributeHeaderValueCreator">
+		<property name="requiredAttributesFactory" ref="requiredAttributesFactory"/>
+	</bean>
+
+	<alias name="defaultExcelClassificationService" alias="excelClassificationService"/>
+	<bean id="defaultExcelClassificationService"
+		  class="com.hybris.backoffice.excel.classification.DefaultExcelClassificationService">
+		<property name="catalogService" ref="catalogService"/>
+		<property name="classificationService" ref="classificationService"/>
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+		<property name="filters" ref="excelClassificationServiceFilters"/>
+	</bean>
+
+</beans>

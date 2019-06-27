@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+         http://www.springframework.org/schema/util/spring-util.xsd">
+
+   <!-- DAOs -->
+   <bean name="patchExecutionDao" class="de.hybris.platform.servicelayer.internal.dao.DefaultGenericDao">
+      <constructor-arg value="#{T(de.hybris.platform.patches.model.PatchExecutionModel)._TYPECODE} " />
+   </bean>
+
+   <!-- SERVICES -->
+   <alias alias="patchExecutionService" name="defaultPatchExecutionService"/>
+   <bean id="defaultPatchExecutionService" class="de.hybris.platform.patches.service.impl.DefaultPatchExecutionService">
+      <property name="timeService" ref="timeService"/>
+      <property name="modelService" ref="modelService"/>
+      <property name="sessionService" ref="sessionService"/>
+      <property name="configurationService" ref="configurationService"/>
+      <property name="patchExecutionDao" ref="patchExecutionDao"/>
+   </bean>
+
+   <bean id="patchesSystemSetup" class="de.hybris.platform.patches.AbstractPatchesSystemSetup" abstract="true">
+      <property name="patchExecutionService" ref="patchExecutionService"/>
+   </bean>
+
+   <bean id="numberOfUnitsAttributeHandler" class="de.hybris.platform.patches.attribute.NumberOfUnitsAttributeHandler">
+      <property name="flexibleSearchService" ref="flexibleSearchService"/>
+   </bean>
+
+   <bean id="numberOfErrorUnitsAttributeHandler" class="de.hybris.platform.patches.attribute.NumberOfErrorUnitsAttributeHandler">
+      <property name="flexibleSearchService" ref="flexibleSearchService"/>
+   </bean>
+
+   <alias alias="patchImportService" name="defaultPatchImportService"/>
+   <bean id="defaultPatchImportService" class="de.hybris.platform.patches.service.impl.DefaultPatchImportService">
+      <property name="configurationService" ref="configurationService"/>
+      <property name="importService" ref="importService"/>
+   </bean>
+
+   <!-- PATCH -->
+   <bean id="abstractPatch" class="de.hybris.platform.patches.AbstractPatch" abstract="true">
+      <property name="importPatchAction" ref="importPatchAction"/>
+      <property name="sqlCommandPatchAction" ref="sqlCommandPatchAction"/>
+   </bean>
+
+   <!-- ACTIONS -->
+   <bean id="importPatchAction" class="de.hybris.platform.patches.actions.ImportPatchAction">
+      <property name="patchImportService" ref="patchImportService"/>
+      <property name="configurationService" ref="configurationService"/>
+      <property name="releasesPath" value="#{configurationService.configuration.getProperty('patches.releases.folder.name')}"/>
+      <property name="releasePath" value="#{configurationService.configuration.getProperty('patches.release.folder.name')}"/>
+      <property name="patchPath" value="#{configurationService.configuration.getProperty('patches.patch.folder.name')}"/>
+      <property name="globalPath" value="#{configurationService.configuration.getProperty('patches.global.folder.name')}"/>
+      <property name="extensionPath" value="#{configurationService.configuration.getProperty('patches.extension.folder.name')}"/>
+   </bean>
+
+   <bean id="sqlCommandPatchAction" class="de.hybris.platform.patches.actions.SqlCommandPatchAction"/>
+
+   <!-- AOP -->
+   <aop:aspectj-autoproxy />
+   <bean id="patchExecutionUnitAspect" class="de.hybris.platform.patches.aop.PatchExecutionUnitAspect">
+      <property name="timeService" ref="timeService" />
+      <property name="modelService" ref="modelService" />
+      <property name="patchExecutionService" ref="patchExecutionService" />
+      <property name="patchImportService" ref="patchImportService" />
+      <property name="ownAspectsList" ref="ownAspectsList" />
+      <property name="defaultPatchExecutionUnitTrackingStrategy" ref="defaultPatchExecutionUnitTrackingStrategy" />
+      <property name="patchExecutionUnitTrackingStrategyMap" ref="patchExecutionUnitTrackingStrategyMap" />
+   </bean>
+
+   <!-- Default bean for Patch Execution Unit tracking strategies. -->
+   <bean id="defaultPatchExecutionUnitTrackingStrategy" class="de.hybris.platform.patches.strategies.impl.DefaultPatchExecutionUnitTrackingStrategy">
+      <property name="timeService" ref="timeService" />
+      <property name="modelService" ref="modelService" />
+      <property name="patchExecutionService" ref="patchExecutionService" />
+      <property name="executionUnitType" value="#{T(de.hybris.platform.patches.enums.ExecutionUnitType).ACTION}" />
+   </bean>
+
+   <bean id="sqlCommandActionPatchExecutionUnitTrackingStrategy" parent="defaultPatchExecutionUnitTrackingStrategy">
+      <property name="executionUnitType" value="#{T(de.hybris.platform.patches.enums.ExecutionUnitType).SQL_COMMAND}" />
+   </bean>
+
+   <!-- List of PatchAction implementations that have their own aspects defined. -->
+   <util:list id="ownAspectsList">
+      <value>de.hybris.platform.patches.actions.ImportPatchAction</value>
+   </util:list>
+
+   <util:map id="patchExecutionUnitTrackingStrategyMap" key-type="java.lang.String" value-type="de.hybris.platform.patches.strategies.PatchExecutionUnitTrackingStrategy">
+      <entry key="de.hybris.platform.patches.actions.SqlCommandPatchAction" value-ref="sqlCommandActionPatchExecutionUnitTrackingStrategy" />
+   </util:map>
+
+</beans>

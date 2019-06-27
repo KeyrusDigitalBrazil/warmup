@@ -1,0 +1,57 @@
+<div>
+    <div data-ng-if="item.type == 'ACTION'"
+        class="toolbar-action">
+        <button type="button"
+            class="btn btn-default toolbar-action--button"
+            data-ng-click="triggerAction(item, $event)"
+            aria-pressed="false"
+            aria-haspopup="true"
+            id="{{toolbarName}}_option_{{item.key}}_btn"
+            aria-expanded="false">
+            <span data-ng-if='item.iconClassName'
+                id="{{toolbarName}}_option_{{item.key}}_btn_iconclass"
+                data-ng-class="item.iconClassName"></span>
+            <img data-ng-if='!item.iconClassName && item.icons'
+                id="{{toolbarName}}_option_{{item.key}}"
+                data-ng-src="{{::imageRoot}}{{item.icons[0]}}"
+                class="file"
+                id="{{toolbarName}}_option_{{item.key}}_btn_icon"
+                title="{{item.name | translate}}"
+                alt="{{item.name | translate}}" />
+            <span class="toolbar-action--button--txt"
+                id="{{toolbarName}}_option_{{item.key}}_btn_lbl">{{item.name | translate}}</span>
+        </button>
+    </div>
+    <div data-ng-if="item.type == 'HYBRID_ACTION'"
+        class="toolbar-action toolbar-action--hybrid"
+        data-uib-dropdown
+        data-auto-close="outsideClick"
+        data-is-open="item.isOpen"
+        data-item-key="{{ item.key }}">
+        <button data-ng-show="item.iconClassName || item.icons"
+            type="button"
+            class="btn btn-default toolbar-action--button"
+            data-uib-dropdown-toggle
+            ng-disabled="disabled "
+            aria-pressed="false "
+            data-ng-click="triggerAction(item, $event)">
+            <span data-ng-if='item.iconClassName'
+                data-ng-class="item.iconClassName"></span>
+            <img data-ng-if='!item.iconClassName && item.icons'
+                id="{{toolbarName}}_option_{{item.key}}"
+                data-ng-src="{{::imageRoot}}{{item.icons[0]}}"
+                class="file"
+                title="{{item.name | translate}}"
+                alt="{{item.name | translate}}" />
+            <span class="toolbar-action--button--txt">{{item.name | translate}}</span>
+        </button>
+
+        <div data-uib-dropdown-menu
+            data-ng-class="{ 'dropdown-menu-left': item.section == 'left' || item.section == 'middle', 'dropdown-menu-right': item.section == 'right' }"
+            class="btn-block toolbar-action--include">
+            <div data-ng-if="getItemVisibility(item)"
+                data-ng-include="item.include"></div>
+        </div>
+
+    </div>
+</div>

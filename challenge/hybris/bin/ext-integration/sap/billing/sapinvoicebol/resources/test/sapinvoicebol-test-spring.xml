@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans   xmlns="http://www.springframework.org/schema/beans" 
+			xmlns:context="http://www.springframework.org/schema/context" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://www.springframework.org/schema/beans            
+			http://www.springframework.org/schema/beans/spring-beans.xsd            
+			http://www.springframework.org/schema/context            
+			http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- define module access  -->
+      
+	 <alias alias="sapInvoiceBO" name="sapInvoiceBOImpl" />
+	<bean id="sapInvoiceBOImpl" parent="sapCoreBusinessObject"
+		class="de.hybris.platform.sap.sapinvoicebol.businessobject.impl.SapInvoiceBOImpl">	
+	</bean> 
+	
+	
+	
+<!-- 	<bean id="sapInvoiceBackendTypeERP" class="de.hybris.platform.sap.sapinvoiceservice.backend.impl.SapInvoiceBackendImpl" scope="sapSession" parent="sapCoreBackendObjectJCo" > -->
+<!-- 		<property name="jcoFunction" value="ERP_WEC_GET_INVOICE_AS_PDF"/> -->
+<!-- 		<property name="billingDocumentFieldName" value="IV_BILLING_DOC"/> -->
+<!-- 		<property name="tableName" value="T_PDF"/> -->
+<!-- 		<property name="parameters"> -->
+<!-- 			<map> -->
+<!-- 				<entry key="IV_OUTPUT_TYPE" value="RD00"/> -->
+<!-- 			</map> -->
+<!-- 		</property> -->
+<!-- 	</bean> -->
+	
+
+	<bean id="sapInvoiceBackendTypeERP" class="de.hybris.platform.sap.sapinvoicebol.backend.impl.SapInvoiceBackendImpl" scope="sapSession" parent="sapCoreBackendObjectJCo">
+		<property name="jcoFunction" value="ERP_WEC_GET_INVOICE_AS_PDF" />
+		<property name="billingDocumentFieldName" value="IV_BILLING_DOC" />
+		<property name="tableName" value="T_PDF" />
+		<property name="parameters">
+			<map>
+				<entry key="IV_OUTPUT_TYPE" value="RD00" />
+			</map>
+		</property>
+	 </bean>
+	 
+	
+		
+</beans>

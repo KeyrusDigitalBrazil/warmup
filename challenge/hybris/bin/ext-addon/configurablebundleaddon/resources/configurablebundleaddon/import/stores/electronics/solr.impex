@@ -1,0 +1,30 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$productCatalog=electronicsProductCatalog
+$catalogVersions=catalogVersions(catalog(id),version);
+$serverConfigName=electronicsSolrServerConfig
+$indexConfigName=electronicsSolrIndexConfig
+$searchConfigName=electronicsPageSize
+$facetSearchConfigName=electronicsIndex
+$facetSearchConfigDescription=Electronics Solr Index
+$searchIndexNamePrefix=electronics
+$solrIndexedType=electronicsProductType
+$indexBaseSite=electronics
+$indexLanguages=ja,en,de,zh
+$indexCurrencies=JPY,USD
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);multiValue[default=true];facet;facetSort(code);priority;categoryField[default=true];fieldValueProvider;visible[default=false];localized[default=false]
+;$solrIndexedType;bundleTemplates;string;;false;;5000;false;productBundleTemplatesValueProvider;;
+
+INSERT_UPDATE SolrSearchQueryProperty;indexedProperty(name, solrIndexedType(identifier))[unique=true];searchQueryTemplate(name, indexedType(identifier))[unique=true][default=DEFAULT:$solrIndexedType];facet;includeInResponse[default=true]
+;bundleTemplates:$solrIndexedType;;false;
+

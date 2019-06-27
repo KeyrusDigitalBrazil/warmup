@@ -1,0 +1,44 @@
+<div class="ySEVisbilityModalContainer">
+    <button data-ng-show="!$ctrl.showRestrictionPicker"
+        type="button"
+        class="y-add-btn"
+        data-ng-click="$ctrl.onClickOnAdd()">
+        <span class="hyicon hyicon-add"></span>
+        <span class="y-add-btn__text">{{ 'se.cms.restrictions.editor.button.add.new ' | translate }}</span>
+    </button>
+
+    <label data-ng-if="$ctrl.restrictions.length > 0"
+        class="ySEVisbilityModalContainer-leftPane-title">{{ 'se.cms.restrictions.list.title' | translate }}</label>
+
+    <restrictions-table data-ng-if="$ctrl.isRestrictionsReady"
+        data-editable="true"
+        data-restrictions="$ctrl.restrictions"
+        data-on-click-on-edit='$ctrl.onClickOnEdit'
+        data-on-criteria-selected="$ctrl.matchCriteriaChanged"
+        data-restriction-criteria="$ctrl.criteria"
+        data-errors="$ctrl.errors"
+        data-custom-class="'ySERestrictionListLink'">
+    </restrictions-table>
+
+    <div data-ng-if="$ctrl.errors.length > 0">
+        <span data-ng-repeat="error in $ctrl.errors"
+            class="se-help-block--has-error help-block">
+            {{ error.message | translate}}
+        </span>
+    </div>
+
+    <span data-ng-show="$ctrl.showRestrictionPicker"
+        class="ySEVisbilityModalContainer-rightPane__restriction">
+        <y-slider-panel data-slider-panel-configuration="$ctrl.sliderPanelConfiguration"
+            data-slider-panel-hide="$ctrl.sliderPanelHide"
+            class="se-add-restriction-panel"
+            data-slider-panel-show="$ctrl.sliderPanelShow">
+            <restriction-management data-config="$ctrl.restrictionManagement.operation"
+                data-uri-context="$ctrl.restrictionManagement.uriContext"
+                class="se-se-add-restriction-panel__restriction-management"
+                data-submit-fn="$ctrl.restrictionManagement.submitFn"
+                data-is-dirty-fn="$ctrl.restrictionManagement.isDirtyFn">
+            </restriction-management>
+        </y-slider-panel>
+    </span>
+</div>

@@ -1,0 +1,76 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the CMS content for the Electronics site
+#
+$contentCatalog=electronics-euContentCatalog
+$masterContentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$masterContentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$masterContentCatalog]),CatalogVersion.version[default=Online])[default=$masterContentCatalog:Online]
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+$siteResource=jar:de.hybris.platform.multicountrysampledataaddon.constants.MulticountrysampledataaddonConstants&/multicountrysampledataaddon/import/contentCatalogs/preview-images/$contentCatalog
+
+
+
+###### Electronics EU Homepage ######
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images'];;
+;;homepagePreview;text/png;Homepage.png;$siteResource/Homepage.png;;;
+
+# Welcome text
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;MultiCountryCMShomepageEUWelcomText;HomepageEUWelcomeText;MultiCountryCMShomepageEUWelcomText
+;;MultiCountryCMShomepageOnlyDEText;HomepageOnlyDEText;HomepageOnlyDEText
+
+
+UPDATE SimpleResponsiveBannerComponent;$masterContentCV[unique=true];uid[unique=true];&componentRef
+;;ElectronicsHompageSplashBannerComponent;ElectronicsHompageSplashBannerComponent
+;;ElectronicsHompageDiscountBannerComponent;ElectronicsHompageDiscountBannerComponent
+;;ElectronicsHompageLightFamBannerComponent;ElectronicsHompageLightFamBannerComponent
+;;ElectronicsHompageLightFamTextBannerComponent;ElectronicsHompageLightFamTextBannerComponent
+;;ElectronicsHompageCamcordersChildBannerComponent;ElectronicsHompageCamcordersChildBannerComponent
+;;ElectronicsHompageCamcordersBannerComponent;ElectronicsHompageCamcordersBannerComponent
+;;ElectronicsHompageSmDiscountBannerComponent;ElectronicsHompageSmDiscountBannerComponent
+;;ElectronicsHompageShopBannerComponent;ElectronicsHompageShopBannerComponent
+;;ElectronicsHompageShipmentBannerComponent;ElectronicsHompageShipmentBannerComponent
+;;ElectronicsHompageServiceBannerComponent;ElectronicsHompageServiceBannerComponent
+
+UPDATE SimpleResponsiveBannerComponent;$masterContentCV[unique=true];uid[unique=true];&componentRef
+;;ElectronicsHompageFreeDelBannerComponent;ElectronicsHompageFreeDelBannerComponent
+
+UPDATE ProductCarouselComponent;$masterContentCV[unique=true];uid[unique=true];&componentRef
+;;ElectronicsHomepageProductCarouselComponent;ElectronicsHomepageProductCarouselComponent
+;;NewElectronicsHomepageProductCarouselComponent;NewElectronicsHomepageProductCarouselComponent
+
+
+# Site-wide Homepage
+INSERT_UPDATE ContentPage;originalPage(uid,$masterContentCV)[default='homepage'];$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$masterContentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true'];previewImage(code, $contentCV)
+;;;homepage-eu;Homepage EU;LandingPage2Template;homepage;;;;homepagePreview
+
+INSERT_UPDATE ContentSlot;originalSlot(uid,$masterContentCV);$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;Section1Slot-Homepage;;Section1Slot-Homepage-eu;Section1 Slot for Homepage EU;true;MultiCountryCMShomepageEUWelcomText,ElectronicsHompageSplashBannerComponent,ElectronicsHompageDiscountBannerComponent
+;Section2ASlot-Homepage;;Section2ASlot-Homepage-eu;Section2A Slot for Homepage EU;true;ElectronicsHompageLightFamBannerComponent,ElectronicsHompageLightFamTextBannerComponent
+;Section2BSlot-Homepage;;Section2BSlot-Homepage-eu;Section2B Slot for Homepage EU;true;ElectronicsHompageCamcordersChildBannerComponent,ElectronicsHompageCamcordersBannerComponent
+;Section2CSlot-Homepage;;Section2CSlot-Homepage-eu;Section2C Slot for Homepage EU;true;
+;Section3Slot-Homepage;;Section3Slot-Homepage-eu;Section3 Slot for Homepage EU;true;ElectronicsHomepageProductCarouselComponent,NewElectronicsHomepageProductCarouselComponent
+;Section4Slot-Homepage;;Section4Slot-Homepage-eu;Section4 Slot for Homepage EU;true;ElectronicsHompageSmDiscountBannerComponent,ElectronicsHompageShopBannerComponent,ElectronicsHompageShipmentBannerComponent,ElectronicsHompageServiceBannerComponent
+;Section5Slot-Homepage;;Section5Slot-Homepage-eu;Section5 Slot for Homepage EU;true;ElectronicsHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage-eu'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Homepage-eu;Section1;;Section1Slot-Homepage-eu
+;;Section2A-Homepage-eu;Section2A;;Section2ASlot-Homepage-eu
+;;Section2B-Homepage-eu;Section2B;;Section2BSlot-Homepage-eu
+;;Section2C-Homepage-eu;Section2C;;Section2CSlot-Homepage-eu
+;;Section3-Homepage-eu;Section3;;Section3Slot-Homepage-eu
+;;Section4-Homepage-eu;Section4;;Section4Slot-Homepage-eu
+;;Section5-Homepage-eu;Section5;;Section5Slot-Homepage-eu

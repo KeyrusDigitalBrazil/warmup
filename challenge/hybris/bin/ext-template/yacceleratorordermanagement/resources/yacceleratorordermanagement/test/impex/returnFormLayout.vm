@@ -1,0 +1,147 @@
+##messageSource=classpath:/ordermanagementaddon/messages/document-returnform_$lang.properties
+<html>
+<head>
+    <style type='text/css'>@media screen, print {
+        table {
+            width: 96%;
+            margin: 25px 10px 0;
+            font-family: "Open Sans", sans-serif;
+            color: #151c22;
+        }
+
+        th {
+            padding: 5px 5px 5px 15px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        td {        
+            padding: 5px 0 5px 15px;
+            vertical-align: top;
+        }
+
+		td.document-date {
+			text-align: right;
+		}
+		
+        .address td {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+    }</style>
+</head>
+<body>
+	<table>
+		<tr>
+			<td>${ctx.cmsSlotContents.SiteLogo}</td>
+			<td class="document-date">$!{ctx.date}</td>
+		</tr>
+		<tr>
+			<td colspan="2" align="center" valign="middle">
+				<a href="${ctx.baseUrl}" style="display: block; margin-top: 10px; margin-bottom: 10px;">${ctx.cmsSlotContents.TopContent}</a>
+			</td>
+		</tr>
+		<tr>
+			<td><strong>$!{ctx.messages.orderId}</strong></td>
+			<td><strong>$!{ctx.messages.orderDate}</strong></td>
+		</tr>
+		<tr>
+			<td>$!{ctx.order.code}</td>
+			<td>$!{ctx.order.date}</td>
+		</tr>
+		<tr>
+            <td colspan="2"><hr style="border-top: dotted 1px;" /></td>		
+		</tr>
+		
+		<tr>
+			<td colspan="2">
+			    <strong>$!{ctx.messages.shipTo} </strong><br/>
+			    $!{ctx.address.firstname} $!{ctx.address.lastname}
+			</td>		
+		</tr>
+		
+        <tr class="address">
+            <td>
+                $!{ctx.messages.shippingAddressLine1} <br/>
+            </td>
+            <td>
+                $!{ctx.address.line1} <br/>
+            </td>
+        </tr>
+        <tr class="address">
+            <td>
+                $!{ctx.messages.shippingAddressLine2} <br/>
+            </td>
+            <td>
+                $!{ctx.address.line2} <br/>
+            </td>
+        </tr>
+        <tr class="address">
+            <td>
+                $!{ctx.messages.shippingAddressCity} <br/>
+            </td>
+            <td>
+                $!{ctx.address.town} <br/>
+            </td>
+        </tr>
+        <tr class="address">
+            <td>
+                $!{ctx.messages.shippingAddressPostalCode} <br/>
+            </td>
+            <td>
+                $!{ctx.address.postalcode} <br/>
+            </td>
+        </tr>
+        <tr class="address">
+            <td>
+                $!{ctx.messages.shippingAddressPhone} <br/>
+            </td>
+            <td>
+                $!{ctx.address.phone1} <br/>
+            </td>
+        </tr>
+		<tr>
+            <td colspan="2"><hr style="border-top: dotted 1px;" /></td>		
+		</tr>
+	</table>
+
+	<table class='data'>
+        <tr>
+            <td colspan="6"><h1>$!{ctx.messages.customerOrder}</h1></td>
+        </tr>
+        <tr>
+            <th colspan="6"><strong>$!{ctx.messages.returnedItems}</strong></th>
+        </tr>
+       <tr>
+           <th>$!{ctx.messages.productCode}</th>
+           <th>$!{ctx.messages.productName}</th>
+           <th>$!{ctx.messages.basePrice} ($!{ctx.order.currency.symbol})</th>
+			#if (${ctx.showQuantityPurchased})
+				<th>$!{ctx.messages.quantity}</th>
+			#end
+           <th>$!{ctx.messages.quantityReturned}</th>
+       </tr>
+
+       #foreach( $returnFormEntry in ${ctx.returnForm.formEntries} )
+           <tr>
+		       <td>$!{returnFormEntry.product.code}</td>
+		       <td>$!{returnFormEntry.product.name}</td>
+		       <td>$!{ctx.number.format('#0.00', $!{returnFormEntry.basePrice})}</td>
+				#if (${ctx.showQuantityPurchased})
+					<td>$!{returnFormEntry.quantityPurchased}</td>
+				#end
+		       <td>$!{returnFormEntry.quantityReturned}</td>
+           </tr>
+       #end
+           
+	</table>			
+
+	<table>
+	    <tr>
+	        <td colspan="2" align="center" valign="middle">
+	            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.BottomContent}</a>
+	        </td>
+	    </tr>
+	</table>
+</body>
+</html>

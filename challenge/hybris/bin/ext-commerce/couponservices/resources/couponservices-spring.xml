@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- begin intercepters -->
+		
+	<bean id="multiCodeCouponInitDefaultsValidator" class="de.hybris.platform.couponservices.interceptor.MultiCodeCouponInitDefaultsInterceptor">
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+	</bean>
+	<bean id="couponInitDefaultsValidatorInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="multiCodeCouponInitDefaultsValidator"/>
+		<property name="typeCode" value="MultiCodeCoupon"/>
+	</bean>
+	
+	<bean id="codeGenerationConfigurationValidateInterceptor" class="de.hybris.platform.couponservices.interceptor.CodeGenerationConfigurationValidateInterceptor">
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+		<property name="couponDao" ref="couponDao"/>
+	</bean>
+
+	<bean id="codeGenerationConfigurationValidateInterceptorMapping"
+			class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="codeGenerationConfigurationValidateInterceptor"/>
+		<property name="typeCode" value="CodeGenerationConfiguration"/>
+	</bean>
+
+	<bean id="codeGenerationConfigurationUsageValidateInterceptor" class="de.hybris.platform.couponservices.interceptor.CodeGenerationConfigurationUsageValidateInterceptor">
+		<property name="couponDao" ref="couponDao"/>
+		<property name="l10NService" ref="l10nService"/>
+	</bean>
+
+	<bean id="codeGenerationConfigurationUsageValidateInterceptorMapping"
+		  class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="codeGenerationConfigurationUsageValidateInterceptor"/>
+		<property name="typeCode" value="CodeGenerationConfiguration"/>
+	</bean>
+
+	<!-- end intercepters -->
+
+	<alias name="defaultCouponCodesGenerator" alias="couponCodesGenerator"/>
+	<bean id="defaultCouponCodesGenerator" class="de.hybris.platform.couponservices.couponcodegeneration.impl.DefaultCouponCodesGenerator">
+		<property name="cipherTextStrategy" ref="couponCodeCipherTextGenerationStrategy"/>
+		<property name="clearTextStrategy" ref="couponCodeClearTextGenerationStrategy"/>
+	</bean>
+	
+	<bean id="generatedCouponMediaCodeGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator">
+        <property name="key" value="${keygen.coupon_media.code.name}"/>
+		<property name="digits" value="${keygen.coupon_media.code.digits}"/>
+		<property name="start" value="${keygen.coupon_media.code.start}"/>
+		<property name="type" value="${keygen.coupon_media.code.type}"/>
+		<property name="template" value="${keygen.coupon_media.code.template}"/>
+	</bean>
+
+    <alias name="defaultCouponCodeGenerationService" alias="couponCodeGenerationService"/>
+	<bean id="defaultCouponCodeGenerationService" class="de.hybris.platform.couponservices.services.impl.DefaultCouponCodeGenerationService">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="codeSeparatorPattern" value="[-#_;\|\+\*\.]"/>
+		<property name="cipherTextStrategy" ref="couponCodeCipherTextGenerationStrategy"/>
+		<property name="clearTextStrategy" ref="couponCodeClearTextGenerationStrategy"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="couponCodesGenerator" ref="couponCodesGenerator"/>
+		<property name="keyGenerator" ref="generatedCouponMediaCodeGenerator"/>
+	</bean>
+
+	<alias name="defaultCouponCodeCipherTextGenerationStrategy" alias="couponCodeCipherTextGenerationStrategy"/>
+	<bean id="defaultCouponCodeCipherTextGenerationStrategy" class="de.hybris.platform.couponservices.couponcodegeneration.impl.DefaultCouponCodeCipherTextGenerationStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultCouponCodeClearTextGenerationStrategy" alias="couponCodeClearTextGenerationStrategy"/>
+	<bean id="defaultCouponCodeClearTextGenerationStrategy" class="de.hybris.platform.couponservices.couponcodegeneration.impl.DefaultCouponCodeClearTextGenerationStrategy" />
+
+	<alias name="defaultCouponRaoPopulator" alias="couponRaoPopulator"/>
+	<bean id="defaultCouponRaoPopulator" class="de.hybris.platform.couponservices.converters.populator.CouponRaoPopulator">
+		<property name="couponService" ref="couponService" />
+	</bean>
+
+ 	<bean parent="modifyPopulatorList">
+	  <property name="list" ref="cartRaoConverter" />
+	  <property name="add" ref="couponRaoPopulator" />	
+ 	</bean>	
+	
+	<alias name="defaultCouponRaoExtractor" alias="couponRaoExtractor"/>	
+	<bean id="defaultCouponRaoExtractor" class="de.hybris.platform.couponservices.rao.providers.impl.CouponCartRaoExtractor"/>	
+		
+	<bean id="cartRAOProviderExtractorsListMergeDirective" depends-on="cartRAOProviderExtractors" parent="listMergeDirective">
+		<property name="add" ref="couponRaoExtractor"/>
+	</bean>
+     
+     <alias name="couponRedemptionMethodHook" alias="voucherRedemptionPlaceOrderMethodHook" />
+     <bean id="couponRedemptionMethodHook" class="de.hybris.platform.couponservices.order.hooks.CouponRedemptionMethodHook">
+       <property name="couponService" ref="couponService" />
+     </bean>
+     
+     <bean id="giveAwayMultiCodeCouponGenerationHook" class="de.hybris.platform.couponservices.order.hooks.GiveAwayMultiCodeCouponGenerationHook">
+       <property name="couponDao" ref="couponDao" />
+       <property name="ruleBasedCouponActionDao" ref="ruleBasedCouponActionDao" />
+       <property name="couponCodeGenerationService" ref="couponCodeGenerationService" />
+       <property name="modelService" ref="modelService" />
+     </bean>
+     
+     <bean id="giveAwayMultiCodeCouponGenerationHooksListMergeDirective" depends-on="commercePlaceOrderMethodHooks" parent="listMergeDirective" >
+         <property name="add" ref="giveAwayMultiCodeCouponGenerationHook" />
+     </bean>
+    
+    <alias name="couponRedeemableValidationHook" alias="voucherRedeemableCartValidationMethodHook" />
+    <bean id="couponRedeemableValidationHook" class="de.hybris.platform.couponservices.cart.hooks.CouponRedeemableValidationHook">
+       <property name="couponService" ref="couponService" />
+    </bean>
+	
+	
+	<alias name="defaultFindCouponStrategiesList" alias="findCouponStrategiesList" />
+	<util:list id="defaultFindCouponStrategiesList">
+		<ref bean="findSingleCodeCouponStrategy" />
+		<ref bean="findMultiCodeCouponStrategy" />
+	</util:list>
+	
+	<alias name="redemptionStrategyMap"  alias="redemptionStrategyMap"/>
+    <util:map id="redemptionStrategyMap" map-class="java.util.LinkedHashMap" value-type="de.hybris.platform.couponservices.redemption.strategies.CouponRedemptionStrategy">
+        <entry key="SingleCodeCoupon" value-ref="singleCodeCouponRedemptionStrategy"/>
+        <entry key="MultiCodeCoupon" value-ref="multiCodeCouponRedemptionStrategy"/>
+    </util:map>
+	
+	<alias name="defaultCouponManagementService" alias="couponManagementService" />
+	<bean id="defaultCouponManagementService" class="de.hybris.platform.couponservices.services.impl.DefaultCouponManagementService">
+	  <property name="modelService" ref="modelService" />
+	  <property name="redemptionStrategyMap" ref="redemptionStrategyMap"/>
+	  <property name="findCouponStrategiesList" ref="findCouponStrategiesList" />
+	</bean>
+	
+	<alias name="defaultSingleCodeCouponRedemptionStrategy" alias="singleCodeCouponRedemptionStrategy" />
+	<bean id="defaultSingleCodeCouponRedemptionStrategy" class="de.hybris.platform.couponservices.redemption.strategies.impl.DefaultSingleCodeCouponRedemptionStrategy">
+	  <property name="couponRedemptionDao" ref="couponRedemptionDao" />
+	</bean>
+
+	<alias name="defaultMultiCodeCouponRedemptionStrategy" alias="multiCodeCouponRedemptionStrategy" />
+	<bean id="defaultMultiCodeCouponRedemptionStrategy" class="de.hybris.platform.couponservices.redemption.strategies.impl.DefaultMultiCodeCouponRedemptionStrategy">
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService" />
+		<property name="couponRedemptionDao" ref="couponRedemptionDao" />
+	</bean>
+
+	<alias name="findSingleCodeCouponStrategy" alias="findSingleCodeCouponStrategy" />
+	<bean id="findSingleCodeCouponStrategy" class="de.hybris.platform.couponservices.strategies.impl.DefaultFindSingleCodeCouponStrategy">
+		<property name="couponDao" ref="couponDao" />
+	</bean>
+
+	<alias name="findMultiCodeCouponStrategy" alias="findMultiCodeCouponStrategy" />
+	<bean id="findMultiCodeCouponStrategy" class="de.hybris.platform.couponservices.strategies.impl.DefaultFindMultiCodeCouponStrategy">
+		<property name="couponDao" ref="couponDao" />
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService" />
+	</bean>
+
+	<bean id="couponRuleParameterValueMapper" class="de.hybris.platform.couponservices.rule.strategies.impl.mappers.CouponRuleParameterValueMapper">
+		<property name="couponDao" ref="couponDao" />
+	</bean>
+	
+	<alias name="defaultCouponDao" alias="couponDao" />
+	<bean id="defaultCouponDao" class="de.hybris.platform.couponservices.dao.impl.DefaultCouponDao" parent="abstractItemDao"/>
+	
+	<alias name="defaultCouponRedemptionDao" alias="couponRedemptionDao" />
+	<bean id="defaultCouponRedemptionDao" class="de.hybris.platform.couponservices.dao.impl.DefaultCouponRedemptionDao"/>
+	
+	<alias name="defaultCodeGenerationConfigurationDao" alias="codeGenerationConfigurationDao" />
+	<bean id="defaultCodeGenerationConfigurationDao" class="de.hybris.platform.couponservices.dao.impl.DefaultCodeGenerationConfigurationDao"/>
+	
+	<alias name="defaultRuleBasedCouponActionDao" alias="ruleBasedCouponActionDao" />
+	<bean id="defaultRuleBasedCouponActionDao" class="de.hybris.platform.couponservices.dao.impl.DefaultRuleBasedCouponActionDao" parent="abstractItemDao"/>
+	
+	<bean id="couponRuleParameterValueTypeDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueTypeDefinition">
+		<property name="mapper" ref="couponRuleParameterValueMapper"/>
+		<property name="type" value="ItemType(AbstractCoupon)"/>
+	</bean>
+	
+	<alias alias="ruleQualifyingCouponsConditionTranslator" name="defaultRuleQualifyingCouponsConditionTranslator" />
+	<bean id="defaultRuleQualifyingCouponsConditionTranslator" class="de.hybris.platform.couponservices.conditions.RuleQualifyingCouponsConditionTranslator" />
+	
+	<alias name="defaultCouponService" alias="couponService" />
+	<bean id="defaultCouponService" class="de.hybris.platform.couponservices.services.impl.DefaultCouponService">
+		<property name="couponManagementService" ref="couponManagementService"/>
+		<property name="calculationService" ref="calculationService"/>
+		<property name="promotionsService" ref="promotionsService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>	
+		<property name="modelService" ref="modelService"/>
+		<property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+	</bean>
+
+	<util:list id="ruleActionCouponMetadataHandlerList">
+		<ref bean="ruleActionCouponMetadataHandler"/>
+	</util:list>
+
+	<bean id="defaultCouponRuleActionMetadataHandlersMergeDirective" depends-on="ruleActionMetadataHandlers" parent="mapMergeDirective" >
+		<property name="key" value="couponIds"/>
+		<property name="value" ref="ruleActionCouponMetadataHandlerList"/>
+	</bean>
+	
+	<bean id="ruleActionCouponMetadataHandler" class="de.hybris.platform.couponservices.RuleActionCouponMetadataHandler">
+	    <property name="modelService" ref="modelService"/>	
+	    <property name="metadataId" value="couponIds"/>
+	    <property name="couponService" ref="couponService"/>
+	    <property name="promotionResultUtils" ref="promotionResultUtils"/>
+	</bean>
+	
+	<alias name="couponVoucherService" alias="voucherService" />
+	<bean id="couponVoucherService" class="de.hybris.platform.couponservices.services.impl.CouponVoucherService" parent="defaultVoucherService" />	
+	
+	<bean id="singleCodeCouponValidateInterceptor" class="de.hybris.platform.couponservices.interceptor.SingleCodeCouponValidateInterceptor"/>
+
+	<bean id="singleCodeCouponValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="singleCodeCouponValidateInterceptor"/>
+		<property name="typeCode" value="SingleCodeCoupon"/>
+	</bean>
+	
+	<bean id="multiCodeCouponValidateInterceptor" class="de.hybris.platform.couponservices.interceptor.MultiCodeCouponValidateInterceptor">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<bean id="multiCodeCouponValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="multiCodeCouponValidateInterceptor"/>
+		<property name="typeCode" value="MultiCodeCoupon"/>
+	</bean>
+	
+	<bean id="abstractCouponValidateInterceptor" class="de.hybris.platform.couponservices.interceptor.AbstractCouponValidateInterceptor"/>
+
+	<bean id="abstractCouponValidatorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="abstractCouponValidateInterceptor"/>
+		<property name="typeCode" value="AbstractCoupon"/>
+	</bean>
+	
+	<bean id="ruleGiveCouponAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+	    <property name="raoAction" ref="ruleAddCouponRAOAction"/>
+	</bean>
+	
+	<alias name="defaultRuleAddCouponRAOAction" alias="ruleAddCouponRAOAction" />
+	<bean id="defaultRuleAddCouponRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.couponservices.rule.evaluation.actions.impl.RuleAddCouponRAOAction" />
+	
+	<bean id="givenCouponActionStrategiesMappingMergeDirective" depends-on="promotionActionStrategiesMapping" parent="mapMergeDirective" >
+		<property name="key" value="defaultRuleAddCouponRAOAction"/>
+		<property name="value" ref="addCouponActionStrategy"/>
+	</bean>
+	
+	<bean id="givenCouponActionStrategiesMergeDirective" depends-on="actionStrategies" parent="listMergeDirective" >
+       <property name="add" ref="addCouponActionStrategy" />
+    </bean>
+	
+	<alias name="defaultAddCouponActionStrategy" alias="addCouponActionStrategy"/>
+	<bean id="defaultAddCouponActionStrategy" parent="abstractRuleActionStrategy" class="de.hybris.platform.couponservices.action.impl.DefaultAddCouponActionStrategy" >
+		<property name="promotionAction" value="de.hybris.platform.couponservices.model.RuleBasedAddCouponActionModel"/>
+	</bean>
+
+	<alias name="defaultCouponCodeRetrievalStrategy" alias="couponCodeRetrievalStrategy"/>
+	<bean id="defaultCouponCodeRetrievalStrategy" class="de.hybris.platform.couponservices.strategies.impl.DefaultCouponCodeRetrievalStrategy" />
+	
+	<bean id="couponServicesSystemSetup" class="de.hybris.platform.couponservices.setup.impl.CouponServicesSystemSetup" parent="abstractRuleEngineSystemSetup" />
+</beans>

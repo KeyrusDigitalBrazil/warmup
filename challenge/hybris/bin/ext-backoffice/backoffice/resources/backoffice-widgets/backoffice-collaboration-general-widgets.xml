@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<widget-extension widgetId="mainSlot">
+		<widget id="perspective-viewswitcher-container-collaboration" widgetDefinitionId="com.hybris.cockpitng.flexiblelayout"
+		        template="false" slotId="cockpitWidgetChildrenInvisible">
+
+			<widget id="collaboration-center-layout" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+			        template="false" slotId="sidebar">
+
+				<widget id="collaboration-center-title-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+				        slotId="headerSlot" template="false">
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-header yw-collaboration-center-styled</setting>
+					<setting key="toolbarActions" type="String">collaboration-center-title-actions</setting>
+				</widget>
+
+				<widget id="collaboration-center-tabs" widgetDefinitionId="com.hybris.cockpitng.defaulttabwidget" template="false" slotId="centerSlot">
+					<widget id="collaboration-center-tab-workflows" widgetDefinitionId="com.hybris.cockpitng.defaulttabwidget" template="false" slotId="children" title="label.collaborationCenter.tab.workflows" access="backofficeworkflowadmin">
+						<widget id="collaboration-center-tab-workflows-running" widgetDefinitionId="com.hybris.backoffice.widgets.workflows" template="false" slotId="children" title="label.collaborationCenter.tab.workflows.running">
+							<setting key="isWorkflowRunningEnabled" type="Boolean" value="true" />
+							<setting key="workflowRenderer" type="String" value="runningWorkflowRenderer" />
+							<setting key="dragAndDropConfigCtx" type="String" value="collaborationDragAndDropComponent"/>
+							<virtual-sockets>
+								<output id="showFlow" type="de.hybris.platform.workflow.model.WorkflowModel" />
+							</virtual-sockets>
+						</widget>
+						<widget id="collaboration-center-tab-workflows-new" widgetDefinitionId="com.hybris.backoffice.widgets.workflows" template="false" slotId="children" title="label.collaborationCenter.tab.workflows.new">
+							<setting key="isWorkflowPlannedEnabled" type="Boolean" value="true" />
+							<setting key="workflowRenderer" type="String" value="plannedWorkflowRenderer" />
+							<setting key="dragAndDropConfigCtx" type="String" value="collaborationDragAndDropComponent"/>
+							<virtual-sockets>
+								<output id="showFlow" type="de.hybris.platform.workflow.model.WorkflowModel" />
+							</virtual-sockets>
+						</widget>
+						<widget id="workflowsRefreshMultiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+								slotId="cockpitWidgetChildrenInvisible">
+							<setting key="newTabSelected_expression" type="String" value="'collaboration-center-tab-workflows-new' == #root"/>
+							<setting key="runningTabSelected_expression" type="String" value="'collaboration-center-tab-workflows-running' == #root"/>
+							<virtual-sockets>
+								<output id="newTabSelected" type="java.lang.Object" visibility="external"/>
+								<output id="runningTabSelected" type="java.lang.Object" visibility="external"/>
+							</virtual-sockets>
+						</widget>
+						
+						<setting key="widgetStyleClass" type="String">yw-collaboration-center-tab-workflows</setting>
+						<setting key="tabScrollable" type="Boolean">false</setting>
+					</widget>
+					<widget id="collaboration-center-tab-tasks" widgetDefinitionId="com.hybris.backoffice.widgets.workflowactions" template="false" slotId="children" title="label.collaborationCenter.tab.tasks"/>
+
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-tabs</setting>
+					<setting key="tabScrollable" type="Boolean">false</setting>
+				</widget>
+
+				<setting key="northDisabled" type="Boolean" value="false"/>
+				<setting key="southDisabled" type="Boolean" value="true"/>
+				<setting key="northHeight" type="String" value="50px"/>
+				<setting key="eastDisabled" type="Boolean" value="true"/>
+				<setting key="westDisabled" type="Boolean" value="true"/>
+				<setting key="northCollapsible" type="Boolean" value="false"/>
+				<setting key="northSplittable" type="Boolean" value="false"/>
+				<setting key="widgetMold" type="String" value="light"/>
+				<setting key="widgetStyleClass" type="String">yw-collaboration-center-sidebar</setting>
+			</widget>
+
+			<setting key="sidebarPosition" type="String" value="right"/>
+			<setting key="sidebarState" type="String" value="closed"/>
+			<setting key="sidebarOverlap" type="Boolean" value="true"/>
+			<setting key="sidebarCollapsible" type="Boolean" value="false"/>
+			<setting key="widgetStyleClass" type="String">yw-perspective-viewswitcher-container-collaboration</setting>
+		</widget>
+	</widget-extension>
+
+	<widget-extension widgetId="perspectiveViewSwitcher">
+		<move widgetId="mainSlot" targetWidgetId="perspective-viewswitcher-container-collaboration" targetSlotId="contents"/>
+	</widget-extension>
+
+	<widget-extension widgetId="perspective-viewswitcher-container-collaboration">
+		<move widgetId="mainSlot" targetWidgetId="mainSlot" targetSlotId="mainArea"/>
+	</widget-extension>
+
+	<widget-extension widgetId="systembarActionsRight">
+		<virtual-sockets>
+			<input id="collaborationToggleState" type="java.lang.String" visibility="default"/>
+			<input id="numberOfWorkflowActions" type="java.lang.Integer"/>
+			<output id="collaborationToggleSidebar" type="java.lang.String" visibility="default"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-extension widgetId="perspectiveViewSwitcher">
+		<widget id="collaborationContainer-view" widgetDefinitionId="com.hybris.cockpitng.borderlayout" title="collaboration.container" slotId="views" template="false">
+			<widget id="collaborationViewSwitcher" widgetDefinitionId="com.hybris.backoffice.viewswitcher" slotId="centerSlot" template="false"/>
+			<widget id="collaborationContainer-view-toolbar" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+					slotId="headerSlot" template="false">
+				<widget id="collaborationNavigationHistory" widgetDefinitionId="com.hybris.cockpitng.navigationhistory"
+						slotId="leftSlot" template="false">
+					<widget id="collaborationNavigationHistory-reset" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+							template="false" slotId="cockpitWidgetChildrenInvisible">
+						<setting key="expression">#root.contains('backofficeMainSlot')</setting>
+						<setting key="socketDataType_$T" type="String">java.util.Collection</setting>
+					</widget>
+					<setting key="emptyHistoryOutputValueEval" type="String">'backofficeMainSlot'</setting>
+					<setting key="widgetStyleAttribute" type="String"></setting>
+					<setting key="displayEmptyHistoryElementInPopup" type="Boolean">false</setting>
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-navigation-history</setting>
+					<setting key="proxyEnabled" type="Boolean">true</setting>
+				</widget>
+
+				<widget id="collaborationCenter-center-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+						slotId="centerSlot" template="false">
+					<widget id="collaborationCenter-center-toolbar-actions-multiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+							slotId="cockpitWidgetChildrenInvisible">
+						<setting key="default_output" type="String" value="noActions"/>
+						<setting key="noActions_eval" type="String" value="' '"/>
+						<virtual-sockets>
+							<output id="noActions" type="java.lang.String" visibility="external"/>
+						</virtual-sockets>
+					</widget>
+
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-center-toolbar</setting>
+					<setting key="toolbarActions" type="String" />
+				</widget>
+
+				<widget id="collaborationCenter-sidebar-header" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+						  slotId="rightSlot" template="false">
+					<widget id="collaborationCenter-sidebar-header-actions-multiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+							slotId="cockpitWidgetChildrenInvisible">
+						<setting key="default_output" type="String" value="noActions"/>
+						<setting key="noActions_eval" type="String" value="' '"/>
+						<virtual-sockets>
+							<output id="noActions" type="java.lang.String" visibility="external"/>
+						</virtual-sockets>
+					</widget>
+					<widget id="collaborationCenter-sidebar-header-three-dots" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+							  slotId="toolbarAfterSlot">
+						<virtual-sockets>
+							<input id="items" type="java.lang.Object"/>
+						</virtual-sockets>
+						<widget id="collaborationCenter-sidebar-header-three-dots-multiplexer" widgetDefinitionId="com.hybris.cockpitng.widgets.common.multiplexer"
+								slotId="cockpitWidgetChildrenInvisible">
+							<setting key="default_output" type="String" value="noActions"/>
+							<setting key="noActions_eval" type="String" value="' '"/>
+							<virtual-sockets>
+								<output id="noActions" type="java.lang.String" visibility="external"/>
+							</virtual-sockets>
+						</widget>
+					</widget>
+
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-sidebar-header</setting>
+					<virtual-sockets>
+						<input id="items" type="java.lang.Object"/>
+					</virtual-sockets>
+				</widget>
+
+				<setting key="northDisabled" type="Boolean">true</setting>
+				<setting key="southDisabled" type="Boolean">true</setting>
+				<setting key="eastDisabled" type="Boolean">false</setting>
+				<setting key="eastCollapsible" type="Boolean">false</setting>
+				<setting key="eastSplittable" type="Boolean">false</setting>
+				<setting key="eastWidth" type="String" value="350px"/>
+				<setting key="westDisabled" type="Boolean">false</setting>
+				<setting key="westCollapsible" type="Boolean">false</setting>
+				<setting key="westSplittable" type="Boolean">false</setting>
+				<setting key="westWidth" type="String">75%</setting>
+				<setting key="widgetMold" type="String">light</setting>
+				<setting key="widgetStyleClass" type="String">yw-collaboration-center-toolbar</setting>
+			</widget>
+			<setting key="westDisabled" type="Boolean">true</setting>
+			<setting key="eastDisabled" type="Boolean">true</setting>
+			<setting key="southDisabled" type="Boolean">true</setting>
+			<setting key="northDisabled" type="Boolean">false</setting>
+			<setting key="northCollapsible" type="Boolean">false</setting>
+			<setting key="northSplittable" type="Boolean">false</setting>
+			<setting key="widgetMold" type="String">light</setting>
+			<setting key="widgetStyleClass" type="String">yw-collaboration-center-container-view</setting>
+			<virtual-sockets/>
+		</widget>
+		<setting key="selectCollaborationCenter_eval" type="String" value="'collaborationContainer-view'"/>
+		<virtual-sockets>
+			<input id="selectCollaborationCenter" type="java.lang.Object"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="perspectiveViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="collaborationNavigationHistory-reset" inputId="input"/>
+	<widget-connection sourceWidgetId="collaborationNavigationHistory-reset" outputId="true"
+					   targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+
+	<widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="numberOfWorkflowActions"
+					   targetWidgetId="systembarActionsRight" inputId="numberOfWorkflowActions"/>
+	<widget-connection sourceWidgetId="systembarActionsRight" outputId="collaborationToggleSidebar"
+	                   targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="collaboration-center-toolbar" outputId="selectView"
+					   targetWidgetId="perspective-viewswitcher-container-collaboration" inputId="toggleSidebar"/>
+	<widget-connection sourceWidgetId="perspective-viewswitcher-container-collaboration" outputId="sidebarState"
+	                   targetWidgetId="systembarActionsRight" inputId="collaborationToggleState"/>
+
+	<widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="emptyHistoryBackButtonPressed"
+	                   targetWidgetId="perspectiveViewSwitcher" inputId="selectViews"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="createWorkflowContext" targetWidgetId="configurableFlow" inputId="context"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="createWorkflowContext" targetWidgetId="configurableFlow" inputId="context"/>
+	<!-- Reset navigation history on sidebar START-->
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowSelected" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="workflowSelected" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="workflowActionSelected" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="workflowActionSelected" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="workflowActionSelected" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-toolbar" outputId="selectView" targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<!-- Reset navigation history on sidebar END-->
+
+	<!-- Center toolbar actions -->
+	<widget-connection sourceWidgetId="collaborationViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="collaborationCenter-center-toolbar-actions-multiplexer" inputId="element" />
+	<widget-connection sourceWidgetId="collaborationCenter-center-toolbar-actions-multiplexer" outputId="noActions"
+					   targetWidgetId="collaborationCenter-center-toolbar" inputId="toolbarActions" />
+
+	<!-- Sidebar header actions -->
+	<widget-connection sourceWidgetId="collaborationViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="collaborationCenter-sidebar-header-actions-multiplexer" inputId="element" />
+	<widget-connection sourceWidgetId="collaborationCenter-sidebar-header-actions-multiplexer" outputId="noActions"
+					   targetWidgetId="collaborationCenter-sidebar-header" inputId="toolbarActions" />
+
+	<widget-connection sourceWidgetId="collaborationViewSwitcher" outputId="selectedViews"
+					   targetWidgetId="collaborationCenter-sidebar-header-three-dots-multiplexer" inputId="element" />
+	<widget-connection sourceWidgetId="collaborationCenter-sidebar-header-three-dots-multiplexer" outputId="noActions"
+					   targetWidgetId="collaborationCenter-sidebar-header-three-dots" inputId="toolbarActions" />
+
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows" outputId="selectedWidgetId" targetWidgetId="workflowsRefreshMultiplexer" inputId="element"/>
+	<widget-connection sourceWidgetId="workflowsRefreshMultiplexer" outputId="runningTabSelected" targetWidgetId="collaboration-center-tab-workflows-running" inputId="refresh"/>
+	<widget-connection sourceWidgetId="workflowsRefreshMultiplexer" outputId="newTabSelected" targetWidgetId="collaboration-center-tab-workflows-new" inputId="refresh"/>
+
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-running" outputId="showFlow" targetWidgetId="workflowOverview-workflows-flow-presentation" inputId="initData"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-workflows-new" outputId="showFlow" targetWidgetId="workflowOverview-workflows-flow-presentation" inputId="initData"/>
+
+
+</widgets>

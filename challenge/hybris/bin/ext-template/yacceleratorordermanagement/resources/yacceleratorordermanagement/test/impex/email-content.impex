@@ -1,0 +1,110 @@
+#
+# Import the CMS content for the Electronics site emails
+#
+$contentCatalog=contentCatalog_online
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+$wideContent=CMSImageComponent,BannerComponent
+
+# Document page Template
+INSERT_UPDATE DocumentPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;frontendTemplateName;htmlTemplate(code);restrictedPageTypes(code)
+;;ReturnShippingLabelDocumentTemplate;Return Shipping Label Document Template;true;returnshippingLabel;return-shipping-label-template;DocumentPage
+;;ReturnFormDocumentTemplate;Return Form Document Template;true;returnForm;return-form-template;DocumentPage
+
+# Templates for CMS Cockpit Page Edit
+UPDATE DocumentPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ReturnShippingLabelDocumentTemplate;jar:/yacceleratorordermanagement/test/impex/structure_returnShippingLayout.vm
+;;ReturnFormDocumentTemplate;jar:/yacceleratorordermanagement/test/impex/structure_returnFormLayout.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnShippingLabelDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnFormDocumentTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+# Create Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;DocumentTopSlot;Default Document Top Slot;true
+;;DocumentBottomSlot;Default Document Bottom Slot;true
+;;DocumentSiteLogoSlot;Default Document Site Slot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnShippingLabelDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnShippingLabelDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ReturnShippingLabelDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ReturnShippingLabelDocument;BottomContent;;DocumentBottomSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnFormDocumentTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnFormDocument;SiteLogo;;DocumentSiteLogoSlot;true
+;;TopContent-ReturnFormDocument;TopContent;;DocumentTopSlot;true
+;;BottomContent-ReturnFormDocument;BottomContent;;DocumentBottomSlot;true
+
+# Document Pages
+INSERT_UPDATE DocumentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;returnshippingLabel;Return Shipping Label Document Page;ReturnShippingLabelDocumentTemplate;true;
+;;returnForm;Return Form Document Page;ReturnFormDocumentTemplate;true;
+
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity']
+;return-shipping-label-template;de.hybris.platform.warehousing.labels.context.ReturnShippingLabelContext
+;return-form-template;de.hybris.platform.warehousing.labels.context.ReturnFormContext
+
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+
+# Email page Template
+INSERT_UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];name;active;frontendTemplateName;subject(code);htmlTemplate(code);restrictedPageTypes(code)
+;;ReturnLabelEmailTemplate;Return Label Email Template;true;returnLabelEmail;electronics_Email_Return_Label_Subject;electronics_Email_Return_Label_Body;EmailPage
+
+# Templates for CMS Cockpit Page Edit
+UPDATE EmailPageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;ReturnLabelEmailTemplate;jar:/yacceleratorordermanagement/test/impex/structure_returnLabelEmailTemplate.vm
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+# Create Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;EmailTopSlot;Default Email Top Slot;true
+;;EmailBottomSlot;Default Email Bottom Slot;true
+;;EmailSiteLogoSlot;Default Email Site Slot;true
+
+# Bind Content Slots to Email Page Templates
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnLabelEmail;SiteLogo;;EmailSiteLogoSlot;true
+;;TopContent-ReturnLabelEmail;TopContent;;EmailTopSlot;true
+;;BottomContent-ReturnLabelEmail;BottomContent;;EmailBottomSlot;true
+
+# Email Pages
+INSERT_UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;ReturnLabelEmail;Return Label Email;ReturnLabelEmailTemplate;true;
+
+# Email velocity templates
+INSERT_UPDATE RendererTemplate;code[unique=true];contextClass;rendererType(code)[default='velocity']
+;electronics_Email_Return_Label_Body;de.hybris.platform.yacceleratorordermanagement.email.ReturnLabelEmailContext
+;electronics_Email_Return_Label_Subject;de.hybris.platform.yacceleratorordermanagement.email.ReturnLabelEmailContext
+
+UPDATE EmailPage;$contentCV[unique=true];uid[unique=true];
+;;ReturnLabelEmail;
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];validComponentTypes(code)
+;SiteLogo;;;logo
+;TopContent;;$wideContent;
+;BottomContent;;$wideContent;
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='ReturnLabelEmailTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-ReturnLabelEmail;SiteLogo;;EmailSiteLogoSlot;true
+;;TopContent-ReturnLabelEmail;TopContent;;EmailTopSlot;true
+;;BottomContent-ReturnLabelEmail;BottomContent;;EmailBottomSlot;true
+
+# Media Folders
+INSERT_UPDATE MediaFolder;qualifier[unique=true];path[unique=true]
+;images;images
+;email-body;email-body
+;email-attachments;email-attachments
+;documents;documents

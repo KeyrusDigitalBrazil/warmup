@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<alias name="defaultFacadeValidationService" alias="facadeValidationService" />
+	<bean id="defaultFacadeValidationService" class="de.hybris.platform.cmsfacades.common.validator.impl.DefaultFacadeValidationService">
+		<property name="validatorErrorFactory" ref="validatorErrorFactory" />
+	</bean>
+
+	<alias name="defaultValidatorErrorFactory" alias="validatorErrorFactory" />
+	<bean id="defaultValidatorErrorFactory" class="de.hybris.platform.cmsfacades.factory.impl.DefaultErrorFactory">
+	</bean>
+
+	<alias name="defaultValidationDtoFactory" alias="validationDtoFactory" />
+	<bean id="defaultValidationDtoFactory" class="de.hybris.platform.cmsfacades.common.validator.ValidationDtoFactory">
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="cmsAdminComponentService" ref="cmsAdminComponentService" />
+		<property name="cmsAdminPageService" ref="cmsAdminPageService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<!-- Synchronization Validator -->
+
+	<alias name="defaultSyncJobRequestValidator" alias="syncJobRequestValidator" />
+	<bean id="defaultSyncJobRequestValidator" class="de.hybris.platform.cmsfacades.synchronization.validator.SyncJobRequestValidator">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="catalogVersionExistsPredicate" ref="catalogVersionExistsPredicate" />
+		<property name="catalogExistsPredicate" ref="catalogExistsPredicate" />
+	</bean>
+
+	<alias name="defaultSyncJobRequestSourceValidator" alias="syncJobRequestSourceValidator" />
+	<bean id="defaultSyncJobRequestSourceValidator" class="de.hybris.platform.cmsfacades.synchronization.validator.SyncJobRequestSourceValidator">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="catalogVersionExistsPredicate" ref="catalogVersionExistsPredicate" />
+		<property name="catalogExistsPredicate" ref="catalogExistsPredicate" />
+	</bean>
+
+	<!-- Page Content Slot Component Validators -->
+	<alias name="defaultUpdatePageContentSlotComponentValidator" alias="updatePageContentSlotComponentValidator" />
+	<bean id="defaultUpdatePageContentSlotComponentValidator"
+		class="de.hybris.platform.cmsfacades.pagescontentslotscomponents.validator.UpdatePageContentSlotComponentValidator">
+		<property name="componentExistsInCatalogVersionsPredicate" ref="componentExistsInCatalogVersionsPredicate" />
+		<property name="contentSlotExistsInCatalogVersionsPredicate" ref="contentSlotExistsInCatalogVersionsPredicate" />
+		<property name="pageExistsPredicate" ref="pageExistsPredicate" />
+		<property name="componentTypeAllowedForContentSlotPredicate" ref="componentTypeAllowedForContentSlotPredicate" />
+		<property name="validationDtoFactory" ref="validationDtoFactory" />
+	</bean>
+
+	<alias name="defaultComponentExistsInSlotValidator" alias="componentExistsInSlotValidator" />
+	<bean id="defaultComponentExistsInSlotValidator" class="de.hybris.platform.cmsfacades.pagescontentslotscomponents.validator.ComponentExistsInSlotValidator">
+		<property name="componentAlreadyInContentSlotPredicate" ref="componentAlreadyInContentSlotPredicate" />
+		<property name="componentExistsPredicate" ref="componentExistsPredicate" />
+		<property name="validationDtoFactory" ref="validationDtoFactory" />
+	</bean>
+
+	<alias name="defaultCreatePageContentSlotComponentCompositeValidator" alias="createPageContentSlotComponentCompositeValidator" />
+	<bean id="defaultCreatePageContentSlotComponentCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="updatePageContentSlotComponentValidator" />
+				<ref bean="componentExistsInSlotValidator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultNamedQueryDataValidator" alias="namedQueryDataValidator" />
+	<bean id="defaultNamedQueryDataValidator" class="de.hybris.platform.cmsfacades.namedquery.validator.NamedQueryDataValidator">
+		<property name="maxPageSize" value="${cmsfacades.namedquery.max.pagesize}" />
+		<property name="namedQueryExistsPredicate" ref="namedQueryExistsPredicate" />
+	</bean>
+
+	<!-- Media validators -->
+
+	<alias name="defaultMediaCodeExistsPredicate" alias="mediaCodeExistsPredicate" />
+	<bean id="defaultMediaCodeExistsPredicate" class="de.hybris.platform.cmsfacades.media.validator.predicate.MediaCodeExistsPredicate">
+		<property name="mediaService" ref="mediaService" />
+	</bean>
+
+	<alias name="defaultValidFileTypePredicate" alias="validFileTypePredicate" />
+	<bean id="defaultValidFileTypePredicate" class="de.hybris.platform.cmsfacades.media.validator.predicate.ValidFileTypePredicate">
+		<property name="supportedTypes" value="${media.allowed.extensions.for.ClassLoader}" />
+	</bean>
+
+	<alias name="defaultCreateMediaValidator" alias="createMediaValidator" />
+	<bean id="defaultCreateMediaValidator" class="de.hybris.platform.cmsfacades.media.validator.CreateMediaValidator">
+		<property name="validStringLengthPredicate" ref="validStringLengthPredicate" />
+		<property name="mediaCodeExistsPredicate" ref="mediaCodeExistsPredicate" />
+	</bean>
+
+	<alias name="defaultCreateMediaFileValidator" alias="createMediaFileValidator" />
+	<bean id="defaultCreateMediaFileValidator" class="de.hybris.platform.cmsfacades.media.validator.CreateMediaFileValidator">
+		<property name="validFileTypePredicate" ref="validFileTypePredicate" />
+	</bean>
+
+	
+	<!-- Common Validator -->
+
+	<alias name="defaultCmsValidationErrors" alias="cmsValidationErrors"/>
+	<bean id="defaultCmsValidationErrors" class="de.hybris.platform.cmsfacades.common.validator.impl.DefaultValidationErrors" scope="prototype"/>
+
+	<alias name="defaultCmsValidationErrorsProvider" alias="cmsValidationErrorsProvider"/>
+	<bean id="defaultCmsValidationErrorsProvider" class="de.hybris.platform.cmsfacades.common.validator.impl.DefaultValidationErrorsProvider">
+		<property name="validationErrorsObjectFactory">
+			<bean class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+				<property name="targetBeanName" value="cmsValidationErrors" />
+			</bean>
+		</property>
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<alias name="defaultCmsValidatableService" alias="cmsValidatableService"/>
+	<bean id="defaultCmsValidatableService" class="de.hybris.platform.cmsfacades.common.validator.impl.DefaultValidatableService">
+		<property name="validationErrorsProvider" ref="cmsValidationErrorsProvider"/>
+	</bean>
+
+
+</beans>

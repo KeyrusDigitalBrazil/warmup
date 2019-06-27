@@ -1,0 +1,55 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE Catalog;id[unique=true];
+;catmap01;
+;catmap02;
+
+INSERT_UPDATE CatalogVersion;version[unique=true];catalog(id)[unique=true];
+;Staged;catmap01;
+;Online;catmap01;
+;Staged;catmap02;
+;Online;catmap02;
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;catmap01-preview-module;junit-hybris-rules;catmap01-preview;1.0.0;DEFAULT;true;0;
+;catmap01-live-module;junit-hybris-rules;catmap01-live;1.0.0;DEFAULT;true;0;
+;catmap02-preview-module;junit-hybris-rules;catmap02-preview;1.0.0;DEFAULT;true;0;
+;catmap02-live-module;junit-hybris-rules;catmap02-live;1.0.0;DEFAULT;true;0;
+;catmap03-live-module;junit-hybris-rules;catmap03-live;1.0.0;DEFAULT;true;0;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code)[default=EQUALITY];eventProcessingMode(code)[default=STREAM]
+;catmap01-preview-base;catmap01-preview-module;
+;catmap01-live-base;catmap01-live-module;
+;catmap02-preview-base;catmap02-preview-module;
+;catmap02-live-base;catmap02-live-module;
+;catmap03-live-base;catmap03-live-module;
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)[default=STATEFUL]
+;catmap01-preview-session;catmap01-preview-base;
+;catmap01-live-session;catmap01-live-base;
+;catmap02-preview-session;catmap02-preview-base;
+;catmap02-live-session;catmap02-live-base;
+;catmap03-live-session;catmap03-live-base;
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit
+;catmap01-live-context;catmap01-live-session;200;
+;catmap01-preview-context;catmap01-preview-session;200;
+;catmap02-live-context;catmap02-live-session;200;
+;catmap02-preview-context;catmap02-preview-session;200;
+;catmap03-live-context;catmap03-live-session;200;
+
+INSERT_UPDATE CatalogVersionToRuleEngineContextMapping;context(name)[unique=true];catalogVersion(catalog(id),version)[unique=true]
+;catmap01-preview-context;catmap01:Staged
+;catmap01-live-context;catmap01:Online
+;catmap02-preview-context;catmap02:Staged
+;catmap02-live-context;catmap02:Online
+

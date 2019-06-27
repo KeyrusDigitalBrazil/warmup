@@ -1,0 +1,58 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=electronics-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$siteResource=jar:de.hybris.platform.personalizationsampledataaddon.constants.PersonalizationsampledataaddonConstants&/personalizationsampledataaddon/import/addons/multicountrysampledataaddon/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$lang=en
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+$masterContentCatalog=electronicsContentCatalog
+$regionContentCatalog=electronics-euContentCatalog
+$masterContentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$masterContentCatalog]),CatalogVersion.version[default=Online])[default=$masterContentCatalog:Online]
+$regionContentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$regionContentCatalog]),CatalogVersion.version[default=Online])[default=$regionContentCatalog:Online]
+
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images];
+;mobile		;Electronics_MayDaySale_EN_480W.jpg	;$siteResource/images/Electronics_MayDaySale_EN_480W.jpg	;Electronics_MayDaySale_EN_480W.jpg	;"May Day Sale";
+;tablet		;Electronics_MayDaySale_EN_770W.jpg	;$siteResource/images/Electronics_MayDaySale_EN_770W.jpg	;Electronics_MayDaySale_EN_770W.jpg	;"May Day Sale";
+;desktop	;Electronics_MayDaySale_EN_960W.jpg	;$siteResource/images/Electronics_MayDaySale_EN_960W.jpg	;Electronics_MayDaySale_EN_960W.jpg	;"May Day Sale";
+;widescreen ;Electronics_MayDaySale_EN_1400W.jpg;$siteResource/images/Electronics_MayDaySale_EN_1400W.jpg	;Electronics_MayDaySale_EN_1400W.jpg;"May Day Sale";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-may-day-sale-homepage-splash-en;Electronics_MayDaySale_EN_480W.jpg,Electronics_MayDaySale_EN_770W.jpg,Electronics_MayDaySale_EN_960W.jpg,Electronics_MayDaySale_EN_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer;name;urlLink;&componentRef
+;;mayDaySaleElectronicsUKHomepageSplashBannerComponent;electronics-may-day-sale-homepage-splash-en;Electronics UK May Day Homepage Splash Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;mayDaySaleElectronicsUKHomepageSplashBannerComponent
+
+#Remove default components from the slots
+REMOVE ElementsForSlot;source(uid,$contentCV)[unique=true];target(uid,$masterContentCV)[unique=true];
+;Section1Slot-Homepage-uk;ElectronicsHompageSplashBannerComponent
+;Section2ASlot-Homepage-uk;ElectronicsHompageLightFamBannerComponent
+;Section2ASlot-Homepage-uk;ElectronicsHompageLightFamTextBannerComponent
+;Section2BSlot-Homepage-uk;ElectronicsHompageCamcordersChildBannerComponent
+;Section2BSlot-Homepage-uk;ElectronicsHompageCamcordersBannerComponent
+;Section4Slot-Homepage-uk;ElectronicsHompageSmDiscountBannerComponent
+;Section4Slot-Homepage-uk;ElectronicsHompageShopBannerComponent
+;Section4Slot-Homepage-uk;ElectronicsHompageShipmentBannerComponent
+;Section4Slot-Homepage-uk;ElectronicsHompageServiceBannerComponent
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];sourceId;name;defaultCmsComponent(uid,$masterContentCV);slots(uid,$contentCV)
+;;Section1SlotHomepageCxContainer;Section1SlotHomepageCxContainer;Section1SlotHomepageCxContainer;ElectronicsHompageSplashBannerComponent;Section1Slot-Homepage-uk
+;;Section2ASlotHomepageCxContainer;Section2ASlotHomepageCxContainer;Section2ASlotHomepageCxContainer;ElectronicsHompageLightFamBannerComponent;Section2ASlot-Homepage-uk
+;;Section2BSlotHomepageCxContainer;Section2BSlotHomepageCxContainer;Section2BSlotHomepageCxContainer;ElectronicsHompageCamcordersBannerComponent;Section2BSlot-Homepage-uk
+;;Section4SlotHomepageCxContainer;Section4SlotHomepageCxContainer;Section4SlotHomepageCxContainer;ElectronicsHompageShipmentBannerComponent;Section4Slot-Homepage-uk
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(uid,$masterContentCV)[mode=append];
+;;Section2ASlot-Homepage-uk;true;ElectronicsHompageLightFamTextBannerComponent;
+;;Section2BSlot-Homepage-uk;true;ElectronicsHompageCamcordersChildBannerComponent;
+;;Section4Slot-Homepage-uk;true;ElectronicsHompageShopBannerComponent,ElectronicsHompageSmDiscountBannerComponent,ElectronicsHompageServiceBannerComponent;

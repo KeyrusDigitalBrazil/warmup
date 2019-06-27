@@ -1,0 +1,25 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+######### Segment relation Cleanup CronJobs START #########
+INSERT_UPDATE FlexibleSearchRetentionRule;code[unique=true];searchQuery;actionReference;retentionTimeSeconds
+# Find all user to segment relations where user has not given consent to process his personal data for personalization
+;cxCustomerSegmentRetentionRule;SELECT distinct {u2s.pk}, {u2s.itemtype} FROM {CxConfig AS conf JOIN ConsentTemplate AS t on {conf.consentTemplates} LIKE CONCAT( '%', CONCAT( {t.PK} , '%' ) ) JOIN CxUserToSegment AS u2s on {u2s.baseSite} = {t.baseSite} } WHERE {u2s.pk} NOT IN ({{ SELECT distinct {u2s1.pk} FROM {CxConfig AS conf1 JOIN ConsentTemplate AS t1 on {conf1.consentTemplates} LIKE CONCAT( '%', CONCAT( {t1.PK} , '%' ) ) JOIN CxUserToSegment AS u2s1 on {u2s1.baseSite} = {t1.baseSite} JOIN Consent AS c1 on {u2s1.user} = {c1.customer} AND {c1.consentTemplate} = {t1.pk}} WHERE {u2s.basesite} = {t1.basesite} AND	{c1.consentGivenDate} = ({{ SELECT MAX({c2.consentGivenDate}) FROM {Consent AS c2} 	WHERE {c2.customer} = {c1.customer} AND {c2.consentTemplate} = {c1.consentTemplate} }}) AND ( {c1.consentWithdrawnDate} IS NULL OR {c1.consentWithdrawnDate} >= ?CALC_RETIREMENT_TIME )}});cxSegmentRelationCleanupRemoveCleanupAction;0
+                  
+ 
+# FS JOB
+INSERT_UPDATE RetentionJob;code[unique=true];retentionRule(code);batchSize
+;cxCustomerSegmentRetentionJob;cxCustomerSegmentRetentionRule;100
+
+# FS CRON JOB
+INSERT_UPDATE CronJob;code[unique=true];job(code);sessionLanguage(isoCode)[default=en]
+;cxCustomerSegmentRetentionCronJob;cxCustomerSegmentRetentionJob;
+#########  Segment relation Cleanup CronJobs END #########

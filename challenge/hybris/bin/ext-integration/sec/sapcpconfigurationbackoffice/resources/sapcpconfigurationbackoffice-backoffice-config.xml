@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- [y] hybris Platform Copyright (c) 2018 SAP SE or an SAP affiliate company. 
+	All rights reserved. This software is the confidential and proprietary information 
+	of SAP ("Confidential Information"). You shall not disclose such Confidential 
+	Information and shall use it only in accordance with the terms of the license 
+	agreement you entered into with SAP. -->
+<config xmlns="http://www.hybris.com/cockpit/config"
+	xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+	xmlns:y="http://www.hybris.com/cockpit/config/hybris" xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+	xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+	xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+
+	<context component="explorer-tree">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="Customer Engagement Center">
+				<explorer-tree:navigation-node id="Service Ticket">
+
+					<explorer-tree:type-node id="CecService"
+						code="CecService" />
+					<explorer-tree:type-node id="BaseSiteCecServiceMapping"
+						code="BaseSiteCecServiceMapping" />
+				</explorer-tree:navigation-node>
+
+				<explorer-tree:type-node id="CecTechnicalUser"
+					code="CecTechnicalUser" />
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+
+	<context type="CecTechnicalUser" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="technicalUser" />
+
+
+		</list-view:list-view>
+	</context>
+	<context type="BaseSiteCecServiceMapping" component="listview">
+		<list-view:list-view>
+			<list-view:column qualifier="baseSite" />
+			<list-view:column qualifier="CecService" />
+			<list-view:column qualifier="CecTechnicalUser" />
+
+		</list-view:list-view>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="CecService"
+		component="listview">
+		<list-view:list-view
+			xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+			<list-view:column qualifier="identifier" />
+			<list-view:column qualifier="serviceURL" />
+
+
+		</list-view:list-view>
+	</context>
+
+	<context type="BaseSiteCecServiceMapping" component="base"
+		merge-by="type" parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>baseSite</y:label>
+			</y:labels>
+			<y:preview />
+		</y:base>
+	</context>
+
+	<context type="CecTechnicalUser" component="base" merge-by="type"
+		parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>technicalUser</y:label>
+			</y:labels>
+			<y:preview />
+		</y:base>
+	</context>
+
+	<context type="CecService" component="base" merge-by="type"
+		parent="GenericItem">
+		<y:base>
+			<y:labels>
+				<y:label>identifier</y:label>
+			</y:labels>
+			<y:preview />
+		</y:base>
+	</context>
+
+	<context component="create-wizard" type="BaseSiteCecServiceMapping">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+			id="BaseSiteCecServiceMappingWizard" title="create.BaseSiteCecServiceMapping.title">
+			<wz:prepare id="BaseSiteCecServiceMappingPrepare">
+				<wz:initialize property="newBaseSiteCecServiceMapping"
+					type="BaseSiteCecServiceMapping" />
+			</wz:prepare>
+			<wz:step id="step1" label="step1">
+				<wz:content id="step1.content">
+					<wz:property-list root="newBaseSiteCecServiceMapping">
+						<wz:property qualifier="baseSite" />
+						<wz:property qualifier="CecService" />
+						<wz:property qualifier="CecTechnicalUser" />
+
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+					<wz:done
+						visible="!#empty(newBaseSiteCecServiceMapping.baseSite) and newBaseSiteCecServiceMapping.CecService != null and newBaseSiteCecServiceMapping.CecTechnicalUser != null">
+						<wz:save property="newBaseSiteCecServiceMapping" />
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context component="create-wizard" type="CecTechnicalUser">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+			id="CecTechnicalUserWizard" title="create.CecTechnicalUser.title">
+			<wz:prepare id="CecTechnicalUserPrepare">
+				<wz:initialize property="newCecTechnicalUser" type="CecTechnicalUser" />
+			</wz:prepare>
+			<wz:step id="step1" label="step1">
+				<wz:content id="step1.content">
+					<wz:property-list root="newCecTechnicalUser">
+
+						<wz:property qualifier="technicalUser" />
+						<wz:property qualifier="password" />
+						<wz:property qualifier="oauthURL" />
+						<wz:property qualifier="tenantName" />
+
+
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+					<wz:done
+						visible="!#empty(newCecTechnicalUser.tenantName) and !#empty(newCecTechnicalUser.technicalUser) and !#empty(newCecTechnicalUser.password) and !#empty(newCecTechnicalUser.oauthURL)">
+						<wz:save property="newCecTechnicalUser" />
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="CecTechnicalUser"
+		component="editor-area">
+		<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="field.CecTechnicalUser.password.description">
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="password"
+						editor="com.sap.platform.Sapcpconfigurationbackoffice.editor.masktext" />
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="technicalUser" />
+				</editorArea:section>
+				<editorArea:section
+					name="field.CecTechnicalUser.otherattribute.description">
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="tenantName" />
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="oauthURL" />
+
+
+
+				</editorArea:section>
+
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="CecService"
+		component="editor-area">
+		<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="hmc.essential">
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="serviceURL" />
+				</editorArea:section>
+
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<context merge-by="type" parent="GenericItem" type="BaseSiteCecServiceMapping"
+		component="editor-area">
+		<editorArea:editorArea
+			xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.common">
+				<editorArea:section name="hmc.essential">
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="baseSite" />
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="CecService" />
+					<editorArea:attribute
+						xmlns="http://www.hybris.com/cockpitng/component/editorArea"
+						qualifier="CecTechnicalUser" />
+				</editorArea:section>
+
+
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+
+	<context component="create-wizard" type="CecService">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+			id="CecServiceWizard" title="create.CecService.title">
+			<wz:prepare id="CecServicePrepare">
+				<wz:initialize property="newCecService" type="CecService" />
+			</wz:prepare>
+			<wz:step id="step1" label="step1">
+				<wz:content id="step1.content">
+					<wz:property-list root="newCecService">
+						<wz:property qualifier="identifier" />
+						<wz:property qualifier="serviceURL" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel />
+					<wz:done visible="!#empty(newCecService.serviceURL)">
+						<wz:save property="newCecService" />
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+</config>

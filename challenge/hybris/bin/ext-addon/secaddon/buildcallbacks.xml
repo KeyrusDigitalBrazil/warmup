@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="secaddon_buildcallbacks" xmlns:if="ant:if">
+
+    <property name="ext.secaddon.y.main.dir" value="${ext.secaddon.path}/y-main" />
+    <property name="ext.secaddon.path" value="${ext.secaddon.path}" />
+	<property name="ext.angularancillary.node.modules.dir" value="${ext.angularancillary.path}/resources/npm/node_modules" />
+	<property name="angular.project.node.modules.additional" value="${ext.secaddon.path}/resources/additional_node_modules" />
+	
+    <patternset id="extension.secaddon.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    	    <exclude name="**/y-main/aot/"/>
+    	    <exclude name="**/y-main/aot_gen/"/>
+    	    <exclude name="**/acceleratoraddon/web/webroot/_ui/responsive/common/angular/build*"/>
+   
+    </patternset>
+
+    <patternset id="extension.secaddon.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    	    <exclude name="**/y-main/aot/"/>
+   	    <exclude name="**/y-main/aot_gen/"/>
+    	    <exclude name="**/acceleratoraddon/web/webroot/_ui/responsive/common/angular/build*"/>
+    </patternset>
+
+    <patternset id="extension.secaddon.production.filter">
+        <patternset refid="extension.production.filter" />
+        <exclude name="**/y-main/node_modules/"/>
+        <exclude name="**/y-main/npm"/>
+    </patternset>
+	<macrodef name="secaddon_after_build">
+        <sequential>
+            <impexGenerate extname="secaddon"/>
+            <delete file="${ext.secaddon.path}/resources-lang/touch_impexgen" failonerror="false"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="secaddon_after_clean">
+        <sequential>
+            <delete file="${ext.secaddon.path}/resources-lang/touch_impexgen" failonerror="false"/>
+        </sequential>
+    </macrodef>
+    <macrodef name="secaddon_before_clean" if:true="${angularancillary.ready}">
+        <sequential>
+            <clean_angular_addon angular.project.path="${ext.secaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+
+    <macrodef name="secaddon_npm_build">
+        <sequential>
+            <prepare_node_modules_for_build angular.project.path="${ext.secaddon.y.main.dir}" />     
+            <build_angular_project angular.project.path="${ext.secaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+	
+    <macrodef name="secaddon_before_build" if:true="${angularancillary.ready}">
+        <sequential>
+            <secaddon_npm_build/>
+        </sequential>
+    </macrodef>
+
+    <target name="build-secaddon-ymain" description="Build the secaddon y-main Angular project" if:true="${angularancillary.ready}">
+        <secaddon_npm_build/>
+    </target>
+
+    <macrodef name="secaddon_before_yunit" if:true="${angulartestancillary.ready}">
+        <sequential>
+            <prepare_and_test_angular_project angular.project.path="${ext.secaddon.y.main.dir}" />
+        </sequential>
+    </macrodef>
+
+</project>

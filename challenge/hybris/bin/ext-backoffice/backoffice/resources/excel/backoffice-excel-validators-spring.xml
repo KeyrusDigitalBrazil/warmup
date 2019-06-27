@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultExcelWorkbookValidators" alias="excelWorkbookValidators"/>
+	<util:list id="defaultExcelWorkbookValidators"
+			   value-type="com.hybris.backoffice.excel.validators.WorkbookValidator">
+		<ref bean="workbookTypeCodeAndAttributesValidator"/>
+		<ref bean="workbookMandatoryColumnsValidator"/>
+		<ref bean="excelWorkbookMaxRowsValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelWorkbookTypeCodeAndSelectedAttributesValidator"
+		   alias="excelWorkbookTypeCodeAndSelectedAttributesValidator"/>
+	<bean id="defaultExcelWorkbookTypeCodeAndSelectedAttributesValidator"
+		  class="com.hybris.backoffice.excel.validators.WorkbookTypeCodeAndSelectedAttributeValidator">
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="excelWorkbookService" ref="excelWorkbookService" />
+		<property name="excelSheetService" ref="excelSheetService" />
+		<property name="excelHeaderService" ref="excelHeaderService" />
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+	</bean>
+
+	<alias name="defaultWorkbookTypeCodeAndAttributesValidator"
+		   alias="workbookTypeCodeAndAttributesValidator"/>
+	<bean id="defaultWorkbookTypeCodeAndAttributesValidator"
+		  class="com.hybris.backoffice.excel.validators.WorkbookTypeCodeAndAttributesValidator"
+		  parent="defaultExcelWorkbookTypeCodeAndSelectedAttributesValidator">
+		<property name="excelHeaderService" ref="excelHeaderService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="excelAttributeTypeSystemService" ref="excelAttributeTypeSystemService"/>
+		<property name="excelClassificationTypeSystemService" ref="excelClassificationTypeSystemService"/>
+	</bean>
+
+	<alias name="defaultExcelWorkbookMaxRowsValidator" alias="excelWorkbookMaxRowsValidator"/>
+	<bean id="defaultExcelWorkbookMaxRowsValidator"
+		  class="com.hybris.backoffice.excel.validators.WorkbookMaxRowValidator">
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="excelSheetService" ref="excelSheetService" />
+		<property name="excelCellService" ref="excelCellService" />
+	</bean>
+
+	<alias name="defaultWorkbookMandatoryColumnsValidator" alias="workbookMandatoryColumnsValidator"/>
+	<bean id="defaultWorkbookMandatoryColumnsValidator"
+		  class="com.hybris.backoffice.excel.validators.WorkbookMandatoryColumnsValidator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="excelTemplateService" ref="excelTemplateService"/>
+		<property name="excelWorkbookService" ref="excelWorkbookService" />
+		<property name="excelSheetService" ref="excelSheetService" />
+		<property name="displayNameAttributeNameFormatter" ref="displayNameAttributeNameFormatter" />
+		<property name="typeService" ref="typeService"/>
+		<property name="mapper">
+			<bean parent="fromTypeCodeToAttributeDescriptorsMapper">
+				<property name="filters">
+					<list>
+						<ref bean="mandatoryAndAvailableCheckingFilter"/>
+						<ref bean="skippingPkFilter"/>
+						<bean class="com.hybris.backoffice.excel.template.filter.NegateFilter">
+							<property name="excelFilter" ref="valueCheckingFilter"/>
+						</bean>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelJavaTypeValidators" alias="excelJavaTypeValidators"/>
+	<util:list id="defaultExcelJavaTypeValidators" value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelMandatoryFieldValidator"/>
+		<ref bean="excelBooleanValidator"/>
+		<ref bean="excelDateValidator"/>
+		<ref bean="excelNumberValidator"/>
+		<ref bean="excelStringValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelBooleanValidator" alias="excelBooleanValidator"/>
+	<bean id="defaultExcelBooleanValidator" class="com.hybris.backoffice.excel.validators.ExcelBooleanValidator"/>
+
+	<alias name="defaultExcelDateValidator" alias="excelDateValidator"/>
+	<bean id="defaultExcelDateValidator" class="com.hybris.backoffice.excel.validators.ExcelDateValidator">
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultExcelNumberValidator" alias="excelNumberValidator"/>
+	<bean id="defaultExcelNumberValidator" class="com.hybris.backoffice.excel.validators.ExcelNumberValidator">
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias name="defaultExcelStringValidator" alias="excelStringValidator"/>
+	<bean id="defaultExcelStringValidator" class="com.hybris.backoffice.excel.validators.ExcelStringValidator"/>
+
+	<alias name="defaultExcelMandatoryFieldValidator" alias="excelMandatoryFieldValidator"/>
+	<bean id="defaultExcelMandatoryFieldValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelMandatoryFieldValidator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultExcelCatalogVersionValidators" alias="excelCatalogVersionValidators"/>
+	<util:list id="defaultExcelCatalogVersionValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelCatalogVersionValidator"/>
+		<ref bean="excelMandatoryFieldValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelCatalogVersionValidator" alias="excelCatalogVersionValidator"/>
+	<bean id="defaultExcelCatalogVersionValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelCatalogVersionValidator">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="typeService" ref="typeService"/>
+	</bean>
+
+	<alias name="defaultExcelEnumValidators" alias="excelEnumValidators"/>
+	<util:list id="defaultExcelEnumValidators" value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelEnumValidator"/>
+		<ref bean="excelMandatoryFieldValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelEnumValidator" alias="excelEnumValidator"/>
+	<bean id="defaultExcelEnumValidator" class="com.hybris.backoffice.excel.validators.ExcelEnumValidator">
+		<property name="enumerationService" ref="enumerationService"/>
+	</bean>
+
+	<alias name="defaultExcelSupercategoriesValidators" alias="excelSupercategoriesValidators"/>
+	<util:list id="defaultExcelSupercategoriesValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelCatalogVersionValidator"/>
+		<ref bean="excelCategoryValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelCategoryValidator" alias="excelCategoryValidator"/>
+	<bean id="defaultExcelCategoryValidator" class="com.hybris.backoffice.excel.validators.ExcelCategoryValidator">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="categoryService" ref="categoryService"/>
+	</bean>
+
+	<alias name="defaultExcelBaseProductValidators" alias="excelBaseProductValidators"/>
+	<util:list id="defaultExcelBaseProductValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelMandatoryFieldValidator"/>
+		<ref bean="excelCatalogVersionValidator"/>
+		<ref bean="excelBaseProductValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelBaseProductValidator" alias="excelBaseProductValidator"/>
+	<bean id="defaultExcelBaseProductValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelBaseProductValidator">
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="productService" ref="productService"/>
+	</bean>
+
+	<alias name="defaultExcelEurope1PricesValidators" alias="excelEurope1PricesValidators"/>
+	<util:list id="defaultExcelEurope1PricesValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelEurope1PricesValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelEurope1PricesValidator" alias="excelEurope1PricesValidator"/>
+	<bean id="defaultExcelEurope1PricesValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelEurope1PricesValidator">
+		<property name="currencyDao" ref="currencyDao"/>
+		<property name="unitService" ref="unitService"/>
+		<property name="enumerationService" ref="enumerationService"/>
+		<property name="userService" ref="userService"/>
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultExcelMediaImportValidator" alias="excelMediaImportValidator"/>
+	<bean id="defaultExcelMediaImportValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelMediaImportValidator">
+		<property name="typeService" ref="typeService"/>
+		<property name="importService" ref="excelImportService"/>
+	</bean>
+
+	<alias name="defaultExcelMediaCollectionImportValidator" alias="excelMediaCollectionImportValidator"/>
+	<bean id="defaultExcelMediaCollectionImportValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelMediaCollectionImportValidator"
+		  parent="defaultExcelMediaImportValidator">
+		<property name="singleMediaValidators">
+			<util:list value-type="com.hybris.backoffice.excel.validators.ExcelSingleMediaValidator">
+				<ref bean="excelMediaFilenameExtensionValidator"/>
+				<ref bean="excelMediaImportValidator"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelMediaFilenameExtensionValidator" alias="excelMediaFilenameExtensionValidator"/>
+	<bean id="defaultExcelMediaFilenameExtensionValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelMediaFilenameExtensionValidator"
+		  parent="defaultExcelMediaImportValidator">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultExcelMediaImportValidators" alias="excelMediaImportValidators"/>
+	<util:list id="defaultExcelMediaImportValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelMediaFilenameExtensionValidator"/>
+		<ref bean="excelMediaImportValidator"/>
+		<ref bean="excelCatalogVersionValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelMediaCollectionImportValidators" alias="excelMediaCollectionImportValidators"/>
+	<util:list id="defaultExcelMediaCollectionImportValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelMediaCollectionImportValidator"/>
+		<ref bean="excelCatalogVersionValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelBooleanValueConverter" alias="excelBooleanValueConverter"/>
+	<bean id="defaultExcelBooleanValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelBooleanValueConverter">
+		<property name="order" value="0"/>
+	</bean>
+
+	<alias name="defaultExcelDateValueConverter" alias="excelDateValueConverter"/>
+	<bean id="defaultExcelDateValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelDateValueConverter">
+		<property name="order" value="0"/>
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultExcelNumberValueConverter" alias="excelNumberValueConverter"/>
+	<bean id="defaultExcelNumberValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelNumberValueConverter">
+		<property name="order" value="0"/>
+	</bean>
+
+	<alias name="defaultExcelStringValueConverter" alias="excelStringValueConverter"/>
+	<bean id="defaultExcelStringValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelStringValueConverter">
+		<property name="order" value="500"/>
+	</bean>
+
+	<alias name="defaultExcelNullValueConverter" alias="excelNullValueConverter"/>
+	<bean id="defaultExcelNullValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelNullValueConverter">
+		<property name="order" value="1000"/>
+	</bean>
+
+	<alias name="defaultExcelMultiValueConverter" alias="excelMultiValueConverter"/>
+	<bean id="defaultExcelMultiValueConverter"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelMultiValueConverter">
+		<property name="order" value="-1000"/>
+	</bean>
+
+	<alias name="defaultExcelValueConverterRegistry" alias="excelValueConverterRegistry"/>
+	<bean id="defaultExcelValueConverterRegistry"
+		  class="com.hybris.backoffice.excel.validators.engine.converters.ExcelValueConverterRegistry">
+		<property name="converters">
+			<util:list value-type="com.hybris.backoffice.excel.validators.engine.converters.ExcelValueConverter">
+				<ref bean="excelBooleanValueConverter"/>
+				<ref bean="excelDateValueConverter"/>
+				<ref bean="excelNumberValueConverter"/>
+				<ref bean="excelStringValueConverter"/>
+				<ref bean="excelNullValueConverter"/>
+				<ref bean="excelMultiValueConverter"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelPlatformAbstractValidationEngineAwareStrategy"
+		   alias="excelPlatformAbstractValidationEngineAwareStrategy"/>
+	<bean id="defaultExcelPlatformAbstractValidationEngineAwareStrategy"
+		  class="com.hybris.backoffice.excel.validators.engine.ExcelAbstractValidationEngineAwareStrategy"
+		  abstract="true">
+		<property name="converterRegistry" ref="excelValueConverterRegistry"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="validationDao" ref="backofficeValidationDao"/>
+		<property name="validationService" ref="validationService"/>
+		<property name="severities">
+			<list value-type="de.hybris.platform.validation.enums.Severity">
+				<value>ERROR</value>
+				<value>WARN</value>
+				<value>INFO</value>
+			</list>
+		</property>
+		<property name="constraintGroups">
+			<list>
+				<value>default</value>
+				<value>defaultBackofficeValidationGroup</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelPlatformValidationEngineAwareLocalizedStrategy"
+		   alias="excelPlatformValidationEngineAwareLocalizedStrategy"/>
+	<bean id="defaultExcelPlatformValidationEngineAwareLocalizedStrategy"
+		  class="com.hybris.backoffice.excel.validators.engine.ExcelValidationEngineAwareLocalizedStrategy"
+		  parent="excelPlatformAbstractValidationEngineAwareStrategy">
+		<property name="violationFactory" ref="constraintViolationFactory"/>
+		<property name="localizedConstraintsRegistry" ref="localizedConstraintsRegistry"/>
+	</bean>
+
+	<alias name="defaultExcelPlatformValidationEngineAwareUnlocalizedStrategy"
+		   alias="excelPlatformValidationEngineAwareUnlocalizedStrategy"/>
+	<bean id="defaultExcelPlatformValidationEngineAwareUnlocalizedStrategy"
+		  class="com.hybris.backoffice.excel.validators.engine.ExcelValidationEngineAwareUnlocalizedStrategy"
+		  parent="excelPlatformAbstractValidationEngineAwareStrategy"/>
+
+	<alias name="defaultExcelPlatformValidationEngineAwareStrategies"
+		   alias="excelPlatformValidationEngineAwareStrategies"/>
+	<util:list id="defaultExcelPlatformValidationEngineAwareStrategies"
+			   value-type="com.hybris.backoffice.excel.validators.engine.ExcelValidationEngineAwareStrategy">
+		<ref bean="excelPlatformValidationEngineAwareLocalizedStrategy"/>
+		<ref bean="excelPlatformValidationEngineAwareUnlocalizedStrategy"/>
+	</util:list>
+
+	<alias name="defaultExcelPlatformValidationEngineAwareValidator"
+		   alias="excelPlatformValidationEngineAwareValidator"/>
+	<bean id="defaultExcelPlatformValidationEngineAwareValidator"
+		  class="com.hybris.backoffice.excel.validators.engine.DefaultExcelValidationEngineAwareValidator">
+		<property name="strategies" ref="excelPlatformValidationEngineAwareStrategies"/>
+	</bean>
+
+	<alias name="defaultExcelClassificationPostProcessorValidators"
+		   alias="excelClassificationPostProcessorValidators"/>
+	<util:list id="defaultExcelClassificationPostProcessorValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelAttributeValidator">
+		<ref bean="excelDefaultValuesClassificationFieldValidator"/>
+		<ref bean="excelMandatoryClassificationFieldValidator"/>
+		<ref bean="excelClassificationReferenceValidator"/>
+		<ref bean="excelEnumClassificationValidator"/>
+		<ref bean="excelBooleanClassificationFieldValidator"/>
+		<ref bean="excelNumberClassificationFieldValidator"/>
+		<ref bean="excelDateClassificationFieldValidator"/>
+		<ref bean="excelRangeClassificationFieldValidator"/>
+		<ref bean="excelMultivalueClassificationFieldValidator"/>
+		<ref bean="excelUnitClassificationFieldValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelClassificationReferenceValidator" alias="excelClassificationReferenceValidator"/>
+	<bean id="defaultExcelClassificationReferenceValidator"
+		  class="com.hybris.backoffice.excel.validators.classification.ExcelClassificationGenericReferenceValidator">
+		<property name="excelGenericReferenceValidator" ref="excelGenericReferenceValidator"/>
+		<property name="requiredAttributesFactory" ref="requiredAttributesFactory"/>
+	</bean>
+
+	<alias name="defaultExcelEnumClassificationValidator" alias="excelEnumClassificationValidator"/>
+	<bean id="defaultExcelEnumClassificationValidator"
+		  class="com.hybris.backoffice.excel.validators.classification.ExcelEnumClassificationValidator"/>
+
+	<alias name="defaultExcelUnitClassificationFieldValidator" alias="excelUnitClassificationFieldValidator"/>
+	<bean id="defaultExcelUnitClassificationFieldValidator"
+		  class="com.hybris.backoffice.excel.validators.classification.ExcelUnitClassificationFieldValidator">
+		<property name="classificationSystemService" ref="classificationSystemService"/>
+		<property name="validators">
+			<list>
+				<ref bean="excelNumberClassificationFieldValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelMandatoryClassificationFieldValidator" alias="excelMandatoryClassificationFieldValidator"/>
+	<bean id="defaultExcelMandatoryClassificationFieldValidator"
+		  class="com.hybris.backoffice.excel.validators.classification.ExcelMandatoryClassificationFieldValidator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<alias name="defaultExcelBooleanClassificationFieldValidator" alias="excelBooleanClassificationFieldValidator"/>
+	<bean id="defaultExcelBooleanClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelBooleanClassificationFieldValidator"/>
+
+	<alias name="defaultExcelNumberClassificationFieldValidator" alias="excelNumberClassificationFieldValidator"/>
+	<bean id="defaultExcelNumberClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelNumberClassificationFieldValidator"/>
+
+	<alias name="defaultExcelDateClassificationFieldValidator" alias="excelDateClassificationFieldValidator"/>
+	<bean id="defaultExcelDateClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelDateClassificationFieldValidator">
+		<property name="excelDateUtils" ref="excelDateUtils"/>
+	</bean>
+
+	<alias name="defaultExcelGenericReferenceValidator" alias="excelGenericReferenceValidator"/>
+	<bean id="defaultExcelGenericReferenceValidator"
+		  class="com.hybris.backoffice.excel.validators.ExcelGenericReferenceValidator">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="requiredAttributesFactory" ref="requiredAttributesFactory"/>
+	</bean>
+
+	<alias name="defaultExcelGenericReferenceValidators" alias="excelGenericReferenceValidators"/>
+	<util:list id="defaultExcelGenericReferenceValidators"
+			   value-type="com.hybris.backoffice.excel.validators.ExcelValidator">
+		<ref bean="excelMandatoryFieldValidator"/>
+		<ref bean="excelGenericReferenceValidator"/>
+	</util:list>
+
+	<alias name="defaultExcelRangeClassificationFieldValidator" alias="excelRangeClassificationFieldValidator"/>
+	<bean id="defaultExcelRangeClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelRangeClassificationFieldValidator">
+		<property name="validators">
+			<list>
+				<ref bean="excelNumberClassificationFieldValidator"/>
+				<ref bean="excelDateClassificationFieldValidator"/>
+				<ref bean="excelUnitClassificationFieldValidator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultExcelDefaultValuesClassificationFieldValidator" alias="excelDefaultValuesClassificationFieldValidator"/>
+	<bean id="defaultExcelDefaultValuesClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelDefaultValuesClassificationFieldValidator"/>
+
+	<alias name="defaultExcelMultivalueClassificationFieldValidator" alias="excelMultivalueClassificationFieldValidator"/>
+	<bean id="defaultExcelMultivalueClassificationFieldValidator" class="com.hybris.backoffice.excel.validators.classification.ExcelMultivalueClassificationFieldValidator">
+		<property name="validators">
+			<list>
+				<ref bean="excelBooleanClassificationFieldValidator"/>
+				<ref bean="excelNumberClassificationFieldValidator"/>
+				<ref bean="excelDateClassificationFieldValidator"/>
+				<ref bean="excelRangeClassificationFieldValidator"/>
+				<ref bean="excelEnumClassificationValidator"/>
+				<ref bean="excelClassificationReferenceValidator"/>
+				<ref bean="excelUnitClassificationFieldValidator"/>
+			</list>
+		</property>
+	</bean>
+
+</beans>

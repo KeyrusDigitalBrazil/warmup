@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="marketplacestoreSystemSetup"
+		class="de.hybris.platform.marketplacestore.setup.MarketplacestoreSystemSetup"
+		parent="abstractCoreSystemSetup">
+		<property name="coreDataImportService" ref="marketplaceCoreDataImportService" />
+		<property name="sampleDataImportService" ref="marketplaceSampleDataImportService" />
+	</bean>
+
+	<bean id="marketplaceSampleDataImportService"
+		class="de.hybris.platform.marketplacestore.service.dataimport.impl.MarketplaceSampleDataImportService"
+		parent="sampleDataImportService" />
+
+	<bean id="marketplaceCoreDataImportService"
+		class="de.hybris.platform.marketplacestore.service.dataimport.impl.MarketplaceCoreDataImportService"
+		parent="coreDataImportService" />
+
+	<bean id="marketplaceExtenedCategorySource" parent="abstractCategorySource">
+		<property name="rootCategory" value="1"/>
+		<!-- '1' is the root icecat category -->
+	</bean>
+	<bean id="marketplaceBrandCategorySource" parent="abstractCategorySource">
+		<property name="rootCategory" value="brands"/>
+		<!-- 'brands' is the root of the brands hierarchy -->
+	</bean>
+
+	<bean id="marketplaceCategoryCodeValueProvider" parent="abstractCategoryCodeValueProvider">
+		<property name="categorySource" ref="marketplaceExtenedCategorySource"/>
+	</bean>
+	<bean id="marketplaceBrandCategoryCodeValueProvider" parent="abstractCategoryCodeValueProvider">
+		<property name="categorySource" ref="marketplaceBrandCategorySource"/>
+	</bean>
+	<bean id="marketplaceCategoryNameValueProvider" parent="abstractCategoryNameValueProvider">
+		<property name="categorySource" ref="marketplaceExtenedCategorySource"/>
+	</bean>
+	<bean id="marketplaceBrandCategoryNameValueProvider" parent="abstractCategoryNameValueProvider">
+		<property name="categorySource" ref="marketplaceBrandCategorySource"/>
+	</bean>
+
+</beans>

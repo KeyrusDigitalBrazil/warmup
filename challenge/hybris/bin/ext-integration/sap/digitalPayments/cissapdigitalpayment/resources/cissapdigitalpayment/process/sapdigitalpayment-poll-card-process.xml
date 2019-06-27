@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkSapDigiPaySessionId" name="sapdigitalpayment-poll-card-process" processClass="de.hybris.platform.cissapdigitalpayment.model.SapDigitPayPollCardProcessModel">
+
+	<action id="checkSapDigiPaySessionId" bean="sapDigiPayCheckSessionAction">
+		<transition name="OK" to="sapDigiPaySavePollCardResult"/>
+		<transition name="NOK" to="error"/>
+	</action>
+	
+	<action id="sapDigiPaySavePollCardResult" bean="sapDigiPaySavePollCardResultAction">
+		<transition name="OK" to="success"/>
+		<transition name="NOK" to="failed"/>
+	</action>
+	
+	<end id="error" state="ERROR">All went wrong.</end>
+	<end id="failed" state="FAILED">Polling card failed</end>
+	<end id="success" state="SUCCEEDED">Polling card success</end>
+
+</process>

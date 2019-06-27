@@ -1,0 +1,19 @@
+#*************************************************
+#************* Inbound OMS Stock Level ***********
+#*************************************************
+
+INSERT_UPDATE IntegrationObject; code[unique = true];
+; InboundOMSStockLevel
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; InboundOMSStockLevel ; StockLevel ; StockLevel
+; InboundOMSStockLevel ; Warehouse  ; Warehouse
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; InboundOMSStockLevel:StockLevel ; available   ; StockLevel:available   ;
+; InboundOMSStockLevel:StockLevel ; productCode ; StockLevel:productCode ;                      ; true
+; InboundOMSStockLevel:StockLevel ; warehouse   ; StockLevel:warehouse   ; InboundOMSStockLevel:Warehouse ; true
+
+; InboundOMSStockLevel:Warehouse  ; code        ; Warehouse:code         ;                      ; true
+; InboundOMSStockLevel:Warehouse  ; name        ; Warehouse:name         ;                      ;
+

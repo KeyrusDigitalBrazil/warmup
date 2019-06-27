@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+
+	<enumtypes>
+		<enumtype code="DataLoadTriggerMode" generate="true"
+			autocreate="true">
+			<description>
+				This enumeration defines the different data loader calling modes
+			</description>
+			<value code="Resume" />
+			<value code="StartInitial" />
+			<value code="StartDelta" />
+		</enumtype>
+		<enumtype code="CronJobResult"  autocreate="false"
+			generate="false">
+			<value code="DATALOAD_ALREADY_RUNNING" />
+			<value code="DATALOAD_RESUME_ATTEMPT_DONE" />
+			<value code="DATALOAD_NO_INITIAL_DOWNLOAD" />
+		</enumtype>		
+	
+		<enumtype code="DataloadStatus" generate="true"
+			autocreate="true">
+			<description>
+				This enumeration defines the different data load statuses
+			</description>
+			<value code="NOT_STARTED" />
+			<value code="INITIAL_LOAD" />
+			<value code="INITIAL_LOAD_COMPLETED" />
+			<value code="INITIAL_LOAD_STOPPED" />
+			<value code="DELTA_LOAD" />
+			<value code="DELTA_LOAD_STOPPED" />
+			<value code="ERROR" />
+		</enumtype>
+		
+	</enumtypes>	
+		
+	<itemtypes>
+	
+	   <itemtype code="CPQDataloadStatus" autocreate="true" generate="true">
+	      <deployment table="CPQDataloadStatus" typecode="9900"/>
+			<attributes>
+			   <attribute qualifier="cpqDataloadStatusForSapConfiguration" type="java.lang.String">
+					<description>CPQ Dataload Status Name</description>
+					<persistence type="property"/>
+					<modifiers unique="true" optional="false"/>
+				</attribute>
+				<attribute qualifier="cpqDataloadStatus"
+					type="DataloadStatus" generate="true" autocreate="true" >
+					<description>Product Config - Data Load Status</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqLastInitialLoadStartTime"
+					type="java.util.Date" generate="true" autocreate="true" >
+					<description>Product Config - Last Initial Load Start Time</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqLastInitialLoadEndTime"
+					type="java.util.Date" generate="true" autocreate="true" >
+					<description>Product Config - Last Initial Load End Time</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqLastInitialLoadTransferredVolume"
+					type="java.math.BigDecimal" generate="true" autocreate="true" >
+					<description>Product Config - Last Initial Load Transferred Volume</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqCurrentInitialLoadTransferredVolume"
+					type="java.math.BigDecimal" generate="true" autocreate="true" >
+					<description>Product Config - Current Initial Load Transferred Volume</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqNumberOfEntriesInDeltaLoadQueue"
+					type="java.lang.Integer" generate="true" autocreate="true" >
+					<description>Product Config - Number of Entries in Delta Load Queue</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="cpqCurrentDeltaLoadTransferredVolume"
+					type="java.math.BigDecimal" generate="true" autocreate="true" >
+					<description>Product Config - Current Delta Load Transferred Volume</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+		   </attributes>
+		</itemtype>      
+	
+		<itemtype code="SAPConfiguration" autocreate="false"
+			generate="false">
+			<attributes>
+				
+<!-- SAP RFC Parameters Begin -->
+				<attribute qualifier="sapproductconfig_sapServer"
+					type="SAPRFCDestination" generate="true" autocreate="true" >
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapproductconfig_sapRFCDestination"
+					type="java.lang.String" generate="true" autocreate="true" >
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+<!-- SAP RFC Parameters End -->
+
+<!-- File Filter Parameters Begin -->
+				<attribute qualifier="sapproductconfig_filterKnowledgeBase"
+					type="Media" generate="true" autocreate="true" >
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapproductconfig_filterCondition"
+					type="Media" generate="true" autocreate="true" >
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapproductconfig_filterMaterial"
+					type="Media" generate="true" autocreate="true" >
+					<persistence type="property" />
+				</attribute>
+<!-- File Filter Parameters End -->
+<!-- Data Load Status Begin -->
+				<attribute qualifier="sapproductconfig_cpqDataloadStatus"
+					type="CPQDataloadStatus" generate="true" autocreate="true" >
+					<description>Product Config - Data Load Status</description>
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+<!-- Data Load Status End -->
+          </attributes>
+		</itemtype>        
+			
+		<itemtype code="DataLoaderCronJob" autocreate="true"
+				generate="true" extends="CronJob">
+			<attributes>
+				<attribute qualifier="sapConfiguration"
+					type="SAPConfiguration" generate="true" autocreate="true" >
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>	
+				<attribute qualifier="triggerMode"
+					type="DataLoadTriggerMode" generate="true" autocreate="true" >
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>				
+			</attributes>		
+		</itemtype>
+		<itemtype code="DataLoaderStopCronJob" autocreate="true"
+				generate="true" extends="CronJob">
+		</itemtype>
+		
+
+		
+	</itemtypes>
+
+</items>

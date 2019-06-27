@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<!-- enums -->
+	<enum class="de.hybris.platform.cms2.enums.SortDirection">
+		<value>ASC</value>
+		<value>DESC</value>
+	</enum>
+	
+
+	<!-- DTO for Pageable Search -->	
+
+	<bean class="de.hybris.platform.cms2.data.PageableData">
+		<description>POJO representation of search query pagination.</description>
+		<property name="pageSize" type="int">
+			<description>The number of results per page. A page may have less results if there are less than a full page of results, only on the last page in the results.</description>
+		</property>
+		<property name="currentPage" type="int">
+			<description>The current page number. The first page is number zero (0), the second page is number one (1), and so on.</description>
+		</property>
+		<property name="sort" type="String">
+			<description>The selected sort code.</description>
+		</property>
+	</bean>
+	
+	
+	<!-- DTOs for NamedQuery Service -->
+
+	<bean class="de.hybris.platform.cms2.namedquery.NamedQuery" template="resources/template/beans/simpleJavaBeanUsingWithMethods-template.vm">
+		<property name="queryName" type="java.lang.String" />
+		<property name="sort" type="java.util.List&lt;de.hybris.platform.cms2.namedquery.Sort>" />
+		<property name="currentPage" type="java.lang.Integer" />
+		<property name="pageSize" type="java.lang.Integer" />
+		<property name="parameters" type="java.util.Map&lt;String, ? extends Object>" />
+	</bean>
+
+	<bean class="de.hybris.platform.cms2.namedquery.NamedQueryConversionDto" template="resources/template/beans/simpleJavaBeanUsingWithMethods-template.vm">
+		<property name="query" type="java.lang.String" />
+		<property name="namedQuery" type="de.hybris.platform.cms2.namedquery.NamedQuery" />
+	</bean>
+
+	<bean class="de.hybris.platform.cms2.namedquery.Sort" template="resources/template/beans/simpleJavaBeanUsingWithMethods-template.vm">
+		<property name="parameter" type="java.lang.String" />
+		<property name="direction" type="de.hybris.platform.cms2.enums.SortDirection" />
+	</bean>
+
+	<bean class="de.hybris.platform.cms2.data.CMSItemSearchData">
+		<property name="mask" type="String" />
+		<property name="typeCode" type="String" />
+		<property name="typeCodes" type="java.util.List&lt;String&gt;" />
+		<property name="catalogId" type="String" />
+		<property name="catalogVersion" type="String" />
+		<property name="itemSearchParams" type="java.util.Map&lt;String, String&gt;" />
+	</bean>
+
+	<bean class="de.hybris.platform.cms2.data.CMSVersionSearchData">
+		<property name="mask" type="String" />
+		<property name="itemUid" type="String" />
+		<property name="itemCatalogId" type="String" />
+		<property name="itemCatalogVersion" type="String" />
+	</bean>
+
+	<bean class="de.hybris.platform.cms2.data.CMSItemData">
+		<property name="uid" type="String" />
+		<property name="catalogId" type="String" />
+		<property name="catalogVersion" type="String" />
+		<property name="pk" type="de.hybris.platform.core.PK" />
+		<property name="typeCode" type="String" />
+	</bean>
+
+	<!-- DTO for PreviewCriteriaData -->
+	<bean class="de.hybris.platform.cms2.data.PagePreviewCriteriaData">
+		<property name="versionUid" type="String" />
+	</bean>
+
+</beans>

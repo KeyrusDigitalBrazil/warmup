@@ -1,0 +1,68 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	   profile="backoffice_testing">
+
+	<alias alias="cockpitConfigurationService" name="onPremiseCockpitConfigurationService"/>
+	<bean id="onPremiseCockpitConfigurationService" parent="moduleAwareCockpitConfigurationService"
+		  class="com.hybris.backoffice.config.impl.TestingBackofficeCockpitConfigurationService">
+		<property name="contextStrategies">
+			<map merge="true">
+				<entry key="type" value-ref="typeConfigurationContextStrategy"/>
+				<entry key="source" value-ref="notificationSourceContextStrategy"/>
+				<entry key="module" value-ref="moduleConfigurationContextStrategy"/>
+			</map>
+		</property>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="typeService" ref="typeService"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="userService" ref="userService"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="obligatoryMergeAttributes">
+			<list merge="true">
+				<value>module</value>
+			</list>
+		</property>
+		<property name="resourceLoader">
+			<bean class="org.springframework.core.io.DefaultResourceLoader"/>
+		</property>
+		<property name="backofficeConfigurationMediaHelper" ref="backofficeConfigurationMediaHelper" />
+	</bean>
+
+	<alias alias="widgetPersistenceService" name="backofficeWidgetPersistenceService"/>
+	<bean id="backofficeWidgetPersistenceService"
+		  class="com.hybris.backoffice.config.impl.TestingBackofficeWidgetPersistenceService"
+		  parent="cockpitModuleWidgetPersistenceService">
+		<property name="mediaService" ref="mediaService"/>
+		<property name="backofficeConfigurationMediaHelper" ref="backofficeConfigurationMediaHelper" />
+	</bean>
+
+	<alias name="testBackofficeConfigurationTestingService" alias="backofficeConfigurationTestingService" />
+	<bean name="testBackofficeConfigurationTestingService" class="org.springframework.remoting.httpinvoker.HttpInvokerServiceExporter">
+		<property name="service">
+			<bean class="com.hybris.backoffice.selenium.remote.TestBackofficeConfigurationTestingService">
+				<property name="cockpitConfigurationService" ref="cockpitConfigurationService"/>
+				<property name="widgetPersistenceService" ref="widgetPersistenceService"/>
+				<property name="widgetUtils" ref="widgetUtils"/>
+				<property name="sessionService" ref="sessionService"/>
+				<property name="userService" ref="userService"/>
+				<property name="cockpitAdminService" ref="cockpitAdminService"/>
+				<property name="importService" ref="defaultImportService"/>
+				<property name="validationService" ref="validationService" />
+			</bean>
+		</property>
+		<property name="serviceInterface" value="com.hybris.backoffice.selenium.remote.BackofficeConfigurationTestingService"/>
+	</bean>
+
+</beans>

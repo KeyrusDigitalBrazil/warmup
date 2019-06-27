@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Field mapping configuration -->
+    <bean id="dataMapper"
+          class="de.hybris.platform.webservicescommons.mapping.impl.DefaultDataMapper">
+        <property name="fieldSetBuilder" ref="fieldSetBuilder"/>
+    </bean>
+
+    <bean id="fieldSetBuilder"
+          class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetBuilder">
+        <property name="defaultRecurrencyLevel" value="4"/>
+        <property name="defaultMaxFieldSetSize" value="50000"/>
+        <property name="fieldSetLevelHelper" ref="fieldSetLevelHelper"/>
+        <property name="subclassRegistry" ref="subclassRegistry"/>
+    </bean>
+
+    <alias alias="fieldSetLevelHelper" name="defaultFieldSetLevelHelper"/>
+    <bean id="defaultFieldSetLevelHelper"
+          class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetLevelHelper">
+    </bean>
+
+    <bean class="de.hybris.platform.webservicescommons.mapping.filters.GeneralFieldFilter">
+        <property name="fieldSelectionStrategy" ref="fieldSelectionStrategy"/>
+    </bean>
+
+    <bean id="cxActionFactory" class="de.hybris.platform.webservicescommons.mapping.config.DynamicTypeFactory"
+          init-method="init" p:baseType="de.hybris.platform.personalizationfacades.data.ActionData"/>
+
+    <bean id="cxActionFullFactory" class="de.hybris.platform.webservicescommons.mapping.config.DynamicTypeFactory"
+          init-method="init" p:baseType="de.hybris.platform.personalizationfacades.data.ActionFullData"/>
+
+    <bean id="cxExpressionFactory" class="de.hybris.platform.webservicescommons.mapping.config.DynamicTypeFactory"
+          init-method="init" p:baseType="de.hybris.platform.personalizationfacades.data.ExpressionData"/>
+
+    <bean id="cxTriggerFactory" class="de.hybris.platform.webservicescommons.mapping.config.DynamicTypeFactory"
+          init-method="init" p:baseType="de.hybris.platform.personalizationfacades.data.TriggerData"/>
+
+    <!-- Field mapping -->
+
+    <bean id="segmentTriggerDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.SegmentTriggerData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.SegmentTriggerData"/>
+    </bean>
+
+    <bean id="defaultTriggerDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.DefaultTriggerData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.DefaultTriggerData"/>
+    </bean>
+
+    <bean id="expressionTriggerDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData"/>
+    </bean>
+
+    <bean id="segmentExpressionDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.SegmentExpressionData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.SegmentExpressionData"/>
+    </bean>
+
+    <bean id="groupExpressionDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.GroupExpressionData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.GroupExpressionData"/>
+    </bean>
+
+    <bean id="negationExpressionDataFieldMapper" parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.personalizationfacades.data.NegationExpressionData"/>
+        <property name="destClass" value="de.hybris.platform.personalizationfacades.data.NegationExpressionData"/>
+    </bean>
+
+    <!-- Fieldset mapping -->
+
+    <bean parent="fieldSetLevelMapping" id="paginationDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.webservicescommons.dto.PaginationWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="count,totalCount,page,totalPages,hasNext,hasPrevious"/>
+                <entry key="DEFAULT" value="count,totalCount,page,totalPages,hasNext,hasPrevious"/>
+                <entry key="FULL" value="count,totalCount,page,totalPages,hasNext,hasPrevious"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="customerDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.CustomerData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="uid"/>
+                <entry key="DEFAULT" value="uid,segmentLinks(DEFAULT)"/>
+                <entry key="FULL" value="uid,segmentLinks(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="customerSegmentationListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.CustomerSegmentationListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="pagination(BASIC), customerSegmentations(BASIC)"/>
+                <entry key="DEFAULT" value="pagination(BASIC), customerSegmentations(DEFAULT)"/>
+                <entry key="FULL" value="pagination(BASIC), customerSegmentations(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="customerSegmentationDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.CustomerSegmentationData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,baseSite,affinity,provider,segment(DEFAULT),customer(DEFAULT)"/>
+                <entry key="FULL" value="code,baseSite,affinity,provider,segment(FULL),customer(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="segmentListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.SegmentListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="pagination(BASIC),segments(BASIC)"/>
+                <entry key="DEFAULT" value="pagination(BASIC),segments(DEFAULT)"/>
+                <entry key="FULL" value="pagination(BASIC),segmetns(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="segmentDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.SegmentData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code,description"/>
+                <entry key="DEFAULT" value="code,description,customerLinks(code,affinity,customer(BASIC)),segmentTriggers(code,groupBy,variation(BASIC))"/>
+                <entry key="FULL" value="code,description,customerLinks(code,affinity,customer(BASIC)),segmentTriggers(code,groupBy,variation(BASIC))"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="triggerListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.TriggerListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="triggers(BASIC)"/>
+                <entry key="DEFAULT" value="triggers(DEFAULT)"/>
+                <entry key="FULL" value="triggers(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="triggerDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.TriggerData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code"/>
+                <entry key="FULL" value="code,variation(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="segmentTriggerDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.SegmentTriggerData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,groupBy,segments(DEFAULT),variation(DEFAULT)"/>
+                <entry key="FULL" value="code,groupBy,segments(FULL),variation(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="defaultTriggerDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.DefaultTriggerData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,variation(DEFAULT)"/>
+                <entry key="FULL" value="code,variation(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="groupExpressionDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.GroupExpressionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="operator,elements(BASIC)"/>
+                <entry key="DEFAULT" value="operator,elements(DEFAULT)"/>
+                <entry key="FULL" value="operator,elements(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="negationExpressionDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.NegationExpressionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="element(BASIC)"/>
+                <entry key="DEFAULT" value="element(DEFAULT)"/>
+                <entry key="FULL" value="element(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="segmentExpressionDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.SegmentExpressionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code"/>
+                <entry key="FULL" value="code"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="expressionDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.ExpressionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="element(BASIC),elements(BASIC),code,operator"/>
+                <entry key="DEFAULT" value="element(DEFAULT),elements(DEFAULT),code,operator"/>
+                <entry key="FULL" value="element(FULL),elements(FULL),code,operator"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="expressionTriggerDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,expression(DEFAULT),variation(DEFAULT)"/>
+                <entry key="FULL" value="code,expression(FULL),variation(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="variationListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.VariationListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="variations(BASIC)"/>
+                <entry key="DEFAULT" value="variations(DEFAULT)"/>
+                <entry key="FULL" value="variations(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="variationDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.VariationData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code,name,active,enabled,status,rank"/>
+                <entry key="DEFAULT" value="code,name,active,enabled,status,rank,catalog,catalogVersion,actions(DEFAULT),customization(DEFAULT),triggers(DEFAULT)"/>
+                <entry key="FULL" value="code,name,active,enabled,status,rank,catalog,catalogVersion,customization(FULL),actions(FULL),triggers(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="customizationListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.CustomizationListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="pagination(BASIC),customizations(BASIC)"/>
+                <entry key="DEFAULT" value="pagination(BASIC),customizations(DEFAULT)"/>
+                <entry key="FULL" value="pagination(BASIC),customizations(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="customizationDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.CustomizationData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code,name,rank,active"/>
+                <entry key="DEFAULT" value="code,name,description,rank,active,status,enabledStartDate,enabledEndDate,catalog,catalogVersion,variations(DEFAULT)"/>
+                <entry key="FULL" value="code,name,description,rank,active,status,enabledStartDate,enabledEndDate,catalog,catalogVersion,variations(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="actionListWsDTOFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationwebservices.data.ActionListWsDTO"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="actions(BASIC)"/>
+                <entry key="DEFAULT" value="actions(DEFAULT)"/>
+                <entry key="FULL" value="actions(FULL)"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean parent="fieldSetLevelMapping" id="actionDataFieldSetLevelMapping">
+        <property name="dtoClass" value="de.hybris.platform.personalizationfacades.data.ActionData"/>
+        <property name="levelMapping">
+            <map>
+                <entry key="BASIC" value="code"/>
+                <entry key="DEFAULT" value="code,catalog,catalogVersion"/>
+                <entry key="FULL" value="code,catalog,catalogVersion"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+	<itemtypes>
+	    <itemtype code="AbstractRuleBasedPromotionAction"  autocreate="false" generate="false">
+	        <attributes>
+	        	<attribute qualifier="usedCouponCodes" type="StringCollection">
+                    <persistence type="property" />
+                </attribute>
+	        </attributes>
+	    </itemtype>
+		<itemtype code="AbstractCoupon" abstract="true" jaloclass="de.hybris.platform.couponservices.jalo.AbstractCoupon"
+			extends="GenericItem" generate="true" autocreate="true">
+			<deployment table="Coupon" typecode="5400"/>
+			<attributes>
+				<attribute qualifier="couponId" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="name" type="localized:java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="startDate" type="java.util.Date">
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="endDate" type="java.util.Date">
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<modifiers optional="false"/>
+					<persistence type="property"/>				
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="UC_Coupon" unique="true">
+					<key attribute="couponId" />
+				</index>
+			</indexes>				
+		</itemtype>
+	
+		<itemtype code="SingleCodeCoupon" jaloclass="de.hybris.platform.couponservices.jalo.SingleCodeCoupon"
+			extends="AbstractCoupon" generate="true" autocreate="true">
+			<description>
+				A SingleCodeCoupon uses one coupon code (i.e. the inherited couponId attribute) for coupon redemption.
+				The additional attributes allow to restrict the number of times the coupon can be redeemed.
+			</description>
+			<attributes>
+				<attribute qualifier="maxRedemptionsPerCustomer" type="java.lang.Integer">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Integer.valueOf(1)</defaultvalue>
+				</attribute>
+				<attribute qualifier="maxTotalRedemptions" type="java.lang.Integer">
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Integer.valueOf(100)</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="MultiCodeCoupon" jaloclass="de.hybris.platform.couponservices.jalo.MultiCodeCoupon"
+			extends="AbstractCoupon" generate="true" autocreate="true">
+			<description>A MultiCodeCoupon uses generated coupon codes for coupon redemption. The (inherited) couponId attribute functions as a prefix for the generated coupon codes.</description>
+			<attributes>
+				<attribute qualifier="codeGenerationConfiguration" type="CodeGenerationConfiguration">
+					<modifiers optional="false" />
+					<persistence type="property"/>				
+				</attribute>
+				<attribute qualifier="generatedCodes" type="MediaCollection">
+					<persistence type="property"/>
+				</attribute>
+				<!-- start: internal attributes for coupon code generation -->
+				<attribute qualifier="alphabet" type="java.lang.String">
+					<modifiers initial="true" write="false"/>
+					<persistence type="property"/>				
+					<description>used for coupon code generation. The alphabet is a 16 character long distinct set of characters.</description>
+				</attribute>
+				<attribute qualifier="signature" type="java.lang.String">
+					<modifiers initial="true" write="false"/>
+					<persistence type="property"/>				
+					<description>used for coupon code generation. The signature is a base64 encoded signature used for the ciphertext part of the coupon code.</description>
+				</attribute>
+				<attribute qualifier="couponCodeNumber" type="java.lang.Long">
+					<modifiers optional="false" />
+					<persistence type="property"/>				
+					<description>used for coupon code generation. The coupon code number functions as a seed for coupon codes.</description>
+					<defaultvalue>java.lang.Long.valueOf(0L)</defaultvalue>
+				</attribute>
+				<!-- end: internal attributes for coupon code generation -->
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="CodeGenerationConfiguration" jaloclass="de.hybris.platform.couponservices.jalo.CodeGenerationConfiguration"
+			extends="GenericItem" generate="true" autocreate="true">
+			<deployment table="CodeGenerationConfig" typecode="5405" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers unique="true" optional="false" />
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="codeSeparator" type="java.lang.String">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+					<defaultvalue>new java.lang.String("-")</defaultvalue>
+				</attribute>
+				<attribute qualifier="couponPartCount" type="int">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Integer.valueOf(4)</defaultvalue>
+				</attribute>
+				<attribute qualifier="couponPartLength" type="int">
+					<modifiers optional="false" />
+					<persistence type="property"/>
+					<defaultvalue>java.lang.Integer.valueOf(4)</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CouponRedemption" jaloclass="de.hybris.platform.couponservices.jalo.CouponRedemption"
+			extends="GenericItem" generate="true" autocreate="true">
+			<deployment table="CouponRedemption" typecode="5401" />
+			<attributes>
+				<attribute qualifier="couponCode" type="java.lang.String">
+					<modifiers optional="false"/>	
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="coupon" type="AbstractCoupon">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="order" type="AbstractOrder">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="user" type="User">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IDX_CouponRedemption">
+					<key attribute="couponCode" />
+				</index>
+			</indexes>
+		</itemtype>
+				
+		<itemtype code="AbstractOrder" autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="appliedCouponCodes" type="StringCollection">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="RuleBasedAddCouponAction"
+			extends="AbstractRuleBasedPromotionAction"
+			jaloclass="de.hybris.platform.couponservices.jalo.RuleBasedAddCouponAction"
+			autocreate="true"
+			generate="true">
+			<attributes>
+				<attribute
+					qualifier="couponId"
+					autocreate="true"
+					type="java.lang.String">
+					<description>Coupon Id</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute
+					qualifier="couponCode"
+					autocreate="true"
+					type="java.lang.String">
+					<description>Coupon Code</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

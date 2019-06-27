@@ -1,0 +1,274 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$consentEmail=({{ SELECT {ct.pk} FROM {ConsentTemplate AS ct} WHERE {ct.id}='SAPYMKT_EMAIL' }})
+$consentPers=({{ SELECT {ct.pk} FROM {ConsentTemplate AS ct} WHERE {ct.id}='SAPYMKT_PERS' }})
+$consentDisabled=NOT EXISTS $consentPers
+$consentFilter=({{ SELECT {cons.customer} FROM {Consent AS cons} WHERE {cons.consentTemplate} IN $consentPers AND ?session.user.currentTime > {cons.consentGivenDate} AND \
+({cons.consentWithdrawnDate} IS NULL OR ?session.user.currentTime < {cons.consentWithdrawnDate}) }})
+$consentFilterInteraction=({{ SELECT {cons.customer} FROM {Consent AS cons} WHERE {cons.consentTemplate} IN $consentPers AND ?session.user.currentTime > {cons.consentGivenDate} AND \
+({cons.consentWithdrawnDate} IS NULL OR ?session.user.currentTime < {cons.consentWithdrawnDate}) AND {item.modifiedtime} > {cons.consentGivenDate} }})
+$customerFilter=({{ SELECT {pk} FROM {Customer} }})
+
+INSERT_UPDATE Catalog;id[unique=true]
+;electronicsProductCatalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true]
+;electronicsProductCatalog;Online
+
+#-------------------------------------------------------------------------------------------#
+#--------------- Customer, Address, Order, Order Entry, Product, and Category---------------#
+#-------------------------------------------------------------------------------------------#
+
+# Stream Container
+INSERT_UPDATE Y2YStreamConfigurationContainer ; id[unique = true]                ; catalogVersion(catalog(id), version) ; dataHubExtension ; feed                                 ; pool                                 ; targetSystem
+											  ; ymktCustomerStreamContainer      ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_OUTBOUND_FEED            ; YMKT_HYBRIS_OUTBOUND_POOL            ; yMKT-CUAN_IMPORT_SRV
+											  ; ymktReviewStreamContainer        ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_OUTBOUND_FEED            ; YMKT_HYBRIS_OUTBOUND_POOL            ; yMKT-CUAN_IMPORT_SRV
+											  ; ymktProductStreamContainer       ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_OUTBOUND_FEED            ; YMKT_HYBRIS_OUTBOUND_POOL            ; yMKT-CUAN_IMPORT_SRV
+											  ; ymktCategoryStreamContainer      ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_OUTBOUND_FEED            ; YMKT_HYBRIS_OUTBOUND_POOL            ; yMKT-CUAN_IMPORT_SRV
+                                              ; ymktOrderStreamContainer         ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_ORDER_OUTBOUND_FEED      ; YMKT_HYBRIS_ORDER_OUTBOUND_POOL      ; yMKT-CUAN_BUSINESS_DOCUMENT_IMP_SRV
+                                              ; ymktSavedCartStreamContainer     ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_SAVED_CART_OUTBOUND_FEED ; YMKT_HYBRIS_SAVED_CART_OUTBOUND_POOL ; yMKT-CUAN_BUSINESS_DOCUMENT_IMP_SRV
+                                              ; ymktAbandonedCartStreamContainer ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_OUTBOUND_FEED            ; YMKT_HYBRIS_OUTBOUND_POOL            ; yMKT-CUAN_IMPORT_SRV
+                                              ; ymktConsentEmailStreamContainer  ; electronicsProductCatalog:Online     ; ymkt-raw         ; YMKT_HYBRIS_CONSENT_EMAIL_FEED       ; YMKT_HYBRIS_CONSENT_EMAIL_POOL       ; yMKT-CUAN_IMPORT_SRV
+# Stream Configurations
+INSERT_UPDATE Y2YStreamConfiguration ; streamId[unique = true]          ; container(id)                    ; itemTypeForStream(code) ; dataHubType     ; whereClause                                                                       ; infoExpression
+                                     ; ymktCustomerStreamCoCo           ; ymktCustomerStreamContainer      ; Customer                ; CustomerRaw     ; {item.uid} != 'anonymous'                                                         \
+                                     																													 AND                                                                               \
+                                     																													 ($consentDisabled OR {item.pk} IN $consentFilter)                                 ; "%deleteViaRaw%customerID->#{getCustomerID()}"
+
+                                     ; ymktAddressStreamCoCo            ; ymktCustomerStreamContainer      ; Address                 ; AddressRaw      ; {item.original} IS NULL                                                           \
+                                     																													 AND                                                                               \
+                                     																													 {item.owner} IN $customerFilter                                                   \
+                                     																													 AND                                                                               \
+                                     																													 ($consentDisabled OR {item.owner} IN $consentFilter)                              ; "%deleteViaRaw%pk->#{getPk().toString()}"
+
+                                     ; ymktOrderStreamCoCo              ; ymktOrderStreamContainer         ; Order                   ; OrderRaw        ; {item.user} IN $customerFilter                                                    \
+                                     																													 AND                                                                               \
+                                     																													 ($consentDisabled OR {item.user} IN $consentFilterInteraction)                    ; "%deleteViaRaw%code->#{getCode()}"
+
+                                     ; ymktOrderEntryStreamCoCo         ; ymktOrderStreamContainer         ; OrderEntry              ; OrderEntryRaw   ; {item.order} IN                                                                   \
+                                     																													 ({{                                                                               \
+                                     																													 	SELECT {o.pk} FROM {Order AS o} WHERE {o.user} IN $customerFilter              \
+                                                                                                                                                         	AND                                                                            \
+                                                                                                                                                         	($consentDisabled OR {o.user} IN $consentFilterInteraction)                    \
+                                                                                                                                                         }})                                                                               ; "%deleteViaRaw%order->#{getOrder().getCode()}|entryNumber->#{getEntryNumber()}"
+
+                                     ; ymktProductStreamCoCo            ; ymktProductStreamContainer       ; Product                 ; ProductRaw      ; {catalogVersion}=?catalogVersion                                                  ; "%deleteViaRaw%code->#{getCode()}"
+
+                                     ; ymktCategoryStreamCoCo           ; ymktCategoryStreamContainer      ; Category                ; CategoryRaw     ; {catalogVersion}=?catalogVersion                                                  ; "%deleteViaRaw%code->#{getCode()}|catalogVersion->#{getCatalogVersion().getVersion()}"
+
+                                     ; ymktMediaStreamCoCo              ; ymktProductStreamContainer       ; Media                   ; MediaRaw        ; {catalogVersion}=?catalogVersion                                                  ; "%deleteViaRaw%code->#{getCode()}|catalogVersion->#{getCatalogVersion().getVersion()}"
+
+                                     ; ymktCustomerReviewStreamCoCo     ; ymktReviewStreamContainer        ; CustomerReview          ; ReviewRaw       ; {item.blocked}=0                                                                  \
+                                     																													 AND                                                                               \
+                                     																													 {item.approvalstatus} IN                                                          \
+                                     																													 ({{                                                                               \
+                                     																													 	SELECT {c.pk} FROM {CustomerReviewApprovalType as c} WHERE {c.code}='approved' \
+                                     																													 }})                                                                               \
+                                     																													 AND                                                                               \
+                                     																													 {item.product} IN                                                                 \
+                                     																													 ({{                                                                               \
+                                     																													 	SELECT {p.pk} FROM {Product as p} WHERE {p.catalogVersion}=?catalogVersion     \
+                                     																													 }})                                                                               \
+                                     																													 AND                                                                               \
+                                     																													 {item.user} IN $customerFilter                                                    \
+                                     																													 AND                                                                               \ 
+                                     																													 ($consentDisabled OR {item.user} IN $consentFilterInteraction)                    ; "%deleteViaRaw%pk->#{getPk().toString()}"
+                                    
+                                     ; ymktSavedCartStreamCoCo          ; ymktSavedCartStreamContainer     ; Cart                    ; CartRaw         ; {item.saveTime} IS NOT NULL                                                       \
+                                     																													 AND                                                                               \
+                                     																													 {item.user} IN $customerFilter                                                    \ 
+                                     																													 AND                                                                               \
+                                     																													 ($consentDisabled                                                                 \ 
+                                     																													 OR                                                                                \
+                                     																													 ({item.user} IN $consentFilterInteraction                                         \ 
+                                     																													 AND                                                                               \
+                                     																													 ({item.savedBy} IS NULL OR {item.savedBy} IN $consentFilterInteraction)))         ; "%deleteViaRaw%code->#{getCode()}"
+                                     
+                                     ; ymktSavedCartEntryStreamCoCo     ; ymktSavedCartStreamContainer     ; CartEntry               ; CartEntryRaw    ; {item.order} IN                                                                   \
+                                     																													 ({{                                                                               \
+                                     																													 	SELECT {c.pk} FROM {Cart AS c} WHERE {c.saveTime} IS NOT NULL                  \ 
+                                     																													 	AND                                                                            \
+                                     																													 	{c.user} IN $customerFilter                                                    \ 
+                                     																													 	AND                                                                            \
+                                     																											         	($consentDisabled                                                              \
+                                     																											         	OR                                                                             \
+                                     																											         	({c.user} IN $consentFilterInteraction                                         \ 
+                                     																											         	AND                                                                            \
+                                     																											         	({c.savedBy} IS NULL OR {c.savedBy} IN $consentFilterInteraction)))            \
+                                     																											         }})                                                                               ; "%deleteViaRaw%order->#{getOrder().getCode()}|entryNumber->#{getEntryNumber()}"
+                                     
+                                     ; ymktAbandonedCartStreamCoCo      ; ymktAbandonedCartStreamContainer ; Cart                    ; CartRaw         ; ?session.user.currentTime > {item.modifiedtime} + INTERVAL 2 HOUR                 \
+                                     																													 AND                                                                               \
+                                     																													 {item.saveTime} IS NULL                                                           \ 
+                                     																													 AND                                                                               \
+                                     																													 {item.user} IN $customerFilter                                                    \ 
+                                     																													 AND                                                                               \
+                                     																													 ($consentDisabled                                                                 \ 
+                                     																													 OR                                                                                \
+                                     																													 ({item.user} IN $consentFilterInteraction                                         \ 
+                                     																													 AND                                                                               \
+                                     																													 ({item.savedBy} IS NULL OR {item.savedBy} IN $consentFilterInteraction)))         ; "%deleteViaRaw%code->#{getCode()}"
+                                     
+                                     ; ymktAbandonedCartEntryStreamCoCo ; ymktAbandonedCartStreamContainer ; CartEntry               ; CartEntryRaw    ; ?session.user.currentTime > {item.modifiedtime} + INTERVAL 2 HOUR                 \ 
+                                     																													 AND                                                                               \
+                                     																													 {item.order} IN                                                                   \ 
+                                     																													 ({{                                                                               \
+                                     																													 	SELECT {c.pk} FROM {Cart AS c} WHERE {c.saveTime} IS NULL                      \ 
+                                     																													 	AND                                                                            \
+                                     																													 	{c.user} IN $customerFilter                                                    \ 
+                                     																													 	AND                                                                            \
+                                     																													 	($consentDisabled                                                              \ 
+                                     																													 	OR                                                                             \
+                                     																													 	({c.user} IN $consentFilterInteraction                                         \ 
+                                     																													 	AND                                                                            \
+                                     																													 	({c.savedBy} IS NULL OR {c.savedBy} IN $consentFilterInteraction)))            \ 
+                                     																													 }})                                                                               ; "%deleteViaRaw%order->#{getOrder().getCode()}|entryNumber->#{getEntryNumber()}"
+                                     
+                                     ; ymktConsentEmailStreamCoCo       ; ymktConsentEmailStreamContainer  ; Consent                 ; ConsentEmailRaw ; {item.consentTemplate} IN $consentEmail                                           ; "%deleteViaRaw%pk->#{getPk().toString()}"
+
+# Column Definitions
+INSERT_UPDATE Y2YColumnDefinition ; position[unique = true] ; attributeDescriptor(enclosingType(code), qualifier) ; impexHeader                                                                                                                       ; streamConfiguration(streamId)[unique = true] ; columnName  
+# Customer
+                                  ; 0                       ; Customer:customerID                                 ; customerID[unique=true]                                                                                                           ; ymktCustomerStreamCoCo                       ;
+                                  ; 1                       ; Customer:uid                                        ; uid                                                                                                                               ; ymktCustomerStreamCoCo                       ;
+                                  ; 2                       ; Customer:name                                       ; name                                                                                                                              ; ymktCustomerStreamCoCo                       ;
+                                  ; 3                       ; Customer:title                                      ; title(code)                                                                                                                       ; ymktCustomerStreamCoCo                       ;
+                                  ; 4                       ; Customer:defaultPaymentAddress                      ; defaultPaymentAddress                                                                                                             ; ymktCustomerStreamCoCo                       ;
+                                  ; 5                       ; Customer:modifiedtime                               ; modifiedtime[dateformat=dd.MM.yyyy HH:mm:ss]                                                                                      ; ymktCustomerStreamCoCo                       ;
+# Address
+                                  ; 0                       ; Address:pk                                          ; PK[cellDecorator=de.hybris.platform.impex.jalo.header.ExternalImportKeyCellDecorator, sourceSystemId=sourcePlatform, unique=true] ; ymktAddressStreamCoCo                        ;
+                                  ; 1                       ; Address:firstname                                   ; firstname                                                                                                                         ; ymktAddressStreamCoCo                        ;
+                                  ; 2                       ; Address:lastname                                    ; lastname                                                                                                                          ; ymktAddressStreamCoCo                        ;
+                                  ; 3                       ; Address:middlename                                  ; middlename                                                                                                                        ; ymktAddressStreamCoCo                        ;
+                                  ; 4                       ; Address:dateOfBirth                                 ; dateOfBirth[dateformat=dd.MM.yyyy HH:mm:ss]                                                                                       ; ymktAddressStreamCoCo                        ;
+                                  ; 5                       ; Address:gender                                      ; gender(code)                                                                                                                      ; ymktAddressStreamCoCo                        ;
+                                  ; 6                       ; Address:phone1                                      ; phone1                                                                                                                            ; ymktAddressStreamCoCo                        ;
+                                  ; 7                       ; Address:phone2                                      ; phone2                                                                                                                            ; ymktAddressStreamCoCo                        ;
+                                  ; 8                       ; Address:cellphone                                   ; cellphone                                                                                                                         ; ymktAddressStreamCoCo                        ;
+                                  ; 9                       ; Address:email                                       ; email                                                                                                                             ; ymktAddressStreamCoCo                        ;
+                                  ; 10                      ; Address:company                                     ; company                                                                                                                           ; ymktAddressStreamCoCo                        ;
+                                  ; 11                      ; Address:billingAddress                              ; billingAddress                                                                                                                    ; ymktAddressStreamCoCo                        ;
+                                  ; 12                      ; Address:contactAddress                              ; contactAddress                                                                                                                    ; ymktAddressStreamCoCo                        ;
+                                  ; 13                      ; Address:unloadingAddress                            ; unloadingAddress                                                                                                                  ; ymktAddressStreamCoCo                        ;
+                                  ; 14                      ; Address:shippingAddress                             ; shippingAddress                                                                                                                   ; ymktAddressStreamCoCo                        ;
+                                  ; 15                      ; Address:streetname                                  ; streetname                                                                                                                        ; ymktAddressStreamCoCo                        ;
+                                  ; 16                      ; Address:streetnumber                                ; streetnumber                                                                                                                      ; ymktAddressStreamCoCo                        ;
+                                  ; 17                      ; Address:postalcode                                  ; postalcode                                                                                                                        ; ymktAddressStreamCoCo                        ;
+                                  ; 18                      ; Address:remarks                                     ; remarks                                                                                                                           ; ymktAddressStreamCoCo                        ;
+                                  ; 19                      ; Address:town                                        ; town                                                                                                                              ; ymktAddressStreamCoCo                        ;
+                                  ; 20                      ; Address:region                                      ; region(isocodeShort)                                                                                                              ; ymktAddressStreamCoCo                        ;
+                                  ; 21                      ; Address:country                                     ; country(isocode)                                                                                                                  ; ymktAddressStreamCoCo                        ;
+                                  ; 22                      ; Address:owner                                       ; owner(Customer.customerID)                                                                                                        ; ymktAddressStreamCoCo                        ;
+# Order
+                                  ; 0                       ; Order:code                                          ; code[unique=true]                                                                                                                 ; ymktOrderStreamCoCo                          ;
+                                  ; 1                       ; Order:entries                                       ; entries(entryNumber)                                                                                                              ; ymktOrderStreamCoCo                          ;
+                                  ; 2                       ; Order:user                                          ; user(Customer.customerID)                                                                                                         ; ymktOrderStreamCoCo                          ;
+                                  ; 3                       ; Order:modifiedtime                                  ; modifiedtime[dateformat=dd.MM.yyyy HH:mm:ssXXX]                                                                                   ; ymktOrderStreamCoCo                          ;
+                                  ; 4                       ; Order:totalPrice                                    ; totalPrice[numberformat=##################.######]                                                                                ; ymktOrderStreamCoCo                          ;
+                                  ; 5                       ; Order:currency                                      ; currency(isocode)                                                                                                                 ; ymktOrderStreamCoCo                          ;
+                                  ; 6                       ; Order:status                                        ; status(code)                                                                                                                      ; ymktOrderStreamCoCo                          ; orderStatus
+                                  ; 7                       ; Order:ymktTrackingId                                ; ymktTrackingId                                                                                                                    ; ymktOrderStreamCoCo                          ;
+# Order Entry
+                                  ; 0                       ; OrderEntry:order                                    ; order(code)[unique=true]                                                                                                          ; ymktOrderEntryStreamCoCo                     ;
+                                  ; 1                       ; OrderEntry:entryNumber                              ; entryNumber[unique=true]                                                                                                          ; ymktOrderEntryStreamCoCo                     ;
+                                  ; 2                       ; OrderEntry:product                                  ; product(code)                                                                                                                     ; ymktOrderEntryStreamCoCo                     ;
+                                  ; 3                       ; OrderEntry:totalPrice                               ; totalPrice[numberformat=##################.######]                                                                                ; ymktOrderEntryStreamCoCo                     ;
+                                  ; 4                       ; OrderEntry:quantity                                 ; quantity[numberformat=##################]                                                                                         ; ymktOrderEntryStreamCoCo                     ;
+                                  ; 5                       ; OrderEntry:unit                                     ; unit(code)                                                                                                                        ; ymktOrderEntryStreamCoCo                     ;
+# Product
+                                  ; 0                       ; Product:code                                        ; code[unique=true]                                                                                                                 ; ymktProductStreamCoCo                        ;
+                                  ; 1                       ; Product:name                                        ; name[lang=en]                                                                                                                     ; ymktProductStreamCoCo                        ;
+                                  ; 2                       ; Product:description                                 ; description[lang=en]                                                                                                              ; ymktProductStreamCoCo                        ;
+                                  ; 3                       ; Product:picture                                     ; picture(code, catalogVersion(catalog(id), version))                                                                               ; ymktProductStreamCoCo                        ;
+                                  ; 4                       ; Product:catalogVersion                              ; catalogVersion(catalog(id), version)[unique=true]                                                                                 ; ymktProductStreamCoCo                        ;
+                                  ; 5                       ; Product:thumbnail                                   ; thumbnail(code, catalogVersion(catalog(id), version))                                                                             ; ymktProductStreamCoCo                        ;
+                                  ; 6                       ; Product:supercategories                             ; supercategories(code, catalogVersion(catalog(id), version))                                                                       ; ymktProductStreamCoCo                        ;
+                                  ; 7                       ; Product:detail                                      ; detail(code, catalogVersion(catalog(id), version))                                                                                ; ymktProductStreamCoCo                        ;
+                                  ; 8                       ; Product:unit                                        ; unit(code)                                                                                                                        ; ymktProductStreamCoCo                        ;
+# Category
+                                  ; 0                       ; Category:code                                       ; code[unique=true]                                                                                                                 ; ymktCategoryStreamCoCo                       ;
+                                  ; 1                       ; Category:name                                       ; name[lang=en]                                                                                                                     ; ymktCategoryStreamCoCo                       ;
+                                  ; 2                       ; Category:supercategories                            ; supercategories(code, catalogVersion(catalog(id), version))                                                                       ; ymktCategoryStreamCoCo                       ;
+                                  ; 3                       ; Category:description                                ; description[lang=en]                                                                                                              ; ymktCategoryStreamCoCo                       ;
+                                  ; 4                       ; Category:catalogVersion                             ; catalogVersion(catalog(id), version)[unique=true]                                                                                 ; ymktCategoryStreamCoCo                       ;
+# Media
+                                  ; 0                       ; Media:code                                          ; code[unique=true]                                                                                                                 ; ymktMediaStreamCoCo                          ;
+                                  ; 1                       ; Media:catalogVersion                                ; catalogVersion(catalog(id), version)[unique=true]                                                                                 ; ymktMediaStreamCoCo                          ;
+                                  ; 2                       ; Media:URL                                           ; URL                                                                                                                               ; ymktMediaStreamCoCo                          ;
+# Customer Review
+                                  ; 0                       ; CustomerReview:pk                                   ; pk[unique=true]                                                                                                                   ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 1                       ; CustomerReview:user                                 ; user(Customer.customerID)                                                                                                         ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 2                       ; CustomerReview:product                              ; product(code)                                                                                                                     ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 3                       ; CustomerReview:comment                              ; comment                                                                                                                           ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 4                       ; CustomerReview:headline                             ; headline                                                                                                                          ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 5                       ; CustomerReview:rating                               ; rating                                                                                                                            ; ymktCustomerReviewStreamCoCo                 ;
+                                  ; 6                       ; CustomerReview:modifiedtime                         ; modifiedtime[dateformat=dd.MM.yyyy HH:mm:ssXXX]                                                                                   ; ymktCustomerReviewStreamCoCo                 ;
+# Saved Cart
+                                  ; 0                       ; Cart:code                                           ; code[unique=true]                                                                                                                 ; ymktSavedCartStreamCoCo                      ;
+                                  ; 1                       ; Cart:entries                                        ; entries(entryNumber)                                                                                                              ; ymktSavedCartStreamCoCo                      ;
+                                  ; 2                       ; Cart:name                                           ; name                                                                                                                              ; ymktSavedCartStreamCoCo                      ;
+                                  ; 3                       ; Cart:description                                    ; description                                                                                                                       ; ymktSavedCartStreamCoCo                      ;
+                                  ; 4                       ; Cart:user                                           ; user(Customer.customerID)                                                                                                         ; ymktSavedCartStreamCoCo                      ;
+                                  ; 5                       ; Cart:modifiedtime                                   ; modifiedtime[dateformat=dd.MM.yyyy HH:mm:ssXXX]                                                                                   ; ymktSavedCartStreamCoCo                      ;
+                                  ; 6                       ; Cart:totalPrice                                     ; totalPrice[numberformat=##################.######]                                                                                ; ymktSavedCartStreamCoCo                      ;
+                                  ; 7                       ; Cart:currency                                       ; currency(isocode)                                                                                                                 ; ymktSavedCartStreamCoCo                      ;
+                                  ; 8                       ; Cart:ymktTrackingId                                 ; ymktTrackingId                                                                                                                    ; ymktSavedCartStreamCoCo                      ;
+# Saved Cart Entry
+                                  ; 0                       ; CartEntry:order                                     ; order(code)[unique=true]                                                                                                          ; ymktSavedCartEntryStreamCoCo                 ;
+                                  ; 1                       ; CartEntry:entryNumber                               ; entryNumber[unique=true]                                                                                                          ; ymktSavedCartEntryStreamCoCo                 ;
+                                  ; 2                       ; CartEntry:product                                   ; product(code)                                                                                                                     ; ymktSavedCartEntryStreamCoCo                 ;
+                                  ; 3                       ; CartEntry:totalPrice                                ; totalPrice[numberformat=##################.######]                                                                                ; ymktSavedCartEntryStreamCoCo                 ;
+                                  ; 4                       ; CartEntry:quantity                                  ; quantity[numberformat=##################]                                                                                         ; ymktSavedCartEntryStreamCoCo                 ;
+                                  ; 5                       ; CartEntry:unit                                      ; unit(code)                                                                                                                        ; ymktSavedCartEntryStreamCoCo                 ;
+# Abandoned Cart
+                                  ; 0                       ; Cart:code                                           ; code[unique=true]                                                                                                                 ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 1                       ; Cart:entries                                        ; entries(entryNumber)                                                                                                              ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 2                       ; Cart:name                                           ; name                                                                                                                              ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 3                       ; Cart:description                                    ; description                                                                                                                       ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 4                       ; Cart:user                                           ; user(Customer.customerID)                                                                                                         ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 5                       ; Cart:modifiedtime                                   ; modifiedtime[dateformat=dd.MM.yyyy HH:mm:ssXXX]                                                                                   ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 6                       ; Cart:totalPrice                                     ; totalPrice[numberformat=##################.######]                                                                                ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 7                       ; Cart:currency                                       ; currency(isocode)                                                                                                                 ; ymktAbandonedCartStreamCoCo                  ;
+                                  ; 8                       ; Cart:ymktTrackingId                                 ; ymktTrackingId                                                                                                                    ; ymktAbandonedCartStreamCoCo                  ;
+# Abandoned Cart Entry
+                                  ; 0                       ; CartEntry:order                                     ; order(code)[unique=true]                                                                                                          ; ymktAbandonedCartEntryStreamCoCo             ;
+                                  ; 1                       ; CartEntry:entryNumber                               ; entryNumber[unique=true]                                                                                                          ; ymktAbandonedCartEntryStreamCoCo             ;
+                                  ; 2                       ; CartEntry:product                                   ; product(code)                                                                                                                     ; ymktAbandonedCartEntryStreamCoCo             ;
+                                  ; 3                       ; CartEntry:totalPrice                                ; totalPrice[numberformat=##################.######]                                                                                ; ymktAbandonedCartEntryStreamCoCo             ;
+                                  ; 4                       ; CartEntry:quantity                                  ; quantity[numberformat=##################]                                                                                         ; ymktAbandonedCartEntryStreamCoCo             ;
+                                  ; 5                       ; CartEntry:unit                                      ; unit(code)                                                                                                                        ; ymktAbandonedCartEntryStreamCoCo             ;
+# Email Consent
+                                  ; 0                       ; Consent:customer                                    ; customer(uid)[unique=true]                                                                                                        ; ymktConsentEmailStreamCoCo                   ;
+                                  ; 1                       ; Consent:consentWithdrawnDate                        ; consentWithdrawnDate[dateformat=dd.MM.yyyy HH:mm:ssXXX]                                                                           ; ymktConsentEmailStreamCoCo                   ;
+
+# Jobs
+INSERT_UPDATE Y2YSyncJob ; code[unique = true]            ; streamConfigurationContainer(id) ; syncType(code) ; sessionUser(uid) ;
+                         ; ymktCustomersToDatahubJob      ; ymktCustomerStreamContainer      ; DataHub        ; admin            ;
+                         ; ymktCustomersToZipJob          ; ymktCustomerStreamContainer      ; Zip            ; admin            ;
+                         ; ymktReviewsToDatahubJob        ; ymktReviewStreamContainer        ; DataHub        ; admin            ;
+                         ; ymktReviewsToZipJob            ; ymktReviewStreamContainer        ; Zip            ; admin            ;
+                         ; ymktProductsToDatahubJob       ; ymktProductStreamContainer       ; DataHub        ; admin            ;
+                         ; ymktProductsToZipJob           ; ymktProductStreamContainer       ; Zip            ; admin            ;
+                         ; ymktCategoriesToDatahubJob     ; ymktCategoryStreamContainer      ; DataHub        ; admin            ;
+                         ; ymktCategoriesToZipJob         ; ymktCategoryStreamContainer      ; Zip            ; admin            ;
+                         ; ymktOrdersToDatahubJob         ; ymktOrderStreamContainer         ; DataHub        ; admin            ;
+                         ; ymktOrdersToZipJob             ; ymktOrderStreamContainer         ; Zip            ; admin            ;
+                         ; ymktSavedCartsToDatahubJob     ; ymktSavedCartStreamContainer     ; DataHub        ; admin            ;
+                         ; ymktSavedCartsToZipJob         ; ymktSavedCartStreamContainer     ; Zip            ; admin            ;
+                         ; ymktAbandonedCartsToDatahubJob ; ymktAbandonedCartStreamContainer ; DataHub        ; admin            ;
+                         ; ymktAbandonedCartsToZipJob     ; ymktAbandonedCartStreamContainer ; Zip            ; admin            ;
+                         ; ymktConsentEmailsToDatahubJob  ; ymktConsentEmailStreamContainer  ; DataHub        ; admin            ;
+                         ; ymktConsentEmailsToZipJob      ; ymktConsentEmailStreamContainer  ; Zip            ; admin            ;
+
+# Triggers
+INSERT_UPDATE Trigger ; job(code)[unique=true,forceWrite=true] ; cronExpression   ;  
+#                     ; ymktToZipJob                           ; 0 0/10 * * * ? * ;  
+#                     ; ymktToZipJob                           ;                  ;

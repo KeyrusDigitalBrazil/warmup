@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<bean id="conditionsEditorSectionRenderer" class="de.hybris.platform.rulebuilderbackoffice.editors.conditionseditor.ConditionsEditorSectionRenderer"
+		parent="abstractEditorAreaComponentRenderer">
+		<property name="modelService" ref="modelService" />
+		<property name="ruleService" ref="ruleService" />
+		<property name="editorViewModelClass" value="de.hybris.platform.rulebuilderbackoffice.editors.conditionseditor.ConditionsEditorViewModel"/>
+	</bean>
+
+	<bean id="actionsEditorSectionRenderer" class="de.hybris.platform.rulebuilderbackoffice.editors.actionseditor.ActionsEditorSectionRenderer"
+		parent="abstractEditorAreaComponentRenderer">
+		<property name="modelService" ref="modelService" />
+		<property name="ruleService" ref="ruleService" />
+		<property name="editorViewModelClass" value="de.hybris.platform.rulebuilderbackoffice.editors.actionseditor.ActionsEditorViewModel"/>
+	</bean>
+
+	<bean id="rulebuilderbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator"
+		init-method="init" lazy-init="false">
+		<property name="location" value="/rulebuilderbackoffice-backoffice-labels/" />
+		<property name="name" value="labels" />
+	</bean>
+
+	<bean id="backofficeRuleParameterTypeFormatter" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.DefaultRuleParameterTypeFormatter">
+		<property name="formats">
+			<map>
+				<entry key="Enum\((.*)\)" value="java.lang.Enum(%s)" />
+				<entry key="List\(ItemType\((.*)\)\)" value="MultiReference-LIST(%s)" />
+				<entry key="ItemType\((.*)\)" value="Reference(%s)" />
+				<entry key="List\((.+)\)" value="List(%s)" />
+				<entry key="Map\((.+)\,\s*(.+)\)" value="Map(%s, %s)" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ruleParameterEnumLabelProvider" class="de.hybris.platform.rulebuilderbackoffice.labels.RuleParameterEnumLabelProvider">
+		<property name="l10NService" ref="l10nService" />
+	</bean>
+	
+	<cng:map-extender bean="editAvailabilityProviderFactory" property="editAvailabilityProviders">
+		<cng:put key-type="java.lang.Class" value-type="com.hybris.cockpitng.widgets.editorarea.renderer.EditAvailabilityProvider">
+			<entry key="de.hybris.platform.ruleengineservices.model.AbstractRuleModel" value-ref="abstractRuleEditAvailabilityProvider"/>
+		</cng:put>
+	</cng:map-extender>
+	
+	<bean id="abstractRuleEditAvailabilityProvider" class="de.hybris.platform.rulebuilderbackoffice.editors.AbstractRuleEditAvailabilityProvider">
+		<property name="ruleAllowedToEditPredicate" ref="ruleAllowedToEditPredicate"/>
+	</bean>
+</beans>

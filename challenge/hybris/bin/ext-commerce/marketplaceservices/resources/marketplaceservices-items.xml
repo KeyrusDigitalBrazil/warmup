@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+	<enumtypes>
+		<enumtype code="ArticleApprovalStatus" autocreate="false" generate="true" dynamic="false">
+			<value code="editing"/>
+		</enumtype>
+	</enumtypes>
+	<relations>
+		<relation code="Category2VendorRelation" autocreate="true" generate="true" localized="false">
+			<deployment table="Cat2VenRel" typecode="9867" />
+			<sourceElement qualifier="categories" type="Category" cardinality="many" ordered="false">
+				<description>Super Categories</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="vendors" type="Vendor" cardinality="many" ordered="false">
+				<description>Vendors</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="Vendor2VendorUserRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="vendor" type="Vendor" cardinality="one" ordered="false">
+				<description>Vendor</description>
+				<modifiers read="true" write="true" search="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="vendorUsers" type="VendorUser" cardinality="many" ordered="false">
+				<description>VendorUser</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+		<relation code="Vendor2UsergroupRelation" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="vendor" type="Vendor" cardinality="one" ordered="false">
+				<description>Vendor</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</sourceElement>
+			<targetElement qualifier="userGroups" type="UserGroup" cardinality="many" ordered="false">
+				<description>UserGroups</description>
+				<modifiers read="true" write="true" search="true" optional="true" />
+			</targetElement>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+		<typegroup name="bizitems">
+			<itemtype generate="false" code="Vendor" autocreate="false">
+				<attributes>
+					<attribute qualifier="active" type="boolean">
+						<modifiers read="true" write="true" optional="true" />
+						<defaultvalue>Boolean.FALSE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+					<attribute autocreate="true" qualifier="catalog" type="Catalog">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute autocreate="true" qualifier="logo" type="MediaContainer">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="satisfactionRating">
+		                <description>Satisfaction level</description>
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="deliveryRating">
+		                <description>Delivery speed</description>
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="communicationRating">
+		                <description>Communication effectiveness</description>
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="averageRating">
+		                <description>Average rating</description>
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Long" qualifier="reviewCount">
+		                <description>Number of Reviews</description>
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="VendorUser" extends="Employee" autocreate="true" generate="true" />
+
+			<itemtype code="CustomerVendorReview" autocreate="true" generate="true">
+				<deployment table="CustomerVendorReviews" typecode="9868" />
+				<attributes>
+	                <attribute type="User" qualifier="user">
+	                    <persistence type="property"/>
+	                    <modifiers initial="true" read="true" write="false" optional="false"/>
+	                </attribute>
+	                <attribute type="Consignment" qualifier="consignment">
+	                    <persistence type="property"/>
+	                    <modifiers initial="true" read="true" write="false" optional="false"/>
+	                </attribute>
+					<attribute type="java.lang.Double" qualifier="satisfaction">
+		                <description>Satisfaction level</description>
+						<modifiers initial="true" read="true" write="false" optional="false" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="delivery">
+		                <description>Delivery speed</description>
+						<modifiers initial="true" read="true" write="false" optional="false" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.Double" qualifier="communication">
+		                <description>Communication effectiveness</description>
+						<modifiers initial="true" read="true" write="false" optional="false" />
+						<persistence type="property" />
+					</attribute>
+		            <attribute type="java.util.Date" qualifier="createDate">
+		                <description>Date when the review is created</description>
+		                <modifiers initial="true" read="true" write="false" optional="false"/>
+		                <persistence type="property"/>
+		            </attribute>
+					<attribute type="CustomerReviewApprovalType" qualifier="approvalStatus">
+						<description>Review approval status</description>
+						<persistence type="property" />
+						<modifiers initial="true" read="true" write="true" optional="false" />
+						<defaultvalue>em().getEnumerationValue("CustomerReviewApprovalType","pending")</defaultvalue>
+					</attribute>
+					<attribute type="Vendor" qualifier="vendor">
+		                <description>Target vendor</description>
+						<modifiers initial="true" read="true" write="false" optional="false" />
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.String" qualifier="comment">
+						<description>
+						Comment for the customer vendor review
+						</description>
+						<modifiers initial="true" optional="true" />
+						<persistence type="property">
+							<columntype database="oracle">
+								<value>CLOB</value>
+							</columntype>
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+					</attribute>
+					<attribute qualifier="language" type="Language">
+						<description>The language context</description>
+						<persistence type="property" />
+						<modifiers read="true" write="true" optional="true" />
+					</attribute>
+				</attributes>
+                <indexes>
+                    <index name="IDX_CONSIGNMENT">
+                        <key attribute="consignment"/>
+                    </index>
+                    <index name="IDX_VENDOR">
+                        <key attribute="vendor"/>
+                    </index>
+                </indexes>
+			</itemtype>
+
+			<itemtype code="Product" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="vendorSku" type="java.lang.String">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+					<attribute qualifier="saleable" type="java.lang.Boolean">
+						<modifiers read="true" write="true" optional="true" />
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+
+			<itemtype code="Consignment" autocreate="false" generate="false">
+				<attributes>
+					<attribute qualifier="totalPrice" type="java.lang.Double">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+
+		<typegroup name="cmsitems">
+			<itemtype code="ProductCarouselComponent" autocreate="false" generate="false">
+				<attributes>
+					<attribute type="localized:Media" qualifier="media">
+						<persistence type="property" />
+						<modifiers />
+						<description>Localized media that is displayed in the component.</description>
+					</attribute>
+					<attribute qualifier="url" type="java.lang.String">
+						<persistence type="property" />
+					</attribute>
+					
+					<attribute qualifier="vendorCarouselCode" type="java.lang.String">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+										
+				</attributes>
+			</itemtype>
+
+			<itemtype code="VendorPage" extends="AbstractPage" jaloclass="de.hybris.platform.marketplaceservices.jalo.VendorPage"
+				generate="true" singleton="false" jaloonly="false" metatype="CMSPageType" autocreate="true" />
+
+			<itemtype code="CMSVendorRestriction" jaloclass="de.hybris.platform.marketplaceservices.jalo.restrictions.VendorRestriction"
+				extends="AbstractRestriction" autocreate="true" generate="true">
+				<attributes>
+					<attribute qualifier="vendor" type="Vendor">
+						<modifiers read="true" write="true" optional="true" />
+						<persistence type="property" />
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

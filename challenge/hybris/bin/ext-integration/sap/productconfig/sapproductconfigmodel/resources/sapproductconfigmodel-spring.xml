@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="sapProductConfigDefaultDataLoaderJob"
+	      class="de.hybris.platform.sap.productconfig.model.cronjob.DataLoaderJob"
+	      parent="abstractJobPerformable">
+		<property name="dataLoaderManagerContainer" ref="sapProductConfigDataLoaderManagerContainer" />
+		<property name="dataLoader" ref="sapProductConfigDataLoader" />			      
+		<property name="dataLoaderConfigurationHelper" ref="sapProductConfigDataLoaderConfigurationHelper" />			      
+		<property name="progressListener" ref="sapProductConfigDataLoaderProgressListener" />	      
+		<property name="messageListener" ref="sapProductConfigDataLoaderMessageListener" />	      
+		<property name="propertyAccessFacade" ref="sapProductConfigPropertyAccessFacade" />	 
+		<property name="cronJobService" ref="cronJobService" />	     
+	</bean>
+			
+	<bean id="sapProductConfigDefaultDataLoaderStopJob"
+	      class="de.hybris.platform.sap.productconfig.model.cronjob.DataLoaderStopJob"
+	      parent="abstractJobPerformable">
+		<property name="dataLoaderManagerContainer" ref="sapProductConfigDataLoaderManagerContainer" />	      
+		<property name="cronJobService" ref="cronJobService"/>
+	</bean>		
+	
+	<alias alias="sapProductConfigDataLoaderManagerContainer" name="sapProductConfigDefaultDataLoaderManagerContainer" />
+	<bean id="sapProductConfigDefaultDataLoaderManagerContainer"
+	      class="de.hybris.platform.sap.productconfig.model.impl.DataLoaderManagerContainerImpl" >
+	</bean>
+		
+	<alias alias="sapProductConfigDataLoader" name="sapProductConfigDefaultDataLoader" />
+	<bean id="sapProductConfigDefaultDataLoader"
+	      class="de.hybris.platform.sap.productconfig.model.impl.DataLoaderImpl" >
+	</bean>	
+	
+	<alias alias="sapProductConfigDataLoaderConfigurationHelper" name="sapProductConfigDefaultDataLoaderConfigurationHelper" />
+	<bean id="sapProductConfigDefaultDataLoaderConfigurationHelper"
+	      class="de.hybris.platform.sap.productconfig.model.impl.DataLoaderConfigurationHelperImpl" >
+	</bean>		
+
+	<alias alias="sapProductConfigDataLoaderProgressListener" name="sapProductConfigDefaultDataLoaderProgressListener" />
+	<bean id="sapProductConfigDefaultDataLoaderProgressListener" scope="prototype"
+	      class="de.hybris.platform.sap.productconfig.model.cronjob.DefaultDataloaderProgressListenerImpl" >
+	   <property name="modelService" ref="modelService" />   
+	</bean>
+			
+	<alias alias="sapProductConfigDataLoaderMessageListener" name="sapProductConfigDefaultDataLoaderMessageListener" />
+	<bean id="sapProductConfigDefaultDataLoaderMessageListener" scope="prototype"
+	      class="de.hybris.platform.sap.productconfig.model.cronjob.DefaultDataloaderMessageListenerImpl" >
+	</bean>
+			
+	<alias alias="sapProductConfigPropertyAccessFacade" name="sapProductConfigDefaultPropertyAccessFacade" />
+	<bean id="sapProductConfigDefaultPropertyAccessFacade" scope="prototype"
+	      class="de.hybris.platform.sap.productconfig.model.cronjob.DefaultPropertyAccessFacade" >
+	</bean>		
+	
+	<alias alias="sapProductConfigDataLoaderCronjobParameters" name="sapProductConfigDefaultDataLoaderCronjobParameters" />
+	<bean id="sapProductConfigDefaultDataLoaderCronjobParameters"
+	      class="de.hybris.platform.sap.productconfig.model.impl.DataLoaderCronjobParametersImpl" >
+	   <property name="dataloadStartJobBeanId" value="sapProductConfigDefaultDataLoaderJob"/>
+	   <property name="dataloadStopJobBeanId" value="sapProductConfigDefaultDataLoaderStopJob"/>   
+	   <property name="cronJobService" ref="cronJobService"/>
+	</bean>	
+			
+</beans>

@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE Language;isocode[unique=true];active[default=true];name[lang=de];name[lang=en]
+;de;;Deutsch;German
+;en;;Englisch;English
+;fn;;Französisch;French
+
+INSERT_UPDATE SolrIndexedType;identifier[unique=true];type(code);indexName
+;Language_testIndexedType${testId};Language;Language_testIndexedType${testId}
+
+INSERT_UPDATE SolrIndexerQuery;solrIndexedType(identifier)[unique=true];identifier[unique = true];type(code);query;injectLastIndexTime[default=false];injectCurrentTime[default=true];injectCurrentDate[default=true];user(uid);solrIndexerQueryParameters(name);
+;Language_testIndexedType${testId};testIndexedQuery${testId};full;SELECT {pk} FROM {Language} WHERE {isocode} in ('en', 'de', 'fr');;;;anonymous;;
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);fieldValueProvider;valueProviderParameters[map-delimiter=|]
+;Language_testIndexedType${testId};isocode;string;modelAttributesValueResolver;attribute->isocode
+;Language_testIndexedType${testId};active;string;modelAttributesValueResolver;attribute->active
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];solrIndexedTypes(identifier);
+;testFacetSearchConfig${testId};Language_testIndexedType${testId}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <alias name="defaultAssistedServiceService" alias="assistedServiceService"/>
+    <bean id="defaultAssistedServiceService" class="de.hybris.platform.assistedserviceservices.impl.DefaultAssistedServiceService">
+        <property name="modelService" ref="modelService"/>
+        <property name="userService" ref="userService"/>
+        <property name="baseSiteService" ref="baseSiteService"/>
+        <property name="cartService" ref="cartService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+        <property name="commerceCartService" ref="commerceCartService"/>
+        <property name="customerAccountService" ref="customerAccountService"/>
+        <property name="commonI18NService" ref="commonI18NService"/>
+        <property name="timeService" ref="timeService"/>
+    </bean>
+    
+	<alias name="defaultAssistedServiceCartModelDao" alias="assistedServiceCartModelDao"/>
+	<bean name="defaultAssistedServiceCartModelDao"
+			class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+		<constructor-arg value="Cart"/>
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+	</bean>
+
+    <alias name="defaultAssistedServiceOrderModelDao" alias="assistedServiceOrderModelDao"/>
+    <bean name="defaultAssistedServiceOrderModelDao"
+          class="de.hybris.platform.commerceservices.search.dao.impl.DefaultPagedGenericDao">
+        <constructor-arg value="Order"/>
+        <property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+    </bean>
+
+	<alias name="defaultCustomerSupportEventService" alias="customerSupportEventService"/>
+	<bean id="defaultCustomerSupportEventService" class="de.hybris.platform.assistedserviceservices.events.impl.DefaultCustomerSupportEventService">
+		<property name="modelService" ref="modelService"/>
+		<property name="customerSupportEventDao" ref="customerSupportEventDao"/>
+		<property name="userService" ref="userService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+	</bean>
+
+    <alias alias="commerceCustomerSupportService" name="defaultAsmCommerceCustomerSupportService"/>
+    <bean id="defaultAsmCommerceCustomerSupportService" class="de.hybris.platform.assistedserviceservices.impl.DefaultCommerceCustomerSupportService">
+        <property name="assistedServiceService" ref="assistedServiceService"/>
+    </bean>
+    
+    <bean id="defaultRecentlyStartedSessionCustomerListSearchStrategy"
+	      class="de.hybris.platform.assistedserviceservices.strategy.DefaultRecentlyStartedSessionCustomerListSearchStrategy">
+        <property name="customerSupportEventService" ref="customerSupportEventService"/>
+        <property name="userService" ref="userService"/>
+	</bean>
+
+	<bean id="defaultRecentlyStartedSessionCustomerListMergeDirective" depends-on="customerListSearchStrategyMap" parent="mapMergeDirective" >
+		<property name="key" value="ASM_RECENT_SESSIONS"/>
+		<property name="value" ref="defaultRecentlyStartedSessionCustomerListSearchStrategy" />
+	</bean>
+
+	<alias name="defaultCustomerGroupDao" alias="customerGroupDao"/>
+	<bean id="defaultCustomerGroupDao" class="de.hybris.platform.assistedserviceservices.dao.impl.DefaultCustomerGroupDao">
+		<constructor-arg value="Customer" />
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService"/>
+        <property name="timeService" ref="timeService"/>
+	</bean>
+	
+    <bean id="defaultInStoreCustomerListSearchStrategy"
+          class="de.hybris.platform.assistedserviceservices.strategy.DefaultInStoreCustomerListSearchStrategy">
+          <property name="userService" ref="userService"/>
+          <property name="customerGroupDao" ref="customerGroupDao"/>
+    </bean>
+
+    <bean id="defaultInStoreCustomerListMergeDirective" depends-on="customerListSearchStrategyMap" parent="mapMergeDirective" >
+        <property name="key" value="IN_STORE"/>
+        <property name="value" ref="defaultInStoreCustomerListSearchStrategy" />
+    </bean>
+
+    <bean id="defaultBopisCustomerListSearchStrategy"
+          class="de.hybris.platform.assistedserviceservices.strategy.DefaultBopisCustomerListSearchStrategy">
+        <property name="userService" ref="userService"/>
+        <property name="customerGroupDao" ref="customerGroupDao"/>
+    </bean>
+
+    <bean id="defaultBopisCustomerListMergeDirective" depends-on="customerListSearchStrategyMap" parent="mapMergeDirective" >
+        <property name="key" value="BOPIS"/>
+        <property name="value" ref="defaultBopisCustomerListSearchStrategy"/>
+    </bean>
+
+	<alias name="assistedServiceQuoteUserIdentificationStrategy" alias="quoteUserIdentificationStrategy" />
+    <bean id="assistedServiceQuoteUserIdentificationStrategy"
+          class="de.hybris.platform.assistedserviceservices.strategy.AssistedServiceQuoteUserIdentificationStrategy" parent="defaultQuoteUserIdentificationStrategy">
+        <property name="assistedServiceService" ref="assistedServiceService" />
+        <property name="quoteUserTypeIdentificationStrategy" ref="quoteUserTypeIdentificationStrategy"/>
+    </bean>
+ </beans>

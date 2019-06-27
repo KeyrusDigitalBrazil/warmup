@@ -1,0 +1,50 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$currencies=EUR
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+$catalogId=contentCatalogWithMultipleBaseSite
+$catalogId1=testContentCatalog
+$catalog-version=Online
+
+INSERT_UPDATE ContentCatalog;id[unique=true];defaultCatalog[default=true];
+;$catalogId;;
+;$catalogId1;;
+
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true,default=$catalog-version];active[default=true];defaultCurrency(isocode)[default=$defaultCurrency];
+;$catalogId;;;;
+;$catalogId1;;;;
+
+INSERT_UPDATE BaseStore;uid[unique=true];currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode
+;testStore1;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+;testStore2;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+
+INSERT_UPDATE CMSSite;uid[unique=true];stores(uid);contentCatalogs(id);
+;testSite;testStore1;$catalogId;
+;testSite1;testStore1;$catalogId;
+;testSite2;testStore1;$catalogId;
+;testSite3;testStore1;$catalogId;
+;singleSite;testStore2;$catalogId1;
+
+INSERT_UPDATE CxConfig;code[unique=true];minAffinity;actionResultMaxRepeat;userChangedActions;anonymousUserMinRequestNumber;ignoreRecalcForAnonymous[default=false]
+;testSiteConfig;0,5;1;RECALCULATE,ASYNC_PROCESS;2;
+;testSite1Config;0,75;2;LOAD;2;
+;testSite2Config;1;3;UPDATE;2;
+;singleSiteConfig;0,9;3;UPDATE;;
+
+INSERT_UPDATE BaseSite;uid[unique=true];cxConfig(code)
+;testSite;testSiteConfig;
+;testSite1;testSite1Config;
+;testSite2;testSite2Config;
+;singleSite;singleSiteConfig;

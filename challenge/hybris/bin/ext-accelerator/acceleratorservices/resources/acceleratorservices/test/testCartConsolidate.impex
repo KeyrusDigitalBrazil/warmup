@@ -1,0 +1,89 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$customergroup=customergroup
+$defaultPassword=12341234
+
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0
+$testCategory1-id=testCategory1
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+
+INSERT_UPDATE Address;&addrID;streetname;streetnumber;postalcode[unique=true];town[unique=true];country(isocode);region(isocode);phone1;owner(PointOfService.name)[unique=true]
+;addr6;Koto-ken Koto-shi;;;Koto;US;;+81 9583 8863;Koto
+;addr7;Kanagawa-ken Yokosuka-shi;;;Yokosuka;US;;+81 9583 8863;Yokosuka
+;addr8;Nakano-ken Nakano-shi;;;Nakano;US;;+81 9583 8863;Nakano
+;addr9;Shinbashi-ken Shinbashi-shi;;;Shinbashi;US;;+81 9583 8863;Shinbashi
+
+INSERT_UPDATE PointOfService;name[unique=true];type(code);address(&addrID);latitude;longitude;geocodeTimestamp[dateformat=dd-MM-yyyy];&posID
+;Koto;STORE;addr6;35,7091;139,6732;29-04-2025;Koto
+;Yokosuka;STORE;addr7;35,7091;139,6732;29-04-2025;Yokosuka
+;Nakano;STORE;addr8;35,7091;139,6732;29-04-2025;Nakano
+;Shinbashi;STORE;addr9;35,7091;139,6732;29-04-2025;Shinbashi
+
+INSERT_UPDATE Vendor;code[unique=true];name[lang=en];;;;;;;
+;test;Test;;;;;;;
+
+INSERT_UPDATE Warehouse;code[unique=true];name[lang=en];vendor(code);baseStores(uid)
+;Koto;Koto;test;testStore
+;Yokosuka;Yokosuka;test;testStore
+;Nakano;Nakano;test;testStore
+;Shinbashi;Shinbashi;test;testStore
+
+INSERT_UPDATE PoS2WarehouseRel;source(name)[unique=true];target(code)[unique=true]
+;Koto;Koto
+;Nakano;Nakano
+;Shinbashi;Shinbashi
+;Yokosuka;Yokosuka
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode
+;testStore;$catalog-id;$defaultCurrency;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)
+;testSite;testStore
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved;
+;10;Yokosuka;notSpecified;0;-1;0;0;TCC-000;0;
+;5;Nakano;notSpecified;0;-1;0;0;TCC-001;0;
+;5;Shinbashi;notSpecified;0;-1;0;0;TCC-001;0;
+;5;Nakano;notSpecified;0;-1;0;0;TCC-002;0;
+;10;Koto;notSpecified;0;-1;0;0;TCC-002;0;
+
+INSERT_UPDATE Product;code[unique=true];$catalogversion;stockLevels(productCode,warehouse(code));vendors(code);$prices;approvalStatus(code);unit(code)
+;TCC-000;;TCC-000:Yokosuka;test;57,95 EUR;approved;pieces
+;TCC-001;;TCC-001:Nakano;test;57,95 EUR;approved;pieces
+;TCC-001;;TCC-001:Shinbashi;test;57,95 EUR;approved;pieces
+;TCC-002;;TCC-002:Nakano;test;57,95 EUR;approved;pieces
+;TCC-002;;TCC-002:Koto;test;57,95 EUR;approved;pieces
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;;
+;ahertz;K2006-C0005;Anja Hertz;;en;USD;customergroup;1234;;
+
+INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;site(uid);store(uid);guid;;;;
+;ahertz;ahertzCart;EUR;27.04.2010 00:00:00;false;false;;;;;;
+
+INSERT_UPDATE CartEntry;order(Cart.code);creationTime[dateformat=dd.MM.yyyy HH:mm:ss];product(code,catalogVersion(catalog(id),version))[unique=true];quantity;unit(code);entryNumber[unique=true];deliveryPointOfService(&posID);;;
+;ahertzCart;27.04.2010 00:00:00;TCC-000:$catalog-id:$catalog-version;2;pieces;0;;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-000:$catalog-id:$catalog-version;2;pieces;1;Yokosuka;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-001:$catalog-id:$catalog-version;4;pieces;2;Nakano;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-001:$catalog-id:$catalog-version;3;pieces;3;Shinbashi;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-001:$catalog-id:$catalog-version;6;pieces;4;;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-002:$catalog-id:$catalog-version;2;pieces;5;Koto;;;
+;ahertzCart;27.04.2010 00:00:00;TCC-002:$catalog-id:$catalog-version;3;pieces;6;Nakano;;;

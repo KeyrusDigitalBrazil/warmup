@@ -1,0 +1,269 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$catalog-id=testCatalog
+$catalog-version=Online
+$approved=approvalstatus(code)[default='approved']
+$catalogversion=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+$currencies=USD
+$defaultCurrency=USD
+$defaultLanguage=en
+$deliveryCountries=US
+$paymentProvider=Mockup
+
+$ruleType=ruleType(code)[default='ANY']
+
+INSERT_UPDATE Catalog;id[unique=true]
+;$catalog-id
+
+INSERT_UPDATE Currency;isocode[unique=true];active;conversion;digits;symbol
+;USD;true;1.5;2;"$"
+;JPY;true;2;2;"¥"
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];conversion
+;pieces;pieces;1
+
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;defaultCurrency(isocode)[default=USD]
+;$catalog-id;$catalog-version;true;
+;$catalog-id;Staged;false
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);paymentProvider
+;testStore;$catalog-id;$currencies;false;$defaultCurrency;$defaultLanguage;$defaultLanguage;$paymentProvider
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)
+;testSite;testStore
+
+INSERT_UPDATE Product;code[unique=true];$supercategories;manufacturerName;manufacturerAID;unit(code)[default=pieces];ean;$prices;soldIndividually[default=true];$catalogversion;$approved
+;PRODUCT01;;product01;product01;;8000000000001;600 USD
+;PRODUCT02;;product02;product02;;8000000000002;650 USD
+;PRODUCT03;;product03;product03;;8000000000003;850 USD
+;PRODUCT04;;product04;product04;;8000000000004;950 USD
+;PRODUCT05;;product05;product05;;8000000000005;650 USD
+;PRODUCT06;;product06;product06;;8000000000006;600 USD;false
+;PREMIUM01;;premium01;premium01;;8000000000021;710 USD
+;PREMIUM02;;premium02;premium02;;8000000000022;720 USD
+;PREMIUM03;;premium03;premium03;;8000000000023;730 USD
+;PREMIUM04;;premium04;premium04;;8000000000024;740 USD
+;PREMIUM05;;premium05;premium05;;8000000000025;750 USD
+;PREMIUM06;;premium06;premium06;;8000000000026;760 USD
+;OTHER01;;other01;other01;;8000000000027;49 USD
+;OTHER02;;other01;other01;;8000000000028;49 USD
+;OTHER03;;other01;other01;;8000000000029;49 USD
+;OTHER04;;other01;other01;;8000000000030;49 USD
+;MANDATORY01;;manufacturerName;manufacturerId;;000000000031;9.99 USD
+;STANDALONE01;;manufacturerName;manufacturerId;;8000000000031;99 USD
+;SHARED01;;manufacturerName;manufacturerId;;8000000000032;99 USD
+;SHARED02;;manufacturerName;manufacturerId;;8000000000029;99 USD
+;NO_STOCK_PRODUCT;;manufacturerName;manufacturerId;;000000000000;99 USD
+
+INSERT_UPDATE Vendor;code[unique=true];
+;vendor;
+
+INSERT_UPDATE Warehouse;code[unique=true];vendor(code);default;baseStores(uid)
+;warehouse;vendor;true;testStore
+
+INSERT_UPDATE StockLevel;productCode[unique=true];inStockStatus(code)[default=forceInStock];warehouse(code)[default='warehouse'];available[default=10]
+;PRODUCT01
+;PRODUCT02
+;PRODUCT03
+;PRODUCT04
+;PRODUCT05
+;PRODUCT06
+;PREMIUM01
+;PREMIUM02
+;PREMIUM03
+;PREMIUM04
+;PREMIUM05
+;PREMIUM06
+;OTHER01
+;OTHER02
+;OTHER03
+;OTHER04
+;STANDALONE01
+;SHARED01
+;SHARED02
+;NO_STOCK_PRODUCT;notSpecified;warehouse;0;
+;MANDATORY01
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code);$catalogversion
+;testBundleStatus;approved
+;testBundleArchived;archived
+
+INSERT_UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];$catalogversion;parentTemplate(id);status(id)[default='testBundleStatus']
+;ParentPackage;;;;
+;NestedGroup1;;;ParentPackage;
+;NestedGroup2;;;ParentPackage;
+;NestedComponent1;;;NestedGroup1;
+;NestedComponent2;;;NestedGroup2;
+;ProductComponent1;;;NestedComponent1;
+;PremiumComponent2;;;NestedComponent2;
+;OptionalComponent;;;NestedComponent1;
+
+;SecondPackage
+;SecondGroup1;;;SecondPackage
+;SecondGroup2;;;SecondPackage
+;SecondComponent1;;;SecondGroup1
+;SecondComponent2;;;SecondGroup2
+;SecondComponent3;;;SecondGroup2
+
+;ThirdPackage
+;ThirdGroup1;;;ThirdPackage
+;ThirdGroup2;;;ThirdPackage
+;ThirdComponent1;;;ThirdGroup1
+;ThirdComponent2;;;ThirdGroup1
+;ThirdComponent3;;;ThirdGroup1
+;ThirdComponent4;;;ThirdGroup1
+;ThirdComponent5;;;ThirdGroup1
+;ThirdComponent6;;;ThirdGroup1
+;ThirdComponent7;;;ThirdGroup2
+
+;RootComponent;;;;
+;NestedComponent;;;RootComponent;
+;RequiredComponent;;;NestedComponent;
+;DependentComponent;;;NestedComponent;
+;AnotherComponent;;;NestedComponent;
+
+;StagedPackage;;testCatalog:Staged
+;RootBundleTemptate;;;;
+;NestedBundleTemplate;;;RootBundleTemptate;
+;LeafBundleTemptate1;;;NestedBundleTemplate;
+;LeafBundleTemptate2;;;NestedBundleTemplate;
+
+;FourthPackage
+;FourthGroup0;;;FourthPackage
+;FourthGroup1;;;FourthPackage
+;FourthGroup2;;;FourthPackage
+;FourthGroup3;;;FourthPackage
+;FourthGroup4;;;FourthPackage
+;FourthGroup5;;;FourthPackage
+;FourthComponentBasic;;;FourthGroup0
+;FourthComponent1;;;FourthGroup1
+;FourthComponent2;;;FourthGroup1
+;FourthComponent3;;;FourthGroup2
+;FourthComponent4;;;FourthGroup2
+;FourthComponent5;;;FourthGroup3
+;FourthComponent6;;;FourthGroup3
+;FourthComponent7;;;FourthGroup4
+;FourthComponent8;;;FourthGroup4
+;FourthComponent9;;;FourthGroup5
+;FourthComponent10;;;FourthGroup5
+;FourthComponent11;;;FourthGroup4
+;FourthComponent12;;;FourthGroup5
+;FourthComponent0;;;FourthGroup4
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];n;$catalogversion
+;ProductComponent_PickExactly_2;3
+;PremiumComponent_PickExactly_2;3
+;ThirdComponent_PickExactly_2;3
+;FourthComponent1_PickExactly_1;1
+;FourthComponent0_PickExactly_1;1
+;FourthComponent9_PickExactly_2;2
+;FourthComponent11_PickExactly_1;1
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;$catalogversion
+;OptionalComponent_Pick_0to1;0;1
+;FourthComponent3_Pick_0to1;0;1
+;FourthComponent5_Pick_1to2;1;2
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0];bundleSelectionCriteria(id, $catalogversion);$catalogversion
+;ProductComponent1;;ProductComponent_PickExactly_2
+;PremiumComponent2;;PremiumComponent_PickExactly_2
+;OptionalComponent;;OptionalComponent_Pick_0to1
+;ThirdComponent1;;ThirdComponent_PickExactly_2
+;ThirdComponent2;;ThirdComponent_PickExactly_2
+;ThirdComponent4;;ThirdComponent_PickExactly_2
+;ThirdComponent5;;ThirdComponent_PickExactly_2
+;ThirdComponent6;;ThirdComponent_PickExactly_2
+;ThirdComponent7;;ThirdComponent_PickExactly_2
+;FourthComponent1;;FourthComponent1_PickExactly_1
+;FourthComponent3;;FourthComponent3_Pick_0to1
+;FourthComponent5;;FourthComponent5_Pick_1to2
+;FourthComponent0;;FourthComponent0_PickExactly_1
+;FourthComponent9;;FourthComponent9_PickExactly_2
+;FourthComponent11;;FourthComponent11_PickExactly_1
+;SecondComponent1;;ProductComponent_PickExactly_2
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];products(code, $catalogversion);$catalogversion
+;ProductComponent1;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;PremiumComponent2;;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06,SHARED01;
+;OptionalComponent;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06;
+;RequiredComponent;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06;
+;DependentComponent;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06;
+;AnotherComponent;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01;
+;SecondComponent1;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06;
+;SecondComponent2;;OTHER01,OTHER02,OTHER03,OTHER04;
+;SecondComponent3;;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06;
+;ThirdComponent1;;PRODUCT01,PRODUCT02,PRODUCT03;
+;ThirdComponent2;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06;
+;ThirdComponent3;;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06;
+;ThirdComponent4;;PREMIUM01;
+;ThirdComponent5;;SHARED01;
+;ThirdComponent6;;SHARED02;
+;ThirdComponent7;;SHARED02;
+;LeafBundleTemptate1;;PRODUCT01,PRODUCT02,PRODUCT05,PRODUCT06;
+;LeafBundleTemptate2;;PREMIUM01,PREMIUM02;
+;FourthComponentBasic;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent0;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent1;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent2;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent3;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent4;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent5;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent6;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent7;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent8;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent9;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent10;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent11;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+;FourthComponent12;;PRODUCT01,PRODUCT02,PRODUCT03,PRODUCT04,PRODUCT05,PRODUCT06,SHARED01,NO_STOCK_PRODUCT;
+
+UPDATE BundleTemplate;id[unique=true];requiredBundleTemplates(id, version[default=1.0], $catalogversion);version[default=1.0][unique=true];$catalogversion
+;DependentComponent;RequiredComponent
+;FourthComponent2;FourthComponent1
+;FourthComponent4;FourthComponent3
+;FourthComponent6;FourthComponent5
+;FourthComponent8;FourthComponent7
+;FourthComponent10;FourthComponent9
+;FourthComponent12;FourthComponent11
+;FourthComponent7;FourthComponent0
+
+INSERT_UPDATE ChangeProductPriceBundleRule;id[unique=true,forceWrite=true,allownull=true];bundleTemplate(id, version, $catalogversion)[unique=true];conditionalProducts(code, $catalogversion);targetProducts(code, $catalogversion);price;$catalogversion;ruleType(code)[default=ANY];currency(isocode)[default=USD, unique=true]
+;price_PRODUCT05_in_ProductComponent1;ProductComponent1:1.0;PREMIUM01,PREMIUM02;PRODUCT05;500 USD
+;price_SHARED01_in_ThirdComponent5;ThirdComponent5:1.0;PRODUCT01;SHARED01;500 USD
+
+INSERT_UPDATE ChangeProductPriceBundleRule;$catalogversion;id[unique=true,forceWrite=true,allownull=true];currency(isocode)[default=USD, unique=true];bundleTemplate(id, version[default=1.0], $catalogversion)[unique=true];ruleType(code)[default=ANY];conditionalProducts(code, $catalogversion);targetProducts(code, $catalogversion);price
+;;price_PRODUCT02_with_PRODUCT01;;LeafBundleTemptate1;;PRODUCT01;PRODUCT02;1
+;;price_PRODUCT02_with_PRODUCT01_and_PRODUCT05;;LeafBundleTemptate1;;PRODUCT01,PRODUCT05;PRODUCT02;10
+;;price__PRODUCT02_with_PRODUCT01_JPY;JPY;LeafBundleTemptate1;;PRODUCT01;PRODUCT02;100
+;;price_PRODUCT01_with_PREMIUM01;;LeafBundleTemptate1;;PREMIUM01;PRODUCT01;99
+;;price_PRODUCT01_with_PREMIUM02;;LeafBundleTemptate1;ALL;PREMIUM02;PRODUCT01;5
+;;price_PREMIUM01_with_PREMIUM02;;LeafBundleTemptate2;;PREMIUM02;PREMIUM01;100
+;;price_PREMIUM01_with_PREMIUM02_cheap;;LeafBundleTemptate2;;PREMIUM02;PREMIUM01;99
+;;price_PRODUCT01_with_PREMIUM01_and_PRODUCT05;;LeafBundleTemptate1;ALL;PREMIUM02,PRODUCT05;PRODUCT01;1
+;;price_PRODUCT02_or_PRODUCT06_with_PREMIUM01_and_PRODUCT05;;LeafBundleTemptate1;ALL;PREMIUM02,PRODUCT05;PRODUCT06,PRODUCT02;400
+;;price_PREMIUM02_with_PREMIUM01_JPY;JPY;LeafBundleTemptate2;;PREMIUM01;PREMIUM02;200
+
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogversion;bundleTemplate(id,version[default=1.0],$catalogversion);conditionalProducts(code,$catalogversion);targetProducts(code,$catalogversion);$ruleType
+;ThirdPackage_DisableProduct01WhenProduct03;;ThirdComponent1;PRODUCT03;PRODUCT01
+;ThirdPackage_DisableProduct01WhenProduct04;;ThirdComponent1;PRODUCT04;PRODUCT01
+;ThirdPackage_DisableProduct01WithAnyPremiumProduct;;ThirdComponent1;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06;PRODUCT01
+;ThirdPackage_DisableProduct02WithAllPremiumProducts;;ThirdComponent1;PREMIUM01,PREMIUM02,PREMIUM03,PREMIUM04,PREMIUM05,PREMIUM06;PRODUCT02;ALL
+;ThirdPackage_DisableSHARED01WhenProduct01;;ThirdComponent5;PRODUCT01;SHARED01;
+;ThirdPackage_NoConditionalProducts;;ThirdComponent6;;SHARED02;
+;ThirdPackage_NoTargetProducts;;ThirdComponent7;SHARED01;;
+;ProductComponent1_disable_PRODUCT06_when_PRODUCT01;;ProductComponent1;PRODUCT01;PRODUCT06
+;ProductComponent1_disable_PRODUCT01_when_PRODUCT06;;ProductComponent1;PRODUCT06;PRODUCT01
+;PremiumComponent2_disable_PREMIUM06_when_PREMIUM01;;PremiumComponent2;PREMIUM01;PREMIUM06
+;PremiumComponent2_disable_PREMIUM01_when_PREMIUM06;;PremiumComponent2;PREMIUM06;PREMIUM01

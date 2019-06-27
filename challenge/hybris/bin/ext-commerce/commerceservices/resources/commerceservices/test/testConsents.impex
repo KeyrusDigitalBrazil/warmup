@@ -1,0 +1,85 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Setting up test store and site
+$currencies=EUR,USD
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0;
+$testCategory1-id=testCategory1;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$catalog-id;$catalog-id;true;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;EUR;Euro;true;true;1;2;E
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;US;United States of America;true;;;;;
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;
+;en;true;;;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=en];;;;;;;
+;en;English;;;;;;;
+
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id);currencies(isocode);net;taxGroup(code);storelocatorDistanceUnit(code);defaultCurrency(isocode);languages(isocode);defaultLanguage(isocode);deliveryCountries(isocode);solrFacetSearchConfiguration(name);submitOrderProcessCode
+;testStore;$catalog-id;$currencies;false;;km;$defaultCurrency;$defaultLanguage;$defaultLanguage;$deliveryCountries;;
+
+INSERT_UPDATE BaseSite;uid[unique=true];stores(uid)
+;testSite;testStore
+;testSite1;testStore
+;testSite2;testStore
+
+# Test customer
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;customergroup;;
+
+INSERT_UPDATE Customer;originalUid[unique=true];uid[unique=true];title(code);name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;&CustomerRef
+;testCustomer;testcustomer;;test customer;test customer;en;EUR;customergroup;1234;customer_ref_1
+;testCustomer2;testcustomer2;;test customer;test customer;en;EUR;customergroup;1234;customer_ref_2
+;testCustomer3;testcustomer3;;test customer 3;test customer 3;en;EUR;customergroup;1234;customer_ref_3
+
+
+# Test data for consent starts here
+INSERT_UPDATE ConsentTemplate;id[unique=true];name;description;version[unique=true];baseSite(uid)[unique=true];&ConsentTemplateRef
+# testSite
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite;consent_template_record_1
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";1;testSite;consent_template_record_2
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";2;testSite;consent_template_record_3
+;CONSENT_TEMPLATE_2;"Newsletter Subscription Consent 2";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite;consent_template_record_4
+;CONSENT_TEMPLATE_2;"Newsletter Subscription Consent 2";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";1;testSite;consent_template_record_5
+;CONSENT_TEMPLATE_2;"Newsletter Subscription Consent 2";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";2;testSite;consent_template_record_6
+;CONSENT_TEMPLATE_3;"Newsletter Subscription Consent 3";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite;consent_template_record_7
+# testSite
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite1;consent_template_record_8
+;CONSENT_TEMPLATE_1;"Newsletter Subscription Consent 1";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";1;testSite1;consent_template_record_9
+;CONSENT_TEMPLATE_4;"Newsletter Subscription Consent 5";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";0;testSite1;consent_template_record_10
+;CONSENT_TEMPLATE_4;"Newsletter Subscription Consent 5";"I approve to use my personal data for receiving e-mail newsletters for Marketing campaigns.";1;testSite1;consent_template_record_11
+
+INSERT_UPDATE Consent;code[unique=true];consentTemplate(&ConsentTemplateRef);customer(&CustomerRef);consentgivendate[dateformat=dd-MM-yyyy];consentwithdrawndate[dateformat=dd-MM-yyyy]
+;consent0;consent_template_record_1;customer_ref_1;"01-07-2017"
+;consent1;consent_template_record_2;customer_ref_1;"02-07-2017"
+;consent2;consent_template_record_3;customer_ref_1;"03-07-2017";"03-07-2017"
+;consent3;consent_template_record_3;customer_ref_1;"04-07-2017"
+;consent4;consent_template_record_4;customer_ref_2;"03-07-2017"
+;consent5;consent_template_record_5;customer_ref_2;"04-07-2017"
+;consent6;consent_template_record_6;customer_ref_2;"05-07-2017";"06-07-2017"
+;consent7;consent_template_record_8;customer_ref_1;"01-07-2017"
+;consent8;consent_template_record_9;customer_ref_1;"02-07-2017"
+;consent9;consent_template_record_10;customer_ref_1;"03-07-2017"
+;consent10;consent_template_record_11;customer_ref_1;"04-07-2017"
+;consent11;consent_template_record_3;customer_ref_3;"04-07-2017"

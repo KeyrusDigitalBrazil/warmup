@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<util:properties id="sapCpiProperties" location="classpath:/sap-cpi.properties" />
+
+	<!-- Deprecated -->
+	<!-- OAuth Client -->
+	<alias name="sapCpiOAuthDefaultClient" alias="sapCpiOAuthClient" />
+	<bean id="sapCpiOAuthDefaultClient" class="com.hybris.charon.HttpClientFactoryBean">
+		<property name="type" value="de.hybris.platform.sap.sapcpiadapter.clients.SapCpiOAuthClient" />
+		<property name="propertyResolver" ref="sapCpiPropertiesResolver" />
+	</bean>
+
+	<!-- Deprecated -->
+	<!-- Customer Client -->
+	<alias name="sapCpiCustomerDefaultClient" alias="sapCpiCustomerClient" />
+	<bean id="sapCpiCustomerDefaultClient" class="com.hybris.charon.HttpClientFactoryBean">
+		<property name="type" value="de.hybris.platform.sap.sapcpiadapter.clients.SapCpiCustomerClient" />
+		<property name="propertyResolver" ref="sapCpiPropertiesResolver" />
+	</bean>
+
+	<!-- Deprecated -->
+	<!-- Order Client -->
+	<alias name="sapCpiOrderDefaultClient" alias="sapCpiOrderClient"/>
+	<bean id="sapCpiOrderDefaultClient" class="com.hybris.charon.HttpClientFactoryBean">
+		<property name="type" value="de.hybris.platform.sap.sapcpiadapter.clients.SapCpiOrderClient"/>
+		<property name="propertyResolver" ref="sapCpiPropertiesResolver"/>
+	</bean>
+
+	<!-- Deprecated -->
+	<!-- Resolver Service -->
+	<alias name="sapCpiDefaultPropertiesResolver" alias="sapCpiPropertiesResolver" />
+	<bean id="sapCpiDefaultPropertiesResolver" class="com.hybris.charon.conf.PropertiesResolver">
+		<constructor-arg value="scpi" />
+		<property name="properties" ref="sapCpiProperties" />
+	</bean>
+
+	<!-- Deprecated -->
+	<!-- OAuth Service -->
+	<alias name="sapCpiOAuthDefaultService" alias="sapCpiOAuthService" />
+	<bean id="sapCpiOAuthDefaultService" class="de.hybris.platform.sap.sapcpiadapter.service.impl.SapCpiOAuthServiceImpl">
+		<property name="authClient" ref="sapCpiOAuthClient" />
+		<property name="propertiesResolver" ref="sapCpiPropertiesResolver" />
+	</bean>
+
+</beans>

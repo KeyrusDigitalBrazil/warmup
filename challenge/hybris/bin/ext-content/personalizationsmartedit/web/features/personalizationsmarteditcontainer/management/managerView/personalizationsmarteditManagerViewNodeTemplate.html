@@ -1,0 +1,305 @@
+<div class="y-tree-row"
+    data-ng-init="customization.isCollapsed=true"
+    data-ng-class="allCustomizationsCollapsed()? 'active-level' : 'inactive-level'">
+    <div class="desktop-layout hidden-sm hidden-xs customization-rank-{{customization.rank}}-row">
+        <div data-ng-click="customization.isCollapsed =! customization.isCollapsed">
+            <a class="btn btn-link category-toggle"
+                title="{{customization.isCollapsed ? 'personalization.commons.icon.title.expand' : 'personalization.commons.icon.title.collapse' | translate}}">
+                <span data-ng-class="customization.isCollapsed ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'"
+                    class="glyphicon"></span>
+            </a>
+        </div>
+        <div ui-tree-handle
+            class="y-tree-row__angular-ui-tree-handle">
+            <div class="y-tree__col--lg">
+                <div class="perso-wrap-ellipsis perso-tree__primary-data"
+                    title={{customization.name}}>
+                    <span class="personalizationsmartedit-customization-code"
+                        data-ng-bind="customization.name"></span>
+                </div>
+            </div>
+            <div class="y-tree__col--xs"
+                data-ng-bind="(customization.variations | statusNotDeleted).length || 0">
+            </div>
+            <div class="y-tree__col--xs"></div>
+            <div class="y-tree__col--md perso-tree__status"
+                data-ng-class="getActivityStateForCustomization(customization)">
+                <span data-ng-bind="getEnablementTextForCustomization(customization)"
+                    class="perso-library__status-layout"></span>
+            </div>
+            <div class="y-tree__col--sm">
+                <div data-ng-show="customization.status === PERSONALIZATION_MODEL_STATUS_CODES.ENABLED"
+                    class="perso-tree__dates-layout">
+                    <span data-ng-bind="getFormattedDate(customization.enabledStartDate)"></span>
+                </div>
+            </div>
+            <div class="y-tree__col--sm">
+                <div data-ng-show="customization.status === PERSONALIZATION_MODEL_STATUS_CODES.ENABLED"
+                    class="perso-tree__dates-layout">
+                    <span data-ng-bind="getFormattedDate(customization.enabledEndDate)"></span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div data-uib-dropdown>
+                <button type="button"
+                    data-uib-dropdown-toggle
+                    class="btn btn-link">
+                    <span class="hyicon hyicon-more"></span>
+                </button>
+                <ul data-uib-dropdown-menu
+                    class="pull-right text-left"
+                    role="menu">
+                    <li>
+                        <a data-ng-click="editCustomizationAction(customization)"
+                            data-translate="personalization.modal.manager.customization.options.edit"></a>
+                    </li>
+                    <li data-ng-class="isFilterEnabled() || $first ? 'disabled' : '' ">
+                        <a data-ng-click="(isFilterEnabled() || $first) ? $event.stopPropagation() : setCustomizationRank(customization, -1)"
+                            data-translate="personalization.modal.manager.customization.options.moveup"></a>
+                    </li>
+                    <li data-ng-class="isFilterEnabled() || $last ? 'disabled' : '' ">
+                        <a data-ng-click="(isFilterEnabled() || $last) ? $event.stopPropagation() : setCustomizationRank(customization, 1)"
+                            data-translate="personalization.modal.manager.customization.options.movedown"></a>
+                    </li>
+                    <li role="separator"
+                        class="divider"></li>
+                    <li>
+                        <a data-ng-click="deleteCustomizationAction(customization)"
+                            data-translate="personalization.modal.manager.customization.options.delete"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!--end contextual menu dropdown-->
+    </div>
+    <!--end desktop-layout for customization row-->
+
+    <div class="mobile-layout hidden-xl hidden-lg hidden-md customization-rank-{{customization.rank}}-row">
+        <div data-ng-click="customization.isCollapsed =! customization.isCollapsed">
+            <a class="btn btn-link category-toggle"
+                title="{{customization.isCollapsed ? 'personalization.commons.icon.title.expand' : 'personalization.commons.icon.title.collapse' | translate}}">
+                <span data-ng-class="customization.isCollapsed ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'"
+                    class="glyphicon customization__glyphicon-chevron"></span>
+            </a>
+        </div>
+        <div ui-tree-handle
+            class="y-tree-row__angular-ui-tree-handle--mobile">
+            <p class="y-tree__col-xl--mobile perso-tree__primary-data perso-wrap-ellipsis"
+                title={{customization.name}}>
+                <span class="personalizationsmartedit-customization-code"
+                    data-ng-bind="customization.name"></span>
+            </p>
+            <div class="mobile-data">
+                <span class="perso-library__tree-head--mobile"
+                    data-translate="personalization.modal.manager.grid.header.variations"></span>
+                <div class="perso-library__number-data--mobile"
+                    data-ng-bind="(customization.variations | statusNotDeleted).length || 0"></div>
+            </div>
+            <div class="mobile-data perso-tree__status"
+                data-ng-class="getActivityStateForCustomization(customization)">
+                <span data-ng-bind="getEnablementTextForCustomization(customization)"></span>
+            </div>
+            <div data-ng-show="customization.status === PERSONALIZATION_MODEL_STATUS_CODES.ENABLED">
+                <div class="mobile-data"
+                    data-ng-if='customization.enabledStartDate || customization.enabledEndDate'>
+                    <span data-ng-if='customization.enabledStartDate'
+                        class="perso-library__tree-head--mobile"
+                        data-translate="personalization.modal.manager.grid.header.startdate"></span>
+                    <p data-ng-bind="getFormattedDate(customization.enabledStartDate)"></p>
+                    <span data-ng-if='customization.enabledEndDate'
+                        class="perso-library__tree-head--mobile"
+                        data-translate="personalization.modal.manager.grid.header.enddate"></span>
+                    <p data-ng-bind="getFormattedDate(customization.enabledEndDate)"></p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div data-uib-dropdown
+                class="mobile-more-menu">
+                <button type="button"
+                    data-uib-dropdown-toggle
+                    class="btn btn-link">
+                    <span class="hyicon hyicon-more"></span>
+                </button>
+                <ul data-uib-dropdown-menu
+                    class="pull-right text-left"
+                    role="menu">
+                    <li>
+                        <a data-ng-click="editCustomizationAction(customization)"
+                            data-translate="personalization.modal.manager.customization.options.edit"></a>
+                    </li>
+                    <li data-ng-class="isFilterEnabled() || $first ? 'disabled' : '' ">
+                        <a data-ng-click="(isFilterEnabled() || $first) ? $event.stopPropagation() : setCustomizationRank(customization, -1)"
+                            data-translate="personalization.modal.manager.customization.options.moveup"></a>
+                    </li>
+                    <li data-ng-class="isFilterEnabled() || $last ? 'disabled' : '' ">
+                        <a data-ng-click="(isFilterEnabled() || $last) ? $event.stopPropagation() : setCustomizationRank(customization, 1)"
+                            data-translate="personalization.modal.manager.customization.options.movedown"></a>
+                    </li>
+                    <li role="separator"
+                        class="divider"></li>
+                    <li>
+                        <a data-ng-click="deleteCustomizationAction(customization)"
+                            data-translate="personalization.modal.manager.customization.options.delete"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--end contextual menu dropdown-->
+    </div>
+    <!--end mobile-layout for customization row-->
+</div>
+<!--end angular-ui-tree-handle-->
+<div data-uib-collapse="customization.isCollapsed"
+    data-expanding="customizationClickAction(customization)">
+    <div ui-tree-nodes
+        data-ng-model="customization.variations">
+        <div class="y-tree-row child-row active-level"
+            data-ng-class="{'perso-library__angular-ui-tree-drag': variation.isDragging}"
+            ui-tree-node
+            data-ng-repeat="variation in customization.variations"
+            data-ng-if="statusNotDeleted(variation)"
+            data-ng-init="variation.isCommerceCustomizationEnabled=isCommerceCustomizationEnabled()">
+            <div class="desktop-layout variation-rank-{{variation.rank}}-row hidden-sm hidden-xs"
+                data-ng-class="$last ? 'active-level--last':''">
+                <div>
+                    <span class="perso__cc-icon hyicon hyicon-commerce"
+                        data-ng-class="{'perso__cc-icon--hidden': !hasCommerceActions(variation)}"
+                        data-uib-tooltip-html="getCommerceCustomizationTooltip(variation)"
+                        data-tooltip-placement="top-left"></span>
+                </div>
+                <div ui-tree-handle
+                    class="y-tree-row__angular-ui-tree-handle">
+                    <div class="y-tree__col--xl perso-wrap-ellipsis"
+                        title={{variation.name}}>
+                        <span data-ng-bind="variation.name"></span>
+                    </div>
+                    <div class="y-tree__col--xs"
+                        data-ng-bind="variation.numberOfComponents">
+                    </div>
+                    <div class="y-tree__col--md perso-tree__status"
+                        data-ng-class="getActivityStateForVariation(customization,variation)">
+                        <span data-ng-bind="getEnablementTextForVariation(variation)"
+                            class="perso-library__status-layout"></span>
+                    </div>
+                    <div class="y-tree__col--lg"></div>
+                </div>
+                <div>
+                    <div data-uib-dropdown>
+                        <button type="button"
+                            data-uib-dropdown-toggle
+                            class="btn btn-link">
+                            <span class="hyicon hyicon-more"></span>
+                        </button>
+                        <ul data-uib-dropdown-menu
+                            class="pull-right text-left"
+                            role="menu">
+                            <li>
+                                <a data-ng-click="editVariationAction(customization, variation)"
+                                    data-translate="personalization.modal.manager.variation.options.edit"></a>
+                            </li>
+                            <li>
+                                <a data-ng-click="toogleVariationActive(customization,variation)"
+                                    data-ng-bind="getEnablementActionTextForVariation(variation)"></a>
+                            </li>
+                            <li data-ng-show="variation.isCommerceCustomizationEnabled">
+                                <a data-ng-click="manageCommerceCustomization(customization, variation)"
+                                    data-translate="personalization.modal.manager.variation.options.commercecustomization"></a>
+                            </li>
+                            <li data-ng-class="$first ? 'disabled' : '' ">
+                                <a data-ng-click="$first ? $event.stopPropagation() : setVariationRank(customization, variation, -1)"
+                                    data-translate="personalization.modal.manager.variation.options.moveup"></a>
+                            </li>
+                            <li data-ng-class="$last ? 'disabled' : '' ">
+                                <a data-ng-click="$last ? $event.stopPropagation() : setVariationRank(customization, variation, 1)"
+                                    data-translate="personalization.modal.manager.variation.options.movedown"></a>
+                            </li>
+                            <li role="separator"
+                                class="divider"></li>
+                            <li data-ng-class="isDeleteVariationEnabled(customization) ? '' : 'disabled' ">
+                                <a data-ng-click="deleteVariationAction(customization, variation, $event)"
+                                    data-translate="personalization.modal.manager.variation.options.delete"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--end contextual menu dropdown-->
+            </div>
+            <!--end desktop-layout for variation row-->
+            <div class="mobile-layout hidden-xl hidden-lg hidden-md variation-rank-{{variation.rank}}-row"
+                data-ng-class="$last ? 'active-level--last':''">
+                <div>
+                    <span class="perso__cc-icon hyicon hyicon-commerce"
+                        data-ng-class="{'perso__cc-icon--hidden': !hasCommerceActions(variation)}"
+                        data-uib-tooltip-html="getCommerceCustomizationTooltip(variation)"
+                        data-tooltip-placement="top-left"></span>
+                </div>
+                <div ui-tree-handle
+                    class="y-tree-row__angular-ui-tree-handle--mobile">
+                    <div>
+                        <p class="y-tree__col-xl--mobile perso-wrap-ellipsis"
+                            title="{{variation.name}}">
+                            <span data-ng-bind="variation.name"></span>
+                        </p>
+                        <div class="mobile-data">
+                            <span class="perso-library__tree-head--mobile"
+                                data-translate="personalization.modal.manager.grid.header.components"></span>
+                            <div data-ng-bind="variation.numberOfComponents"></div>
+                        </div>
+                        <div class="mobile-data perso-tree__status"
+                            data-ng-class="getActivityStateForVariation(customization,variation)">
+                            <span data-ng-bind="getEnablementTextForVariation(variation)"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="mobile-more-menu">
+                        <div data-uib-dropdown>
+                            <button type="button"
+                                data-uib-dropdown-toggle
+                                class="btn btn-link">
+                                <span class="hyicon hyicon-more"></span>
+                            </button>
+                            <ul data-uib-dropdown-menu
+                                class="pull-right text-left"
+                                role="menu">
+                                <li>
+                                    <a data-ng-click="editVariationAction(customization, variation)"
+                                        data-translate="personalization.modal.manager.variation.options.edit"></a>
+                                </li>
+                                <li>
+                                    <a data-ng-click="toogleVariationActive(customization,variation)"
+                                        data-ng-bind="getEnablementActionTextForVariation(variation)"></a>
+                                </li>
+                                <li data-ng-show="variation.isCommerceCustomizationEnabled">
+                                    <a data-ng-click="manageCommerceCustomization(customization, variation)"
+                                        data-translate="personalization.modal.manager.variation.options.commercecustomization"></a>
+                                </li>
+                                <li data-ng-class="$first ? 'disabled' : '' ">
+                                    <a data-ng-click="$first ? $event.stopPropagation() : setVariationRank(customization, variation, -1)"
+                                        data-translate="personalization.modal.manager.variation.options.moveup"></a>
+                                </li>
+                                <li data-ng-class="$last ? 'disabled' : '' ">
+                                    <a data-ng-click="$last ? $event.stopPropagation() : setVariationRank(customization, variation, 1)"
+                                        data-translate="personalization.modal.manager.variation.options.movedown"></a>
+                                </li>
+                                <li role="separator"
+                                    class="divider"></li>
+                                <li data-ng-class="isDeleteVariationEnabled(customization) ? '' : 'disabled' ">
+                                    <a data-ng-click="deleteVariationAction(customization, variation, $event)"
+                                        data-translate="personalization.modal.manager.variation.options.delete"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!--end contextual menu dropdown-->
+                </div>
+            </div>
+            <!--end mobile-layout for variation row-->
+        </div>
+        <!--end variation-repeat-->
+    </div>
+</div>
+<!--end collapse-->

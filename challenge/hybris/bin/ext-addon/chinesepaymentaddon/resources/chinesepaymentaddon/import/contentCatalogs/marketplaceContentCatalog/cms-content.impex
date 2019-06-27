@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=marketplaceContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;OrderConfirmationShippingComponent;Order Confirmation Shipping Info Component;/WEB-INF/views/addons/chinesepaymentaddon/responsive/pages/account/accountOrderDetailShippingInfo.jsp;;OrderConfirmationShippingComponent
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountOrderDetailsShippingComponent;Account Order Details Shipping Info Component;/WEB-INF/views/addons/chinesepaymentaddon/responsive/pages/account/accountOrderDetailShippingInfo.jsp;PayNowAction;AccountOrderDetailsShippingComponent
+
+##############################
+INSERT_UPDATE CMSActionRestriction;$contentCV[unique=true];uid[unique=true];name
+;;ActionRestriction;A CMSAction restriction
+
+INSERT_UPDATE PayNowAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;PayNowAction;/checkout/multi/summary/payRightNow;Pay Now Action;ActionRestriction;PayNowAction
+
+
+INSERT_UPDATE ApplicableCmsActionsTypeForCmsComponent;target(code)[unique=true];source(code)[unique=true]
+;JspIncludeComponent;PayNowAction

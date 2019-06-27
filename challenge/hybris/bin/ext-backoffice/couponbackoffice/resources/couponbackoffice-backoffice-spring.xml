@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="couponbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/couponbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+	
+	<bean id="multiCodeCouponGeneratorInset" class="de.hybris.platform.coupon.backoffice.cockpitng.editor.insets.MultiCodeCouponGeneratorInset">
+	  <property name="modelService" ref="modelService"/>
+	  <property name="couponCodeGenerationService" ref="couponCodeGenerationService"/>
+	  <property name="notificationService" ref="notificationService"/>
+	</bean>
+
+	<alias name="defaultAppliedCouponConverter" alias="appliedCouponConverter"/>
+	<bean id="defaultAppliedCouponConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.coupon.backoffice.data.AppliedCouponData" />
+		<property name="populators">
+			<list>
+				<ref bean="appliedVouchersPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultAppliedCouponsPopulator" alias="appliedVouchersPopulator"/>
+	<bean id="defaultAppliedCouponsPopulator" class="de.hybris.platform.coupon.backoffice.cockpitng.editor.tab.populator.DefaultAppliedCouponPopulator">
+		<property name="couponService" ref="couponService"/>
+	</bean>
+
+	<alias name="defaultCouponsTabEditorAreaRenderer" alias="couponsTabEditorAreaRenderer"/>
+	<bean id="defaultCouponsTabEditorAreaRenderer" class="de.hybris.platform.coupon.backoffice.cockpitng.editor.tab.CouponsTabEditorAreaRenderer"
+		  parent="abstractEditorAreaComponentRenderer">
+		<property name="appliedCouponConverter" ref="appliedCouponConverter"/>
+	</bean>
+
+</beans>

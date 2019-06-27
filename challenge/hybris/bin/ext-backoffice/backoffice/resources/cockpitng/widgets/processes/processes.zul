@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+    <widget sclass="yw-processes" xmlns="http://www.zkoss.org/2005/zul"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xmlns:w="client"
+            xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd">
+
+        <toolbarbutton id="openBtn" sclass="yw-processes-open-btn" image="${wr}/images/icon_processes.svg"
+            w:onClick="jq(this.$f('processesSidebar')).toggleClass('yw-processes-sidebar-disabled');
+                       jq(this.$f('autoCloseComponent')).toggleClass('yw-processes-autoclose-active');"/>
+        <div id="autoCloseComponent" sclass="yw-processes-autoclose" w:onClick="jq(this.$f('processesSidebar')).toggleClass('yw-processes-sidebar-disabled');
+                                                                                jq(this.$f('autoCloseComponent')).toggleClass('yw-processes-autoclose-active');"/>
+        <div id="processesSidebar" sclass="yw-processes-sidebar yw-processes-sidebar-disabled" zindex="5000">
+            <div id="header" sclass="yw-processes-header">
+                <label id="title" value="${labels.processes.header.title}" sclass="yw-processes-header-title"/>
+                <div sclass="yw-processes-header-right-pack">
+                    <toolbarbutton id="settingsBtn" sclass="yw-processes-header-settings-btn" popup="settingPopup, position=after_end"
+                                   image="${wr}/images/icon_settings.png"/>
+                    <a id="closeBtn" sclass="yw-processes-header-close-btn" image="${wr}/images/icon_close.png"
+                       w:onClick="jq(this.$f('processesSidebar')).toggleClass('yw-processes-sidebar-disabled');
+                                  jq(this.$f('autoCloseComponent')).toggleClass('yw-processes-autoclose-active');"/>
+                </div>
+            </div>
+
+            <custom-attributes org.zkoss.zul.listbox.rod="true"/>
+            <custom-attributes org.zkoss.zul.listbox.initRodSize="25"/>
+            <listbox id="processesListbox" sclass="yw-processes-list" vflex="true" emptyMessage="${labels.processes.emptyListInfo}"/>
+        </div>
+
+        <popup id="settingPopup" sclass="yw-processes-header-settings-popup yw-pointer-menupopup yw-pointer-menupopup-top-right" w:minZIndex="5001">
+            <div sclass="yw-processes-header-settings-popup-container">
+                <div sclass="ye-processes-settings-container">
+                    <div sclass="ye-processes-settings-container-setting">
+                        <label value="${labels.processes.header.showGlobalJobs}" sclass="ye-processes-settings-container-setting-name"/>
+                        <label id="globalJobsStateLabel" sclass="ye-processes-settings-container-setting-state"/>
+                    </div>
+                    <checkbox id="globalJobsCheckbox" sclass="ye-switch-checkbox ye-processes-settings-container-checkbox"/>
+                </div>
+                <div sclass="ye-processes-settings-container">
+                    <div sclass="ye-processes-settings-container-setting">
+                        <label value="${labels.processes.header.showFinishedJobs}" sclass="ye-processes-settings-container-setting-name"/>
+                        <label id="finishedJobsStateLabel" sclass="ye-processes-settings-container-setting-state"/>
+                    </div>
+                    <checkbox id="finishedJobsCheckbox" sclass="ye-switch-checkbox ye-processes-settings-container-checkbox"/>
+                </div>
+                <div sclass="ye-processes-settings-container">
+                    <div sclass="ye-processes-settings-container-setting">
+                        <label value="${labels.processes.header.historyRange}" sclass="ye-processes-settings-container-setting-name"/>
+                        <label id="timeRangeStateLabel" sclass="ye-processes-settings-container-setting-state"/>
+                    </div>
+                    <a label="" w:onClick="jq(this.$f('timeRangeList')).slideToggle(100);jq(this).toggleClass('ye-processes-settings-container-range-list-toggle-btn-active')" sclass="ye-processes-settings-container-range-list-toggle-btn" id="timeRangeListToggleBtn"/>
+                    <div sclass="ye-processes-settings-container-collapsible-content">
+                        <listbox id="timeRangeList" visible="false" sclass="ye-processes-settings-container-range-list">
+                            <template name="model">
+                                <listitem value="${each}"  w:onClick="jq(this.$f('timeRangeList')).slideToggle(100); jq(this.$f('timeRangeListToggleBtn')).toggleClass('ye-processes-settings-container-range-list-toggle-btn-active')">
+                                    <listcell>
+                                        <label sclass="ye-processes-settings-container-range-list-label" value="${each.label}"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </div>
+                </div>
+            </div>
+        </popup>
+        <timer id="startedCronJobLookupTimer" running="false" repeats="true" delay="2000"/>
+
+    </widget>
+</zk>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultIntegrationServicesConfiguration" alias="integrationServicesConfiguration" />
+	<bean id="defaultIntegrationServicesConfiguration" class="de.hybris.platform.integrationservices.config.DefaultIntegrationServicesConfiguration">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias name="defaultIntegrationObjectService" alias="integrationObjectService" />
+	<bean name="defaultIntegrationObjectService"
+		  class="de.hybris.platform.integrationservices.service.impl.DefaultIntegrationObjectService">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultIntegrationObjectItemPartOfAttributeHandler" alias="integrationObjectItemPartOfAttributeHandler" />
+	<bean name="defaultIntegrationObjectItemPartOfAttributeHandler" class="de.hybris.platform.integrationservices.model.PartOfAttributeHandler" />
+
+	<alias name="defaultIntegrationObjectItemUniqueAttributesHandler" alias="integrationObjectItemUniqueAttributesHandler" />
+	<bean name="defaultIntegrationObjectItemUniqueAttributesHandler" class="de.hybris.platform.integrationservices.model.UniqueAttributesAttributeHandler" />
+
+	<alias name="defaultMediaPersistenceService" alias="integrationServicesMediaPersistenceService" />
+	<bean name="defaultMediaPersistenceService"
+		  class="de.hybris.platform.integrationservices.service.impl.DefaultMediaPersistenceService">
+		<property name="mediaService" ref="mediaService" />
+		<property name="modelService" ref="modelService" />
+		<property name="integrationServicesConfiguration" ref="integrationServicesConfiguration" />
+	</bean>
+
+	<alias name="defaultSapPassportService" alias="sapPassportService" />
+	<bean id="defaultSapPassportService" class="de.hybris.platform.integrationservices.service.impl.DefaultSapPassportService">
+		<property name="configuration" ref="integrationServicesConfiguration"/>
+	</bean>
+
+	<alias name="defaultAlphabeticalIntegrationKeyGenerator" alias="integrationKeyMetadataGenerator" />
+	<bean id="defaultAlphabeticalIntegrationKeyGenerator"
+	      class="de.hybris.platform.integrationservices.integrationkey.impl.DefaultAlphabeticalIntegrationKeyMetadataGenerator" />
+
+	<alias name="defaultJsonMonitoredRequestErrorParser" alias="jsonMonitoredRequestErrorParser" />
+	<bean id="defaultJsonMonitoredRequestErrorParser" class="de.hybris.platform.integrationservices.monitoring.JsonMonitoredRequestErrorParser"/>
+
+	<alias name="defaultXmlMonitoredRequestErrorParser" alias="xmlMonitoredRequestErrorParser" />
+	<bean id="defaultXmlMonitoredRequestErrorParser" class="de.hybris.platform.integrationservices.monitoring.XmlMonitoredRequestErrorParser" />
+
+	<alias name="defaultAbstractIntegrationKeyGenerator" alias="abstractIntegrationKeyGenerator" />
+	<bean id="defaultAbstractIntegrationKeyGenerator" abstract="true" class="de.hybris.platform.integrationservices.integrationkey.impl.AbstractIntegrationKeyGenerator">
+		<property name="encoding" value="UTF-8" />
+	</bean>
+
+	<alias name="defaultIntegrationObjectConversionService" alias="integrationObjectConversionService"/>
+	<bean id="defaultIntegrationObjectConversionService"
+	      class="de.hybris.platform.integrationservices.service.impl.DefaultIntegrationObjectConversionService">
+		<property name="integrationObjectService" ref="integrationObjectService"/>
+		<property name="itemToIntegrationObjectMapConverter" ref="itemToIntegrationObjectMapConverter"/>
+	</bean>
+
+	<alias name="defaultMapToIntegrationKeyGenerator" alias="mapToIntegrationKeyGenerator" />
+	<bean name="defaultMapToIntegrationKeyGenerator" parent="abstractIntegrationKeyGenerator"
+	      class="de.hybris.platform.integrationservices.integrationkey.impl.DefaultMapToIntegrationKeyGenerator">
+		<property name="integrationKeyMetadataGenerator" ref="integrationKeyMetadataGenerator" />
+	</bean>
+
+	<alias name="defaultAbstractItem2MapPopulator" alias="abstractItem2MapPopulator"/>
+	<bean id="defaultAbstractItem2MapPopulator" abstract="true"
+	      class="de.hybris.platform.integrationservices.populator.AbstractItem2MapPopulator">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<alias name="defaultAtomicType2MapPopulator" alias="atomicType2MapPopulator"/>
+	<bean id="defaultAtomicType2MapPopulator" parent="abstractItem2MapPopulator"
+	      class="de.hybris.platform.integrationservices.populator.DefaultAtomicType2MapPopulator">
+	</bean>
+
+	<alias name="defaultMapType2MapPopulator" alias="mapType2MapPopulator"/>
+	<bean id="defaultMapType2MapPopulator" parent="abstractItem2MapPopulator"
+	      class="de.hybris.platform.integrationservices.populator.DefaultMapType2MapPopulator">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="defaultCollectionType2MapPopulator" alias="collectionType2MapPopulator"/>
+	<bean id="defaultCollectionType2MapPopulator" parent="abstractItem2MapPopulator"
+	      class="de.hybris.platform.integrationservices.populator.DefaultCollectionType2MapPopulator">
+		<property name="itemToIntegrationObjectMapConverter" ref="itemToIntegrationObjectMapConverter"/>
+	</bean>
+
+	<alias name="defaultComposedType2MapPopulator" alias="composedType2MapPopulator"/>
+	<bean id="defaultComposedType2MapPopulator" parent="abstractItem2MapPopulator"
+	      class="de.hybris.platform.integrationservices.populator.DefaultComposedType2MapPopulator">
+		<property name="itemToIntegrationObjectMapConverter" ref="itemToIntegrationObjectMapConverter"/>
+	</bean>
+
+	<alias name="defaultEnumerationMetaType2MapPopulator" alias="enumerationMetaType2MapPopulator"/>
+	<bean id="defaultEnumerationMetaType2MapPopulator" parent="abstractItem2MapPopulator"
+	      class="de.hybris.platform.integrationservices.populator.DefaultEnumerationMetaType2MapPopulator">
+	</bean>
+
+	<alias name="defaultLocalizedAttribute2MapPopulator" alias="localizedAttribute2MapPopulator"/>
+	<bean id="defaultLocalizedAttribute2MapPopulator" parent="abstractItem2MapPopulator"
+		  class="de.hybris.platform.integrationservices.populator.LocalizedAttribute2MapPopulator">
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias name="defaultIntegrationKeyPopulator" alias="integrationKeyPopulator" />
+	<bean id="defaultIntegrationKeyPopulator" class="de.hybris.platform.integrationservices.populator.DefaultIntegrationKeyPopulator">
+		<property name="integrationKeyGenerator" ref="mapToIntegrationKeyGenerator" />
+	</bean>
+
+	<alias name="defaultItemToIntegrationObjectMapConverter" alias="itemToIntegrationObjectMapConverter"/>
+	<bean id="defaultItemToIntegrationObjectMapConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="java.util.HashMap" />
+		<property name="populators">
+			<list>
+				<ref bean="atomicType2MapPopulator"/>
+				<ref bean="mapType2MapPopulator"/>
+				<ref bean="composedType2MapPopulator"/>
+				<ref bean="enumerationMetaType2MapPopulator"/>
+				<ref bean="collectionType2MapPopulator"/>
+				<ref bean="integrationKeyPopulator" />
+				<ref bean="localizedAttribute2MapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

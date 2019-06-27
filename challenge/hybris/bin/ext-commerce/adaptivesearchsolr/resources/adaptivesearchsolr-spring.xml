@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="defaultSolrAsCatalogVersionResolver" alias="solrAsCatalogVersionResolver" />
+	<bean id="defaultSolrAsCatalogVersionResolver" class="de.hybris.platform.adaptivesearchsolr.strategies.impl.DefaultSolrAsCatalogVersionResolver" />
+
+	<alias name="defaultSolrAsCategoryPathResolver" alias="solrAsCategoryPathResolver" />
+	<bean id="defaultSolrAsCategoryPathResolver" class="de.hybris.platform.adaptivesearchsolr.strategies.impl.DefaultSolrAsCategoryPathResolver">
+		<property name="categoryService" ref="categoryService" />
+	</bean>
+	
+	<alias name="defaultSolrAsTypeMappingRegistry" alias="solrAsTypeMappingRegistry" />
+	<bean id="defaultSolrAsTypeMappingRegistry" class="de.hybris.platform.adaptivesearchsolr.strategies.impl.DefaultSolrAsTypeMappingRegistry" />
+
+	<alias name="defaultSolrAsSearchProfileCalculationListener" alias="solrAsSearchProfileCalculationListener" />
+	<bean id="defaultSolrAsSearchProfileCalculationListener" class="de.hybris.platform.adaptivesearchsolr.listeners.SolrAsSearchProfileCalculationListener">
+		<property name="solrAsCatalogVersionResolver" ref="solrAsCatalogVersionResolver" />
+		<property name="solrAsCategoryPathResolver" ref="solrAsCategoryPathResolver" />
+		<property name="solrAsTypeMappingRegistry" ref="solrAsTypeMappingRegistry" />
+		<property name="asSearchProfileContextFactory" ref="asSearchProfileContextFactory" />
+		<property name="asSearchProfileActivationService" ref="asSearchProfileActivationService" />
+		<property name="asSearchProfileCalculationService" ref="asSearchProfileCalculationService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+	</bean>
+
+	<!-- using negative priority to force the listener to be the last one applied -->
+	<bean id="solrAsSearchProfileCalculationListenerDefinition" parent="solrListenerDefinition">
+		<property name="priority" value="-10000" />
+		<property name="listener" ref="solrAsSearchProfileCalculationListener" />
+	</bean>
+
+    <alias name="defaultSolrAsSearchProvider" alias="solrAsSearchProvider" />
+    <bean id="defaultSolrAsSearchProvider" class="de.hybris.platform.adaptivesearchsolr.strategies.impl.SolrAsSearchProvider">
+        <property name="solrFacetSearchConfigDao" ref="solrFacetSearchConfigDao" />
+        <property name="solrIndexedTypeDao" ref="solrIndexedTypeDao" />
+        <property name="solrIndexedPropertyDao" ref="solrIndexedPropertyDao" />
+        <property name="solrIndexedPropertyTypeRegistry" ref="solrIndexedPropertyTypeRegistry" />
+        <property name="solrAsTypeMappingRegistry" ref="solrAsTypeMappingRegistry" />
+        <property name="facetSearchConfigService" ref="facetSearchConfigService" />
+        <property name="facetSearchService" ref="facetSearchService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="i18nService" ref="i18nService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+    </bean>
+</beans>

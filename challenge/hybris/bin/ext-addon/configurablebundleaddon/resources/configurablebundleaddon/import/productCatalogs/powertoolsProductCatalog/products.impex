@@ -1,0 +1,188 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$productCatalog=powertoolsProductCatalog
+$productCatalogName=Powertools Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$approved=approvalstatus(code)[default='approved']
+$syncJobCode=sync $productCatalog:Staged->Online
+$ruleType=ruleType(code)[default='ANY']
+
+INSERT_UPDATE Product;code[unique=true];unit(code)[default='pieces'];$catalogVersion;$approved
+# Drills
+;3755211
+;3755201
+;2116282
+# Screwdrivers
+;3755207
+;3755213
+;3788611
+;3788612
+;3788614
+;3788616
+;3788618
+;3788619
+;3793687
+;3793707
+;3793710
+;3794609
+;3794619
+;3795253
+;3881027
+;3881028
+;3881074
+;3881076
+;3881338
+;3881339
+;3884593
+;3921095
+;4598185
+;4600658
+;5888798
+;321654DD
+# Toolkits
+;693923
+;3803058
+;1128762
+# Sanders
+;2116274
+;2116283
+;3884599
+;3884600
+# Hand Tools
+;3864748
+;3865361
+
+INSERT_UPDATE BundleTemplateStatus;id[unique=true];status(code)[default='approved'];$catalogVersion
+;Status_TOOLKIT
+
+# Add BundleTemplate and BundleTemplateStatus as rootTypes to the synchronization
+UPDATE CatalogVersionSyncJob;code[unique=true];roottypes(code)[mode=append];
+;$syncJobCode;BundleTemplate,BundleTemplateStatus;
+
+### Toolkit Starter and Toolkit Professional Package
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_TOOLKIT'];version[default=1.0][unique=true];$catalogVersion
+;ToolkitStarterPackage
+;StarterDrillComponent;ToolkitStarterPackage
+;StarterScrewdriverComponent;ToolkitStarterPackage
+
+;ToolkitProfessionalPackage
+# Level 1 nested bundle
+;ProMainToolsComponent;ToolkitProfessionalPackage
+;ProAdditionalToolsComponent;ToolkitProfessionalPackage
+# Level 2 nested bundle
+;ProToolkitComponent;ProMainToolsComponent
+;ProPowerToolComponent;ProMainToolsComponent
+;ProSanderComponent;ProAdditionalToolsComponent
+;ProHandToolComponent;ProAdditionalToolsComponent
+# Level 3 nested bundle
+;ProDrillComponent;ProPowerToolComponent
+;ProScrewdriverComponent;ProPowerToolComponent
+
+# Set the child templates again to make sure that the sequence of child templates is correct
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;ToolkitStarterPackage;;StarterDrillComponent,StarterScrewdriverComponent
+
+;ToolkitProfessionalPackage;;ProMainToolsComponent,ProAdditionalToolsComponent
+;ProMainToolsComponent;;ProPowerToolComponent,ProToolkitComponent
+;ProAdditionalToolsComponent;;ProSanderComponent,ProHandToolComponent
+;ProPowerToolComponent;;ProDrillComponent,ProScrewdriverComponent
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;StarterDrillComponent;3755211,3755201
+;StarterScrewdriverComponent;3755207,3755213,3788611,3788612,3788614,3788616,3788618,3788619,3793687,3793707,3793710,3794609,3794619,3795253,3881027,3881028,3881074,3881076,3881338,3881339,3884593,3921095,4598185,4600658,3921095,5888798,321654DD
+
+;ProToolkitComponent;693923,3803058,1128762
+;ProSanderComponent;2116274,2116283,3884599,3884600
+;ProHandToolComponent;3865361,3864748
+;ProDrillComponent;3755211,3755201
+;ProScrewdriverComponent;3755207,3755213,3788611,321654DD
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter;$catalogVersion
+;StarterDrillComponent_Pick1to200;1;200;true
+;StarterScrewdriverComponent_Pick1to200;1;200
+
+;ProDrillComponent_Pick1to1000;1;1000;true
+;ProHandToolComponent_Pick0to5;0;5
+;ProSanderComponent_Pick0to10;0;10
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];starter;n[default=1];$catalogVersion
+;ProToolkitComponent_Pick1
+;ProScrewdriverComponent_Pick2;;2
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;StarterDrillComponent;StarterDrillComponent_Pick1to200
+;StarterScrewdriverComponent;StarterScrewdriverComponent_Pick1to200
+
+;ProDrillComponent;ProDrillComponent_Pick1to1000
+;ProHandToolComponent;ProHandToolComponent_Pick0to5
+;ProSanderComponent;ProSanderComponent_Pick0to10
+;ProToolkitComponent;ProToolkitComponent_Pick1
+;ProScrewdriverComponent;ProScrewdriverComponent_Pick2
+
+INSERT_UPDATE ChangeProductPriceBundleRule;id[unique=true];$catalogVersion;bundleTemplate(id,version[default=1.0],$catalogVersion);conditionalProducts(code,$catalogVersion);targetProducts(code,$catalogVersion);name;$ruleType;price;currency(isocode)[default=USD, unique=true]
+;ProToolkitComponent_ChangePrice1;;ProToolkitComponent;3788611,321654DD;693923;;;29.99;
+;ProToolkitComponent_ChangePrice2;;ProToolkitComponent;3788611,321654DD;3803058;;;19.99;
+
+# Add Disable rules
+INSERT_UPDATE DisableProductBundleRule;id[unique=true];$catalogVersion;bundleTemplate(id,version[default=1.0],$catalogVersion);conditionalProducts(code,$catalogVersion);targetProducts(code,$catalogVersion);$ruleType
+;DisableProductRule_ToolkitStarterPackage_1;;StarterScrewdriverComponent;3755201;3755213,3788611,3788612;
+;DisableProductRule_ToolkitStarterPackage_2;;StarterDrillComponent;3755213,3788611,3788612;3755201;
+
+
+### Personalized Starter Toolkit Package - configurable (complex) products
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_TOOLKIT'];version[default=1.0][unique=true];$catalogVersion
+;ToolkitStarterPackageEngraving
+;StarterDrillComponentEngraving;ToolkitStarterPackageEngraving
+;StarterScrewdriverComponentEngraving;ToolkitStarterPackageEngraving
+
+# Set the child templates again to make sure that the sequence of child templates is correct
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;ToolkitStarterPackageEngraving;;StarterDrillComponentEngraving,StarterScrewdriverComponentEngraving
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;StarterDrillComponentEngraving;2116282
+;StarterScrewdriverComponentEngraving;3755207,3755213,3788611,3788612,3788614,3788616,3788618,3788619,3793687,3793707,3793710,3794609,3794619,3795253,3881027,3881028,3881074,3881076,3881338,3881339,3884593,3921095,4598185,4600658,3921095,5888798,321654DD
+
+INSERT_UPDATE PickExactlyNBundleSelectionCriteria;id[unique=true];starter;n[default=1];$catalogVersion
+;StarterDrillComponent_Pick1Engraving;true
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter;$catalogVersion
+;StarterScrewdriverComponent_Pick1to200Engraving;1;200
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;StarterDrillComponentEngraving;StarterDrillComponent_Pick1Engraving
+;StarterScrewdriverComponentEngraving;StarterScrewdriverComponent_Pick1to200Engraving
+
+### Hand Tool Package - required/dependent components
+INSERT_UPDATE BundleTemplate;id[unique=true];parentTemplate(id, version[default=1.0], $catalogVersion);status(id, $catalogVersion)[default='Status_TOOLKIT'];version[default=1.0][unique=true];$catalogVersion
+;HandToolPackage
+;HandToolPackageToolkitComponent;HandToolPackage
+;HandToolPackageToolComponent;HandToolPackage
+
+UPDATE BundleTemplate;id[unique=true];version[default=1.0][unique=true];childTemplates(id,version[default=1.0],$catalogVersion);$catalogVersion
+;HandToolPackage;;HandToolPackageToolkitComponent,HandToolPackageToolComponent
+
+UPDATE BundleTemplate;id[unique=true];products(code, $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;HandToolPackageToolkitComponent;693923,3803058,1128762
+;HandToolPackageToolComponent;3864748,3865361
+
+INSERT_UPDATE PickNToMBundleSelectionCriteria;id[unique=true];n;m;starter[default=false];$catalogVersion
+;HandToolPackageToolkit_Starter;0;100;true
+;HandToolPackageTool_Pick1to100;1;100
+
+UPDATE BundleTemplate;id[unique=true];bundleSelectionCriteria(id, $catalogVersion);version[default=1.0];$catalogVersion
+;HandToolPackageToolkitComponent;HandToolPackageToolkit_Starter
+;HandToolPackageToolComponent;HandToolPackageTool_Pick1to100
+
+# Set required component
+UPDATE BundleTemplate;id[unique=true];requiredBundleTemplates(id, version[default=1.0], $catalogVersion);version[default=1.0][unique=true];$catalogVersion
+;HandToolPackageToolComponent;HandToolPackageToolkitComponent

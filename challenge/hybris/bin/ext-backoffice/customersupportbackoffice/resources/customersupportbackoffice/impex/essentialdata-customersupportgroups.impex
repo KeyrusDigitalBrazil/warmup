@@ -1,0 +1,43 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE BackofficeRole;UID[unique=true];backOfficeLoginDisabled;authorities
+# we are going to add the employeegrouop to the admin role only as the restriction is working per level and in this case we would get our desired behavior (employee group runs first and then our role restriction
+# runs after and would override some restrictions from employeegroup
+;customersupportadministratorrole;FALSE;customersupportadministratorrole,backofficeworkflowuser
+;customersupportmanagerrole;FALSE;customersupportmanagerrole,backofficeworkflowuser
+;customersupportagentrole;FALSE;customersupportagentrole,backofficeworkflowuser
+
+INSERT_UPDATE UserGroup;UID[unique=true];description
+;customersupportadministratorgroup;The Customer Support Administrator Group has access to the Customer Support Backoffice's Customer Support Administrator Group and Customer Support Agent Group views AND/OR the Assisted Service Module.
+
+INSERT_UPDATE CsAgentGroup;UID[unique=true];description
+;customersupportmanagergroup;The Customer Support Manager Group has access to the Customer Support Backoffice's Customer Support Manager Group and Customer Support Agent Group views AND/OR the Assisted Service Module.
+;customersupportagentgroup;The Customer Support Agent Group has access to the Customer Support Backoffice's Customer Support Agent Group views and AND/OR the Assisted Service Module.
+
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;customersupportadministratorrole;employeegroup
+;customersupportmanagerrole;employeegroup
+;customersupportagentrole;employeegroup
+;customersupportadministratorgroup;backofficeadmingroup
+;customersupportadministratorgroup;customersupportadministratorrole
+;customersupportadministratorgroup;customersupportmanagerrole
+;customersupportadministratorgroup;customersupportagentrole
+;customersupportadministratorgroup;csagentmanagergroup
+;customersupportadministratorgroup;backofficeauditgroup
+;customersupportmanagergroup;employeegroup
+;customersupportmanagergroup;customersupportmanagerrole
+;customersupportmanagergroup;customersupportagentrole
+;customersupportmanagergroup;csagentmanagergroup
+;customersupportmanagergroup;backofficeauditgroup
+;customersupportagentgroup;employeegroup
+;customersupportagentgroup;customersupportagentrole
+;customersupportagentgroup;backofficeauditgroup

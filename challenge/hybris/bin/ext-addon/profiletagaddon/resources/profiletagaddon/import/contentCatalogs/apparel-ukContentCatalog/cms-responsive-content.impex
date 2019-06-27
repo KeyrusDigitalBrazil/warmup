@@ -1,0 +1,26 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=apparel-ukContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:com.hybris.yprofile.profiletagaddon.constants.ProfiletagaddonConstants&/profiletagaddon/import/cockpit/cmscockpit
+$siteUid=apparel-uk
+$lang=en
+
+INSERT_UPDATE ConsentTemplate;id[unique=true];name[lang=$lang];description[lang=$lang];version[unique=true];baseSite(uid)[unique=true,default=$siteUid];exposed
+;PROFILE;"Allow SAP Commerce Cloud, Context-Driven Services tracking";"We would like to store your browsing behaviour so that our website can dynamically present you with a personalised browsing experience and our customer support agents can provide you with contextual customer support.";1;;true
+
+
+INSERT_UPDATE ProfileTagScriptComponent;$contentCV[unique=true];uid[unique=true];name;
+;;ProfileTagScriptComponent;Profile Tag;ProfileTagScriptTagScript;;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(uid,$contentCV)[mode=append]
+;;PlaceholderContentSlot;true;ProfileTagScriptComponent

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/cache
+     	http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+		
+	<context:annotation-config />
+	<context:component-scan base-package="com.hybris.ymkt.recommendationwebservices" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	<mvc:annotation-driven>
+		<mvc:message-converters>
+			<ref bean="jsonHttpMessageConverter"/>
+			<ref bean="xmlHttpMessageConverter"/>
+		</mvc:message-converters>
+	</mvc:annotation-driven>	
+
+	<mvc:default-servlet-handler />
+
+	<security:global-method-security pre-post-annotations="enabled" proxy-target-class="true" secured-annotations="enabled" />
+	<mvc:resources mapping="**/swagger-ui.html" location="classpath:/META-INF/resources/"/>
+	<mvc:resources mapping="/webjars/**" location="classpath:/META-INF/resources/webjars/"/>
+</beans>

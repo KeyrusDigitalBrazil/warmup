@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:na="http://www.hybris.com/cockpitng/config/notifications">
+
+	<context merge-by="module" type="AbstractOrder" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:customTab name="hmc.tab.abstractorder.promotionengineresults" spring-bean="promotionEngineResultsTabEditorAreaRenderer"/>
+		</editorArea:editorArea>
+	</context>
+
+    <context merge-by="module" parent="auto" component="explorer-tree">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+			<explorer-tree:navigation-node id="hmc_treenode_marketing">
+				<explorer-tree:navigation-node id="hmc_type_tree_abstractpromotion" merge-mode="remove" />
+			    <explorer-tree:type-node id="hmc_typenode_promotion_rules" code="PromotionSourceRule"/>
+				<explorer-tree:type-node id="hmc_typenode_promotion_rule_templates" code="PromotionSourceRuleTemplate"/>
+				<explorer-tree:type-node id="hmc_type_tree_promotiongroup" code="PromotionGroup"/>
+				<explorer-tree:type-node id="hmc_typenode_promotion_modules" code="DroolsKIEModule"/>
+				<explorer-tree:type-node id="hmc_typenode_promotion_rule_groups" code="RuleGroup"/>
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+    <context component="explorer-tree" principal="marketingmanagerrole">
+		<explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+				<explorer-tree:navigation-node id="hmc_treenode_marketing">
+					<explorer-tree:type-node id="hmc_typenode_promotion_rules" code="PromotionSourceRule"/>
+					<explorer-tree:type-node id="hmc_typenode_promotion_rule_templates" code="PromotionSourceRuleTemplate"/>
+					<explorer-tree:type-node id="hmc_type_tree_promotiongroup" code="PromotionGroup"/>
+					<explorer-tree:type-node id="hmc_typenode_promotion_modules" code="DroolsKIEModule"/>
+					<explorer-tree:type-node id="hmc_typenode_promotion_rule_groups" code="RuleGroup"/>
+					<explorer-tree:type-node id="hmc_typenode_campaign" code="Campaign" position="99"/>
+				</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+    </context>
+
+	<context type="DroolsKIEModule" principal="marketingmanagerrole">
+		<context merge-by="type" parent="AbstractRulesModule" component="editorareaactions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:label>actiongroup.common</y:label>
+					<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.rulesmodulesyncaction" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.rulesmodulesyncaction</y:value>
+						</y:parameter>
+					</y:action>
+				</y:group>
+			</y:actions>
+		</context>
+	</context>
+
+	<context type="PromotionSourceRule">
+		<context component="listviewactions">
+	         <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	            <y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+		               <y:parameter>
+					  		<y:name>targetComponent</y:name>
+					  		<y:value>configurableFlow</y:value>
+					  	</y:parameter>
+	               </y:action>
+					<y:action action-id="de.hybris.platform.ruleenginebackoffice.widgets.listview.actions.deleterules" property="selectedObjects">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.deleterules</y:value>
+						</y:parameter>
+					</y:action>
+					<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.rulecompileallpromotionsformoduleaction" property="selectedObjects">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.rulecompileselectedpromotionsformoduleaction</y:value>
+						</y:parameter>
+					</y:action>
+					<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.ruleundeployselectedpromotionsfrommoduleaction" property="selectedObjects">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.ruleundeployselectedpromotionsfrommoduleaction</y:value>
+						</y:parameter>
+					</y:action>
+	            </y:group>
+	         </y:actions>
+    	</context>
+    	
+		<context merge-by="type" parent="SourceRule" component="advanced-search">
+			<advanced-search:advanced-search xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch">
+				<advanced-search:field-list>
+					<advanced-search:field name="website" position="2" selected="true"/>
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		
+    	<context merge-by="type" parent="SourceRule" component="listview">
+			<list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+				<list-view:column qualifier="website" position="2"/>
+			</list-view:list-view>
+		</context>
+
+    	<context component="editor-area" merge-by="type" parent="SourceRule">
+			<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+				<editorArea:tab name="tab.configuration.abstractrule">
+					<editorArea:section name="sec.configuration.abstractrule.rulemanagement" merge-mode="append">
+						<editorArea:attribute qualifier="website" position="0"/>
+						<editorArea:attribute qualifier="excludeFromStorefrontDisplay" position="5"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		
+		<context component="editorareaactions" merge-by="type" parent="GenericItem">
+	        <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	           <y:group qualifier="common">
+	           		<y:label>actiongroup.common</y:label>
+	           		<y:action action-id="de.hybris.platform.ruleenginebackoffice.action.deletesourcerule" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.deletesourcerule</y:value>
+						</y:parameter>
+					</y:action>
+				   	<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.ruleundeploypromotionfrommoduleaction" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.ruleundeploypromotionfrommoduleaction</y:value>
+						</y:parameter>
+					</y:action>
+				   	<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.promotionrulecloneaction" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>promotion.rule.clone.title</y:value>
+						</y:parameter>
+					</y:action>
+				   	<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.rulecompilepromotionformoduleaction" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.rulecompilepromotionformoduleaction</y:value>
+						</y:parameter>
+					</y:action>
+	           </y:group>
+	        </y:actions>
+    	</context>
+
+		<context component="create-wizard">
+			<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="PromotionSourceRuleWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="sourceRulePrepare">
+					<wz:initialize property="newPromotionSourceRule" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="create.promotion.rule.label">
+					<wz:content id="step1.content">
+						<wz:property-list root="newPromotionSourceRule">
+							<wz:property qualifier="code" type="java.lang.String" />
+							<wz:property qualifier="name" type="java.lang.String" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done visible="!#empty(newPromotionSourceRule.code)">
+							<wz:save property="newPromotionSourceRule"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+	
+	<context type="PromotionSourceRuleTemplate">
+		<context merge-by="type" parent="AbstractRuleTemplate" component="editorareaactions">
+			<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+				<y:group qualifier="common">
+					<y:action action-id="de.hybris.platform.ruleenginebackoffice.widgets.actions.deleteruletemplate" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>title.deleteruletemplate</y:value>
+						</y:parameter>
+					</y:action>
+					<y:action action-id="de.hybris.platform.promotionenginebackoffice.action.rulecreatepromotionfromtemplateaction" property="currentObject">
+						<y:parameter>
+							<y:name>actionName</y:name>
+							<y:value>rule.createfromtemplate.title</y:value>
+						</y:parameter>
+					</y:action>
+				</y:group>
+			</y:actions>
+		</context>
+	
+    	<context component="listviewactions" merge-by="type" parent="AbstractRuleTemplate">
+	         <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	            <y:group qualifier="common">
+	               <y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+		               <y:parameter>
+					  		<y:name>targetComponent</y:name>
+					  		<y:value>editorArea</y:value>
+					  	</y:parameter>
+					  	<y:parameter>
+					  		<y:name>initializeEntity</y:name>
+					  		<y:value>true</y:value>
+					  	</y:parameter>
+	               </y:action>
+	            </y:group>
+	         </y:actions>
+    	</context>  
+	</context>
+	
+	<context merge-by="type" parent="GenericItem" type="PromotionGroup" component="base">
+		<y:base>
+			<y:labels>
+				<y:label>Identifier</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+	
+ <!-- specific configuration for ProductPromotionRule -->
+   <context type="ProductPromotionRule">   
+      <context component="editor-area" merge-by="type" parent="auto">
+         <ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+            <ea:tab name="hmc.administration" position="99">
+               <ea:section name="ruleenginebackoffice_section_ruleattributes">
+                  <ea:attribute qualifier="product"  />
+               </ea:section>
+            </ea:tab>
+         </ea:editorArea>
+      </context>
+
+      <context component="simple-search" parent="auto" merge-by="type">
+         <yss:simple-search xmlns:yss="http://www.hybris.com/cockpitng/config/simplesearch">
+            <yss:field name="product" />
+         </yss:simple-search>
+      </context>
+
+      <context component="listview" merge-by="type" parent="auto">
+         <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+            <list-view:column qualifier="product" />
+         </list-view:list-view>
+      </context>
+	</context>
+	
+    <context type="AbstractCoupon" component="base" merge-by="type" parent="GenericItem">
+        <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+            <y:labels>
+                <y:label>couponId</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    
+    <context type="PromotionGroup">
+    		<context component="listviewactions" merge-by="type">
+	         <y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	            <y:group qualifier="common">
+					<y:action action-id="com.hybris.cockpitng.action.create" property="pageable.typeCode">
+		               <y:parameter>
+					  		<y:name>targetComponent</y:name>
+					  		<y:value>editorArea</y:value>
+					  	</y:parameter>
+					  	<y:parameter>
+					  		<y:name>initializeEntity</y:name>
+					  		<y:value>true</y:value>
+					  	</y:parameter>
+	               </y:action>
+	            </y:group>
+	         </y:actions>
+    	</context>
+		<context merge-by="type" parent="GenericItem" component="simple-search">
+			<simple-search:simple-search xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+				<simple-search:field name="identifier"/>
+			</simple-search:simple-search>
+		</context>
+	</context>
+	
+	<context merge-by="type" parent="GenericItem" type="PromotionGroup" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="hmc.tab.promotiongroup.properties" merge-mode="replace">
+				<editorArea:section name="sec.configuration.promotiongroup.promotionsourcerule">
+						<editorArea:attribute qualifier="promotionSourceRules"/>
+				</editorArea:section>
+			</editorArea:tab>	
+            <editorArea:tab name="hmc.administration">
+            	<editorArea:section name="hmc.section.promotiongroup.promotions" >            
+						<editorArea:attribute qualifier="Promotions"
+							editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>referenceListView</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+				</editorArea:section>
+			</editorArea:tab>					
+		</editorArea:editorArea>
+	</context>
+
+	<context type="Campaign" merge-by="type" parent="GenericItem" component="editor-area" principal="marketingmanagerrole">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea" xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+      		<editorArea:essentials>
+        		<editorArea:essentialSection name="hmc.text.campaign.label">
+          			  <editorArea:attribute qualifier="code"/>
+          			  <editorArea:attribute qualifier="name"/>
+				</editorArea:essentialSection>
+	 		</editorArea:essentials>
+			<editorArea:tab name="hmc.tab.configuration.campaign">
+				<editorArea:section name="hmc.sec.configuration.campaign" position="0">
+					<editorArea:panel colspan="4" name="hmc.sec.configuration.campaign" rowspan="2">
+						<editorArea:attribute editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor"
+											  qualifier="sourceRules" position="99">
+							<editorArea:editor-parameter>
+								<editorArea:name>listConfigContext</editorArea:name>
+								<editorArea:value>campaignSourceRulesListView</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:panel>
+				    <editorArea:attribute qualifier="description"/>
+				    <editorArea:attribute qualifier="startDate">
+						<editorArea:editor-parameter>
+							<editorArea:name>dateFormat</editorArea:name>
+							<editorArea:value>MMM dd, yyyy h:mm a</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				    <editorArea:attribute qualifier="endDate">
+						<editorArea:editor-parameter>
+							<editorArea:name>dateFormat</editorArea:name>
+							<editorArea:value>MMM dd, yyyy h:mm a</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				    <editorArea:attribute qualifier="enabled"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	
+</config>

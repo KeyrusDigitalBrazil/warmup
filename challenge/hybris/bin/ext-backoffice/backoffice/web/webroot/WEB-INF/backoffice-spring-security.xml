@@ -1,0 +1,64 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+                    http://www.springframework.org/schema/beans/spring-beans.xsd
+                    http://www.springframework.org/schema/security
+                    http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <beans:import resource="classpath:/META-INF/backoffice-core-spring-security.xml"/>
+
+    <http use-expressions="true" security="none" pattern="/zkau/**" disable-url-rewriting="false"/>
+    <http use-expressions="true" security="none" pattern="/cng/**" disable-url-rewriting="false"/>
+    <http use-expressions="true" security="none" pattern="/css/**" disable-url-rewriting="false"/>
+    <http use-expressions="true" security="none" pattern="/login.zul" disable-url-rewriting="false"/>
+    <http use-expressions="true" disable-url-rewriting="false" >
+        <headers disabled="true">
+            <frame-options disabled="true"/>
+        </headers>
+        <csrf disabled="true" />
+        <http-basic />
+        <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMINGROUP')" requires-channel="https"/>
+        <intercept-url pattern="/j_spring_security_check" access="permitAll" requires-channel="https"/>
+        <intercept-url pattern="/**" access="isAuthenticated()" requires-channel="https"/>
+        <form-login authentication-details-source-ref="backofficeAuthenticationDetailsSource"
+                    always-use-default-target="false"
+                    login-page="/login.zul"
+                    authentication-success-handler-ref="backofficeAuthenticationSuccessHandler"
+                    authentication-failure-handler-ref="backofficeAuthenticationFailureHandler"
+                    username-parameter="j_username"
+                    password-parameter="j_password"
+                    login-processing-url="/j_spring_security_check"
+                    />
+        <logout logout-url="/j_spring_security_logout" logout-success-url="/login.zul"/>
+        <session-management session-authentication-strategy-ref="fixation"/>
+        <access-denied-handler error-page="/login.zul"/>
+        <remember-me services-ref="backofficeRememberMeService" key="backoffice"/>
+        <request-cache ref="requestCache"/>
+        <port-mappings>
+            <port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}"
+                          https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}"/>
+            <port-mapping http="80" https="443"/>
+        </port-mappings>
+    </http>
+
+    <beans:bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="backofficeAuthenticationProvider"/>
+    </authentication-manager>
+
+    <beans:bean id="fixation"
+                class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/>
+
+</beans:beans>

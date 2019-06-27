@@ -1,0 +1,34 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; IntegrationService ; INBOUND
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; IntegrationService ; IntegrationObject              ; IntegrationObject
+; IntegrationService ; IntegrationType                ; IntegrationType
+; IntegrationService ; IntegrationObjectItem          ; IntegrationObjectItem
+; IntegrationService ; IntegrationObjectItemAttribute ; IntegrationObjectItemAttribute
+; IntegrationService ; AttributeDescriptor            ; AttributeDescriptor
+; IntegrationService ; ComposedType                   ; ComposedType
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]; autoCreate[default = false]
+; IntegrationService:IntegrationObject              ; code                        ; IntegrationObject:code                                     ;                                                   ; true
+; IntegrationService:IntegrationObject              ; integrationType             ; IntegrationObject:integrationType                          ; IntegrationService:IntegrationType                ;
+; IntegrationService:IntegrationObject              ; items                       ; IntegrationObject:items                                    ; IntegrationService:IntegrationObjectItem          ;
+
+; IntegrationService:IntegrationType                ; code                        ; IntegrationType:code                                       ;                                                   ;
+
+; IntegrationService:IntegrationObjectItem          ; code                        ; IntegrationObjectItem:code                                 ;                                                   ; true
+; IntegrationService:IntegrationObjectItem          ; type                        ; IntegrationObjectItem:type                                 ; IntegrationService:ComposedType                   ;
+; IntegrationService:IntegrationObjectItem          ; integrationObject           ; IntegrationObjectItem:integrationObject                    ; IntegrationService:IntegrationObject              ; true ; true
+; IntegrationService:IntegrationObjectItem          ; attributes                  ; IntegrationObjectItem:attributes                           ; IntegrationService:IntegrationObjectItemAttribute ;
+
+; IntegrationService:IntegrationObjectItemAttribute ; attributeName               ; IntegrationObjectItemAttribute:attributeName               ;                                                   ; true
+; IntegrationService:IntegrationObjectItemAttribute ; returnIntegrationObjectItem ; IntegrationObjectItemAttribute:returnIntegrationObjectItem ; IntegrationService:IntegrationObjectItem          ;      ; true
+; IntegrationService:IntegrationObjectItemAttribute ; attributeDescriptor         ; IntegrationObjectItemAttribute:attributeDescriptor         ; IntegrationService:AttributeDescriptor            ; true
+; IntegrationService:IntegrationObjectItemAttribute ; unique                      ; IntegrationObjectItemAttribute:unique                      ;                                                   ;
+; IntegrationService:IntegrationObjectItemAttribute ; autoCreate                  ; IntegrationObjectItemAttribute:autoCreate                  ;                                                   ;
+; IntegrationService:IntegrationObjectItemAttribute ; integrationObjectItem       ; IntegrationObjectItemAttribute:integrationObjectItem       ; IntegrationService:IntegrationObjectItem          ; true ; true
+
+; IntegrationService:AttributeDescriptor            ; qualifier                   ; AttributeDescriptor:qualifier                              ;                                                   ; true
+; IntegrationService:AttributeDescriptor            ; enclosingType               ; AttributeDescriptor:enclosingType                          ; IntegrationService:ComposedType                   ; true
+
+; IntegrationService:ComposedType                   ; code                        ; ComposedType:code                                          ;                                                   ; true

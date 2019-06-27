@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!--EXPORT - START-->
+	<alias name="defaultExcelExportWorkbookPostProcessor" alias="excelExportWorkbookPostProcessor"/>
+	<bean id="defaultExcelExportWorkbookPostProcessor"
+		  class="com.hybris.backoffice.excel.exporting.DefaultExcelExportWorkbookPostProcessor">
+		<property name="decorators" ref="excelExportDecorators"/>
+	</bean>
+
+	<alias name="defaultExcelSupercategorySelectionDecorator" alias="excelSupercategorySelectionDecorator"/>
+	<bean  id="defaultExcelSupercategorySelectionDecorator"
+		  class="com.hybris.backoffice.excel.exporting.DefaultExcelSupercategorySelectionDecorator">
+		<property name="typeService" ref="typeService"/>
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+	</bean>
+
+	<alias name="defaultExcelExportPreProcessorDecorators" alias="excelExportPreProcessorDecorators"/>
+	<util:list id="defaultExcelExportPreProcessorDecorators"
+			   value-type="com.hybris.backoffice.excel.exporting.ExcelExportParamsDecorator">
+		<ref bean="excelSupercategorySelectionDecorator"/>
+	</util:list>
+
+	<alias name="defaultExcelExportPreProcessor" alias="excelExportPreProcessor"/>
+	<bean id="defaultExcelExportPreProcessor"
+		  class="com.hybris.backoffice.excel.exporting.DefaultExcelExportPreProcessor">
+		<property name="decorators" ref="excelExportPreProcessorDecorators"/>
+	</bean>
+
+	<alias name="defaultExcelExportDecorators" alias="excelExportDecorators"/>
+	<util:list id="defaultExcelExportDecorators"
+			   value-type="com.hybris.backoffice.excel.exporting.ExcelExportWorkbookDecorator">
+		<ref bean="excelExportClassificationWorkbookDecorator"/>
+		<ref bean="headerPromptWorkbookDecorator"/>
+		<ref bean="excelSheetWorkbookDecorator"/>
+		<ref bean="isoCodeDecorator"/>
+		<ref bean="hideUtilitySheetsDecorator"/>
+		<ref bean="removeSheetsDecorator"/>
+	</util:list>
+
+	<bean id="abstractExcelExportWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.exporting.AbstractExcelExportWorkbookDecorator" abstract="true">
+		<property name="excelCellService" ref="excelCellService"/>
+		<property name="attributeNameFormatter" ref="classificationAttributeNameFormatter"/>
+		<property name="excelAttributeTranslatorRegistry" ref="excelClassificationAttributeTranslatorRegistry"/>
+	</bean>
+
+	<alias name="defaultExcelExportClassificationWorkbookDecorator" alias="excelExportClassificationWorkbookDecorator"/>
+	<bean id="defaultExcelExportClassificationWorkbookDecorator"
+		  parent="abstractExcelExportWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.exporting.DefaultExcelExportClassificationWorkbookDecorator">
+	</bean>
+
+	<alias name="defaultExcelSheetWorkbookDecorator" alias="excelSheetWorkbookDecorator"/>
+	<bean id="defaultExcelSheetWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.exporting.ExcelSheetWorkbookDecorator">
+		<property name="populators" ref="typeSystemWorkbookDecoratorPopulators"/>
+	</bean>
+
+	<alias name="defaultHideUtilitySheetsDecorator" alias="hideUtilitySheetsDecorator"/>
+	<bean id="defaultHideUtilitySheetsDecorator"
+		  class="com.hybris.backoffice.excel.exporting.HideUtilitySheetsDecorator">
+		<property name="utilitySheets">
+			<list>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					CLASSIFICATION_TYPE_SYSTEM
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					HEADER_PROMPT
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					TYPE_SYSTEM
+				</value>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					TYPE_TEMPLATE
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRemoveSheetsDecorator" alias="removeSheetsDecorator"/>
+	<bean id="defaultRemoveSheetsDecorator"
+		  class="com.hybris.backoffice.excel.exporting.RemoveSheetsDecorator">
+		<property name="sheetsToRemove">
+			<list>
+				<value type="com.hybris.backoffice.excel.template.ExcelTemplateConstants$UtilitySheet">
+					PK
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultHeaderPromptWorkbookDecorator" alias="headerPromptWorkbookDecorator"/>
+	<bean id="defaultHeaderPromptWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.exporting.HeaderPromptWorkbookDecorator">
+		<property name="headerPromptPopulator" ref="classificationIncludedHeaderPromptPopulator"/>
+		<property name="mapper">
+			<bean parent="fromExcelResultToExcelAttributesMapper">
+				<property name="filters1">
+					<list>
+						<ref bean="availableCheckingFilter"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<alias name="defaultIsoCodeDecorator" alias="isoCodeDecorator"/>
+	<bean id="defaultIsoCodeDecorator" class="com.hybris.backoffice.excel.exporting.IsoCodeDecorator">
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="excelWorkbookService" ref="excelWorkbookService"/>
+	</bean>
+	<!--EXPORT END-->
+
+	<!-- IMPORT START -->
+	<alias name="defaultExcelImportWorkbookPostProcessor" alias="excelImportWorkbookPostProcessor"/>
+	<bean id="defaultExcelImportWorkbookPostProcessor"
+		  class="com.hybris.backoffice.excel.importing.DefaultExcelImportWorkbookPostProcessor">
+		<property name="decorators" ref="excelImportDecorators"/>
+	</bean>
+
+	<alias name="defaultExcelImportDecorators" alias="excelImportDecorators"/>
+	<util:list id="defaultExcelImportDecorators"
+			   value-type="com.hybris.backoffice.excel.importing.ExcelImportWorkbookDecorator">
+		<ref bean="excelImportClassificationWorkbookDecorator"/>
+	</util:list>
+
+	<alias name="defaultAbstractExcelImportWorkbookDecorator" alias="abstractExcelImportWorkbookDecorator"/>
+	<bean id="defaultAbstractExcelImportWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.importing.AbstractExcelImportWorkbookDecorator" abstract="true">
+		<property name="excelHeaderService" ref="excelHeaderService"/>
+		<property name="parserRegistry" ref="parserRegistry"/>
+	</bean>
+
+	<alias name="defaultExcelImportClassificationWorkbookDecorator" alias="excelImportClassificationWorkbookDecorator"/>
+	<bean id="defaultExcelImportClassificationWorkbookDecorator"
+		  class="com.hybris.backoffice.excel.importing.DefaultExcelImportClassificationWorkbookDecorator"
+		  parent="abstractExcelImportWorkbookDecorator">
+		<property name="classificationSystemService" ref="classificationSystemService"/>
+		<property name="excelAttributeTranslatorRegistry" ref="excelClassificationAttributeTranslatorRegistry"/>
+		<property name="excelClassificationAttributeFactory" ref="excelClassificationAttributeFactory"/>
+		<property name="excelClassificationTypeSystemService" ref="excelClassificationTypeSystemService"/>
+		<property name="validators" ref="excelClassificationPostProcessorValidators" />
+		<property name="excelSheetService" ref="excelSheetService" />
+		<property name="excelCellService" ref="excelCellService" />
+	</bean>
+	<!--IMPORT END-->
+
+</beans>

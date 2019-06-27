@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.contents.containers.AbstractCMSComponentContainerModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="abstractCMSComponentContainerModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="abstractCMSComponentModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.pages.AbstractPageModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="abstractPageModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.pages.ContentPageModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="contentPageModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.relations.ContentSlotForPageModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="contentSlotForPageModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.contents.contentslot.ContentSlotModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="contentSlotModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.navigation.CMSNavigationNodeModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="cmsNavigationNodeVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.cms2.model.navigation.CMSNavigationEntryModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="cmsNavigationEntryVisitor"/>
+	</bean>
+
+ 	<alias name="defaultAbstractCMSComponentContainerModelVisitor" alias="abstractCMSComponentContainerModelVisitor"/>
+	<bean name="defaultAbstractCMSComponentContainerModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.DefaultAbstractCMSComponentContainerModelVisitor"/>
+
+	<alias name="defaultAbstractCMSComponentModelVisitor" alias="abstractCMSComponentModelVisitor"/>
+	<bean name="defaultAbstractCMSComponentModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.DefaultAbstractCMSComponentModelVisitor"/>
+
+	<alias name="defaultAbstractPageModelVisitor" alias="abstractPageModelVisitor"/>
+	<bean name="defaultAbstractPageModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.DefaultAbstractPageModelVisitor">
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="cmsSessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+	</bean>
+
+	<alias name="defaultContentPageModelVisitor" alias="contentPageModelVisitor"/>
+	<bean name="defaultContentPageModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.ContentPageModelVisitor">
+		<property name="cmsAdminContentSlotService" ref="cmsAdminContentSlotService" />
+		<property name="cmsSessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+	</bean>
+
+	<alias name="defaultContentSlotForPageModelVisitor" alias="contentSlotForPageModelVisitor"/>
+	<bean name="defaultContentSlotForPageModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.ContentSlotForPageModelVisitor"/>
+
+	<alias name="defaultContentSlotModelVisitor" alias="contentSlotModelVisitor"/>
+	<bean name="defaultContentSlotModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.ContentSlotModelVisitor"/>
+
+	<alias name="defaultCmsNavigationNodeVisitor" alias="cmsNavigationNodeVisitor"/>
+	<bean name="defaultCmsNavigationNodeVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.CMSNavigationNodeModelVisitor"/>
+
+	<alias name="defaultCmsNavigationEntryVisitor" alias="cmsNavigationEntryVisitor"/>
+	<bean name="defaultCmsNavigationEntryVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.CMSNavigationEntryModelVisitor"/>
+
+	<alias name="defaultMediaContainerModelVisitor" alias="mediaContainerModelVisitor"/>
+	<bean name="defaultMediaContainerModelVisitor" class="de.hybris.platform.cmsfacades.synchronization.itemvisitors.impl.MediaContainerModelVisitor"/>
+	
+</beans>

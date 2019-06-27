@@ -1,0 +1,49 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=electronicsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$addonExtensionName=secaddon
+
+#cms-content.impex
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false'];previewImage(code, $contentCV)
+;;support-tickets;Support Tickets Page;AccountPageTemplate;support-tickets
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='support-tickets'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-support-tickets;BodyContent;;BodyContent-support-tickets;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;BodyContent-support-tickets;Body Content Slot for SecAngularComponent;true;SecAngularComponent;;;
+
+# CMS Navigation Nodes (children of my account)
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SupportTicketNavNode;;SupportTicketNavNode;MyAccountNavNode;;SupportTicketNavNode
+
+# create cms navigation entry for nvaigation child nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;SupportTicketNavNodeEntry;;SupportTicketNavNodeEntry;SupportTicketNavNode;AccountSupportTicketHistoryLink;
+
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];
+;;AccountSupportTicketHistoryLink;AccountSupportTicketHistoryLink;/my-account/support-tickets;AccountSupportTicketHistoryLink;AccountSupportTicketHistoryLink;;
+
+INSERT_UPDATE SECAngularScriptComponent;$contentCV[unique=true];uid[unique=true];name;file;actions(uid,$contentCV);&componentRef
+;;SecAngularComponent;Angular Component;/WEB-INF/views/addons/secaddon/responsive/pages/angular/angularPage.jsp;;SecAngularComponent
+
+
+INSERT_UPDATE SecChatComponent;$contentCV[unique=true];uid[unique=true];name;chatScript;&componentRef
+;;SecChatComponent;Sec Chat Service Component;Text/Video Chat Script;SecChatComponent
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)[mode=append]
+;;NavigationBarSlot;true;SecChatComponent

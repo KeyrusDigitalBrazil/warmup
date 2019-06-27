@@ -1,0 +1,88 @@
+<div data-ng-controller="topToolbarMenuController"
+    data-uib-dropdown
+    data-is-open="item.isOpen"
+    class="btn-group pe-toolbar-action pe-combined-view-menu"
+    data-auto-close="disabled">
+    <button type="button"
+        class="btn btn-default pe-toolbar-action__button"
+        data-uib-dropdown-toggle
+        data-ng-disabled="disabled"
+        aria-pressed="false"
+        data-ng-class="{'pe-toolbar-action__button-with-context': isCombinedViewCustomizationSelected()}">
+        <span class="hyicon hyicon-combinedview pe-toolbar-menu-ddlb__button-icon"></span>
+        <span class="pe-toolbar-action__button-txt"
+            data-translate="personalization.toolbar.combinedview.name"></span>
+    </button>
+
+    <personalizationsmartedit-combined-view-toolbar-context></personalizationsmartedit-combined-view-toolbar-context>
+
+    <div data-uib-dropdown-menu
+        class="btn-block pe-toolbar-action--include">
+
+        <ul class="pe-toolbar-menu-content se-toolbar-menu-content--pe-customized"
+            role="menu">
+            <div class="se-toolbar-menu-content--pe-customized__headers">
+                <h2 class="se-toolbar-menu-content--pe-customized__headers--h2"
+                    data-translate="personalization.toolbar.combinedview.header.title"></h2>
+                <y-help class="se-toolbar-menu-content__y-help"
+                    data-template="'<span data-translate=personalization.toolbar.combinedview.header.description></span>'"></y-help>
+            </div>
+            <div class="pe-combined-view-menu">
+                <div class="pe-combined-view-panel__wrapper"
+                    data-ng-controller="personalizationsmarteditCombinedViewMenuController">
+                    <div class="pe-combined-view-panel__configure-layout">
+                        <button class="btn btn-link pe-combined-view-panel__configure-btn perso-wrap-ellipsis"
+                            data-ng-click="$parent.combinedViewClick()"
+                            data-translate="personalization.toolbar.combinedview.openconfigure.button"
+                            title="{{'personalization.toolbar.combinedview.openconfigure.button' | translate}}">
+                        </button>
+                        <div class="perso-toggle">
+                            <label class="personalization-modal__label perso-toggle__label perso-wrap-ellipsis"
+                                data-translate="personalization.toolbar.combinedview.toggle.label"
+                                title="{{'personalization.toolbar.combinedview.toggle.label' | translate}}"></label>
+                            <span class="y-toggle y-toggle-lg">
+                                <input type="checkbox"
+                                    id="combinedview-checkbox-1"
+                                    data-ng-change="combinedViewEnabledChangeEvent()"
+                                    data-ng-model="combinedView.enabled" />
+                                <label class="perso-toggle__checkbox-label"
+                                    for="combinedview-checkbox-1"></label>
+                            </span>
+                        </div>
+                    </div>
+                    <div data-ng-class="combinedView.enabled ? '':'pe-combined-view-panel--disabled'">
+                        <div class="pe-combined-view-panel__list-layout"
+                            data-ng-repeat="item in selectedItems"
+                            data-ng-click="itemClick(item)"
+                            data-ng-class="{'pe-combined-view-panel-list__item--highlighted': item.highlighted}">
+                            <div class="pe-combined-view-panel-list__letter-layout">
+                                <div data-ng-class="getClassForElement($index)"
+                                    data-ng-bind="getLetterForElement($index)"></div>
+                            </div>
+                            <div class="pe-combined-view-panel-list__names-layout">
+                                <div class="perso-wrap-ellipsis"
+                                    data-ng-bind="item.customization.name"
+                                    title="{{item.customization.name}}"></div>
+                                <div class="perso-wrap-ellipsis perso-tree__primary-data"
+                                    data-ng-bind="item.variation.name"
+                                    title="{{item.variation.name}}"></div>
+                            </div>
+                            <div class="pe-combined-view-panel-list__icon">
+                                <span data-ng-if="!isItemFromCurrentCatalog(item.variation)"
+                                    class="perso__globe-icon hyicon hyicon-globe"
+                                    data-uib-tooltip="{{item.variation.catalogVersionNameL10N}}"
+                                    data-tooltip-placement="auto top"
+                                    data-tooltip-enable="combinedView.enabled"></span>
+                            </div>
+                        </div>
+                        <div class="pe-spinner--outer"
+                            data-ng-show="moreCustomizationsRequestProcessing">
+                            <div data-ng-include="'waitDialog.html'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ul>
+    </div>
+
+</div>

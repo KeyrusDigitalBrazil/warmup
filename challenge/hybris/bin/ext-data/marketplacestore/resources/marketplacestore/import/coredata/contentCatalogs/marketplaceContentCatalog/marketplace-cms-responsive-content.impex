@@ -1,0 +1,84 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import marketplace specific CMS content
+#
+$contentCatalog=marketplaceContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+$addonExtensionName=marketplaceaddon
+$storeName=marketplacestore
+
+# Import modulegen config properties into impex macros
+UPDATE GenericItem[processor=de.hybris.platform.commerceservices.impex.impl.ConfigPropertyImportProcessor];pk[unique=true]
+$jarResourceCms=$config-jarResourceCmsValue
+$vendorJarResourceCms=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/$storeName/import/sampledata/cockpits/cmscockpit
+
+# Create VendorLandingPageTemplate
+# These define the layout for pages
+# "FrontendTemplateName" is used to define the JSP that should be used to render the page for pages with multiple possible layouts.
+# "RestrictedPageTypes" is used to restrict templates to page types
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;VendorLandingPageTemplate;Vendor Landing Page Template;addon:/$addonExtensionName/pages/layout/vendorLandingLayoutPage
+;;VendorIndexPageTemplate;Vendor Index Page Template;addon:/$addonExtensionName/pages/layout/vendorIndexLayoutPage;ContentPage
+;;ProductDetailsPageTemplate;Product Details Page Template;addon:/$addonExtensionName/pages/product/productLayout2Page;ProductPage
+
+# Add Velocity templates that are in the CMS Cockpit. These give a better layout for editing pages
+# The FileLoaderValueTranslator loads a File into a String property. The templates could also be inserted in-line in this file.
+UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];velocityTemplate[translator=de.hybris.platform.commerceservices.impex.impl.FileLoaderValueTranslator]
+;;VendorLandingPageTemplate;$vendorJarResourceCms/structure-view/structure_vendorLandingPageTemplate.vm
+;;VendorIndexPageTemplate;$vendorJarResourceCms/structure-view/structure_vendorIndexPageTemplate.vm
+
+# Create ContentSlots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;VendorLeftBodySlot;Vendor Landing page left slot;true
+
+# Product Grid Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='VendorLandingPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;VendorLeftBodySlot;;;wide
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='VendorLandingPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-VendorLandingPage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-VendorLandingPage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;NavigationBar-VendorLandingPage;NavigationBar;;NavigationBarSlot;true
+;;MiniCart-VendorLandingPage;MiniCart;;MiniCartSlot;true
+;;Footer-VendorLandingPage;Footer;;FooterSlot;true
+;;HeaderLinks-VendorLandingPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-VendorLandingPage;SearchBox;;SearchBoxSlot;true
+;;TopHeaderSlot-VendorLandingPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-VendorLandingPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;VendorLeftBodySlot-VendorLandingPage;VendorLeftBodySlot;;VendorLeftBodySlot;true
+;;PlaceholderContentSlot-VendorLandingPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+
+# Create ContentSlots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;VendorGridSlot;Vendor Grid Slot;true
+
+# Product Grid Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='VendorIndexPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;VendorGridSlot;;;wide
+
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='VendorIndexPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-VendorIndexPage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-VendorIndexPage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;NavigationBar-VendorIndexPage;NavigationBar;;NavigationBarSlot;true
+;;MiniCart-VendorIndexPage;MiniCart;;MiniCartSlot;true
+;;Footer-VendorIndexPage;Footer;;FooterSlot;true
+;;HeaderLinks-VendorIndexPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-VendorIndexPage;SearchBox;;SearchBoxSlot;true
+;;TopHeaderSlot-VendorIndexPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-VendorIndexPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;VendorGridSlot-VendorIndexPage;VendorGridSlot;;VendorGridSlot;true
+;;PlaceholderContentSlot-VendorIndexPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false']
+;;vendorIndexPage;Vendor Index Page;VendorIndexPageTemplate;/vendorIndexPage

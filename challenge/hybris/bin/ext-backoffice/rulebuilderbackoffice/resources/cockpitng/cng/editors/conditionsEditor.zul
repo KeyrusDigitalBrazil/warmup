@@ -1,0 +1,122 @@
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<?component name="togglebutton" extends="button" class="de.hybris.platform.rulebuilderbackoffice.components.ToggleButton"?>
+
+<zk xmlns:h="xhtml">
+	<div
+		viewModel="@id('vm') @init(widgetSettings.editorViewModelClass)"
+		sclass="yrb-conditions-editor">
+		<div sclass="yrb-condition-breadcrumbs">
+			<html content="@bind(vm.conditionBreadcrumbs)" />
+		</div>
+		<borderlayout height="450px">
+			<center autoscroll="true">
+				<div sclass="yrb-conditions">
+					<template name="conditions">
+						<forEach items="@bind(tree.children)" var="treeNode">
+							<div draggable="ruleCondition" droppable="ruleCondition,ruleConditionDefinition"
+								onDrop="@command('dropCondition', target=treeNode, isDropPlaceholder=false, source=event.dragged.attributes['draggableSource'])"
+								sclass="@load('yrb-condition yrb-condition-'.concat(treeNode.data.conditionDefinition.id))"
+								condition="@ref(treeNode.data)" conditionDefinition="@ref(treeNode.data.conditionDefinition)">
+
+								<custom-attributes draggableSource="${treeNode}" />
+
+								<div sclass="yrb-condition-handle" />
+
+								<div sclass="yrb-condition-content">
+									<groupbox mold="3d"
+										closable="@load(not (conditionDefinition.allowsChildren or empty condition.parameters))"
+										open="@bind(condition.expanded)">
+										<caption zclass="yrb-condition-caption">
+											<choose>
+												<when test="@load(conditionDefinition.allowsChildren)">
+													<div zclass="yrb-expandable-node">
+														<togglebutton checked="@bind(treeNode.expanded)"
+															checkedIconSclass="z-icon-caret-down" uncheckedIconSclass="z-icon-caret-right"
+															zclass="yrb-toggle-children-btn" />
+													</div>
+													<label value="@load(conditionDefinition.name)" />
+													<apply template="conditionParameters"
+														parameters="@ref(condition.parameters)" />
+												</when>
+												<otherwise>
+													<div zclass="yrb-node" />
+													<if test="@load(not empty condition.parameters)">
+														<h:i
+															class="@bind(condition.expanded ? 'z-icon-caret-down' : 'z-icon-caret-right')" />
+													</if>
+													<label value="@load(conditionDefinition.name)" />
+													
+												</otherwise>
+											</choose>
+
+											<button onClick="@command('removeCondition', treeNode=treeNode)"
+												iconSclass="z-icon-times-circle-o" zclass="yrb-delete-btn ye-delete-btn" />
+										</caption>
+										<if test="@load(not conditionDefinition.allowsChildren)">
+											<apply template="conditionParameters"
+												parameters="@ref(condition.parameters)" />
+										</if>
+									</groupbox>
+
+									<if test="@load(conditionDefinition.allowsChildren)">
+										<div sclass="yrb-condition-children" visible="@bind(treeNode.expanded)">
+											<apply template="conditions" tree="@ref(treeNode)" />
+										</div>
+									</if>
+								</div>
+							</div>
+						</forEach>
+
+						<div draggable="" droppable="ruleCondition,ruleConditionDefinition"
+							onDrop="@command('dropCondition', target=tree, isDropPlaceholder=true, source=event.dragged.attributes['draggableSource'])"
+							sclass="yrb-conditions-drop-placeholder">
+							<label
+								value="@load(c:l('de.hybris.platform.rulebuilderbackoffice.editors.conditionseditor.dropConditionsHere'))" />
+						</div>
+					</template>
+
+					<template name="conditionParameters" src="/cng/editors/parameters.zul" />
+
+					<apply template="conditions" tree="@ref(vm.conditions)" />
+				</div>
+			</center>
+			<east
+				title="@load(c:l('de.hybris.platform.rulebuilderbackoffice.editors.conditionseditor.availableConditions'))"
+				splittable="false" collapsible="true" autoscroll="true" width="25%">
+
+				<listbox id="conditionDefinitions" model="@load(vm.conditionDefinitions)"
+					sclass="yrb-condition-definitions" sizedByContent="true" span="true">
+					<listhead>
+						<listheader />
+					</listhead>
+					<template name="model:group">
+						<listgroup>
+							<listcell>
+								<if test="@load(not empty each.category.icon.url)">
+									<image src="@load('~'.concat(each.category.icon.url))" />
+								</if>
+								<label value="@load(each.category.name)" />
+							</listcell>
+						</listgroup>
+					</template>
+					<template name="model">
+						<listitem checkable="false" draggable="ruleConditionDefinition"
+							sclass="yrb-condition-definition">
+							<custom-attributes draggableSource="${each}" />
+							<listcell label="@load(each.conditionDefinition.name)" />
+						</listitem>
+					</template>
+				</listbox>
+			</east>
+		</borderlayout>
+	</div>
+</zk>

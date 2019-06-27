@@ -1,0 +1,1749 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch">
+
+	<context type="CxAbstractCalcConfig">
+		<!-- Base configuration -->
+		<context  component="base" merge-by="type" type="CxAbstractCalcConfig">
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxAbstractCalcConfig">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section	name="backoffice.personalizationservices.section.general" >
+						<editorArea:attribute qualifier="code" />
+					</editorArea:section>
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="userType" />
+						<editorArea:attribute qualifier="actions" editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>availableValuesProvider</editorArea:name>
+								<editorArea:value>recalculateActionEditorSearchFacade</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+					<editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxAbstractCalcConfig">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="userType" />
+				<list-view:column qualifier="actions" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxAbstractCalcConfig">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="userType" selected="true" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxAbstractCalcConfig">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newCxCalcConfig" type="ctx.TYPE_CODE" />
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="code" type="java.lang.String" />
+							<wz:property qualifier="userType" type="de.hybris.platform.personalizationservices.enums.CxUserType" />
+							<wz:property editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor"
+										 qualifier="actions" type="Set(java.lang.String)">
+								<wz:editor-parameter>
+									<wz:name>availableValuesProvider</wz:name>
+									<wz:value>recalculateActionEditorSearchFacade</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newCxCalcConfig" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration no save-->
+		<context component="create-wizard-no-save" type="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newCxCalcConfig" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="code" type="java.lang.String" />
+							<wz:property qualifier="userType" type="de.hybris.platform.personalizationservices.enums.CxUserType" />
+							<wz:property editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor"
+										 qualifier="actions" type="Set(java.lang.String)">
+								<wz:editor-parameter>
+									<wz:name>availableValuesProvider</wz:name>
+									<wz:value>recalculateActionEditorSearchFacade</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done/>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration - inner with save-->
+		<context component="create-wizard-inner" type="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newCxCalcConfig" type="ctx.TYPE_CODE" />
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="code" type="java.lang.String" />
+							<wz:property qualifier="userType" type="de.hybris.platform.personalizationservices.enums.CxUserType" />
+							<wz:property editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor"
+										 qualifier="actions" type="Set(java.lang.String)">
+								<wz:editor-parameter>
+									<wz:name>availableValuesProvider</wz:name>
+									<wz:value>recalculateActionEditorSearchFacade</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newCxCalcConfig" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxUrlVoterConfig">
+		<!-- Base configuration -->
+		<context  component="base" merge-by="type" type="CxUrlVoterConfig">
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section	name="backoffice.personalizationservices.section.general">
+						<editorArea:attribute qualifier="cxConfig"  readonly="true"/>
+					</editorArea:section>
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="urlRegexp" position="1"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<list-view:list-view>
+				<list-view:column qualifier="cxConfig" />
+				<list-view:column qualifier="urlRegexp" />
+			</list-view:list-view>
+		</context>
+		<!-- List view for in editorArea (displayed for CxConfig)-->
+		<context component="listview-for-editorArea" type="CxPeriodicVoterConfig" >
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="userType" />
+				<list-view:column qualifier="urlRegexp" hflex="2"/>
+				<list-view:column qualifier="actions" hflex="2" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="urlRegexp" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="urlRegexp" type="java.lang.String" />
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration no save-->
+		<context component="create-wizard-no-save" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="urlRegexp" type="java.lang.String" />
+							<wz:property qualifier="cxConfig"  exclude="true"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration - inner with save-->
+		<context component="create-wizard-inner" type="CxUrlVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="urlRegexp" type="java.lang.String" />
+							<wz:property qualifier="cxConfig"  exclude="true"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxPeriodicVoterConfig">
+		<!-- Base configuration -->
+		<context  component="base" merge-by="type" type="CxPeriodicVoterConfig">
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section	name="backoffice.personalizationservices.section.general">
+						<editorArea:attribute qualifier="cxConfig"  readonly="true"/>
+					</editorArea:section>
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="userMinTime" />
+						<editorArea:attribute qualifier="userMinRequestNumber" />
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<list-view:list-view>
+				<list-view:column qualifier="cxConfig" />
+				<list-view:column qualifier="userMinTime" />
+				<list-view:column qualifier="userMinRequestNumber" />
+			</list-view:list-view>
+		</context>
+
+		<!-- List view for in editorArea (displayed for CxConfig)-->
+		<context component="listview-for-editorArea" type="CxPeriodicVoterConfig" >
+			<list-view:list-view>
+				<list-view:column qualifier="code"  />
+				<list-view:column qualifier="userType" />
+				<list-view:column qualifier="userMinTime" />
+				<list-view:column qualifier="userMinRequestNumber" />
+				<list-view:column qualifier="actions" hflex="2"/>
+			</list-view:list-view>
+		</context>
+
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="userMinTime" selected="false" />
+					<advanced-search:field name="userMinRequestNumber" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="userMinTime" type="java.lang.Long" />
+							<wz:property qualifier="userMinRequestNumber" type="java.lang.Integer" />
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration no save-->
+		<context component="create-wizard-no-save" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="userMinTime" type="java.lang.Long" />
+							<wz:property qualifier="userMinRequestNumber" type="java.lang.Integer" />
+							<wz:property qualifier="cxConfig"  exclude="true"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration inner with save-->
+		<context component="create-wizard-inner" type="CxPeriodicVoterConfig" merge-by="type" parent="CxAbstractCalcConfig">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:assign property="newCxCalcConfig.cxConfig" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxCalcConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true"  >
+							<wz:property qualifier="userMinTime" type="java.lang.Long" />
+							<wz:property qualifier="userMinRequestNumber" type="java.lang.Integer" />
+							<wz:property qualifier="cxConfig"  exclude="true"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxConfig">
+		<!-- Base configuration -->
+		<context component="base" type="CxConfig" >
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context type="CxConfig" component="editorAreaDynamicForms" module="platformbackoffice">
+			<df:dynamicForms xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms">
+				<df:attribute disabledIf="baseSites.isEmpty() &amp;&amp; consentTemplates.isEmpty()"
+							  id="baseSitesNotEmpty" qualifier="consentTemplates"
+							  triggeredOn="baseSites,consentTemplates"/>
+			</df:dynamicForms>
+		</context>
+
+		<context component="editor-area" type="CxConfig">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section name="backoffice.personalizationservices.section.general">
+						<editorArea:attribute qualifier="baseSites" />
+						<editorArea:attribute qualifier="consentTemplates">
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_baseSite_contains</editorArea:name>
+								<editorArea:value>{{parentObject.baseSites}}</editorArea:value>
+							</editorArea:editor-parameter>
+							<editorArea:editor-parameter>
+								<editorArea:name>referenceSearchCondition_exposed</editorArea:name>
+								<editorArea:value>{true}</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="userSegmentsStoreInSession" >
+							<editorArea:editor-parameter>
+								<editorArea:name>showOptionalField</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+					<editorArea:section name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="actionResultMaxRepeat" />
+						<editorArea:attribute qualifier="catalogLookup" />
+					</editorArea:section>
+				</editorArea:tab>
+
+				<editorArea:tab name="backoffice.personalizationservices.calculation">
+					<editorArea:section	name="backoffice.personalizationservices.section.general">
+						<editorArea:attribute qualifier="calculationProcess" />
+						<editorArea:attribute qualifier="minAffinity" />
+					</editorArea:section>
+					<editorArea:section name="backoffice.personalizationservices.section.initialactions">
+						<editorArea:attribute qualifier="userChangedActions" editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>availableValuesProvider</editorArea:name>
+								<editorArea:value>recalculateActionEditorSearchFacade</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="anonymousUserDefaultActions" editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>availableValuesProvider</editorArea:name>
+								<editorArea:value>recalculateActionEditorSearchFacade</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+
+						<editorArea:attribute qualifier="consentGivenActions" editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor">
+							<editorArea:editor-parameter>
+								<editorArea:name>availableValuesProvider</editorArea:name>
+								<editorArea:value>recalculateActionEditorSearchFacade</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+
+					</editorArea:section>
+					<editorArea:section	name="backoffice.personalizationservices.section.urlactions">
+						<editorArea:panel name="backoffice.personalizationservices.panel.urlactions">
+							<editorArea:attribute qualifier="urlVoterConfigs" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+								<editorArea:editor-parameter>
+									<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+									<editorArea:value>create-wizard-inner</editorArea:value>
+								</editorArea:editor-parameter>
+								<editorArea:editor-parameter>
+									<editorArea:name>listConfigContext</editorArea:name>
+									<editorArea:value>listview-for-editorArea</editorArea:value>
+								</editorArea:editor-parameter>
+							</editorArea:attribute>
+						</editorArea:panel>
+					</editorArea:section>
+					<editorArea:section	name="backoffice.personalizationservices.section.periodicactions">
+						<editorArea:panel name="backoffice.personalizationservices.panel.periodicactions">
+							<editorArea:attribute qualifier="periodicVoterConfigs" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor">
+								<editorArea:editor-parameter>
+									<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+									<editorArea:value>create-wizard-inner</editorArea:value>
+								</editorArea:editor-parameter>
+								<editorArea:editor-parameter>
+									<editorArea:name>listConfigContext</editorArea:name>
+									<editorArea:value>listview-for-editorArea</editorArea:value>
+								</editorArea:editor-parameter>
+							</editorArea:attribute>
+						</editorArea:panel>
+					</editorArea:section>
+				</editorArea:tab>
+
+				<editorArea:tab name="backoffice.personalizationservices.occ.configuration">
+				<editorArea:section	name="backoffice.personalizationservices.section.general">
+					<editorArea:attribute qualifier="occPersonalizationEnabled">
+						<editorArea:editor-parameter>
+							<editorArea:name>showOptionalField</editorArea:name>
+							<editorArea:value>false</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+					<editorArea:attribute qualifier="occTTL" />
+					<editorArea:attribute qualifier="occPersonalizationIdCookieEnabled">
+						<editorArea:editor-parameter>
+							<editorArea:name>showOptionalField</editorArea:name>
+							<editorArea:value>false</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+				</editorArea:tab>
+
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+
+		<!-- List view configuration -->
+		<context component="listview" type="CxConfig">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="baseSites" />
+				<list-view:column qualifier="minAffinity" />
+				<list-view:column qualifier="actionResultMaxRepeat" />
+				<list-view:column qualifier="consentTemplates" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxConfig">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="baseSites" selected="false" />
+					<advanced-search:field name="calculationProcess" selected="false" />
+					<advanced-search:field name="consentTemplates" selected="false" />
+					<advanced-search:field name="minAffinity" selected="true" />
+					<advanced-search:field name="actionResultMaxRepeat" selected="true" />
+					<advanced-search:field name="catalogLookup" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxConfig">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+				<simple-search:field name="baseSites" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Basic wizard configuration -->
+		<context type="CxConfig" component="configurableFlowDynamicForms" module="platformbackoffice">
+			<df:dynamicForms modelProperty="newCxConfig" xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms">
+				<df:attribute id="wizardBaseSitesNotEmpty" qualifier="consentTemplates" disabledIf="(baseSites==null or baseSites.isEmpty()) and (consentTemplates==null or consentTemplates.isEmpty())" triggeredOn="baseSites,consentTemplates"/>
+			</df:dynamicForms>
+		</context>
+
+		<context component="create-wizard" type="CxConfig">
+			<wz:flow id="CxCustomizationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="cxConfigPrepare">
+					<wz:initialize property="newCxConfig" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="essential.label">
+					<wz:content id="step1.content">
+						<wz:property-list root="newCxConfig"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true">
+							<wz:property qualifier="code"/>
+							<wz:property qualifier="baseSites"/>
+							<wz:property qualifier="consentTemplates">
+								<wz:editor-parameter>
+									<wz:name>referenceSearchCondition_baseSite_contains</wz:name>
+									<wz:value>{{parentObject.baseSites}}</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>referenceSearchCondition_exposed</wz:name>
+									<wz:value>{true}</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="actionResultMaxRepeat"/>
+
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:next />
+					</wz:navigation>
+				</wz:step>
+				<wz:step id="step2" label="backoffice.personalizationservices.calculation">
+					<wz:content id="step2.content">
+						<wz:property-list root="newCxConfig">
+							<wz:property qualifier="calculationProcess" />
+							<wz:property qualifier="minAffinity"/>
+							<wz:property editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor"
+										 qualifier="anonymousUserDefaultActions" type="Set(java.lang.String)">
+								<wz:editor-parameter>
+									<wz:name>availableValuesProvider</wz:name>
+									<wz:value>recalculateActionEditorSearchFacade</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property editor="de.hybris.platform.personalizationservicesbackoffice.editor.defaultrecalculateactioneditor"
+										 qualifier="userChangedActions" type="Set(java.lang.String)">
+								<wz:editor-parameter>
+									<wz:name>availableValuesProvider</wz:name>
+									<wz:value>recalculateActionEditorSearchFacade</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="urlVoterConfigs" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" >
+								<wz:editor-parameter>
+									<wz:name>configurableFlowConfigCtx</wz:name>
+									<wz:value>create-wizard-no-save</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>listConfigContext</wz:name>
+									<wz:value>listview-for-editorArea</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>isNestedObjectCreationDisabled</wz:name>
+									<wz:value>false</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+							<wz:property qualifier="periodicVoterConfigs" editor="com.hybris.cockpitng.editor.extendedmultireferenceeditor" >
+								<wz:editor-parameter>
+									<wz:name>configurableFlowConfigCtx</wz:name>
+									<wz:value>create-wizard-no-save</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>listConfigContext</wz:name>
+									<wz:value>listview-for-editorArea</wz:value>
+								</wz:editor-parameter>
+								<wz:editor-parameter>
+									<wz:name>isNestedObjectCreationDisabled</wz:name>
+									<wz:value>false</wz:value>
+								</wz:editor-parameter>
+							</wz:property>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step2.navigation">
+						<wz:back/>
+						<wz:cancel/>
+						<wz:done >
+							<wz:save-all/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+	
+	<context type="CxResults">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" type="CxResults">
+			<y:base>
+				<y:labels>
+					<y:label>key</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxResults">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+						name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="key" />
+						<editorArea:attribute qualifier="sessionKey" />
+						<editorArea:attribute qualifier="calculationTime" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="anonymous" />
+						<editorArea:attribute qualifier="default" >
+							<editorArea:editor-parameter>
+								<editorArea:name>showOptionalField</editorArea:name>
+								<editorArea:value>false</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+					<editorArea:customSection name="hmc.unbound"
+						spring-bean="unboundSectionRenderer" />
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxResults">
+			<list-view:list-view>
+				<list-view:column qualifier="key" />
+				<list-view:column qualifier="sessionKey" />
+				<list-view:column qualifier="calculationTime" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="anonymous" />
+				<list-view:column qualifier="default" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxResults">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false"
+						editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="key" selected="true" />
+					<advanced-search:field name="sessionKey"
+						selected="false" />
+					<advanced-search:field name="catalogVersion"
+						selected="true" />
+					<advanced-search:field name="anonymous"
+						selected="false" />
+					<advanced-search:field name="default"
+						selected="false" />
+					<advanced-search:field name="calculationTime"
+						selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxResults">
+			<simple-search:simple-search>
+				<simple-search:field name="key" />
+			</simple-search:simple-search>
+		</context>
+	</context>	
+
+	<context type="CxSegment">
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" type="CxSegment">
+			<y:base>
+				<y:labels>
+					<y:label>code</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxSegment">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="description" />
+						<editorArea:attribute qualifier="triggers" />
+						<editorArea:attribute qualifier="expressionTriggers" readonly="true"/>
+						<editorArea:attribute qualifier="userToSegments">
+							<editorArea:editor-parameter>
+								<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+								<editorArea:value>create-wizard-no-save</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxSegment">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="triggers" />
+				<list-view:column qualifier="expressionTriggers" />
+				<list-view:column qualifier="description" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxSegment">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="triggers" selected="false" />
+					<advanced-search:field name="expressionTriggers" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxSegment">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxSegment">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newSegment" type="ctx.TYPE_CODE" />
+				</wz:prepare>
+				<wz:step id="step1" label="backoffice.personalizationservices.segment.wizard">
+					<wz:content id="step1.content">
+						<wz:property-list root="newSegment"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" />
+						<wz:property qualifier="newSegment.description"/>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newSegment" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxAbstractTrigger">
+		<!-- Base configuration -->
+		<context component="base" type="CxAbstractTrigger">
+			<y:base>
+				<y:labels>
+					<y:label>code + " (" + variation.code +")" + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxAbstractTrigger">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="variation" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxAbstractTrigger">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="variation" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxAbstractTrigger">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="catalogVersion" selected="true" />
+					<advanced-search:field name="variation" selected="true" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxAbstractTrigger">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Additional wizard configuration no save-->
+		<context component="create-wizard-no-save" type="CxAbstractTrigger">
+			<wz:flow id="CxAbstractTriggerWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="segmentTriggerPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.variation" value="ctx.parentObject"/>
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true"
+										  enable-non-declared-includes="true" >
+							<wz:property qualifier="code" position="1"/>
+							<wz:property qualifier="variation" position="2"/>
+							<wz:property qualifier="catalogVersion" exclude="true" />
+					    </wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:assign property="newItem.catalogVersion" value="newItem.variation.catalogVersion"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Additional wizard configuration -->
+		<context component="create-wizard" type="CxAbstractTrigger" merge-by="component" parent="create-wizard-no-save">
+			<wz:flow id="CxAbstractTriggerWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+	</context>
+
+	<context type="CxSegmentTrigger" >
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger" >
+			<y:base>
+				<y:labels>
+					<y:label>code + " (" + variation.code +")" + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="segments" />
+						<editorArea:attribute qualifier="groupBy" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger">
+			<list-view:list-view>
+				<list-view:column qualifier="segments" />
+				<list-view:column qualifier="groupBy" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="segments" selected="true" />
+					<advanced-search:field name="groupBy" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+
+		<!-- Additional wizard configuration no save-->
+		<context component="create-wizard-no-save" merge-by="type" parent="CxAbstractTrigger" type="CxSegmentTrigger">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="segments" position="3"/>
+							<wz:property qualifier="groupBy" position="4"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+		<!-- save wizard -->
+		<context component="create-wizard" merge-by="component" parent="create-wizard-no-save" type="CxSegmentTrigger">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+	</context>
+
+	<context type="CxExpressionTrigger" >
+		<!-- Base configuration -->
+		<context component="base" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger" >
+			<y:base>
+				<y:labels>
+					<y:label>code + " (" + variation.code +")" + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="expression" />
+						<editorArea:attribute qualifier="segments" readonly="true"/>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger">
+			<list-view:list-view>
+				<list-view:column qualifier="segments" />
+				<list-view:column qualifier="expression" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="segments" selected="true" />
+					<advanced-search:field name="expression" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+
+		<!-- no save wizard -->
+		<context component="create-wizard-no-save" merge-by="type" parent="CxAbstractTrigger" type="CxExpressionTrigger">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="segments" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+		<!-- save wizard -->
+		<context component="create-wizard" merge-by="component" parent="create-wizard-no-save" type="CxExpressionTrigger">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+	</context>
+
+	<context type="CxVariation">
+		<!-- Base configuration -->
+		<context  component="base" type="CxVariation">
+			<y:base>
+				<y:labels>
+					<y:label>name + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxVariation">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="name" />
+						<editorArea:attribute qualifier="customization" />
+						<editorArea:attribute qualifier="actions">
+							<editorArea:editor-parameter>
+								<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+								<editorArea:value>create-wizard-no-save</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="triggers">
+							<editorArea:editor-parameter>
+								<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+								<editorArea:value>create-wizard-no-save</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="rank" />
+						<editorArea:attribute qualifier="enabled" />
+						<editorArea:attribute qualifier="active" />
+						<editorArea:attribute qualifier="status" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxVariation">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="name" />
+				<list-view:column qualifier="customization" />
+				<list-view:column qualifier="rank" />
+				<list-view:column qualifier="active" />
+				<list-view:column qualifier="status" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxVariation">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="catalogVersion" selected="true" />
+					<advanced-search:field name="name" selected="true" />
+					<advanced-search:field name="customization" selected="true" />
+					<advanced-search:field name="enabled" selected="false" />
+					<advanced-search:field name="status" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxVariation">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+				<simple-search:field name="name" />
+			</simple-search:simple-search>
+		</context>
+
+		<!-- No-save wizard configuration -->
+		<context component="create-wizard-no-save" type="CxVariation">
+			<wz:flow id="CxVariationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="variationPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newItem.customization" value="ctx.parentObject"/>
+					<wz:assign property="newItem.enabled" value="true"/>
+					<wz:assign property="newItem.status" value="ENABLED"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true">
+							<wz:property qualifier="status"/>
+							<wz:property qualifier="catalogVersion" exclude="true" />
+							<wz:property qualifier="enabled" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:assign property="newItem.catalogVersion" value="newItem.customization.catalogVersion"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Save wizard configuration -->
+		<context component="create-wizard" type="CxVariation"  merge-by="component" parent="create-wizard-no-save">
+			<wz:flow id="CxVariationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxAbstractAction">
+		<!-- Base configuration -->
+		<context component="base" type="CxAbstractAction">
+			<y:base>
+				<y:labels>
+					<y:label>code + ", " + affectedObjectKey</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxAbstractAction">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="variation" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxAbstractAction">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="variation" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxAbstractAction">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="catalogVersion" selected="true" />
+					<advanced-search:field name="variation" selected="true" />
+					<advanced-search:field name="target" selected="false" />
+					<advanced-search:field name="type" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxAbstractAction">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Creation wizard no save -->
+		<context component="create-wizard-no-save" type="CxAbstractAction">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newAction" type="ctx.TYPE_CODE" />
+					<wz:assign property="newAction.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newAction.variation" value="ctx.parentObject"/>
+					<wz:assign property="newAction.type" value="T(de.hybris.platform.servicelayer.enums.ActionType).PLAIN"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newAction"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="catalogVersion" exclude="true" />
+							<wz:property qualifier="type" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:assign property="newAction.catalogVersion" value="newAction.variation.catalogVersion"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxAbstractAction" merge-by="component" parent="create-wizard-no-save">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newAction" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+	</context>
+
+	<context type="CxCustomization">
+		<!-- Base configuration -->
+		<context component="base" type="CxCustomization">
+			<y:base>
+				<y:labels>
+					<y:label>name + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxCustomization">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="name" />
+						<editorArea:attribute qualifier="longDescription" />
+						<editorArea:attribute qualifier="group" />
+						<editorArea:attribute qualifier="rank" />
+						<editorArea:attribute qualifier="status" />
+						<editorArea:attribute qualifier="variations">
+							<editorArea:editor-parameter>
+								<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+								<editorArea:value>create-wizard-no-save</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+						<editorArea:attribute qualifier="enabledStartDate" />
+						<editorArea:attribute qualifier="enabledEndDate" />
+						<editorArea:attribute qualifier="active" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxCustomization">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="name" />
+				<list-view:column qualifier="group" />
+				<list-view:column qualifier="rank" />
+				<list-view:column qualifier="status" />
+			</list-view:list-view>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxCustomization">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="catalogVersion" selected="true" />
+					<advanced-search:field name="name" selected="true" />
+					<advanced-search:field name="group" selected="true" />
+					<advanced-search:field name="enabledStartDate" selected="true" />
+					<advanced-search:field name="enabledEndDate" selected="true" />
+					<advanced-search:field name="description" selected="false" />
+					<advanced-search:field name="status" selected="false" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxCustomization">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+				<simple-search:field name="name" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Additional wizard configuration -->
+		<context component="create-wizard-no-save" type="CxCustomization">
+			<wz:flow id="CxCustomizationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="variationPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newItem.group" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true">
+							<wz:property qualifier="status"/>
+							<wz:property qualifier="catalogVersion" exclude="true" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:assign property="newItem.catalogVersion" value="newItem.group.catalogVersion"/>
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Basic wizard configuration -->
+		<context component="create-wizard" type="CxCustomization" merge-by="component" parent="create-wizard-no-save">
+			<wz:flow id="CxCustomizationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="variationPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newItem.group" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true">
+							<wz:property qualifier="status"/>
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxCustomizationsGroup">
+		<!-- Base configuration -->
+		<context component="base" type="CxCustomizationsGroup">
+			<y:base>
+				<y:labels>
+					<y:label>code + " : " + catalogVersion.version</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxCustomizationsGroup">
+			<list-view:list-view>
+				<list-view:column qualifier="code" />
+				<list-view:column qualifier="catalogVersion" />
+				<list-view:column qualifier="customizations" />
+			</list-view:list-view>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxCustomizationsGroup">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="code" />
+						<editorArea:attribute qualifier="catalogVersion" />
+						<editorArea:attribute qualifier="customizations" >
+							<editorArea:editor-parameter>
+								<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+								<editorArea:value>create-wizard-no-save</editorArea:value>
+							</editorArea:editor-parameter>
+						</editorArea:attribute>
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxCustomizationsGroup">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="code" selected="true" />
+					<advanced-search:field name="catalogVersion" selected="true" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxCustomizationsGroup">
+			<simple-search:simple-search>
+				<simple-search:field name="code" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Basic wizard configuration -->
+		<context component="create-wizard" type="CxCustomizationsGroup">
+			<wz:flow id="CxCustomizationGroupWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="variationPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newItem.group" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" />
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newItem" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+
+		<!-- Additional wizard configuration -->
+		<context component="create-wizard-no-save" type="CxCustomizationsGroup">
+			<wz:flow id="CxCustomizationWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="variationPrepare">
+					<wz:initialize property="newItem" type="ctx.TYPE_CODE" />
+					<wz:assign property="newItem.catalogVersion" value="ctx.parentObject.catalogVersion"/>
+					<wz:assign property="newItem.group" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newItem"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" />
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done/>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<context type="CxUserToSegment">
+		<!-- Base configuration -->
+		<context component="base" type="CxUserToSegment">
+			<y:base>
+				<y:labels>
+					<y:label>segment.code + " to " + user.uid +" (" + baseSite.uid + ", " + provider + ")"</y:label>
+				</y:labels>
+			</y:base>
+		</context>
+		<!-- List view configuration -->
+		<context component="listview" type="CxUserToSegment">
+			<list-view:list-view>
+				<list-view:column qualifier="user" />
+				<list-view:column qualifier="segment" />
+				<list-view:column qualifier="baseSite" />
+				<list-view:column qualifier="affinity" />
+				<list-view:column qualifier="provider" />
+			</list-view:list-view>
+		</context>
+		<!-- Editor area configuration -->
+		<context component="editor-area" type="CxUserToSegment">
+			<editorArea:editorArea>
+				<editorArea:tab name="backoffice.personalizationservices.properties">
+					<editorArea:section
+							name="backoffice.personalizationservices.section.attributes">
+						<editorArea:attribute qualifier="segment" />
+						<editorArea:attribute qualifier="user" />
+						<editorArea:attribute qualifier="baseSite" />
+						<editorArea:attribute qualifier="affinity" />
+						<editorArea:attribute qualifier="provider" />
+					</editorArea:section>
+				</editorArea:tab>
+				<editorArea:tab name="hmc.administration" position="99">
+		            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- Advanced search configuration -->
+		<context component="advanced-search" type="CxUserToSegment">
+			<advanced-search:advanced-search>
+				<advanced-search:field-list>
+					<advanced-search:field name="pk" selected="false" editor="com.hybris.cockpitng.editor.defaultlong" />
+					<advanced-search:field name="user" selected="true" />
+					<advanced-search:field name="segment" selected="true" />
+					<advanced-search:field name="baseSite" selected="true" />
+					<advanced-search:field name="affinity" selected="true" />
+					<advanced-search:field name="provider" selected="true" />
+				</advanced-search:field-list>
+			</advanced-search:advanced-search>
+		</context>
+		<!-- Simple search configuration -->
+		<context component="simple-search" type="CxUserToSegment">
+			<simple-search:simple-search>
+				<simple-search:field name="affinity" />
+			</simple-search:simple-search>
+		</context>
+		<!-- Creation wizard -->
+		<context component="create-wizard" type="CxUserToSegment">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newRelation" type="ctx.TYPE_CODE" />
+					<wz:assign property="newRelation.user" value="ctx.parentObject"/>
+					<wz:assign property="newRelation.segment" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newRelation"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="baseSite" />
+							<wz:property qualifier="provider" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done>
+							<wz:save property="newRelation" />
+						</wz:done>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+		<!-- Creation wizard no save-->
+		<context component="create-wizard-no-save" type="CxUserToSegment">
+			<wz:flow id="ItemWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:prepare id="itemPrepare">
+					<wz:initialize property="newRelation" type="ctx.TYPE_CODE" />
+					<wz:assign property="newRelation.user" value="ctx.parentObject"/>
+					<wz:assign property="newRelation.segment" value="ctx.parentObject"/>
+				</wz:prepare>
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newRelation"
+										  include-non-declared-mandatory="true"
+										  include-non-declared-writable-on-creation="false"
+										  include-non-declared-unique="true" enable-non-declared-includes="true" >
+							<wz:property qualifier="baseSite" />
+							<wz:property qualifier="provider" />
+						</wz:property-list>
+					</wz:content>
+					<wz:navigation id="step1.navigation">
+						<wz:cancel/>
+						<wz:done/>
+					</wz:navigation>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+
+	<!-- Customer configuration -->
+	<!-- Editor area configuration -->
+	<context type="Customer" merge-by="type" parent="User" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:tab name="backoffice.personalizationservices.segmentation"
+							position="90">
+				<editorArea:section
+						name="backoffice.personalizationservices.section.attributes">
+					<editorArea:attribute qualifier="userToSegments">
+						<editorArea:editor-parameter>
+							<editorArea:name>configurableFlowConfigCtx</editorArea:name>
+							<editorArea:value>create-wizard-no-save</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:section>
+			</editorArea:tab>
+			<editorArea:tab name="hmc.administration" position="99">
+	            <editorArea:customSection name="hmc.unbound" spring-bean="unboundSectionRenderer"/>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- CxDefaultPersonalizationCalculationCronJob configuration -->
+	<!-- Editor area configuration -->
+	<context type="CxDefaultPersonalizationCalculationCronJob" merge-by="type" parent="CronJob" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="baseSites" />
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- CxPersonalizationProcessCleanupCronJob configuration -->
+	<!-- Editor area configuration -->
+	<context type="CxPersonalizationProcessCleanupCronJob" merge-by="type" parent="CronJob" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="maxProcessAge" />
+					<editorArea:attribute qualifier="processStates" />
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- CxResultsCleaningCronJob configuration -->
+	<!-- Editor area configuration -->
+	<context type="CxResultsCleaningCronJob" merge-by="type" parent="CronJob" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="maxResultsAge" />
+					<editorArea:attribute qualifier="anonymous">
+						<editorArea:editor-parameter>
+							<editorArea:name>trueLabel</editorArea:name>
+							<editorArea:value>cxresultcleaningcronjob.anonymous.true</editorArea:value>
+						</editorArea:editor-parameter>
+						<editorArea:editor-parameter>
+							<editorArea:name>falseLabel</editorArea:name>
+							<editorArea:value>cxresultcleaningcronjob.anonymous.false</editorArea:value>
+						</editorArea:editor-parameter>
+					</editorArea:attribute>
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+
+	<context type="BaseSite" component="editor-area" merge-by="type">
+		<editorArea:editorArea>
+			<editorArea:tab name="backoffice.personalizationservices.basesite.configuration.tab" position="80">
+				<editorArea:section
+						name="backoffice.personalizationservices.section.attributes">
+					<editorArea:attribute qualifier="cxConfig" />
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+	<!-- Explorer tree configuration -->
+	<context component="explorer-tree" merge-by="module" parent="auto" module="personalizationservices">
+		<explorer-tree:explorer-tree>
+			<explorer-tree:navigation-node id="cxnode">
+				<explorer-tree:navigation-node id="cxconfignode">
+					<explorer-tree:type-node code="CxConfig" id="cxconfig" />
+					<explorer-tree:type-node code="CxUrlVoterConfig" id="cxurlvoterconfig" />
+					<explorer-tree:type-node code="CxPeriodicVoterConfig" id="cxperiodicvoterconfig" />
+				</explorer-tree:navigation-node>
+				<explorer-tree:type-node code="CxSegment" id="cxsegment" />
+				<explorer-tree:type-node code="CxUserToSegment" id="cxusertosegment" />
+				<explorer-tree:navigation-node id="cxtriggers">
+					<explorer-tree:type-node code="CxAbstractTrigger" id="cxabstracttrigger" />
+					<explorer-tree:type-node code="CxExpressionTrigger" id="cxexpressiontrigger" />
+					<explorer-tree:type-node code="CxSegmentTrigger" id="cxsegmenttrigger" />
+					<explorer-tree:type-node code="CxDefaultTrigger" id="cxdefaulttrigger" />
+				</explorer-tree:navigation-node>
+				<explorer-tree:type-node code="CxVariation" id="cxvariation" />
+				<explorer-tree:type-node code="CxCustomization" id="cxcustomization" />
+				<explorer-tree:type-node code="CxCustomizationsGroup" id="cxcustomizationsgroup" />
+				<explorer-tree:navigation-node id="cxactions">
+					<explorer-tree:type-node code="CxAbstractAction" id="cxabstractaction" />
+				</explorer-tree:navigation-node>
+				<explorer-tree:type-node code="CxResults" id="cxresults" />
+			</explorer-tree:navigation-node>
+		</explorer-tree:explorer-tree>
+	</context>
+
+	<context type="RegExpConstraint">
+		<!-- Editor area configuration -->
+		<context merge-by="type" parent="AttributeConstraint" type="RegExpConstraint" component="editor-area">
+			<editorArea:editorArea name="">
+				<editorArea:tab name="hmc.tab.constraint">
+					<editorArea:section name="hmc.tab.constraint.attributes">
+						<editorArea:attribute qualifier="notEmpty"/>
+					</editorArea:section>
+				</editorArea:tab>
+			</editorArea:editorArea>
+		</context>
+		<!-- Creation wizard -->
+		<context merge-by="type" parent="AttributeConstraint" type="RegExpConstraint" component="create-wizard">
+			<wz:flow id="AttributeConstraintWizard" title="create.title(ctx.TYPE_CODE)">
+				<wz:step id="step1" label="flow.allmanadatory">
+					<wz:content id="step1.content">
+						<wz:property-list root="newObject">
+							<wz:property qualifier="notEmpty"/>
+						</wz:property-list>
+					</wz:content>
+				</wz:step>
+			</wz:flow>
+		</context>
+	</context>
+</config>
+

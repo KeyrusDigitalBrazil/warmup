@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+
+	   http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <bean id="kymaEventPopulator" class="de.hybris.platform.kymaintegrationservices.populators.KymaEventPopulator">
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+    </bean>
+
+    <bean id="kymaJsonEventPopulator" class="de.hybris.platform.kymaintegrationservices.populators.KymaEventJsonPopulator">
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+    </bean>
+
+    <alias name="defaultCertificateService" alias="certificateService"/>
+    <bean id="defaultCertificateService"
+          class="de.hybris.platform.kymaintegrationservices.services.impl.DefaultCertificateService">
+        <property name="modelService" ref="modelService"/>
+        <property name="destinationService" ref="destinationService"/>
+        <property name="restTemplate" ref="kymaCertificateRestTemplate"/>
+    </bean>
+
+    <alias name="defaultKymaEventConverter" alias="kymaEventConverter"/>
+    <bean id="defaultKymaEventConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.PublishRequestData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="kymaEventPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultKymaJsonEventConverter" alias="kymaJsonEventConverter"/>
+    <bean id="defaultKymaJsonEventConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.JsonPublishRequestData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="kymaJsonEventPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+
+    <bean id="submittingEventConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.PublishRequestData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="submittingOrderEventPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="submittingOrderEventPopulator"
+          class="de.hybris.platform.kymaintegrationservices.populators.custom.SubmittingOrderEventPopulator">
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+    </bean>
+
+    <bean id="kymaExportJacksonObjectMapper" class="com.fasterxml.jackson.databind.ObjectMapper">
+        <property name="serializationInclusion" value="NON_NULL"/>
+    </bean>
+
+    <bean id="kymaApiRegistrationStrategyMap" depends-on="apiRegistrationStrategyMap" parent="mapMergeDirective">
+        <property name="key">
+            <util:constant static-field="de.hybris.platform.apiregistryservices.enums.DestinationChannel.KYMA"/>
+        </property>
+        <property name="value" ref="kymaApiRegistrationStrategy"/>
+    </bean>
+
+    <bean id="kymaApiRegistrationStrategy"
+          class="de.hybris.platform.kymaintegrationservices.strategies.impl.KymaApiRegistrationStrategy">
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+        <property name="restTemplate" ref="kymaDestinationRestTemplateWrapper"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="configurationService" ref="configurationService"/>
+        <property name="webserviceSpecificationConverter" ref="webserviceSpecificationConverter"/>
+        <property name="eventsSpecificationConverter" ref="eventsSpecificationConverter"/>
+        <property name="eventConfigurationDao" ref="eventConfigurationDao"/>
+        <property name="destinationService" ref="destinationService"/>
+    </bean>
+
+    <alias name="defaultWebserviceSpecificationConverter" alias="webserviceSpecificationConverter"/>
+    <bean id="defaultWebserviceSpecificationConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.ServiceRegistrationData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="webserviceSpecificationPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="webserviceSpecificationPopulator"
+          class="de.hybris.platform.kymaintegrationservices.populators.WebserviceSpecificationPopulator">
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+    </bean>
+
+
+    <alias name="defaultEventsSpecificationConverter" alias="eventsSpecificationConverter"/>
+    <bean id="defaultEventsSpecificationConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.ServiceRegistrationData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="eventsSpecificationPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="eventsSpecificationPopulator"
+          class="de.hybris.platform.kymaintegrationservices.populators.EventsSpecificationPopulator">
+        <property name="topicConverter" ref="topicConverter"/>
+    </bean>
+
+    <alias name="defaultTopicConverter" alias="topicConverter"/>
+    <bean id="defaultTopicConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.kymaintegrationservices.dto.TopicData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="topicPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="topicPopulator" class="de.hybris.platform.kymaintegrationservices.populators.TopicPopulator"/>
+
+    <util:list id="defaultMessageConverters" value-type="HttpMessageConverter">
+        <bean class="org.springframework.http.converter.StringHttpMessageConverter"/>
+        <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+    </util:list>
+
+    <bean id="kymaExportRestTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters" ref="defaultMessageConverters"/>
+    </bean>
+
+    <bean id="kymaCertificateRestTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters" ref="defaultMessageConverters"/>
+    </bean>
+
+    <bean id="kymaEventRestTemplateWrapper" class="de.hybris.platform.kymaintegrationservices.utils.RestTemplateWrapper">
+        <property name="timeout" value="${kymaintegrationservices.event.connectionTimeout}"/>
+        <property name="restTemplate" ref="kymaExportRestTemplate"/>
+        <property name="destinationService" ref="destinationService"/>
+    </bean>
+
+    <bean id="kymaDestinationRestTemplateWrapper" class="de.hybris.platform.kymaintegrationservices.utils.RestTemplateWrapper">
+        <property name="timeout" value="${kymaintegrationservices.destination.connectionTimeout}"/>
+        <property name="restTemplate" ref="kymaExportRestTemplate"/>
+        <property name="destinationService" ref="destinationService"/>
+    </bean>
+
+    <bean id="invalidateCertificateCredentialsCacheEventListener" class="de.hybris.platform.kymaintegrationservices.event.listeners.InvalidateCertificateCredentialsCacheEventListener"
+          parent="abstractEventListener">
+        <property name="kymaDestinationRestTemplateWrapper" ref="kymaDestinationRestTemplateWrapper"/>
+        <property name="kymaEventRestTemplateWrapper" ref="kymaEventRestTemplateWrapper"/>
+    </bean>
+
+    <bean depends-on="eventRoutingMap" parent="mapMergeDirective">
+        <property name="key" value="KYMA"/>
+        <property name="value" value="kymaChannel"/>
+    </bean>
+
+    <int:channel id="kymaChannel">
+        <int:queue capacity="${kymaintegrationservices.event.queue.capacity}"/>
+    </int:channel>
+
+    <int:service-activator method="handle" id="kymaEventServiceActivator" input-channel="kymaChannel">
+        <bean class="de.hybris.platform.kymaintegrationservices.event.impl.KymaEventServiceActivator" scope="prototype">
+            <property name="eventEmitStrategy" ref="kymaEventEmitStrategy"/>
+            <property name="kymaEventConverter" ref="kymaEventConverter"/>
+        </bean>
+        <int:poller fixed-rate="50" max-messages-per-poll="${kymaintegrationservices.event.pool.size}" task-executor="kymaExecutor"/>
+    </int:service-activator>
+
+    <bean id="kymaExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="1"/>
+        <property name="maxPoolSize" value="${kymaintegrationservices.event.pool.size}" />
+        <property name="queueCapacity" value="${kymaintegrationservices.event.pool.size}" />
+        <property name="keepAliveSeconds" value="5"/>
+        <property name="threadFactory" ref="kymaEventExportThreadFactory"/>
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor.DiscardPolicy"/>
+        </property>
+    </bean>
+
+    <alias name="defaultKymaEventExportThreadFactory" alias="kymaEventExportThreadFactory"/>
+    <bean id="defaultKymaEventExportThreadFactory" class="de.hybris.platform.core.TenantAwareThreadFactory">
+        <constructor-arg name="tenant" ref="tenantFactory"/>
+    </bean>
+
+    <bean id="kymaEventEmitStrategy" class="de.hybris.platform.kymaintegrationservices.strategies.impl.KymaEventEmitStrategy">
+        <property name="restTemplate" ref="kymaEventRestTemplateWrapper"/>
+        <property name="destinationService" ref="destinationService"/>
+        <property name="eventDlqService" ref="eventDlqService"/>
+        <property name="jacksonObjectMapper" ref="kymaExportJacksonObjectMapper"/>
+        <property name="eventChannel" ref="kymaChannel"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="taskService" ref="taskService"/>
+        <property name="kymaJsonEventConverter" ref="kymaJsonEventConverter"/>
+    </bean>
+
+    <bean id="kymaEventEmitTaskRunner" class="de.hybris.platform.kymaintegrationservices.task.KymaEventEmitTaskRunner">
+        <property name="restTemplate" ref="kymaEventRestTemplateWrapper"/>
+        <property name="destinationService" ref="destinationService"/>
+        <property name="eventChannel" ref="kymaChannel"/>
+        <property name="eventService" ref="eventService"/>
+        <property name="kymaJsonEventConverter" ref="kymaJsonEventConverter"/>
+    </bean>
+</beans>

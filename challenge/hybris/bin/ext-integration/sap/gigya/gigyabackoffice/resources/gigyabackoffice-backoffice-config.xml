@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<!--  Explorer tree config -->
+	<context merge-by="module" component="explorer-tree" parent="auto">
+        <explorer-tree:explorer-tree xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree">
+            <explorer-tree:navigation-node id="gigyagroup" merge-mode="append">
+				<explorer-tree:type-node code="GigyaConfig" id="gigyaconfigbackofficeid"/>
+				<explorer-tree:type-node code="GigyaFieldMapping" id="gigyafieldmappingbackofficeid"/>
+            </explorer-tree:navigation-node>
+        </explorer-tree:explorer-tree>
+    </context>
+
+
+    <!--  Create wizards  -->
+    <context merge-by="type" type="GigyaConfig" component="create-wizard" >
+        <wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="GigyaConfigWizard" title="create.gigyaconfig.title">
+            <wz:prepare id="newItemPrepare">
+                <wz:initialize property="newItem" type="GigyaConfig"/>
+            </wz:prepare>
+            <wz:step id="step1" label="create.gigyaconfig.step1.label" sublabel="create.gigyaconfig.step1.sublabel" position="0">
+                <wz:content>
+                    <wz:property-list root="newItem">
+                    		<wz:property qualifier="code"/>
+                        <wz:property qualifier="gigyaApiKey"/>
+                        <wz:property qualifier="gigyaDataCenter"/>
+                        <wz:property qualifier="gigyaSiteSecret" editor="de.hybris.platform.gigya.gigyabackoffice.editor.masktext" />
+                        <wz:property qualifier="gigyaUserKey"/>
+                        <wz:property qualifier="gigyaUserSecret" editor="de.hybris.platform.gigya.gigyabackoffice.editor.masktext" />
+                        <wz:property qualifier="sites"/>
+                        <wz:property qualifier="mode"/>
+                        <wz:property qualifier="deleteUser"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:next visible="!#empty(newItem.gigyaApiKey) AND ((!#empty(newItem.gigyaUserKey) AND !#empty(newItem.gigyaUserSecret)) OR !#empty(newItem.gigyaSiteSecret)) AND newItem.sites!=null AND newItem.mode!=null"/>
+                    <wz:done visible="!#empty(newItem.gigyaApiKey) AND ((!#empty(newItem.gigyaUserKey) AND !#empty(newItem.gigyaUserSecret)) OR !#empty(newItem.gigyaSiteSecret)) AND newItem.sites!=null AND newItem.mode!=null">
+                        <wz:save property="newItem"/>
+                    </wz:done>
+                </wz:navigation>
+            </wz:step>
+            <wz:step id="step2" label="create.gigyaconfig.step2.label" sublabel="create.gigyaconfig.step2.sublabel" position="1">
+                <wz:content>
+                    <wz:property-list root="newItem">
+                        <wz:property qualifier="gigyaGlobalAdvanced"/>
+                        <wz:property qualifier="language"/>
+                        <wz:property qualifier="providers"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation>
+                    <wz:back/>
+                    <wz:cancel/>
+                    <wz:done visible="newItem.language!=null AND !#empty(newItem.providers)">
+                        <wz:save property="newItem"/>
+                    </wz:done>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+
+    <context merge-by="type" type="GigyaFieldMapping" component="create-wizard" >
+        <wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="gigyaFieldMappingWizard" title="create.gigyafieldmapping.title">
+            <wz:prepare id="newItemPrepare">
+                <wz:initialize property="newItem" type="GigyaFieldMapping"/>
+            </wz:prepare>
+            <wz:step id="step1" label="create.gigyafieldmapping.step1.label" sublabel="create.gigyafieldmapping.step1.sublabel" position="1">
+                <wz:content>
+                    <wz:property-list root="newItem">
+                        <wz:property qualifier="code"/>
+                        <wz:property qualifier="gigyaConfig"/>
+                        <wz:property qualifier="syncDirection"/>
+                        <wz:property qualifier="hybrisAttributeName"/>
+                        <wz:property qualifier="gigyaAttributeName"/>
+                        <wz:property qualifier="hybrisType"/>
+                        <wz:property qualifier="custom"/>
+                    </wz:property-list>
+                </wz:content>
+                <wz:navigation id="step1.navigation">
+                    <wz:cancel/>
+                    <wz:done visible="!#empty(newItem.hybrisAttributeName) AND newItem.gigyaConfig!=null AND newItem.syncDirection!=null AND !#empty(newItem.gigyaAttributeName) AND newItem.hybrisType!=null AND newItem.custom!=null">
+                        <wz:save property="newItem"/>
+                    </wz:done>
+                </wz:navigation>
+            </wz:step>
+        </wz:flow>
+    </context>
+
+    <context merge-by="type" type="Customer" component="create-wizard" >
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="GigyaUserWizard" title="create.gigyauser.title">
+			<wz:prepare id="newItemPrepare">
+				<wz:initialize property="newItem" type="Customer"/>
+			</wz:prepare>
+			<wz:step id="step1" label="create.gigyauser.step1.label" position="0">
+				<wz:content>
+					<wz:property-list root="newItem">
+						<wz:property qualifier="uid"/>
+						<wz:property qualifier="name"/>
+						<wz:property qualifier="gyApiKey"/>
+						<wz:property qualifier="gyUID"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:done visible="!#empty(newItem.uid) AND !#empty(newItem.name) AND !#empty(newItem.gigyaApiKey) AND !#empty(newItem.gigyaUID)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+
+    <!--  Editor area configs -->
+    <context merge-by="type" type="GigyaConfig" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab name="gigyaconfig.main.tab" position="1" merge-mode="append">
+                <editorArea:section name="gigyaconfig.main.section">
+                    <editorArea:attribute qualifier="code"/>
+                    <editorArea:attribute qualifier="gigyaApiKey"/>
+                    <editorArea:attribute qualifier="gigyaDataCenter"/>
+                    <editorArea:attribute qualifier="gigyaSiteSecret" editor="de.hybris.platform.gigya.gigyabackoffice.editor.masktext"/>
+                    <editorArea:attribute qualifier="gigyaUserKey"/>
+                    <editorArea:attribute qualifier="gigyaUserSecret" editor="de.hybris.platform.gigya.gigyabackoffice.editor.masktext"/>
+                    <editorArea:attribute qualifier="sites"/>
+                    <editorArea:attribute qualifier="mode"/>
+                    <editorArea:attribute qualifier="deleteUser"/>
+                    <editorArea:attribute qualifier="gigyaFieldMappings"/>
+                    <editorArea:attribute qualifier="providers"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context merge-by="type" type="GigyaFieldMapping" component="editor-area">
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab name="gigyafieldmapping.main.tab" position="1" merge-mode="append">
+                <editorArea:section name="gigyafieldmapping.main.section">
+                    <editorArea:attribute qualifier="code"/>
+                    <editorArea:attribute qualifier="gigyaConfig"/>
+                </editorArea:section>
+                <editorArea:section name="gigyafieldmapping.sync.section">
+                    <editorArea:attribute qualifier="syncDirection"/>
+                </editorArea:section>
+                <editorArea:section name="gigyafieldmapping.attributes.section">
+                    <editorArea:attribute qualifier="hybrisAttributeName"/>
+                    <editorArea:attribute qualifier="gigyaAttributeName"/>
+                    <editorArea:attribute qualifier="hybrisType"/>
+                    <editorArea:attribute qualifier="custom"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+
+    <context merge-by="type" type="Customer" component="editor-area">
+		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+			<editorArea:tab name="gigyauser.gigya.tab" position="2" merge-mode="append">
+				<editorArea:section name="gigyauser.main.section">
+					<editorArea:attribute qualifier="gyUID"/>
+					<editorArea:attribute qualifier="gyCreated"/>
+					<editorArea:attribute qualifier="gyCreatedTimestamp"/>
+					<editorArea:attribute qualifier="gyIsActive"/>
+					<editorArea:attribute qualifier="gyIsLockedOut"/>
+					<editorArea:attribute qualifier="gyIsRegistered"/>
+					<editorArea:attribute qualifier="gyIsVerified"/>
+					<editorArea:attribute qualifier="gyLastLoginTimestamp"/>
+					<editorArea:attribute qualifier="gyLastUpdated"/>
+					<editorArea:attribute qualifier="gyLastUpdatedTimestamp"/>
+					<editorArea:attribute qualifier="gyLoginProvider"/>
+					<editorArea:attribute qualifier="gyOldestDataUpdated"/>
+					<editorArea:attribute qualifier="gyOldestDataUpdatedTimestamp"/>
+					<editorArea:attribute qualifier="gyRegistered"/>
+					<editorArea:attribute qualifier="gyRegisteredTimestamp"/>
+					<editorArea:attribute qualifier="gySocialProviders"/>
+					<editorArea:attribute qualifier="gyVerified"/>
+					<editorArea:attribute qualifier="gyVerifiedTimestamp"/>
+					<editorArea:attribute qualifier="gyApiKey"/>
+				</editorArea:section>
+			</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+
+
+    <!--  List view configs -->
+    <context merge-by="type" type="GigyaConfig" component="listview">
+        <list-view:list-view xmlns:list-view="http://www.hybris.com/cockpitng/component/listView">
+        		<list-view:column qualifier="code"/>
+        		<list-view:column qualifier="mode"/>
+        		<list-view:column qualifier="gigyaDataCenter"/>
+            <list-view:column qualifier="gigyaApiKey"/>
+        </list-view:list-view>
+    </context>
+
+
+    <!--  Base configs -->
+    <context type="GigyaConfig" component="base" merge-by="type" parent="GenericItem">
+	    <y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+	        <y:labels>
+	            <y:label>code + mode</y:label>
+	        </y:labels>
+	    </y:base>
+    </context>
+
+</config>

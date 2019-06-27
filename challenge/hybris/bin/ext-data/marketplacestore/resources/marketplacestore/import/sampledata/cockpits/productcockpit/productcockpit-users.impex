@@ -1,0 +1,26 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import Sample Product Cockpit User
+# 
+
+
+$defaultPassword=1234
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+;productmanagergroup;cockpitgroup,employeegroup
+
+INSERT_UPDATE Employee;UID[unique=true];password[default=$defaultPassword];description;name;groups(uid);sessionLanguage(isocode);sessionCurrency(isocode)
+;productmanager;;Product manager;Product Manager;productmanagergroup;en;EUR
+
+UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];writePrincipals(uid)[mode=append];
+;globalMarketplaceProductCatalog;Online;productmanagergroup,productmanager;
+;globalMarketplaceProductCatalog;Staged;productmanagergroup,productmanager;

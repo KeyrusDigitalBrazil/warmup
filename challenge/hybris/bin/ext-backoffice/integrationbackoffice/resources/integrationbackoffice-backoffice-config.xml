@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<context component="perspective-view-switcher" authority="integrationadministrator ">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="integrationadministrator ">
+				<vs:view id="integrationBackofficeToolPerspective"/>
+				<vs:view id="hmc2"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="perspective-view-switcher" authority="integrationagent">
+		<vs:view-switcher xmlns:vs="http://www.hybris.com/cockpitng/config/viewSwitcher">
+			<vs:authority name="integrationagent">
+				<vs:view id="integrationBackofficeToolPerspective"/>
+			</vs:authority>
+		</vs:view-switcher>
+	</context>
+
+	<context component="integrationbackoffice-explorer-tree" authority="integrationadministrator,integrationagent">
+		<n:explorer-tree xmlns:n="http://www.hybris.com/cockpitng/config/explorertree">
+			<n:type-node id="integrationbackoffice.explorer.treenode.maintenance" code="Modeling">
+			</n:type-node>
+			<n:navigation-node id="integrationbackoffice.explorer.treenode.monitoring" expanded-by-default="true">
+				<n:type-node id="integrationbackoffice.explorer.typenode.inbound" code="InboundRequest" />
+				<n:type-node id="integrationbackoffice.explorer.typenode.outbound" code="OutboundRequest" />
+			</n:navigation-node>
+		</n:explorer-tree>
+	</context>
+
+	<context component="integrationbackoffice-modeling-toolbar-actions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:group qualifier="common">
+				<y:action action-id="integrationbackoffice.actions.createIntegrationObjectAction"/>
+                <y:action action-id="integrationbackoffice.actions.deleteIntegrationObjectAction"/>
+				<y:action action-id="integrationbackoffice.actions.integrationObjectMetadataViewerAction"/>
+			</y:group>
+		</y:actions>
+	</context>
+
+	<context type="InboundRequest" component="simple-search">
+		<ss:simple-search xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch">
+			<ss:field name="integrationKey"/>
+			<ss:sort-field name="creationtime" asc="false"/>
+		</ss:simple-search>
+	</context>
+	<context type="InboundRequest" component="advanced-search">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list>
+				<as:field name="integrationKey" operator="contains" selected="true"/>
+				<as:field name="messageId" operator="equals" selected="true"/>
+				<as:field name="type" operator="contains" selected="true"/>
+				<as:field name="status" operator="equals" selected="true"/>
+				<as:field name="creationtime" operator="greaterOrEquals"/>
+				<as:field name="creationtime" operator="lessOrEquals"/>
+			</as:field-list>
+			<as:sort-field name="creationtime" asc="false"/>
+		</as:advanced-search>
+	</context>
+	<context type="InboundRequest" component="listview" perspective="integrationBackofficeToolPerspective">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="integrationKey"/>
+			<list:column qualifier="messageId"/>
+			<list:column qualifier="type"/>
+			<list:column qualifier="status"/>
+			<list:column qualifier="creationtime"/>
+		</list:list-view>
+	</context>
+	<context type="InboundRequest" component="editor-area">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="InboundRequest">
+				<ea:section name="integrationbackoffice.monitoring.inbound.details">
+					<ea:attribute qualifier="integrationKey" readonly="true"/>
+					<ea:attribute qualifier="messageId" readonly="true"/>
+					<ea:attribute qualifier="type" readonly="true"/>
+					<ea:attribute qualifier="status" readonly="true"/>
+					<ea:attribute qualifier="creationtime" readonly="true"/>
+					<ea:attribute qualifier="payload" readonly="true" />
+					<ea:attribute qualifier="errors" readonly="true"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="InboundRequest" component="listviewactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+	<context type="InboundRequest" component="editorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+
+	<context type="InboundRequestError" component="listview">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="inboundRequest"/>
+			<list:column qualifier="code"/>
+			<list:column qualifier="message"/>
+		</list:list-view>
+	</context>
+	<context type="InboundRequestError" component="editor-area">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="InboundRequestError">
+				<ea:section name="integrationbackoffice.monitoring.inbound.error.details">
+					<ea:attribute qualifier="code" readonly="true"/>
+					<ea:attribute qualifier="message" readonly="true"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="InboundRequestError" component="listviewactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+	<context type="InboundRequestError" component="editorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+	<context type="InboundRequestError" component="collectioneditorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+
+
+	<context type="OutboundRequest" component="simple-search">
+		<ss:simple-search xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch">
+			<ss:field name="integrationKey"/>
+			<ss:sort-field name="creationtime" asc="false"/>
+		</ss:simple-search>
+	</context>
+	<context type="OutboundRequest" component="advanced-search">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch" connection-operator="AND">
+			<as:field-list>
+				<as:field name="integrationKey" operator="contains" selected="true"/>
+				<as:field name="sapPassport" operator="contains" selected="true"/>
+				<as:field name="type" operator="contains" selected="true"/>
+				<as:field name="status" operator="equals" selected="true"/>
+				<as:field name="destination" operator="contains" selected="true"/>
+				<as:field name="creationtime" operator="greaterOrEquals"/>
+				<as:field name="creationtime" operator="lessOrEquals"/>
+			</as:field-list>
+			<as:sort-field name="creationtime" asc="false"/>
+		</as:advanced-search>
+	</context>
+	<context type="OutboundRequest" component="listview" perspective="integrationBackofficeToolPerspective">
+		<list:list-view xmlns:list="http://www.hybris.com/cockpitng/component/listView">
+			<list:column qualifier="integrationKey"/>
+			<list:column qualifier="destination"/>
+			<list:column qualifier="type"/>
+			<list:column qualifier="status"/>
+			<list:column qualifier="creationtime"/>
+		</list:list-view>
+	</context>
+	<context type="OutboundRequest" component="editor-area">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="OutboundRequest">
+				<ea:section name="integrationbackoffice.monitoring.outbound.details">
+					<ea:attribute qualifier="integrationKey" readonly="true"/>
+					<ea:attribute qualifier="sapPassport" readonly="true"/>
+					<ea:attribute qualifier="destination" readonly="true"/>
+					<ea:attribute qualifier="type" readonly="true"/>
+					<ea:attribute qualifier="status" readonly="true"/>
+					<ea:attribute qualifier="creationtime" readonly="true"/>
+					<ea:attribute qualifier="payload" readonly="true" />
+					<ea:attribute qualifier="error" readonly="true"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	<context type="OutboundRequest" component="listviewactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+	<context type="OutboundRequest" component="editorareaactions">
+		<y:actions xmlns:y="http://www.hybris.com/cockpit/config/hybris"/>
+	</context>
+
+</config>

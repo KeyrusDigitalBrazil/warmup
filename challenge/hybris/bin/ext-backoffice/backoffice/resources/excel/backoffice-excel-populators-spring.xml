@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultTypeSystemSheetPopulator" alias="typeSystemSheetPopulator"/>
+	<bean name="defaultTypeSystemSheetPopulator"
+		  class="com.hybris.backoffice.excel.template.populator.typesheet.TypeSystemSheetPopulator">
+		<property name="mapper">
+			<bean parent="fromExcelResultToAttributeDescriptorsMapper">
+				<property name="filters">
+					<list>
+						<ref bean="availableCheckingFilter"/>
+					</list>
+				</property>
+			</bean>
+		</property>
+		<property name="typeSystemRowFactory">
+			<bean class="com.hybris.backoffice.excel.template.populator.typesheet.TypeSystemRowFactory">
+				<property name="commonI18NService" ref="commonI18NService"/>
+				<property name="excelUniqueFilter" ref="uniqueCheckingFilter"/>
+				<property name="excelTranslatorRegistry" ref="excelTranslatorRegistry"/>
+				<property name="collectionFormatter" ref="collectionFormatter"/>
+				<property name="attributeNameFormatter" ref="displayNameAttributeNameFormatter"/>
+			</bean>
+		</property>
+		<property name="excelCellService" ref="excelCellService"/>
+	</bean>
+
+	<alias name="defaultPermissionAwareTypeSystemSheetPopulator" alias="permissionAwareTypeSystemSheetPopulator"/>
+	<bean name="defaultPermissionAwareTypeSystemSheetPopulator"
+		  class="com.hybris.backoffice.excel.template.populator.typesheet.PermissionAwareTypeSystemSheetPopulator">
+		<property name="excelExportDivider" ref="excelExportDivider"/>
+		<property name="permissionCRUDService" ref="permissionCRUDService"/>
+		<property name="populator" ref="typeSystemSheetPopulator"/>
+	</bean>
+
+	<alias name="defaultClassificationFullNamePopulator" alias="classificationFullNamePopulator"/>
+	<bean id="defaultClassificationFullNamePopulator" class="com.hybris.backoffice.excel.template.populator.ClassificationFullNamePopulator">
+		<property name="attributeNameFormatter" ref="classificationAttributeNameFormatter"/>
+	</bean>
+
+	<util:map id="headerPromptClassificationPopulators"
+			  key-type="com.hybris.backoffice.excel.template.ExcelTemplateConstants.HeaderPrompt"
+			  value-type="com.hybris.backoffice.excel.template.populator.ExcelClassificationCellPopulator">
+		<entry key="HEADER_ATTR_DISPLAYED_NAME" value-ref="classificationFullNamePopulator"/>
+		<entry key="HEADER_REFERENCE_FORMAT">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationReferenceFormatPopulator">
+				<property name="registry" ref="excelClassificationAttributeTranslatorRegistry"/>
+			</bean>
+		</entry>
+	</util:map>
+
+	<alias name="defaultClassificationIncludedHeaderPromptPopulator"
+		   alias="classificationIncludedHeaderPromptPopulator"/>
+	<bean id="defaultClassificationIncludedHeaderPromptPopulator"
+		  class="com.hybris.backoffice.excel.template.ClassificationIncludedHeaderPromptPopulator">
+		<property name="excelAttributeDescriptorPopulators" ref="headerPromptDescriptorPopulators"/>
+		<property name="excelClassificationPopulators" ref="headerPromptClassificationPopulators"/>
+		<property name="excelCellService" ref="excelCellService"/>
+	</bean>
+
+	<util:map id="classificationTypeSystemCellValuePopulators"
+			  key-type="com.hybris.backoffice.excel.template.ExcelTemplateConstants.ClassificationTypeSystemColumns"
+			  value-type="com.hybris.backoffice.excel.template.populator.ExcelClassificationCellPopulator">
+		<entry key="FULL_NAME" value-ref="classificationFullNamePopulator"/>
+		<entry key="CLASSIFICATION_SYSTEM">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationSystemIdPopulator"/>
+		</entry>
+		<entry key="CLASSIFICATION_VERSION">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationSystemVersionPopulator"/>
+		</entry>
+		<entry key="CLASSIFICATION_CLASS">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationClassPopulator"/>
+		</entry>
+		<entry key="CLASSIFICATION_ATTRIBUTE">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationAttributePopulator"/>
+		</entry>
+		<entry key="ATTRIBUTE_LOCALIZED">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationAttributeLocalizedPopulator"/>
+		</entry>
+		<entry key="ATTRIBUTE_LOC_LANG">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationAttributeLocLangPopulator"/>
+		</entry>
+		<entry key="MANDATORY">
+			<bean class="com.hybris.backoffice.excel.template.populator.ClassificationAttributeIsMandatoryPopulator"/>
+		</entry>
+	</util:map>
+
+	<alias name="defaultClassificationTypeSystemSheetPopulator" alias="classificationTypeSystemSheetPopulator"/>
+	<bean id="defaultClassificationTypeSystemSheetPopulator"
+		  class="com.hybris.backoffice.excel.template.populator.ClassificationTypeSystemSheetPopulator">
+		<property name="cellValuePopulators" ref="classificationTypeSystemCellValuePopulators"/>
+		<property name="compressor" ref="classificationTypeSystemSheetCompressor"/>
+		<property name="excelCellService" ref="excelCellService"/>
+		<!-- empty filters -->
+	</bean>
+
+	<util:list id="typeSystemWorkbookDecoratorPopulators"
+			   value-type="com.hybris.backoffice.excel.template.populator.ExcelSheetPopulator">
+		<ref bean="permissionAwareTypeSystemSheetPopulator"/>
+		<ref bean="classificationTypeSystemSheetPopulator"/>
+	</util:list>
+
+	<util:map id="headerPromptDescriptorPopulators"
+			  key-type="com.hybris.backoffice.excel.template.ExcelTemplateConstants.HeaderPrompt"
+			  value-type="com.hybris.backoffice.excel.template.populator.ExcelCellPopulator">
+		<entry key="HEADER_TYPE_CODE">
+			<bean class="com.hybris.backoffice.excel.template.populator.descriptor.ExcelTypeCodeCellPopulator">
+				<property name="excelSheetService" ref="excelSheetService"/>
+			</bean>
+		</entry>
+		<entry key="HEADER_ATTR_DISPLAYED_NAME">
+			<bean class="com.hybris.backoffice.excel.template.populator.descriptor.ExcelAttributeDisplayNameCellPopulator">
+				<property name="attributeNameFormatter" ref="displayNameAttributeNameFormatter"/>
+			</bean>
+		</entry>
+		<entry key="HEADER_REFERENCE_FORMAT">
+			<bean class="com.hybris.backoffice.excel.template.populator.descriptor.ExcelReferenceFormatCellPopulator">
+				<property name="registry" ref="excelTranslatorRegistry"/>
+			</bean>
+		</entry>
+	</util:map>
+
+</beans>

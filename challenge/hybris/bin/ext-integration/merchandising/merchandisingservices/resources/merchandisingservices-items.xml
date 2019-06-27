@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="DestinationChannel" autocreate="false">
+			<value code="MERCH"/>
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="MerchIndexingConfig2MerchProperty" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="merchIndexingConfig" type="MerchIndexingConfig" cardinality="one">
+				<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="merchProperties" type="MerchProperty" cardinality="many"
+						   collectiontype="list" ordered="true">
+				<modifiers optional="true" read="true" write="true" search="false" partof="true" />
+			</targetElement>
+		</relation>
+		<relation code="MerchIndexingConfig2MerchImageProperty" autocreate="true" generate="true" localized="false">
+			<sourceElement qualifier="merchIndexingConfig" type="MerchIndexingConfig" cardinality="one">
+				<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="merchImageProperties" type="MerchImageProperty" cardinality="many"
+						   collectiontype="list" ordered="true">
+				<modifiers optional="true" read="true" write="true" search="false" partof="true" />
+			</targetElement>
+		</relation>
+		<relation code="MerchIndexingConfig2CatalogVersion" autocreate="true" generate="true" localized="false">
+			<deployment table="MerchIdxToCatVers" typecode="2505"/>
+			<sourceElement qualifier="merchIndexingConfig" type="MerchIndexingConfig" cardinality="many">
+				<modifiers optional="true" read="true" write="true" search="true" />
+			</sourceElement>
+			<targetElement qualifier="merchCatalogVersions" type="CatalogVersion" cardinality="many"
+						   collectiontype="list" ordered="true">
+				<modifiers optional="true" read="true" write="true" search="true" initial="false" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="MerchIndexingConfig" jaloclass="com.hybris.merchandising.jalo.MerchIndexingConfig"
+				  extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MerchIndexingConfig" typecode="2500" />
+			<attributes>
+				<attribute qualifier="indexedType" type="SolrIndexedType">
+					<description>Indexed type</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="enabled" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" search="true" />
+				</attribute>
+				<attribute qualifier="language" type="Language" >
+					<modifiers read="true" write="true" optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="currency" type="Currency" >
+					<modifiers read="true" write="true" optional="false" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="baseImageUrl" type="java.lang.String" >
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="baseProductPageUrl" type="java.lang.String" >
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AbstractMerchProperty" extends="GenericItem" abstract="true" autocreate="true" generate="true">
+			<deployment table="MerchBaseProperty" typecode="2503" />
+			<attributes>
+				<attribute qualifier="indexedProperty" type="SolrIndexedProperty">
+					<description>Unique identifier</description>
+					<modifiers read="true" write="true" optional="false" search="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="merchMappedName" type="java.lang.String">
+					<description>Indexed type</description>
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="MerchProperty" extends="AbstractMerchProperty" autocreate="true" generate="true" />
+
+		<itemtype code="MerchImageProperty" extends="AbstractMerchProperty" autocreate="true" generate="true" />
+
+		<itemtype code="MerchSynchronizationConfig" jaloclass="com.hybris.merchandising.jalo.MerchSynchronizationConfig"
+				  extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="MerchSynchConfig" typecode="2504" />
+			<attributes>
+				<attribute qualifier="baseSite" type="BaseSite">
+					<description>Base site to synchronize</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalog" type="Catalog">
+					<description>Catalog to synchronize</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<description>Catalog Version to synchronize</description>
+					<modifiers read="true" write="false" optional="false" initial="true" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="enabled" type="boolean">
+					<defaultvalue>java.lang.Boolean.FALSE</defaultvalue>
+					<persistence type="property" />
+					<modifiers read="true" write="true" optional="false" search="true" />
+				</attribute>
+				<attribute qualifier="baseCategoryUrl" type="java.lang.String" >
+					<modifiers read="true" write="true" optional="true" search="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

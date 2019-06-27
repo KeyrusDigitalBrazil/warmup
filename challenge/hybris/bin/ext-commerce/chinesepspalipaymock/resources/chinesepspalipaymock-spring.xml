@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+    
+    <alias alias="alipayCreateRequestStrategy" name="mockAlipayCreateRequestStrategy" />
+	<bean id="mockAlipayCreateRequestStrategy" class="de.hybris.platform.chinesepspalipaymock.strategies.MockAlipayCreateRequestStrategy" parent="defaultAlipayCreateRequestStrategy" scope="tenant">
+		<property name="mockService" ref="mockService"/>
+	</bean>
+	
+	<alias alias="alipayResponseValidationStrategy" name="mockAlipayResponseValidationStrategy" />
+	<bean id="mockAlipayResponseValidationStrategy" class="de.hybris.platform.chinesepspalipaymock.strategies.MockAlipayResponseValidationStrategy" parent="defaultAlipayResponseValidationStrategy" scope="tenant"/>
+		
+    <bean id="mockService" class="de.hybris.platform.chinesepspalipaymock.service.MockService">
+    	<property name="alipayConfiguration" ref="alipayConfiguration"/>
+		<property name="alipayOrderService" ref="alipayOrderService" />
+		<property name="alipayPaymentTransactionStrategy" ref="alipayPaymentTransactionStrategy" />
+		<property name="alipayHandleResponseStrategy" ref="alipayHandleResponseStrategy"/>
+		<property name="chineseOrderService" ref="chineseOrderService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="eventPublishingSubmitOrderStrategy" ref="eventPublishingSubmitOrderStrategy"/>
+		<property name="alipayService" ref="alipayService"/>
+    </bean>
+    	
+</beans>

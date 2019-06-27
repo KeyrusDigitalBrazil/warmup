@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+# updated search configuration
+
+INSERT_UPDATE AsPromotedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property2;REFINE;180;
+
+INSERT_UPDATE AsFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property1;MULTISELECT_OR;120;
+
+INSERT_UPDATE AsExcludedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;searchConfiguration;property3;REFINE;90;
+
+REMOVE AsPromotedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;searchConfiguration;product1;
+
+REMOVE AsExcludedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;searchConfiguration;product2;
+
+INSERT_UPDATE AsBoostRule;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];indexProperty;operator(code);value;boost;boostType(code);$catalogVersion[unique=true]
+;searchConfiguration;af0d0509-cc0b-4418-b446-6e5f0b696fc1;property1;EQUAL;value;1.6;MULTIPLICATIVE;
+
+INSERT_UPDATE AsSort;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];code;name[lang=en];$catalogVersion[unique=true]
+;searchConfiguration;sort1;sort1code;sort1newname;
+
+INSERT_UPDATE AsSortExpression;sortConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];expression;order(code);$catalogVersion[unique=true]
+;sort2;sort2expression1;property2;DESCENDING;

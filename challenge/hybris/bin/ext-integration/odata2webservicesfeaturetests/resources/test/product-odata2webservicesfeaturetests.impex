@@ -1,0 +1,31 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code)
+; TestProduct ; INBOUND
+; TestOutboundProduct ;
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; TestProduct ; AProduct        ; Product
+; TestProduct ; AUnit           ; Unit
+; TestProduct ; ACatalog        ; Catalog
+; TestProduct ; ACatalogVersion ; CatalogVersion
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; TestProduct:AProduct        ; prodcode       ; Product:code           ;
+; TestProduct:AProduct        ; cv             ; Product:catalogVersion ; TestProduct:ACatalogVersion
+; TestProduct:AProduct        ; prodname       ; Product:name           ;
+; TestProduct:AProduct        ; produnit       ; Product:unit           ; TestProduct:AUnit
+
+; TestProduct:AUnit           ; unitCode       ; Unit:code              ;
+; TestProduct:AUnit           ; unitName       ; Unit:name              ;
+; TestProduct:AUnit           ; unitType       ; Unit:unitType          ;
+
+; TestProduct:ACatalog        ; catalogId       ; Catalog:id             ;
+
+; TestProduct:ACatalogVersion ; acatalog        ; CatalogVersion:catalog ; TestProduct:ACatalog
+; TestProduct:ACatalogVersion ; aversion        ; CatalogVersion:version ;
+; TestProduct:ACatalogVersion ; isactive        ; CatalogVersion:active  ;
+
+INSERT_UPDATE Catalog; id[unique = true]; name[lang = en]; defaultCatalog;
+; Default ; Default ; true
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; active;
+; Default ; Staged ; true

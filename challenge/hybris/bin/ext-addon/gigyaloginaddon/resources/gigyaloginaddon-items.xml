@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+			
+	<relations>
+		<relation localized="false" code="GigyaConfig2CMSSite">
+			<sourceElement qualifier="gigyaConfig" type="GigyaConfig" cardinality="one" />
+			<targetElement qualifier="sites" type="BaseSite" cardinality="many" />
+		</relation>
+	</relations>
+
+	<itemtypes>
+
+		<typegroup name="CMS Components" >
+		
+			<itemtype code="AbstractGigyaComponent" extends="SimpleCMSComponent"
+	                  generate="true" abstract="true" autocreate="true">
+	            <attributes>
+	            
+	                <attribute qualifier="showAnonymous" type="java.lang.Boolean" >
+	                    <description>Should this be shown to an anonymous user</description>
+	                    <defaultvalue>new java.lang.Boolean("true")</defaultvalue>
+	                    <persistence type="property"/>
+	                </attribute>
+
+	                <attribute qualifier="showLoggedIn" type="java.lang.Boolean" >
+	                    <description>Should this be shown to a logged in user</description>
+	                    <defaultvalue>new java.lang.Boolean("true")</defaultvalue>
+	                    <persistence type="property"/>
+	                </attribute>
+	                
+	            </attributes>
+	        </itemtype>
+			
+			<itemtype code="GigyaRaasComponent" extends="AbstractGigyaComponent"
+	                  generate="true" autocreate="true" jaloclass="de.hybris.platform.gigya.gigyaloginaddon.jalo.GigyaRaasComponent">
+	            <description>Gigya RaaS login component</description>
+	            <attributes>
+
+	                <attribute qualifier="embed" type="java.lang.Boolean" >
+	                    <description>Should this screen set be embedded (true) or a modal window</description>
+	                    <modifiers search="false" optional="false" />
+	                    <persistence type="property"/>
+	                    <defaultvalue>new java.lang.Boolean("false")</defaultvalue>
+	                </attribute>
+	                
+	                <attribute qualifier="containerID" type="java.lang.String" >
+	                    <description>If embedded the id of the div that the component would be embedded</description>
+						<persistence type="property" />
+	                </attribute>
+	                
+	                <attribute qualifier="screenSet" type="java.lang.String" >
+	                    <description>The name of the screen-set to be presented</description>
+	                    <persistence type="property"/>
+	                    <defaultvalue>"Default-RegistrationLogin"</defaultvalue>
+	                </attribute>
+	                
+	                <attribute qualifier="startScreen" type="java.lang.String" >
+	                    <persistence type="property"/>
+	                    <description>The name of the start screen</description>
+	                    <defaultvalue>"gigya-login-screen"</defaultvalue>
+	                </attribute>
+	                
+	                <attribute qualifier="linkText" type="localized:java.lang.String" >
+	                    <persistence type="property"/>
+	                    <description>The text that would appear on the link if not embedded</description>
+	                </attribute>
+	                
+	                <attribute qualifier="profileEdit" type="java.lang.Boolean" >
+	                    <description>Is this a profile edit commponet</description>
+	                    <defaultvalue>new java.lang.Boolean("false")</defaultvalue>
+	                    <persistence type="property"/>
+	                </attribute>
+	                
+	                <attribute qualifier="advancedConfiguration" type="java.lang.String" >
+	                    <description>JSON of advanced configuration to pass to the component</description>
+	                    <persistence type="property"/>
+	                </attribute>
+
+	            </attributes>
+	        </itemtype>
+		</typegroup>
+		
+	</itemtypes>
+	
+</items>

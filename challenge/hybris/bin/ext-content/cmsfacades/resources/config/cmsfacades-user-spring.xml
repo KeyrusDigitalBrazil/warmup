@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <alias name="defaultCmsUserFacade" alias="cmsUserFacade" />
+    <bean id="defaultCmsUserFacade" class="de.hybris.platform.cmsfacades.users.impl.DefaultUserFacade" >
+        <property name="userService" ref="userService" />
+        <property name="cmsUserModelToDataConverter" ref="cmsUserModelToDataConverter" />
+    </bean>
+
+    <alias name="defaultCMSUserService" alias="cmsUserService" />
+    <bean id="defaultCMSUserService" class="de.hybris.platform.cmsfacades.users.services.impl.DefaultCMSUserService">
+        <property name="userService" ref="userService"/>
+        <property name="storeSessionFacade" ref="storeSessionFacade" />
+    </bean>
+
+    <!-- converters -->
+    <alias name="defaultUserModelToDataConverter" alias="cmsUserModelToDataConverter" />
+    <bean id="defaultUserModelToDataConverter" parent="abstractPopulatingConverter" >
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.UserData" />
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsUserModelToDataPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- populators -->
+    <alias name="defaultUserModelToDataPopulator" alias="cmsUserModelToDataPopulator" />
+    <bean id="defaultUserModelToDataPopulator" class="de.hybris.platform.cmsfacades.users.populator.UserModelToDataPopulator">
+        <property name="cmsUserService" ref="cmsUserService"/>
+    </bean>
+
+</beans>

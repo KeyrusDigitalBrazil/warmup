@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:p="http://www.springframework.org/schema/p"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util 
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- ## PREDICATES ## -->
+	<!-- is-target-relation-type predicate -->
+	<bean name="abstractDefaultClassTypeAttributePredicate" class="de.hybris.platform.cmsfacades.common.predicate.DefaultClassTypeAttributePredicate" abstract="true">
+		<property name="attributeDescriptorModelHelperService" ref="attributeDescriptorModelHelperService"/>
+	</bean>
+
+	<bean name="abstractDefaultEnclosingTypeAttributePredicate"
+    class="de.hybris.platform.cmsfacades.cmsitems.predicates.DefaultEnclosingTypeAttributePredicate" abstract="true"/>
+	
+	<!-- concrete predicates --> 
+
+	<bean id="cmsItemAttributePredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.CMSItemAttributePredicate">
+		<property name="attributeDescriptorModelHelperService" ref="attributeDescriptorModelHelperService"/>
+	</bean>
+
+	<bean id="cmsMediaTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.core.model.media.MediaModel"/>
+
+	<bean id="cmsNavigationEntryTypeAttributePredicate" class="de.hybris.platform.cmsfacades.types.service.predicate.AndAttributePredicate">
+		<property name="predicates" ref="cmsNavigationEntryItemPredicatesList"/>
+	</bean>
+
+	<bean id="cmsNavigationNodeTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.cms2.model.navigation.CMSNavigationNodeModel"/>
+
+	<bean id="cmsProductTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.core.model.product.ProductModel"/>
+
+	<bean id="cmsCategoryTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.category.model.CategoryModel"/>
+
+	<bean id="cmsUserGroupTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.core.model.user.UserGroupModel"/>
+
+	<bean id="cmsCatalogVersionTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.catalog.model.CatalogVersionModel"/>
+
+	<bean id="cmsPageTypeTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.cms2.model.CMSPageTypeModel"/>
+	
+	<bean id="cmsRestrictionTypeAttributePredicate" parent="abstractDefaultClassTypeAttributePredicate" p:typeClass="de.hybris.platform.cms2.model.restrictions.AbstractRestrictionModel"/>
+
+	<bean id="cmsPartOfLinkToggleAttributePredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.PartOfLinkToggleAttributePredicate">
+		<property name="cmsComposedTypeContainsLinkTogglePredicate" ref="cmsComposedTypeContainsLinkTogglePredicate" />
+	</bean>
+
+	<bean id="cmsLinkTargetAttributePredicate"  class="de.hybris.platform.cmsfacades.types.service.predicate.RegexpStructureTypeAttributePredicate" p:pattern=".*@.*:LinkTargets"/>
+
+    <bean id="cmsIsAbstractBannerComponentAttributePredicate" parent="abstractDefaultEnclosingTypeAttributePredicate"
+    		  p:typeCode="AbstractBannerComponent"/>
+
+  	<bean id="cmsIsLocalizedAttributePredicate" class="de.hybris.platform.cmsfacades.cmsitems.predicates.IsLocalizedAttributePredicate"/>
+
+  	<!-- COMPOSED PREDICATES -->
+  	<bean id="cmsRequiredLocalizedAttributePredicate" factory-bean="cmsRequiredAttributePredicate" factory-method="and">
+  		<constructor-arg ref="cmsIsLocalizedAttributePredicate"/>
+  	</bean>
+
+  	<!-- Predicate for AbstractBannerComponent AND attribute is of type Media -->
+  	<bean id="cmsIsAbstractBannerComponentMediaAttributePredicate" factory-bean="cmsMediaTypeAttributePredicate" factory-method="and">
+  		<constructor-arg ref="cmsIsAbstractBannerComponentAttributePredicate"/>
+  	</bean>
+
+	<!-- Predicates for Nested Components -->
+	<bean id="cmsIsSingleLevelNestedRestrictionAttributePredicate" class="de.hybris.platform.cmsfacades.common.predicate.attributes.IsSingleLevelNestedRestrictionAttributePredicate">
+		<property name="attributeDescriptorModelHelperService" ref="attributeDescriptorModelHelperService"/>
+	</bean>
+
+	<alias name="defaultCmsNestedOrPartOfAttributePredicate" alias="cmsNestedOrPartOfAttributePredicate"/>
+	<bean id="defaultCmsNestedOrPartOfAttributePredicate" class="de.hybris.platform.cmsfacades.common.predicate.attributes.NestedOrPartOfAttributePredicate">
+		<property name="nestedAttributePredicates">
+			<set>
+				<ref bean="cmsIsSingleLevelNestedRestrictionAttributePredicate" />
+			</set>
+		</property>
+	</bean>
+
+	<!-- Predicates for Navigation entries item -->
+	<alias name="defaultCmsNavigationEntryItemPredicatesList" alias="cmsNavigationEntryItemPredicatesList" />
+	<util:list id="defaultCmsNavigationEntryItemPredicatesList">
+		<bean parent="cmsAssignableFromAttributePredicate" p:enclosingTypeCode="CMSNavigationEntry"/>
+		<bean parent="cmsQualifierPredicate" p:qualifier="item"/>
+	</util:list>
+
+</beans>

@@ -1,0 +1,27 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+$indexType=testIndexedType${testId}
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Online${testId}'])[unique=true,default='hwcatalog:Online${testId}']
+
+INSERT_UPDATE AsSimpleSearchProfile;code[unique=true];name[lang=$lang];indexType[default=$indexType];$catalogVersion[unique=true] 
+;searchProfile1;Simple Search Profile;;
+
+INSERT_UPDATE AsSimpleSearchConfiguration;searchProfile(code,$catalogVersion)[unique=true];uid[unique=true];facetsMergeMode(code);boostItemsMergeMode(code);boostRulesMergeMode(code);$catalogVersion[unique=true]
+;searchProfile1;searchConfiguration;ADD_AFTER;ADD_AFTER;ADD;
+
+INSERT_UPDATE AsPromotedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;searchConfiguration;product1;
+;searchConfiguration;product2;
+
+INSERT_UPDATE AsSearchProfileActivationSet;indexType[default=$indexType][unique=true];$catalogVersion[unique=true];searchProfiles(code,$catalogVersion)
+;;;searchProfile1
+

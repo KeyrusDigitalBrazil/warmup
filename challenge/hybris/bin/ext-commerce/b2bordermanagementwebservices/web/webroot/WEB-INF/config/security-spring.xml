@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:security="http://www.springframework.org/schema/security" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2
+     	http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+	<!-- Security OAuth2 -->
+
+	<beans>
+		<http pattern="/**" entry-point-ref="oauthAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
+
+			<anonymous username="anonymous" granted-authority="ROLE_ANONYMOUS" />
+			<session-management session-authentication-strategy-ref="fixation" />
+
+			<intercept-url pattern="/**" requires-channel="https" />
+
+			<port-mappings>
+				<port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}" https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}" />
+			</port-mappings>
+
+			<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+			<custom-filter ref="hybrisUserFilter" after="LAST" />
+			<access-denied-handler ref="oauthAccessDeniedHandler" />
+
+			<csrf disabled="true"/>
+		</http>
+
+		<alias name="defaultOauthClientDetailsDao" alias="oauthClientDetailsDao"/>
+		<bean id="defaultOauthClientDetailsDao" class="de.hybris.platform.webservicescommons.oauth2.client.impl.DefaultClientDetailsDao" />
+
+		<alias name="defaultOauthClientDetails" alias="oauthClientDetails"/>
+		<bean id="defaultOauthClientDetails" class="de.hybris.platform.webservicescommons.oauth2.client.impl.DefaultClientDetailsService">
+			<property name="clientDetailsDao" ref="oauthClientDetailsDao" />
+		</bean>
+
+		<bean id="hybrisUserFilter" class="de.hybris.platform.webservicescommons.oauth2.HybrisOauth2UserFilter" />
+
+		<authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+			<authentication-provider ref="wsAuthenticationProvider" />
+		</authentication-manager>
+
+		<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+			<property name="realmName" value="hybris" />
+			<property name="exceptionRenderer" ref="oAuth2ExceptionRenderer" />
+		</bean>
+
+		<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+			<property name="exceptionRenderer" ref="oAuth2ExceptionRenderer" />
+		</bean>
+
+		<bean id="oAuth2ExceptionRenderer" class="de.hybris.platform.webservicescommons.oauth2.OAuth2ExceptionRenderer">
+			<property name="messageConverters" ref="jaxbMessageConverters" />
+			<property name="exceptionConverter" ref="exceptionConverter" />
+		</bean>
+
+		<bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy" />
+
+		<oauth:resource-server id="resourceServerFilter" resource-id="hybris" token-services-ref="oauthTokenServices"
+							   entry-point-ref="oauthAuthenticationEntryPoint" />
+
+		<security:global-method-security pre-post-annotations="enabled" proxy-target-class="true" secured-annotations="enabled" >
+			<security:expression-handler ref="oauthExpressionHandler" />
+		</security:global-method-security>
+
+		<oauth:expression-handler id="oauthExpressionHandler" />
+
+		<oauth:web-expression-handler id="oauthWebExpressionHandler" />
+
+	</beans>
+</beans>

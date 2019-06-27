@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	
+	<alias name="defaultCxIntegrationMappingService" alias="cxIntegrationMappingService"/>
+	<bean id="defaultCxIntegrationMappingService" class="de.hybris.platform.personalizationintegration.service.impl.DefaultCxIntegrationMappingService" >
+		<property name="converters" ref="cxIntegrationConvertersMap"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="cxSegmentService" ref="cxSegmentService"/>
+		<property name="cxUserSegmentService" ref="cxUserSegmentService"/>
+		<property name="cxUserSegmentSessionService" ref="cxUserSegmentSessionService"/>
+		<property name="cxUserSegmentConversionHelper" ref="cxUserSegmentConversionHelper"/>
+	</bean>
+	
+	<alias alias="cxIntegrationConvertersMap" name="defaultCxIntegrationConvertersMap" />
+    <util:map id="defaultCxIntegrationConvertersMap" key-type="java.lang.String" value-type="de.hybris.platform.servicelayer.dto.converter.Converter"/>
+		
+	<bean id="cxFixedSegmentsProfileMapper" class="de.hybris.platform.personalizationintegration.mapping.mapper.impl.CxFixedSegmentsProfileMapper" abstract="true">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<bean id="cxScriptProfileMapper" class="de.hybris.platform.personalizationintegration.mapping.mapper.impl.CxScriptProfileMapper" abstract="true">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="scriptingLanguagesService" ref="scriptingLanguagesService"/>
+	</bean>	
+
+	<!-- Update strategy -->
+	<alias name="defaultCxUpdateUserSegmentStrategy" alias="updateUserSegmentStrategy"/>
+	<bean id="defaultCxUpdateUserSegmentStrategy"
+		class="de.hybris.platform.personalizationintegration.strategies.impl.DefaultCxUpdateUserSegmentStrategy">
+		<property name="cxIntegrationMappingService" ref="cxIntegrationMappingService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="cxConfigurationService" ref="cxConfigurationService" />
+		<property name="cxConsentService" ref="cxConsentService" />
+	</bean>
+
+
+	<!-- default segment provider -->
+	<bean name="defaultUserSegmentsProvider" class="de.hybris.platform.personalizationintegration.segment.impl.UserTypeSegmentsProvider" >
+		<property name="userService" ref="userService" />
+		<property name="cxConfigurationService" ref="cxConfigurationService" />
+ 	</bean>
+
+	<bean name="faultTolerantConverter" class="de.hybris.platform.personalizationintegration.mapping.FaultTolerantConverter" parent="abstractPopulatingConverter" abstract="true" />
+
+</beans>

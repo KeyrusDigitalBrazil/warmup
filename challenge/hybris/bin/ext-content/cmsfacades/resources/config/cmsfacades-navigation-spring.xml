@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- NAVIGATION NODE FACADE -->
+
+    <alias name="defaultNavigationFacade" alias="cmsNavigationFacade"/>
+    <bean id="defaultNavigationFacade" class="de.hybris.platform.cmsfacades.navigations.impl.DefaultNavigationFacade">
+        <property name="navigationService" ref="cmsNavigationService"/>
+        <property name="navigationModelToDataConverter" ref="cmsNavigationModelToDataConverter"/>
+
+        <property name="modelService" ref="modelService"/>
+        <property name="adminSiteService" ref="cmsAdminSiteService"/>
+        <property name="navigationNodeDataToModelUpdatePopulator" ref="cmsNavigationNodeDataToModelUpdateCompositePopulator"/>
+        <property name="navigationNodeDataToModelCreatePopulator" ref="cmsNavigationNodeDataToModelCreateCompositePopulator"/>
+        <property name="facadeValidationService" ref="facadeValidationService"/>
+        <property name="createNavigationNodeValidator" ref="cmsNavigationNodeCreateValidator"/>
+        <property name="updateNavigationNodeValidator" ref="cmsNavigationNodeUpdateValidator"/>
+        <property name="navigationNodeEntriesValidator" ref="cmsNavigationNodeEntriesValidator"/>
+        <property name="transactionManager" ref="txManager"/>
+        <property name="navigationEntryService" ref="cmsNavigationEntryService"/>
+    </bean>
+
+    <!-- Populators -->
+    <alias name="defaultNavigationNodeModelToDataPopulator" alias="cmsNavigationNodeModelToDataPopulator"/>
+    <bean id="defaultNavigationNodeModelToDataPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.model.NavigationNodeModelToDataPopulator">
+        <property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+        <property name="navigationEntryModelToDataConverter" ref="cmsNavigationEntryModelToDataConverter"/>
+        <property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService"/>
+    </bean>
+
+    <!-- CMSX-3526 Beware that, if you enable this populator, you may expect issues with catalog synchronizations -->
+    <alias name="defaultNavigationNodeDataToModelParentPopulator" alias="cmsNavigationNodeDataToModelParentPopulator"/>
+    <bean id="defaultNavigationNodeDataToModelParentPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.data.NavigationNodeDataToModelParentPopulator">
+        <property name="navigationService" ref="cmsNavigationService"/>
+        <property name="adminSiteService" ref="cmsAdminSiteService"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeDataToModelBasePopulator" alias="cmsNavigationNodeDataToModelBasePopulator"/>
+    <bean id="defaultNavigationNodeDataToModelBasePopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.data.NavigationNodeDataToModelBasePopulator">
+        <description>deprecated since 1811</description>
+        <property name="localizedPopulator" ref="cmsLocalizedPopulator"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeDataToModelPositionPopulator" alias="cmsNavigationNodeDataToModelPositionPopulator"/>
+    <bean id="defaultNavigationNodeDataToModelPositionPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.data.NavigationNodeDataToModelPositionPopulator">
+        <description>deprecated since 1811</description>
+        <property name="navigationModelToDataConverter" ref="cmsNavigationModelToDataConverter"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeDataToModelUidGenerationPopulator"
+           alias="cmsNavigationNodeDataToModelUidGenerationPopulator"/>
+    <bean id="defaultNavigationNodeDataToModelUidGenerationPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.data.NavigationNodeDataToModelUidGenerationPopulator">
+        <description>deprecated since 1811</description>
+        <property name="processCodeGenerator" ref="cmsNavigationNodeModelGenerator"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeDataToModelEntriesPopulator" alias="cmsNavigationNodeDataToModelEntriesPopulator"/>
+    <bean id="defaultNavigationNodeDataToModelEntriesPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.data.NavigationNodeDataToModelEntriesPopulator">
+        <description>deprecated since 1811</description>
+        <property name="navigationEntryService" ref="cmsNavigationEntryService"/>
+    </bean>
+
+    <!-- Converters -->
+
+    <alias name="defaultNavigationModelToDataConverter" alias="cmsNavigationModelToDataConverter"/>
+    <bean id="defaultNavigationModelToDataConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.NavigationNodeData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsNavigationNodeModelToDataPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Composite Populators -->
+    <alias name="defaultNavigationNodeDataToModelUpdateCompositePopulator"
+           alias="cmsNavigationNodeDataToModelUpdateCompositePopulator"/>
+    <bean id="defaultNavigationNodeDataToModelUpdateCompositePopulator"
+          class="de.hybris.platform.cmsfacades.common.populator.impl.CompositePopulator">
+        <description>deprecated since 1811</description>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsNavigationNodeDataToModelBasePopulator"/>
+                <ref bean="cmsNavigationNodeDataToModelPositionPopulator"/>
+                <ref bean="cmsNavigationNodeDataToModelEntriesPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultNavigationNodeDataToModelCreateCompositePopulator"
+           alias="cmsNavigationNodeDataToModelCreateCompositePopulator"/>
+    <bean id="defaultNavigationNodeDataToModelCreateCompositePopulator"
+          class="de.hybris.platform.cmsfacades.common.populator.impl.CompositePopulator">
+        <description>deprecated since 1811</description>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsNavigationNodeDataToModelBasePopulator"/>
+                <ref bean="cmsNavigationNodeDataToModelUidGenerationPopulator"/>
+                <ref bean="cmsNavigationNodeDataToModelEntriesPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Validators -->
+    <alias name="defaultNavigationNodeCreateValidator" alias="cmsNavigationNodeCreateValidator"/>
+    <bean id="defaultNavigationNodeCreateValidator"
+          class="de.hybris.platform.cmsfacades.navigations.validator.NavigationNodeCreateValidator">
+        <description>deprecated since 1811</description>
+        <property name="validateUidPredicate" ref="cmsValidUidPredicate"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeUpdateValidator" alias="cmsNavigationNodeUpdateValidator"/>
+    <bean id="defaultNavigationNodeUpdateValidator"
+          class="de.hybris.platform.cmsfacades.navigations.validator.NavigationNodeUpdateValidator">
+        <description>deprecated since 1811</description>
+        <property name="validateUidPredicate" ref="cmsValidUidPredicate"/>
+        <property name="navigationService" ref="cmsNavigationService"/>
+    </bean>
+
+    <alias name="defaultValidUidPredicate" alias="cmsValidUidPredicate"/>
+    <bean id="defaultValidUidPredicate" class="de.hybris.platform.cmsfacades.navigations.validator.predicate.ValidUidPredicate">
+        <description>deprecated since 1811</description>
+    </bean>
+
+    <alias name="defaultValidEntryItemModelPredicate" alias="cmsValidEntryItemModelPredicate"/>
+    <bean id="defaultValidEntryItemModelPredicate"
+          class="de.hybris.platform.cmsfacades.navigations.validator.predicate.ValidEntryItemModelPredicate">
+        <description>deprecated since 1811</description>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <alias name="defaultNavigationNodeEntriesValidator" alias="cmsNavigationNodeEntriesValidator"/>
+    <bean id="defaultNavigationNodeEntriesValidator"
+          class="de.hybris.platform.cmsfacades.navigations.validator.NavigationNodeEntriesValidator">
+        <description>deprecated since 1811</description>
+        <property name="navigationEntryConverterRegistry" ref="cmsNavigationEntryConverterRegistry"/>
+        <property name="validEntryItemModelPredicate" ref="cmsValidEntryItemModelPredicate"/>
+    </bean>
+
+
+    <!-- Unique Key Generator-->
+    <bean id="cmsNavigationNodeModelGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator"
+          init-method="init">
+        <property name="key" value="${keygen.navigationnode.uid.key}"/>
+        <property name="digits" value="${keygen.navigationnode.uid.digits}"/>
+        <property name="start" value="${keygen.navigationnode.uid.start}"/>
+        <property name="type" value="${keygen.navigationnode.uid.type}"/>
+    </bean>
+
+    <!-- Entries Populators -->
+
+    <alias name="defaultNavigationEntryModelToDataPopulator" alias="cmsNavigationEntryModelToDataPopulator"/>
+    <bean id="defaultNavigationEntryModelToDataPopulator"
+          class="de.hybris.platform.cmsfacades.navigations.populator.model.NavigationEntryModelToDataPopulator">
+        <property name="navigationEntryConverterRegistry" ref="cmsNavigationEntryConverterRegistry"/>
+    </bean>
+
+    <!-- Entries Converters -->
+
+    <alias name="defaultNavigationEntryModelToDataConverter" alias="cmsNavigationEntryModelToDataConverter"/>
+    <bean id="defaultNavigationEntryModelToDataConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.NavigationEntryData"/>
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsNavigationEntryModelToDataPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

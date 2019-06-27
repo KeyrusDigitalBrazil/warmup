@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- WARNING: This is the Spring WEB configuration file. If you want to replace items or managers you have to do this from the extensions 
+	core configuration file (personalizationwebservices/resources/personalizationwebservices-spring.xml) -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:annotation-config/>
+
+	<import resource="config/cache-config-spring.xml"/>
+	<import resource="config/error-config-spring.xml"/>
+	<import resource="config/field-mapping-spring.xml"/>	
+	<import resource="config/validation-config-spring.xml"/>	
+	<import resource="${personalizationwebservices.security.config:config/security-spring.xml}"/>
+	
+	<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>/WEB-INF/messages/messages</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+	
+	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="personalizationwebservicesPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<!-- Filter that catches and resolves exceptions thrown from other filters. Can be uncommented if you need such functionality -->
+				<ref bean="exceptionTranslationFilter" />
+	
+				<ref bean="log4jFilter" />
+				<!-- Order of following filters is very important, session does not work without tenant, and catalogVersion needs to be set in proper session -->
+				<ref bean="tenantActivationFilter" />
+				<ref bean="restSessionFilter" />
+				<ref bean="catalogVersionFilter" />
+				<ref bean="languageFilter" />
+				<!-- Security -->
+				<ref bean="springSecurityFilterChain" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="languageFilter" class="de.hybris.platform.webservicescommons.filter.LanguageFilter">
+		<property name="i18NService" ref="i18NService" />
+		<property name="commonI18nService" ref="commonI18NService" />
+	</bean>
+
+	<bean id="restSessionFilter" class="de.hybris.platform.webservicescommons.filter.RestSessionFilter">
+		<property name="sessionService" ref="sessionService" />
+	</bean>
+
+	<!-- Filter that catches and resolves exceptions thrown from other filters. Can be added to filter chain if you need such functionality -->
+	<alias alias="exceptionTranslationFilter" name="defaultExceptionTranslationFilter" />
+	<bean id="defaultExceptionTranslationFilter" class="de.hybris.platform.webservicescommons.filter.ExceptionTranslationFilter">
+		<property name="restHandlerExceptionResolver" ref="restHandlerExceptionResolver" />
+	</bean>
+
+	<alias alias="catalogVersionFilter" name="defaultCatalogVersionFilter" />	
+	<bean id="defaultCatalogVersionFilter" class="de.hybris.platform.webservicescommons.filter.CatalogVersionFilter">
+		<property name="enabledRegexp" value="^(/v\d+/catalogs)" />
+		<property name="catalogRegexp" value="^(?:/v\d+/catalogs/)([^/]+)" />
+		<property name="catalogVersionRegexp" value="^(?:/v\d+/catalogs/)(?:[^/]+)(?:/catalogVersions/)([^/]+)"/>
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<!-- Option to overwrite or extend any configuration of this web service -->
+	<import resource="classpath*:/personalizationwebservices/additional-web-spring-context.xml"/>
+
+</beans>

@@ -1,0 +1,57 @@
+<div class="ySmartEditToolbars">
+    <toolbar data-css-class="ySmartEditHeaderToolbar"
+        data-image-root="imageRoot"
+        data-toolbar-name="smartEditHeaderToolbar"></toolbar>
+</div>
+<div data-ng-if="pageListCtl.isReady"
+    class="pageListWrapper">
+    <div class="se-page-list__header">
+        <h1 class="se-page-list__title">
+            <span data-translate="se.cms.pagelist.title"></span>
+        </h1>
+        <h4 class="se-page-list__sub-title">{{pageListCtl.catalogName | l10n}} - {{pageListCtl.catalogVersion}}</h4>
+
+        <sites-link data-css-class="se-page-list__page-link se-page-list__page-link--left"
+            data-icon-css-class="se-page-list__page-link-icon" />
+
+        <div class="se-page-list__page-link se-page-list__page-link--right"
+            data-ng-if="pageListCtl.isCatalogVersionInactive"
+            data-ng-click="pageListCtl.goToTrash()">
+            <a class="se-page-list__page-link-text"
+                data-translate="se.cms.pagelist.trashcan.link.text"
+                data-translate-values="{{ pageListCtl.trashedPagesTranslationData }}"></a>
+            <span class="se-page-list__page-link-icon icon-navigation-right-arrow"></span>
+        </div>
+    </div>
+
+    <div class="se-input-group ySEPage-list-search">
+        <div class="se-input-group--addon">
+            <span class="hyicon hyicon-search ySEPage-list-search-icon"></span>
+        </div>
+        <input type="text"
+            class="se-input-group--input ySEPage-list-search-input"
+            placeholder="{{ 'se.cms.pagelist.searchplaceholder' | translate }}"
+            data-ng-model="pageListCtl.query.value"
+            data-ng-model-options="pageListCtl.searchOptions"
+            name="query">
+        <div class="se-input-group--addon ySESearchIcon"
+            data-ng-show="pageListCtl.query.value"
+            data-ng-click="pageListCtl.reset()">
+            <span class="glyphicon glyphicon-remove-sign se-component-search--reset-icon"></span>
+        </div>
+    </div>
+
+    <div class="se-page-list__add-btn-wrapper"
+        has-operation-permission="'se.edit.page'">
+        <button class="y-add-btn"
+            data-ng-click="pageListCtl.openAddPageWizard()">
+            <span class="hyicon hyicon-add"></span>
+            <span class="y-add-btn__text">{{'se.cms.addpagewizard.addpage' | translate}}</span>
+        </button>
+    </div>
+
+    <dynamic-paged-list data-config="pageListCtl.pageListConfig"
+        data-mask="pageListCtl.query.value"
+        data-get-api="pageListCtl.getApi($api);">
+    </dynamic-paged-list>
+</div>

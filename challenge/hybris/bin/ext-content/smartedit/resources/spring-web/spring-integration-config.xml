@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/integration
+           http://www.springframework.org/schema/integration/spring-integration.xsd
+           http://www.springframework.org/schema/integration/http
+           http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+
+<!-- Spring Integration Configuration -->
+
+<int:channel id="httpGETRequestChannel"/>
+<int:channel id="httpPOSTRequestChannel"/>
+<int:channel id="httpPUTRequestChannel"/>
+<int:channel id="httpDELETERequestChannel"/>
+
+<int:poller default="true" fixed-delay="50"/>
+ 
+ <int:gateway id="httpGETGateway" service-interface="de.hybris.smartedit.controllers.HttpGETGateway" 
+ default-request-channel="httpGETRequestChannel">
+ 	<int:method name="loadAll" />
+ </int:gateway>
+ 
+<int:gateway id="httpPOSTGateway" service-interface="de.hybris.smartedit.controllers.HttpPOSTGateway" 
+ default-request-channel="httpPOSTRequestChannel">
+   <int:method name="save">
+            <int:header name="Content-Type" value="application/json"/>
+        </int:method>
+ </int:gateway>
+ 
+<int:gateway id="httpPUTGateway" service-interface="de.hybris.smartedit.controllers.HttpPUTGateway" 
+ default-request-channel="httpPUTRequestChannel">
+   <int:method name="update">
+            <int:header name="Content-Type" value="application/json"/>
+        </int:method>
+ </int:gateway>
+ 
+   <int:gateway id="httpDELETEGateway" service-interface="de.hybris.smartedit.controllers.HttpDELETEGateway" 
+ default-request-channel="httpDELETERequestChannel">
+   <int:method name="delete">
+            <int:header name="Content-Type" value="application/json"/>
+        </int:method>
+ </int:gateway>
+
+ 	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="de.hybris.smartedit.UriVariablesResolver.setHostConfiguration"/>
+		<property name="arguments">
+			<list>
+				<value>${tomcat.ssl.port}</value>
+				<value>${tomcat.http.port}</value>
+				<value>${smartedit.tomcat.hostname}</value>
+			</list>
+		</property>
+	</bean>
+
+ <!--outbound gateways to get/post/put/delete data to/from url-->
+	<int-http:outbound-gateway id='httpGETOutboundGateway'
+     request-channel='httpGETRequestChannel'
+     url="{scheme}://{host}:{port}${configurationServiceLocation}"
+     http-method='GET'
+     expected-response-type='java.lang.String'
+     charset='UTF-8'>
+        <int-http:uri-variable name="scheme" expression="T(org.springframework.web.context.request.RequestContextHolder).
+            requestAttributes.request.getScheme()"/>
+        <int-http:uri-variable name="host" expression="T(de.hybris.smartedit.UriVariablesResolver).resolveHost()" />
+        <int-http:uri-variable name="port" expression="T(de.hybris.smartedit.UriVariablesResolver).resolvePort()" />
+     </int-http:outbound-gateway>
+
+	<int-http:outbound-gateway id='httpPOSTOutboundGateway'
+     request-channel='httpPOSTRequestChannel'
+     url="{scheme}://{host}:{port}${configurationServiceLocation}"
+     http-method='POST'
+     charset='UTF-8'
+     expected-response-type='java.lang.String'>
+        <int-http:uri-variable name="scheme" expression="T(org.springframework.web.context.request.RequestContextHolder).
+            requestAttributes.request.getScheme()"/>
+        <int-http:uri-variable name="host" expression="T(de.hybris.smartedit.UriVariablesResolver).resolveHost()" />
+        <int-http:uri-variable name="port" expression="T(de.hybris.smartedit.UriVariablesResolver).resolvePort()" />
+    </int-http:outbound-gateway>
+     
+    <int-http:outbound-gateway id='httpPUTOutboundGateway'
+     request-channel='httpPUTRequestChannel'
+     url='{scheme}://{host}:{port}${configurationServiceLocation}/{configId}'
+     http-method='PUT'
+     charset='UTF-8'
+     expected-response-type='java.lang.String'>
+        <int-http:uri-variable name="configId" expression="payload[key]"/>
+        <int-http:uri-variable name="scheme" expression="T(org.springframework.web.context.request.RequestContextHolder).
+            requestAttributes.request.getScheme()"/>
+        <int-http:uri-variable name="host" expression="T(de.hybris.smartedit.UriVariablesResolver).resolveHost()" />
+        <int-http:uri-variable name="port" expression="T(de.hybris.smartedit.UriVariablesResolver).resolvePort()" />
+     </int-http:outbound-gateway>
+     
+    <int-http:outbound-channel-adapter id='httpDELETEOutboundGateway'
+     channel='httpDELETERequestChannel'
+     url='{scheme}://{host}:{port}${configurationServiceLocation}/{configId}'
+     http-method='DELETE'
+     charset='UTF-8'
+     expected-response-type='java.lang.String'>
+        <int-http:uri-variable name="configId" expression="payload[key]"/>
+        <int-http:uri-variable name="scheme" expression="T(org.springframework.web.context.request.RequestContextHolder).
+            requestAttributes.request.getScheme()"/>
+        <int-http:uri-variable name="host" expression="T(de.hybris.smartedit.UriVariablesResolver).resolveHost()" />
+        <int-http:uri-variable name="port" expression="T(de.hybris.smartedit.UriVariablesResolver).resolvePort()" />
+     </int-http:outbound-channel-adapter>  
+
+</beans>

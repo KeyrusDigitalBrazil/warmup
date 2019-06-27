@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="sapProductConfigDefaultRuleAwareConfigurationService" alias="sapProductConfigConfigurationService" />
+	<bean id="sapProductConfigDefaultRuleAwareConfigurationService" parent="sapProductConfigDefaultConfigurationService"
+		class="de.hybris.platform.sap.productconfig.rules.service.impl.ProductConfigurationRuleAwareServiceImpl">
+		<property name="factContextFactory" ref="sapProductConfigAdjustDefaultConfigurationFactContextFactory" />
+		<property name="cartService" ref="cartService" />
+		<property name="ruleEngineContextDao" ref="ruleEngineContextDao" />
+		<property name="commerceRuleEngineService" ref="commerceRuleEngineService" />
+		<property name="actionStrategiesMapping" ref="productConfigActionStrategiesMapping" />
+		<property name="timeService" ref="timeService" />
+		<property name="ruleEngineContextFinderStrategy" ref="ruleEngineContextFinderStrategy" />
+		<property name="rulesResultUtil" ref="sapProductConfigRulesResultUtil" />
+	</bean>
+
+	<util:map id="sapProductConfigRaoProviders">
+		<entry key="PRODUCTCONFIG_DEFAULT_CONFIGURATION" value-ref="sapProductConfigAdjustDefaultConfigurationRaoProviders" />
+	</util:map>
+
+	<alias name="sapProductConfigDefaultAdjustDefaultConfigurationFactContextFactory" alias="sapProductConfigAdjustDefaultConfigurationFactContextFactory" />
+	<bean id="sapProductConfigDefaultAdjustDefaultConfigurationFactContextFactory" parent="defaultFactContextFactory">
+		<property name="raoProviders" ref="sapProductConfigRaoProviders" />
+	</bean>
+
+	<util:map id="sapProductConfigAdjustDefaultConfigurationRaoProviders">
+		<entry key="de.hybris.platform.core.model.order.CartModel">
+			<util:list>
+				<ref bean="sapProductConfigCartRaoProvider" />
+			</util:list>
+		</entry>
+		<entry key="de.hybris.platform.sap.productconfig.runtime.interf.model.impl.ConfigModelImpl">
+			<util:list>
+				<ref bean="sapProductConfigRaoProvider" />
+				<ref bean="sapProductConfigCustomerSupportRaoProvider" />
+				<ref bean="sapProductConfigBaseStoreRaoProvider" />
+			</util:list>
+		</entry>
+		<entry key="de.hybris.platform.sap.productconfig.rules.model.ProductConfigProcessStepModel">
+			<util:list>
+				<ref bean="sapProductConfigProcessStepRaoProvider" />
+			</util:list>
+		</entry>
+		<entry key="java.util.Date">
+			<util:list>
+				<ref bean="evaluationTimeRRDProvider" />
+			</util:list>
+		</entry>
+	</util:map>
+
+	<alias name="sapProductConfigDefaultCartRaoProvider" alias="sapProductConfigCartRaoProvider" />
+	<bean id="sapProductConfigDefaultCartRaoProvider" class="de.hybris.platform.sap.productconfig.rules.rao.provider.ProductConfigCartRAOProvider">
+		<property name="cartRaoConverter" ref="sapProductConfigCartRaoConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCartRaoConverter" alias="sapProductConfigCartRaoConverter" />
+	<bean id="sapProductConfigDefaultCartRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.CartRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCartRaoPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCartRaoPopulator" alias="sapProductConfigCartRaoPopulator" />
+	<bean id="sapProductConfigDefaultCartRaoPopulator" class="de.hybris.platform.sap.productconfig.rules.rao.populator.ProductConfigCartRAOPopulator">
+		<property name="productConfigRaoConverter" ref="sapProductConfigRaoConverter" />
+		<property name="userConverter" ref="userRaoConverter" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="productConfigService" ref="sapProductConfigConfigurationService" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigRaoProvider" alias="sapProductConfigRaoProvider" />
+	<bean id="sapProductConfigDefaultConfigRaoProvider" class="de.hybris.platform.sap.productconfig.rules.rao.provider.ProductConfigRAOProvider">
+		<property name="productConfigRaoConverter" ref="sapProductConfigRaoConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRaoConverter" alias="sapProductConfigRaoConverter" />
+	<bean id="sapProductConfigDefaultRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.rules.rao.ProductConfigRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigRaoPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleFormatTranslator" alias="sapProductConfigRuleFormatTranslator" />
+	<bean id="sapProductConfigDefaultRuleFormatTranslator" class="de.hybris.platform.sap.productconfig.rules.service.impl.ProductConfigRuleFormatTranslatorImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleActionStrategyChecker" alias="sapProductConfigRuleActionStrategyChecker" />
+	<bean id="sapProductConfigDefaultRuleActionStrategyChecker" class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.ProductConfigRuleActionStrategyCheckerImpl">
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleUtil" alias="sapProductConfigRuleUtil" />
+	<bean id="sapProductConfigDefaultRuleUtil" class="de.hybris.platform.sap.productconfig.rules.service.impl.ProductConfigRuleUtilImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultRaoPopulator" alias="sapProductConfigRaoPopulator" />
+	<bean id="sapProductConfigDefaultRaoPopulator" class="de.hybris.platform.sap.productconfig.rules.rao.populator.ProductConfigRAOPopulator">
+		<property name="rulesFormator" ref="sapProductConfigRuleFormatTranslator" />
+		<property name="ruleUtil" ref="sapProductConfigRuleUtil" />
+		<property name="assignmentResolverStrategy" ref="sapProductConfigConfigurationAssignmentResolverStrategy" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultProcessStepRaoProvider" alias="sapProductConfigProcessStepRaoProvider" />
+	<bean id="sapProductConfigDefaultProcessStepRaoProvider" class="de.hybris.platform.sap.productconfig.rules.rao.provider.ProductConfigProcessStepRAOProvider">
+		<property name="productConfigProcessStepRaoConverter" ref="sapProductConfigProcessStepRaoConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultProcessStepRaoConverter" alias="sapProductConfigProcessStepRaoConverter" />
+	<bean id="sapProductConfigDefaultProcessStepRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.rules.rao.ProductConfigProcessStepRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigProcessStepRaoPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultProcessStepRaoPopulator" alias="sapProductConfigProcessStepRaoPopulator" />
+	<bean id="sapProductConfigDefaultProcessStepRaoPopulator" class="de.hybris.platform.sap.productconfig.rules.rao.populator.ProductConfigProcessStepRAOPopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCustomerSupportRaoProvider" alias="sapProductConfigCustomerSupportRaoProvider" />
+	<bean id="sapProductConfigDefaultCustomerSupportRaoProvider" class="de.hybris.platform.sap.productconfig.rules.rao.provider.ProductConfigCustomerSupportRAOProvider">
+		<property name="commerceCustomerSupportService" ref="commerceCustomerSupportService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultBaseStoreRaoProvider" alias="sapProductConfigBaseStoreRaoProvider" />
+	<bean id="sapProductConfigDefaultBaseStoreRaoProvider" class="de.hybris.platform.sap.productconfig.rules.rao.provider.ProductConfigBaseStoreRAOProvider">
+		<property name="baseStoreService" ref="baseStoreService" />
+	</bean>
+
+	<alias alias="sapProductConfigSetCsticValueAction" name="sapProductConfigDefaultSetCsticValueAction" />
+	<bean id="sapProductConfigDefaultSetCsticValueAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigSetCsticValueRAOAction" />
+	</bean>
+
+	<alias alias="sapProductConfigRemoveAssignableValueAction" name="sapProductConfigDefaultRemoveAssignableValueAction" />
+	<bean id="sapProductConfigDefaultRemoveAssignableValueAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigRemoveAssignableValueRAOAction" />
+	</bean>
+
+	<alias alias="sapProductConfigHideCsticAction" name="sapProductConfigDefaultHideCsticAction" />
+	<bean id="sapProductConfigDefaultHideCsticAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigHideCsticRAOAction" />
+	</bean>
+
+	<alias alias="sapProductConfigDisplayCsticReadonlyAction" name="sapProductConfigDefaultDisplayCsticReadonlyAction" />
+	<bean id="sapProductConfigDefaultDisplayCsticReadonlyAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigDisplayCsticReadonlyRAOAction" />
+	</bean>
+
+	<alias alias="sapProductConfigDisplayMessageAction" name="sapProductConfigDefaultDisplayMessageAction" />
+	<bean id="sapProductConfigDefaultDisplayMessageAction" class="de.hybris.platform.ruledefinitions.actions.DefaultRuleExecutableAction">
+		<property name="raoAction" ref="sapProductConfigDisplayMessageRAOAction" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleConfigurableProductConditionTranslator" alias="sapProductConfigRuleConfigurableProductConditionTranslator" />
+	<bean id="sapProductConfigDefaultRuleConfigurableProductConditionTranslator" class="de.hybris.platform.sap.productconfig.rules.conditions.RuleConfigurableProductConditionTranslator">
+		<property name="rulesFormator" ref="sapProductConfigRuleFormatTranslator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleConfigurableProductInCartConditionTranslator" alias="sapProductConfigRuleConfigurableProductInCartConditionTranslator" />
+	<bean id="sapProductConfigDefaultRuleConfigurableProductInCartConditionTranslator" class="de.hybris.platform.sap.productconfig.rules.conditions.RuleConfigurableProductInCartConditionTranslator">
+		<property name="rulesFormator" ref="sapProductConfigRuleFormatTranslator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleConfigurableProductCustomersConditionTranslator" alias="sapProductConfigRuleConfigurableProductCustomersConditionTranslator" />
+	<bean id="sapProductConfigDefaultRuleConfigurableProductCustomersConditionTranslator" class="de.hybris.platform.sap.productconfig.rules.conditions.RuleConfigurableProductCustomersConditionTranslator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleConfigurableProductCustomerGroupsConditionTranslator" alias="sapProductConfigRuleConfigurableProductCustomerGroupsConditionTranslator" />
+	<bean id="sapProductConfigDefaultRuleConfigurableProductCustomerGroupsConditionTranslator" class="de.hybris.platform.sap.productconfig.rules.conditions.RuleConfigurableProductCustomerGroupsConditionTranslator">
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultRuleCompilerListener" alias="sapProductConfigRuleCompilerListener" />
+	<bean id="sapProductConfigDefaultRuleCompilerListener" class="de.hybris.platform.sap.productconfig.rules.compiler.listeners.ProductConfigRuleCompilerListener">
+	</bean>
+
+	<bean id="sapProductConfigRuleCompilerListenerDefinition" parent="ruleCompilerListenerDefinition">
+		<property name="listener" ref="sapProductConfigRuleCompilerListener" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleIrProcessor" alias="sapProductConfigRuleIrProcessor" />
+	<bean id="sapProductConfigDefaultRuleIrProcessor" class="de.hybris.platform.sap.productconfig.rules.compiler.processors.ProductConfigRuleIrProcessor">
+	</bean>
+
+	<bean id="sapProductConfigRuleIrProcessorDefinition" parent="ruleIrProcessorDefinition">
+		<property name="ruleIrProcessor" ref="sapProductConfigRuleIrProcessor" />
+	</bean>
+
+	<bean id="sapProductConfigRuleDataSystemSetup" class="de.hybris.platform.sap.productconfig.rules.setup.ProductConfigRulesSetup"
+		parent="abstractCoreSystemSetup">
+		<property name="setupImpexService" ref="setupImpexAddonService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="impexImporter" ref="impExSystemSetup" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultSetCsticValueRAOAction" alias="sapProductConfigSetCsticValueRAOAction" />
+	<bean id="sapProductConfigDefaultSetCsticValueRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.rule.evaluation.impl.SetCsticValueRAOAction" />
+
+	<alias name="sapProductConfigDefaultRemoveAssignableValueRAOAction" alias="sapProductConfigRemoveAssignableValueRAOAction" />
+	<bean id="sapProductConfigDefaultRemoveAssignableValueRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.rule.evaluation.impl.RemoveAssignableValueRAOAction" />
+
+	<alias name="sapProductConfigDefaultHideCsticRAOAction" alias="sapProductConfigHideCsticRAOAction" />
+	<bean id="sapProductConfigDefaultHideCsticRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.rule.evaluation.impl.HideCsticRAOAction" />
+
+	<alias name="sapProductConfigDefaultDisplayCsticReadonlyRAOAction" alias="sapProductConfigDisplayCsticReadonlyRAOAction" />
+	<bean id="sapProductConfigDefaultDisplayCsticReadonlyRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.rule.evaluation.impl.DisplayCsticReadonlyRAOAction" />
+
+	<alias name="sapProductConfigDefaultDisplayMessageRAOAction" alias="sapProductConfigDisplayMessageRAOAction" />
+	<bean id="sapProductConfigDefaultDisplayMessageRAOAction" parent="abstractRuleExecutableSupport"
+		class="de.hybris.platform.sap.productconfig.rules.rule.evaluation.impl.DisplayMessageRAOAction" />
+
+	<util:map id="productConfigActionStrategiesMapping">
+		<entry key="sapProductConfigDefaultSetCsticValueRAOAction" value-ref="sapProductConfigSetCsticValueActionStrategy" />
+		<entry key="sapProductConfigDefaultRemoveAssignableValueRAOAction" value-ref="sapProductConfigRemoveAssignableValueActionStrategy" />
+		<entry key="sapProductConfigDefaultDisplayCsticReadonlyRAOAction" value-ref="sapProductConfigDisplayCsticReadonlyActionStrategy" />
+		<entry key="sapProductConfigDefaultHideCsticRAOAction" value-ref="sapProductConfigHideCsticActionStrategy" />
+		<entry key="sapProductConfigDefaultDisplayMessageRAOAction" value-ref="sapProductConfigDisplayMessageActionStrategy" />
+	</util:map>
+
+	<bean id="sapProductConfigAbstractRuleActionStrategy" abstract="true"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.ProductConfigAbstractRuleActionStrategy">
+		<property name="rulesFormator" ref="sapProductConfigRuleFormatTranslator" />
+		<property name="ruleActionChecker" ref="sapProductConfigRuleActionStrategyChecker" />
+		<property name="ruleEngineService" ref="commerceRuleEngineService" />
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="ruleParametersService" ref="ruleParametersService" />
+		<property name="ruleUtil" ref="sapProductConfigRuleUtil" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultRemoveAssignableValueActionStrategy" alias="sapProductConfigRemoveAssignableValueActionStrategy" />
+	<bean id="sapProductConfigDefaultRemoveAssignableValueActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.RemoveAssignableValueRuleActionStrategyImpl" />
+
+	<alias name="sapProductConfigDefaultSetCsticValueActionStrategy" alias="sapProductConfigSetCsticValueActionStrategy" />
+	<bean id="sapProductConfigDefaultSetCsticValueActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.SetCsticValueRuleActionStrategyImpl" />
+
+	<alias name="sapProductConfigDefaultDisplayCsticReadonlyActionStrategy" alias="sapProductConfigDisplayCsticReadonlyActionStrategy" />
+	<bean id="sapProductConfigDefaultDisplayCsticReadonlyActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.DisplayCsticReadonlyRuleActionStrategyImpl" />
+
+	<alias name="sapProductConfigDefaultHideCsticActionStrategy" alias="sapProductConfigHideCsticActionStrategy" />
+	<bean id="sapProductConfigDefaultHideCsticActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.HideCsticRuleActionStrategyImpl" />
+
+	<alias name="sapProductConfigDefaultDisplayMessageActionStrategy" alias="sapProductConfigDisplayMessageActionStrategy" />
+	<bean id="sapProductConfigDefaultDisplayMessageActionStrategy" parent="sapProductConfigAbstractRuleActionStrategy"
+		class="de.hybris.platform.sap.productconfig.rules.action.strategy.impl.DisplayMessageRuleActionStrategyImpl">
+		<property name="messageValueMapper" ref="sapProductConfigMessageRuleParameterValueMapper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRulesPrepareInterceptor" alias="sapProductConfigRulesPrepareInterceptor" />
+	<bean id="sapProductConfigDefaultRulesPrepareInterceptor" class="de.hybris.platform.sap.productconfig.rules.interceptor.ProductConfigRulesPrepareInterceptor">
+		<property name="ruleDao" ref="ruleDao" />
+	</bean>
+	<bean id="sapProductConfigRulePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="sapProductConfigRulesPrepareInterceptor" />
+		<property name="typeCode" value="AbstractRuleEngineRule" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultMessageRuleParameterValueMapper" alias="sapProductConfigMessageRuleParameterValueMapper" />
+	<bean id="sapProductConfigDefaultMessageRuleParameterValueMapper" class="de.hybris.platform.sap.productconfig.rules.strategies.mappers.impl.ProductConfigMessageRuleParameterValueMapper">
+	</bean>
+
+	<bean id="sapProductConfigMessageRuleParameterValueMapperDefinition" class="de.hybris.platform.ruleengineservices.rule.strategies.impl.RuleParameterValueMapperDefinition">
+		<property name="mapper" ref="sapProductConfigMessageRuleParameterValueMapper" />
+		<property name="type" value="Localized(java.lang.String)" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultRulesResultUtil" alias="sapProductConfigRulesResultUtil" />
+	<bean id="sapProductConfigDefaultRulesResultUtil" class="de.hybris.platform.sap.productconfig.rules.service.impl.ProductConfigRulesResultUtilImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultRuleAwarePricingService" alias="sapProductConfigPricingService" />
+	<bean id="sapProductConfigDefaultRuleAwarePricingService" parent="sapProductConfigDefaultPricingService"
+		class="de.hybris.platform.sap.productconfig.rules.service.impl.PricingRuleAwareServiceImpl">
+		<property name="rulesResultUtil" ref="sapProductConfigRulesResultUtil" />
+	</bean>
+
+	<bean id="sapProductConfigTypeFormatterMergeDirective" depends-on="ruleParameterTypeFormatterMap" parent="mapMergeDirective">
+		<property name="key" value="Localized\((.*)\)" />
+		<property name="value" value="java.lang.String" />
+	</bean>
+</beans>

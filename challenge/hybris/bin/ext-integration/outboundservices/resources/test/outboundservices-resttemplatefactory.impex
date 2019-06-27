@@ -1,0 +1,19 @@
+INSERT_UPDATE OAuthClientDetails; clientId[unique = true]; oAuthUrl ; scope
+; testOauthClient     ; https://some.url.com/oauth2/api/v1/token
+
+INSERT_UPDATE ExposedOAuthCredential; id[unique = true]; oAuthClientDetails(clientId); password[allowNull=true]
+; testOauthCredential     ; testOauthClient
+
+INSERT_UPDATE BasicCredential; id[unique = true]; username ; password[allowNull=true]
+; testBasicCredential ; admin
+
+INSERT_UPDATE Endpoint; id[unique = true]; version[unique = true]; name; specUrl
+; c1203-tmn    ; unknown ; c1203-tmn    ; https://some.url.com/http/oauthtest/specUrl
+; local-hybris ; unknown ; local-hybris ; https://localhost:9002/odata2webservices/InboundProduct/$metadata?Product
+
+INSERT_UPDATE DestinationTarget; id[unique=true]; destinationChannel
+; stoutoutboundtest;
+
+INSERT_UPDATE ConsumedDestination; id[unique = true]; url; endpoint(id, version); credential(id); destinationTarget(id)[default=stoutoutboundtest]
+; scpi-oauth     ; https://some.url.com/http/oauthtest/test ; c1203-tmn:unknown    ; testOauthCredential
+; platform-basic ; https://localhost:9002/odata2webservices/InboundProduct/Products ; local-hybris:unknown ; testBasicCredential

@@ -1,0 +1,27 @@
+$defaultCurrency=EUR
+$lang=en
+$passwordEncoding=md5
+$defaultPassword=welcome
+$setPassword=@password[translator=de.hybris.platform.impex.jalo.translators.ConvertPlaintextToEncodedUserPasswordTranslator][default='$passwordEncoding:$defaultPassword']
+
+
+###################################################################################
+# CPQ Test Users
+###################################################################################
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid);locname[lang=en];
+;b2bgroup;customergroup;B2B Group;
+;b2bcustomergroup;b2bgroup;B2B Customer Group;
+
+INSERT_UPDATE UserPriceGroup;code[unique=true];name[lang=en];
+;B2B_DEFAULT_PRICE_GROUP;A DEFAULT B2B USERPRICEGROUP;
+
+INSERT_UPDATE B2BUnit;name[unique=true];uid
+;Custom Retail;0001010512_1010_10_00
+;Rustic Retail;0001010512_P
+;Rustic;0001010512
+
+###############################
+# B2B Customer
+###############################
+INSERT_UPDATE B2BCustomer;description;uid[unique=true];originalUid;email;name;groups(uid);sessionCurrency(isocode)[default=$defaultCurrency];$setPassword;
+;CPQ Customer B2B;cpq03;cpq03;cpq03@sap.com;cpq03;0001010512,b2bcustomergroup;;;

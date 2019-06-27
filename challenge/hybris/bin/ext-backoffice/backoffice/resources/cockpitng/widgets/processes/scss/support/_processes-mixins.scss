@@ -1,0 +1,95 @@
+@import "cockpitng-globals.scss";
+@import "_processes-variables.scss";
+
+@mixin _indentedBorder ($border-style: $processes__settings-popup-delimiter--border, $border-type: bottom, $height: 0, $border-color-inherit: false) {
+	position: relative;
+
+    &:before {
+	    right: $processes__settings-popup-container--padding-x;
+		left: $processes__settings-popup-container--padding-x;
+		border-#{$border-type}: $border-style;
+		height: $height;
+		@if $border-color-inherit {
+			border-#{$border-type}-color: inherit;
+		}
+		top: 0;
+		content: "";
+		position: absolute;
+		display: block;
+	}
+}
+
+@mixin _statusColoring ($color, $active-item:false, $bg-icon-image:false, $process-bg-color: false) {
+	&.yw-processes-list-item-icon {
+		@if $bg-icon-image {
+			background-image: $bg-icon-image;
+		}
+		@if $active-item {
+			background-color: $processes__list-item-active--bg-color;
+		}
+	}
+
+	&.z-label {
+		color: $color;
+	}
+	
+	+ .yw-processes-list-item-content {
+		@if $active-item {
+			&:before {
+				border-color: $processes__list-item-actvie--border-color;
+				background-color: $processes__list-item-active--bg-color;
+			}
+		}
+		@if $process-bg-color {
+			.yw-processes-list-item-content-progress {
+				background-color: $process-bg-color;
+			}
+		}
+	}
+}
+
+@mixin _addButtonBackgroundDots ($vertical-bg-position:0) {
+	background: url('images/dots.png') center ($vertical-bg-position) no-repeat;
+	box-shadow: none;
+}
+
+@mixin _addSidebarBreakpoint ($max-width, $sidebar-width) {
+	@media screen and ( max-width: $max-width ){
+		max-width: $sidebar-width;
+		
+		.yw-processes-list {
+			min-width: $sidebar-width;
+		}
+	}
+}
+
+@mixin _addIndicatorDot ($background-indicator-color:false, $background-mask-color:false, $top-pos: $processes__header-process-icon-unseen--top, $right-pos: $processes__header-process-icon-unseen--right, $indicator-size: $processes__header-process-icon-unseen--size, $mask-space: $processes__header-process-icon-spinner-before--space){
+
+    &:after, &:before {
+        content: '';
+        position: absolute;
+        display: block;
+        border-radius: 50%;
+    }
+    @if $background-mask-color {
+	    &:before {
+	    	background-color: $background-mask-color;
+	        top: $top-pos - $mask-space;
+	        right: $right-pos - $mask-space;
+	        width: $indicator-size + $mask-space * 2;
+	        height: $indicator-size + $mask-space * 2;
+	    }
+	}
+    &:after {
+    	top: $top-pos;
+        right: $right-pos;
+        width: $indicator-size;
+        height: $indicator-size;
+        
+        @if $background-indicator-color {
+			background-color: $background-indicator-color;
+        }@else {
+        	background: transparent;
+        }
+    }
+}

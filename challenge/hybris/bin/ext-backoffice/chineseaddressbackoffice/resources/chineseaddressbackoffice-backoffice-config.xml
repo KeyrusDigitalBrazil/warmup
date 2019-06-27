@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config" xmlns:df="http://www.hybris.com/cockpitng/component/dynamicForms">
+	<context merge-by="type" parent="GenericItem" component="editor-area" type="Address">
+ 		<editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+ 		<editorArea:tab name="hmc.tab.common">
+ 			<editorArea:section name="hmc.section.address.address.chineseaddress" position="2">
+					<editorArea:attribute qualifier="streetname" label="chineseaddressbackoffice.address.streetname" />
+					<editorArea:attribute qualifier="streetnumber" label="chineseaddressbackoffice.address.streetnumber"/>
+					<editorArea:attribute qualifier="cityDistrict" label="chineseaddressbackoffice.address.district"/>			
+					<editorArea:attribute qualifier="city" label="chineseaddressbackoffice.address.city"/>
+					<editorArea:attribute qualifier="region" label="chineseaddressbackoffice.address.province"/>
+					<editorArea:attribute qualifier="country" />
+					<editorArea:attribute qualifier="postalcode" />
+			</editorArea:section>
+			<editorArea:section name="hmc.section.address.chinesecontact"  position="4">
+					<editorArea:attribute qualifier="title" />
+					<editorArea:attribute qualifier="fullname" label="chineseaddressbackoffice.address.fullname"/>
+					<editorArea:attribute qualifier="building" />
+					<editorArea:attribute qualifier="appartment" />
+					
+			</editorArea:section>			
+		</editorArea:tab>
+		</editorArea:editorArea>
+	</context>
+	<context type="Address" component="editorAreaDynamicForms" merge-by="principal">
+        <df:dynamicForms>
+        	<df:section id="backoffice_non_chinese_address" qualifier="hmc.section.address.address" triggeredOn="country" visibleIf="!context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+			<df:section id="backoffice_chinese_address" qualifier="hmc.section.address.address.chineseaddress" triggeredOn="country" visibleIf="context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+			<df:section id="backoffice_non_chinese_contact" qualifier="hmc.section.address.contact" triggeredOn="country" visibleIf="!context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+			<df:section id="backoffice_chinese_contact" qualifier="hmc.section.address.chinesecontact" triggeredOn="country" visibleIf="context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+        </df:dynamicForms>
+    </context>
+	<context merge-by="type" parent="GenericItem" type="Address" component="cs-editor-area" >
+        <editorArea:editorArea xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea">
+            <editorArea:tab name="hmc.addresses">
+                <editorArea:section name="customersupportbackoffice.address.chineseaddress">
+                	<editorArea:attribute qualifier="title" />
+					<editorArea:attribute qualifier="fullname" label="chineseaddressbackoffice.address.fullname"/>
+                 	<editorArea:attribute qualifier="line1" label="customersupportbackoffice.address.line1" />
+                    <editorArea:attribute qualifier="line2" label="customersupportbackoffice.address.line2" />
+                    <editorArea:attribute qualifier="cityDistrict" label="chineseaddressbackoffice.address.district" />
+                    <editorArea:attribute qualifier="city" label="chineseaddressbackoffice.address.city" />
+                    <editorArea:attribute qualifier="region" label="chineseaddressbackoffice.address.province"/>  
+                    <editorArea:attribute qualifier="country" label="customersupportbackoffice.address.country" />                          
+                    <editorArea:attribute qualifier="postalcode" label="customersupportbackoffice.address.postalcode" /> 
+					<editorArea:attribute qualifier="phone1" label="customersupportbackoffice.address.phone1" />
+				   	<editorArea:attribute qualifier="cellphone" />		    
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="module" type="Address" component="editorAreaDynamicForms" >
+        <df:dynamicForms>
+			<df:section id="cs_backoffice_non_chinese_delivery_address" qualifier="customersupportbackoffice.address.header" triggeredOn="country" visibleIf="!context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+			<df:section id="cs_backoffice_chinese_delivery_address" qualifier="customersupportbackoffice.address.chineseaddress" triggeredOn="country" visibleIf="context.country.isocode.equalsIgnoreCase(&quot;CN&quot;)">
+				<df:scriptingConfig visibleIfLanguage="Groovy" visibleIfScriptType="inline"/>
+			</df:section>
+        </df:dynamicForms>
+    </context>
+</config>

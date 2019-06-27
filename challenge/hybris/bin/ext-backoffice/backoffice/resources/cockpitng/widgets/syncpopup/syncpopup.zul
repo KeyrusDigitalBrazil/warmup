@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk>
+
+    <widget sclass="yw-syncpopup" >
+        <custom-attributes ytestid="syncPopup"/>
+        <widgetslot slotID="syncPopupNotificationarea" sclass="yw-notification"/>
+        <label id="title" sclass="yw-syncpopup-title"/>
+        <label id="description" sclass="yw-syncpopup-subtitle">${labels.description}</label>
+            <div sclass="yw-syncpopup-content">
+                <div sclass="yw-syncpopup-textbox-holder">
+                    <textbox id="searchbox" sclass="yw-syncpopup-textbox" width="100%"
+                             placeholder="${labels.placeholder.text}"/>
+                </div>
+                <tabbox id="tabbox">
+                    <tabs id="tabs">
+                        <tab id="pullTab" label="${labels.tab.pull.from.source}"><custom-attributes ytestid="pullTab"/></tab>
+                        <tab id="pushTab" label="${labels.tab.push.to.target}"><custom-attributes ytestid="pushTab"/></tab>
+                    </tabs>
+                    <tabpanels>
+                        <tabpanel>
+                            <listbox id="pullList">
+                                <template name="model">
+                                    <apply template="listItemTemplate" pushOrPull="pull"/>
+                                </template>
+                            </listbox>
+                        </tabpanel>
+                        <tabpanel>
+                            <listbox id="pushList">
+                                <template name="model">
+                                    <apply template="listItemTemplate" pushOrPull="push"/>
+                                </template>
+                            </listbox>
+                        </tabpanel>
+                        <template name="listItemTemplate">
+                            <listitem value="${each}">
+                                <listcell>
+                                    <label sclass="yw-syncpopup-bold-label" value="${each.name}"
+                                           tooltiptext="${each.name}"/>
+                                    <label sclass="yw-syncpopup-label" value="${each.description}"
+                                           tooltiptext="${each.description}"/>
+                                </listcell>
+                                <listcell sclass="yw-syncpopup-cell-icon">
+                                    <span sclass="yw-syncpopup-${pushOrPull}"/>
+                                </listcell>
+
+                                <listcell if="${each.inSync != null}" sclass="yw-syncpopup-cell-icon">
+                                    <span sclass="${each.inSync ? 'yw-syncpopup-insync':'yw-syncpopup-outofsync'}"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </tabpanels>
+                </tabbox>
+            </div>
+            <div id="syncPopupButtons" sclass="yw-syncpopup-navigation">
+                <div sclass="yw-left-pack"/>
+                <div sclass="yw-right-pack">
+                    <div sclass="yw-component-wrapper">
+                        <button id="cancel" label="${labels.btn.cancel}">
+                            <custom-attributes ytestid="cancelBtn"/>
+                        </button>
+                    </div>
+                    <div sclass="yw-component-wrapper">
+                        <button id="sync" sclass="yw-btn-primary" label="${labels.btn.sync}" disabled="true">
+                            <custom-attributes ytestid="syncBtn"/>
+                        </button>
+                    </div>
+                </div>
+            </div>
+    </widget>
+</zk>

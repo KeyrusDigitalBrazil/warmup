@@ -1,0 +1,72 @@
+<div class="se-media-upload-form">
+
+    <div class="container-fluid se-media-upload-form--toolbar">
+        <div class="navbar-left se-media-upload-form--toolbar--title">
+            <h4 class="se-media-upload-form--toolbar--title--h4">{{ctrl.i18nKeys.UPLOAD_IMAGE_TO_LIBRARY | translate}}</h4>
+        </div>
+        <div class="navbar-right se-media-upload-form--toolbar--buttons">
+            <div class="y-toolbar">
+                <div class="y-toolbar-cell">
+                    <button class="btn btn-subordinate btn-lg navbar-btn se-media-upload-btn__cancel"
+                        type="button"
+                        data-ng-click="ctrl.onCancel()">{{ctrl.i18nKeys.UPLOAD_IMAGE_CANCEL | translate}}</button>
+                </div>
+                <div class="y-toolbar-cell">
+                    <button class="btn btn-default btn-lg navbar-btn se-media-upload-btn__submit"
+                        type="button"
+                        data-ng-click="ctrl.onMediaUploadSubmit()">{{ctrl.i18nKeys.UPLOAD_IMAGE_SUBMIT | translate}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid se-media-upload--filename">
+        <div class="row">
+            <div class="se-media-upload--filename-col1 col-xs-10">
+                <img ng-src="{{assetsRoot}}/images/image_placeholder.png">
+                <div class="se-media-upload--fn--name">{{ctrl.getTruncatedName()}}</div>
+            </div>
+            <div class="se-media-upload--filename-col2 col-xs-2">
+                <se-file-selector data-label-i18n-key="ctrl.i18nKeys.UPLOAD_IMAGE_REPLACE"
+                    data-accepted-file-types="ctrl.acceptedFileTypes"
+                    data-on-file-select="ctrl.onSelectCallback({files: files})"></se-file-selector>
+
+            </div>
+        </div>
+    </div>
+    <form>
+        <div class="se-media-upload--fileinfo">
+            <div class="se-media-upload--fileinfo--field form-group">
+                <label name="label-description"
+                    data-ng-class="{ 'se-media-upload-has-error': ctrl.hasError('description'), 'se-media-upload--fileinfo--label': true }">{{ctrl.i18nKeys.DESCRIPTION | translate}}</label>
+                <se-media-upload-field data-field="'description'"
+                    data-model="ctrl.imageParameters"></se-media-upload-field>
+                <span class="upload-field-error upload-field-error-description"
+                    data-ng-repeat="error in ctrl.getErrorsForField('description')">{{error}}</span>
+            </div>
+
+            <div class="se-media-upload--fileinfo--field form-group">
+                <label name="label-code"
+                    data-ng-class="{ 'se-media-upload-has-error': ctrl.hasError('code')}">{{ctrl.i18nKeys.CODE | translate}}*</label>
+                <se-media-upload-field data-error="ctrl.hasError('code')"
+                    data-field="'code'"
+                    data-model="ctrl.imageParameters"></se-media-upload-field>
+                <span class="upload-field-error upload-field-error-code"
+                    data-ng-repeat="error in ctrl.getErrorsForField('code')">{{error}}</span>
+            </div>
+
+            <div class="se-media-upload--fileinfo--field form-group">
+                <label name="label-alt-text"
+                    data-ng-class="{ 'se-media-upload-has-error': ctrl.hasError('altText') }">{{ctrl.i18nKeys.ALT_TEXT | translate}}</label>
+                <se-media-upload-field data-field="'altText'"
+                    data-model="ctrl.imageParameters"></se-media-upload-field>
+                <span class="upload-field-error upload-field-error-alt-text "
+                    data-ng-repeat="error in ctrl.getErrorsForField('altText')">{{error}}</span>
+            </div>
+        </div>
+
+    </form>
+    <span data-ng-if="ctrl.isUploading"
+        class="upload-image-in-progress">
+        <!--<img src="static-resources/images/spinner.png"> {{ctrl.i18nKeys.UPLOADING | translate}}-->
+    </span>
+</div>

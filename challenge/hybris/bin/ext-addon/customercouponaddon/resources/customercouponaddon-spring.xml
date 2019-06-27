@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+
+	<bean id="customercouponaddonCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2C</value>
+				<!--
+								<value>B2B</value>
+				-->
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false"/>
+				<property name="baseExtensionName" value="customercouponaddon"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="customercouponaddonSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener"  >
+		<property name="extensionName" value="customercouponaddon" />
+	</bean>
+	
+	<!-- imported from assistedservicepromotionaddon Promotions Section start-->
+	<alias name="defaultCustomerCouponPromotionSection" alias="promotionSection"/>
+	<bean id="defaultCustomerCouponPromotionSection" class="de.hybris.platform.assistedservicefacades.customer360.Section">
+		<property name="title" value="text.customer360.promotion"/>
+		<property name="id" value="promotionSection"/>
+		<property name="fragments" ref="promotionSectionFragments"/>
+		<property name="priority" value="50"/>
+	</bean>
+	
+	<alias name="defaultCustomerCoupon360CSAPromotionSectionMergeDirective" alias="defaultCustomer360CSAPromotionSectionMergeDirective"/>
+    <bean id="defaultCustomerCoupon360CSAPromotionSectionMergeDirective" depends-on="customer360Sections" parent="listMergeDirective" >
+        <property name="add" ref="promotionSection" />
+    </bean>
+    
+    <alias name="defaultCustomerCouponPromotionSectionFragments" alias="promotionSectionFragments"/>
+	<util:list id="defaultCustomerCouponPromotionSectionFragments" value-type="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<ref bean="CSAPromotionsFragment"/>
+		<ref bean="CSACouponsFragment"/>
+	</util:list>
+
+	<alias name="defaultCustomerCouponCSAPromotionsFragment" alias="CSAPromotionsFragment"/>
+	<bean id="defaultCustomerCouponCSAPromotionsFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="CSAPromotionsFragment"/>
+		<property name="priority" value="15"/>
+	</bean>
+	
+	<alias name="defaultCustomerCouponCSACouponsFragment" alias="CSACouponsFragment"/>
+	<bean id="defaultCustomerCouponCSACouponsFragment" class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+		<property name="id" value="CSACouponsFragment"/>
+		<property name="priority" value="10"/>
+	</bean>
+	<!-- imported from assistedservicepromotionaddon Promotions Section end -->
+	
+</beans>

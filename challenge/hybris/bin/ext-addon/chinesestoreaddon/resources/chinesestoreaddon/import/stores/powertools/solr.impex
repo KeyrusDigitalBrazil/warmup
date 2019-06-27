@@ -1,0 +1,46 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Import the Solr configuration for the Powertools store
+
+$productCatalog=powertoolsProductCatalog
+$catalogVersions=catalogVersions(catalog(id),version);
+$serverConfigName=powertoolsSolrServerConfig
+$indexConfigName=powertoolsSolrIndexConfig
+$searchConfigName=powertoolsPageSize
+$facetSearchConfigName=powertoolsIndex
+$facetSearchConfigDescription=Powertools Solr Index
+$searchIndexNamePrefix=powertools
+$solrIndexedType=powertoolsProductType
+$indexBaseSite=powertools
+$indexLanguages=ja,en,de,zh
+$indexCurrencies=USD,CAD,CNY
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];description;indexNamePrefix;languages(isocode);currencies(isocode);solrServerConfig(name);solrSearchConfig(description);solrIndexConfig(name);solrIndexedTypes(identifier);enabledLanguageFallbackMechanism;$catalogVersions
+;$facetSearchConfigName;$facetSearchConfigDescription;$searchIndexNamePrefix;$indexLanguages;$indexCurrencies;Default;Default;Default;$solrIndexedType;true;$productCatalog:Online,$productCatalog:Staged
+
+
+# Define price range set
+INSERT_UPDATE SolrValueRangeSet;name[unique=true];qualifier;type;solrValueRanges(&rangeValueRefID)
+;powertoolsPriceRangeCNY;CNY;double;rangeRefCNY1,rangeRefCNY2,rangeRefCNY3,rangeRefCNY4,rangeRefCNY5
+
+# Define price ranges
+INSERT_UPDATE SolrValueRange;&rangeValueRefID;solrValueRangeSet(name)[unique=true];name[unique=true];from;to
+;rangeRefCNY1;powertoolsPriceRangeCNY;      ￥0-￥49;   0;  49.00
+;rangeRefCNY2;powertoolsPriceRangeCNY;    ￥50-￥199;  50; 199.00
+;rangeRefCNY3;powertoolsPriceRangeCNY;   ￥200-￥499; 200; 499.00
+;rangeRefCNY4;powertoolsPriceRangeCNY;   ￥500-￥999; 500; 999.00
+;rangeRefCNY5;powertoolsPriceRangeCNY;￥1,000-￥100,000;1000; 100000
+
+
+# Other facet properties
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);sortableType(code);currency[default=false];localized[default=false];multiValue[default=false];facet[default=true];facetType(code);facetSort(code);priority;visible;useForSpellchecking[default=false];useForAutocomplete[default=false];fieldValueProvider;facetDisplayNameProvider;customFacetSortProvider;topValuesProvider;rangeSets(name)
+;$solrIndexedType; price        	;double ;	 ;true ;     ;     ;     ;MultiSelectOr ;Alpha ; 4000;true;     ;     ;volumeAwareProductPriceValueProvider;;;defaultTopValuesProvider;powertoolsPriceRangeUSD,powertoolsPriceRangeCAD,powertoolsPriceRangeCNY
+

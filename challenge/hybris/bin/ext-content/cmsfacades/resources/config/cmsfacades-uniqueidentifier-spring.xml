@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+	<!-- Service -->
+	<alias name="defaultCmsUniqueItemIdentifierService" alias="cmsUniqueItemIdentifierService"/>
+	<bean id="defaultCmsUniqueItemIdentifierService" class="de.hybris.platform.cmsfacades.uniqueidentifier.impl.DefaultUniqueItemIdentifierService">
+		<property name="typeService" ref="typeService" />
+		<property name="cmsItemDataDataFactory" ref="cmsItemDataDataFactory" />
+	</bean>
+
+	<!-- ItemModel to UID- Converter Functions-->
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultCmsItemModelUniqueIdentifierConverter">
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory"/>
+		<property name="cmsAdminItemService" ref="cmsAdminItemService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="encodedItemComposedKeyObjectFactory" ref="encodedItemComposedKeyFactory"/>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultMediaModelUniqueIdentifierConverter">
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultProductModelUniqueIdentifierConverter">
+		<property name="productService" ref="productService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="productModelItemDataConverter" ref="cmsProductModelItemDataConverter"/>
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultCategoryModelUniqueIdentifierConverter">
+		<property name="categoryService" ref="categoryService"/>
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="categoryModelItemDataConverter" ref="cmsCategoryModelItemDataConverter"/>
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultUserGroupModelUniqueIdentifierConverter">
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory"/>
+		<property name="userGroupDao" ref="userGroupDao" />
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultCatalogVersionModelUniqueIdentifierConverter">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory"/>
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultCMSPageTypeModelUniqueIdentifierConverter">
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory" />
+		<property name="adminPageService" ref="cmsAdminPageService" />
+	</bean>
+
+	<bean class="de.hybris.platform.cmsfacades.uniqueidentifier.functions.DefaultCMSNavigationEntryModelUniqueIdentifierConverter">
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="itemDataDataFactory" ref="cmsItemDataDataFactory" />
+		<property name="cmsNavigationService" ref="cmsNavigationService" />
+	</bean>
+
+	<!-- Base Converters -->
+	<alias name="defaultCmsVersionModelItemDataConverter" alias="cmsVersionModelItemDataConverter" />
+	<bean id="defaultCmsVersionModelItemDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ItemData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsVersionModelItemDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsCategoryModelItemDataConverter" alias="cmsCategoryModelItemDataConverter" />
+	<bean id="defaultCmsCategoryModelItemDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ItemData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsCategoryModelItemDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsProductModelItemDataConverter" alias="cmsProductModelItemDataConverter" />
+	<bean id="defaultCmsProductModelItemDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ItemData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsProductModelItemDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Populators -->
+	<alias name="defaultCmsVersionModelItemDataPopulator" alias="cmsVersionModelItemDataPopulator" />
+	<bean name="defaultCmsVersionModelItemDataPopulator" class="de.hybris.platform.cmsfacades.uniqueidentifier.populator.CMSVersionModelItemDataPopulator"/>
+
+	<alias name="defaultCmsCategoryModelItemDataPopulator" alias="cmsCategoryModelItemDataPopulator" />
+	<bean name="defaultCmsCategoryModelItemDataPopulator" class="de.hybris.platform.cmsfacades.uniqueidentifier.populator.CategoryModelItemDataPopulator"/>
+
+	<alias name="defaultCmsProductModelItemDataPopulator" alias="cmsProductModelItemDataPopulator" />
+	<bean name="defaultCmsProductModelItemDataPopulator" class="de.hybris.platform.cmsfacades.uniqueidentifier.populator.ProductModelItemDataPopulator"/>
+
+</beans>

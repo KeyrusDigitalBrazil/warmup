@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+	<context:component-scan base-package="de.hybris.platform.customercouponaddon" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver"/>
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultCustomercouponaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="customercouponaddon"/>
+		<property name="defaultEncoding" value="UTF-8"/>
+	</bean>
+
+	<bean id="defaultCustomercouponaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultCustomercouponaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getCustomercouponaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultCustomercouponaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="CustomercouponaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getCustomercouponaddonBeforeViewHandler"/>
+	</bean>
+	
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="CSACustomerCouponsFragment" />
+		<property name="value" value="addon:/customercouponaddon/fragments/customer360/customerCouponsFragment" />
+	</bean>
+	
+	<bean depends-on="promotionSectionFragments" parent="listMergeDirective">
+		<property name="add">
+			<bean class="de.hybris.platform.assistedservicefacades.customer360.Fragment">
+				<property name="id" value="CSACustomerCouponsFragment"/>
+				<property name="priority" value="20"/>
+			</bean>
+		</property>
+	</bean>
+	<alias name="customerCouponSearchBreadcrumbBuilder" alias="searchBreadcrumbBuilder"/>
+	<bean id="customerCouponSearchBreadcrumbBuilder" class="de.hybris.platform.customercouponaddon.breadcrumb.CustomerCouponSearchBreadcrumbBuilder">
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="categoryModelUrlResolver" ref="categoryModelUrlResolver"/>
+		<property name="customerCouponFacade" ref="customerCouponFacade"/>
+		<property name="i18nService" ref="i18nService" />
+		<property name="parentBreadcrumbLinkPath" value="/my-account/coupons"/>
+		<property name="parentBreadcrumbResourceKey" value="header.link.mycoupon"/>
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+	
+	<!--imported from assistedservicepromotionaddon Promotions start-->
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="CSAPromotionsFragment" />
+		<property name="value" value="addon:/customercouponaddon/fragments/customer360/imported/csaPromotions" />
+	</bean>
+	
+	<bean depends-on="customer360JspProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="CSACouponsFragment" />
+		<property name="value" value="addon:/customercouponaddon/fragments/customer360/imported/coupons" />
+	</bean>
+	<!--imported from assistedservicepromotionaddon Promotions end-->
+</beans>

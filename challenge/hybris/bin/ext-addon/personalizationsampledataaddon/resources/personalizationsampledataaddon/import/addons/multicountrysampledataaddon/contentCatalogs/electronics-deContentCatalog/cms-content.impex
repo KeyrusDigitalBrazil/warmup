@@ -1,0 +1,30 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=electronics-deContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$siteResource=jar:de.hybris.platform.personalizationsampledataaddon.constants.PersonalizationsampledataaddonConstants&/personalizationsampledataaddon/import/addons/multicountrysampledataaddon/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$lang=en
+$mediaContainer=media(qualifier, $contentCV)[lang=$lang];
+
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/jpeg'];$contentCV[unique=true];folder(qualifier)[default=images];
+;mobile		;Electronics_ChristmasSale_EN_480W.jpg	;$siteResource/images/Electronics_ChristmasSale_EN_480W.jpg	;Electronics_ChristmasSale_EN_480W.jpg	;"Christmas Sale";
+;tablet		;Electronics_ChristmasSale_EN_770W.jpg	;$siteResource/images/Electronics_ChristmasSale_EN_770W.jpg	;Electronics_ChristmasSale_EN_770W.jpg	;"Christmas Sale";
+;desktop	;Electronics_ChristmasSale_EN_960W.jpg	;$siteResource/images/Electronics_ChristmasSale_EN_960W.jpg	;Electronics_ChristmasSale_EN_960W.jpg	;"Christmas Sale";
+;widescreen ;Electronics_ChristmasSale_EN_1400W.jpg	;$siteResource/images/Electronics_ChristmasSale_EN_1400W.jpg;Electronics_ChristmasSale_EN_1400W.jpg	;"Christmas Sale";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;electronics-christmas-sale-homepage-splash-en;Electronics_ChristmasSale_EN_480W.jpg,Electronics_ChristmasSale_EN_770W.jpg,Electronics_ChristmasSale_EN_960W.jpg,Electronics_ChristmasSale_EN_1400W.jpg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];$mediaContainer;name;urlLink;&componentRef
+;;christmasSaleElectronicsDEHomepageSplashBannerComponent;electronics-christmas-sale-homepage-splash-en;Electronics DE Christmas Homepage Splash Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;christmasSaleElectronicsDEHomepageSplashBannerComponent

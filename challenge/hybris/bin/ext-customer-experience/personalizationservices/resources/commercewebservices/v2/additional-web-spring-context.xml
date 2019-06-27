@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultCxOccAttributesStrategy" alias="cxOccAttributesStrategy"/>
+	<bean id="defaultCxOccAttributesStrategy" class="de.hybris.platform.personalizationservices.occ.impl.DefaultCxOccAttributesStrategy">
+		<property name="tokenService" ref="sessionTokenService"/>
+		<property name="timeService" ref="timeService"/>
+		<property name="configurationService" ref="defaultConfigurationService"/>
+		<property name="cxConfigurationService" ref="defaultCxConfigurationService"/>
+	</bean>
+
+    <bean id="cxOccTimeVoter" class="de.hybris.platform.personalizationservices.occ.voters.impl.CxOccTimeVoter">
+        <property name="cxConfigurationService" ref="cxConfigurationService" />
+        <property name="timeService" ref="timeService" />
+		<property name="cxOccAttributesStrategy" ref="cxOccAttributesStrategy"/>
+		<property name="cxActionResultService" ref="cxActionResultService"/>
+		<property name="cxCatalogService" ref="cxCatalogService"/>
+		<property name="userService" ref="userService"/>
+    </bean>
+
+	<bean id="defaultCxOccInterceptor" class="de.hybris.platform.personalizationservices.occ.impl.DefaultCxOccInterceptor">
+		<property name="cxConsentService" ref="cxConsentService"/>
+		<property name="userService" ref="userService"/>
+		<property name="cxOccAttributesStrategy" ref="cxOccAttributesStrategy"/>
+	</bean>
+	
+	<alias name="defaultCxOccPersonalizationFilter" alias="cxOccPersonalizationFilter"/>
+   	<bean id="defaultCxOccPersonalizationFilter" class="de.hybris.platform.personalizationservices.occ.CxOccPersonalizationFilter">
+   		<property name="cxRecalculationService" ref="cxRecalculationService" />
+   		<property name="cxConfigurationService" ref="cxConfigurationService" />
+		<property name="cxOccAttributesStrategy" ref="cxOccAttributesStrategy"/>
+		<property name="tokenService" ref="sessionTokenService"/>
+    </bean>
+
+	<bean depends-on="commerceWebServicesFilterChainListV2" parent="listMergeDirective">
+		<property name="add" ref="cxOccPersonalizationFilter" />
+		<property name="afterBeanNames">
+			<list value-type="java.lang.String">
+				<value>userMatchingFilter</value>
+			</list>
+		</property>
+		<property name="beforeBeanNames">
+			<list value-type="java.lang.String">
+				<value>cartMatchingFilter</value>
+			</list>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<bean id="defaultODataFacade" class="de.hybris.platform.odata2webservices.odata.impl.DefaultODataFacade">
+		<property name="ODataServiceFactory" ref="oDataServiceFactory" />
+		<property name="edmxProviderValidator" ref="oDataEdmxProviderValidator" />
+	</bean>
+
+	<alias name="oDataFacadeMonitoringPersistenceProxy" alias="oDataWebMonitoringFacade" />
+	<bean id="oDataFacadeMonitoringPersistenceProxy"
+		  class="de.hybris.platform.odata2webservices.odata.ODataFacadeMonitoringPersistenceProxy">
+		<property name="inboundServicesConfiguration" ref="inboundServicesConfiguration" />
+		<property name="oDataFacade" ref="defaultODataFacade" />
+		<property name="mediaPersistenceService" ref="integrationServicesMediaPersistenceService" />
+		<property name="inboundRequestService" ref="oDataInboundRequestService" />
+		<property name="requestEntityExtractor" ref="oDataRequestEntityExtractor" />
+		<property name="responseEntityExtractor" ref="oDataResponseEntityExtractor" />
+	</bean>
+
+	<alias name="defaultHttpServletRequestToOdataRequestConverter" alias="oDataWebServletToOdataRequestConverter" />
+	<bean name="defaultHttpServletRequestToOdataRequestConverter"
+		  class="de.hybris.platform.odata2webservices.converter.HttpServletRequestToODataRequestConverter" />
+
+	<alias name="defaultResponseToResponseEntityConverter" alias="oDataResponseToResponseEntityConverter" />
+	<bean id="defaultResponseToResponseEntityConverter"
+		  class="de.hybris.platform.odata2webservices.converter.ODataResponseToResponseEntityConverter">
+	</bean>
+
+	<bean id="httpServletRequestToODataContextConverter"
+		  class="de.hybris.platform.odata2webservices.converter.HttpServletRequestToODataContextConverter">
+		<property name="ODataContextGenerator" ref="oDataContextGenerator" />
+		<property name="requestConverter" ref="oDataWebServletToOdataRequestConverter" />
+	</bean>
+
+	<alias name="defaultIntegrationObjectSystemUpdate" alias="integrationObjectSystemUpdate" />
+	<bean name="defaultIntegrationObjectSystemUpdate" class="de.hybris.platform.odata2webservices.update.IntegrationObjectSystemUpdate">
+		<property name="modelService" ref="modelService"/>
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+</beans>

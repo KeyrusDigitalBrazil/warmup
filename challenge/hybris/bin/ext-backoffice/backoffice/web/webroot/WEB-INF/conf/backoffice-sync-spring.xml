@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:annotation-config/>
+
+    <alias name="defaultBackofficeSynchronizationFacade" alias="synchronizationFacade"/>
+    <bean id="defaultBackofficeSynchronizationFacade"
+          class="com.hybris.backoffice.sync.facades.DefaultSynchronizationFacade">
+        <property name="catalogSynchronizationService" ref="catalogSynchronizationService"/>
+        <property name="synchronizationStatusService" ref="synchronizationStatusService"/>
+        <property name="catalogTypeService" ref="catalogTypeService"/>
+        <property name="relatedItemsCollector" ref="backofficeRelatedItemsCollector"/>
+        <property name="cronJobService" ref="cronJobService"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="mediaService" ref="mediaService"/>
+        <property name="sessionService" ref="sessionService"/>
+        <property name="userService" ref="userService"/>
+        <property name="catalogVersionService" ref="catalogVersionService"/>
+    </bean>
+
+    <alias name="defaultBackofficeRelatedItemsCollector" alias="backofficeRelatedItemsCollector"/>
+    <bean id="defaultBackofficeRelatedItemsCollector"
+          class="de.hybris.platform.servicelayer.model.collector.DefaultRelatedItemsCollector"
+          parent="relatedItemsCollector">
+        <property name="itemVisitorRegistry" ref="backofficeItemVisitorRegistry"/>
+    </bean>
+
+    <alias name="defaultBackofficeItemVisitorRegistry" alias="backofficeItemVisitorRegistry"/>
+    <bean id="defaultBackofficeItemVisitorRegistry"
+          class="de.hybris.platform.servicelayer.model.visitor.ItemVisitorRegistry"
+          parent="itemVisitorRegistry">
+        <property name="visitors" ref="backofficeSyncRelatedItemsVisitors"/>
+    </bean>
+
+    <alias name="defaultBackofficeSyncRelatedItemsVisitors" alias="backofficeSyncRelatedItemsVisitors"/>
+    <bean id="defaultBackofficeSyncRelatedItemsVisitors"
+          class="org.springframework.beans.factory.config.MapFactoryBean">
+        <property name="sourceMap">
+            <map>
+            </map>
+        </property>
+    </bean>
+
+    <alias name="defaultSummarySyncStatusRenderer" alias="summarySyncStatusRenderer"/>
+    <bean id="defaultSummarySyncStatusRenderer"
+          parent="abstractSummaryViewItemWithIconRenderer"
+          class="com.hybris.backoffice.sync.renderers.DefaultSummarySyncStatusRenderer">
+        <property name="synchronizationFacade" ref="synchronizationFacade"/>
+        <property name="partialSyncInfoRenderer" ref="partialSyncInfoRenderer"/>
+        <property name="objectFacade" ref="objectFacade" />
+    </bean>
+
+    <alias name="defaultSyncStatusCellRenderer" alias="syncStatusCellRenderer"/>
+    <bean id="defaultSyncStatusCellRenderer"
+          class="com.hybris.backoffice.sync.renderers.SyncStatusCellRenderer">
+        <property name="lazyTasksExecutorFactory" ref="tasksExecutorFactory"/>
+        <property name="synchronizationFacade" ref="synchronizationFacade"/>
+        <property name="partialSyncInfoRenderer" ref="partialSyncInfoRenderer"/>
+        <property name="lazyRender" value="false"/>
+    </bean>
+
+
+    <alias name="defaultPartialSyncInfoTooltipRenderer" alias="partialSyncInfoRenderer"/>
+    <bean id="defaultPartialSyncInfoTooltipRenderer"
+          class="com.hybris.backoffice.sync.renderers.PartialSyncInfoTooltipRenderer">
+        <property name="synchronizationFacade" ref="synchronizationFacade"/>
+        <property name="labelService" ref="labelService"/>
+    </bean>
+
+    <alias name="defaultTimeRangeFactory" alias="timeRangeFactory"/>
+    <bean id="defaultTimeRangeFactory"
+          class="com.hybris.backoffice.widgets.processes.settings.DefaultTimeRangeFactory"/>
+
+</beans>

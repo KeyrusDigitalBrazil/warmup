@@ -1,0 +1,55 @@
+<div ng-controller="personalizationsearchSearchProfilesController" class="ps-search-profile">
+    <div class="form-group">
+        <label for="search-profile-selector-1" class="control-label ps-control-label" data-translate="personalizationsearchsmartedit.commercecustomization.search.label"></label>
+        <ui-select data-ng-init="initUiSelect($select)" id="search-profile-selector-1" class="form-control" ng-model="selectedSearchProfile" ng-keyup="segmentSearchInputKeypress($event, $select.search)" on-select="searchProfileSelected($item, $select)" theme="select2" search-enabled="true" reset-search-input="false">
+            <ui-select-match placeholder="{{'personalizationsearchsmartedit.commercecustomization.search.placeholder' | translate}}">
+                <span>{{'personalizationsearchsmartedit.commercecustomization.search.placeholder' | translate}}</span>
+            </ui-select-match>
+            <ui-select-choices repeat="item in availableSearchProfiles" ui-disable-choice="isItemInSelectDisabled(item)" position="down" personalization-infinite-scroll="addMoreSearchProfilesItems()" personalization-infinite-scroll-distance="2">
+                <div class="row ng-scope">
+                    <span class="col-md-8 ng-binding" ng-bind="item.name"></span>
+                    <span class="col-md-4 ng-binding" ng-bind="item.catalog"></span>
+                </div>
+            </ui-select-choices>
+        </ui-select>
+
+        <div class="ps-search-profile__selection" data-ng-if="searchProfileActions">
+
+            <label data-ng-if="searchProfileActions.length" class="control-label ps-control-label">
+                <span>{{'personalizationsearchsmartedit.commercecustomization.search.selection.label' | translate}}</span>
+                <y-help data-ng-if="searchProfileActions.length" data-template="helpTemplate"></y-help>
+            </label>
+
+            <div ui-tree="treeOptions" id="tree-root" class="ps-search-profile__sel-tree">
+                <div ui-tree-nodes ng-model="searchProfileActions" class="ps-search-profile__sel-tbody">
+                    <div ng-repeat="action in searchProfileActions" ui-tree-node data-nodrop-enabled="true" class="ps-search-profile__sel-tree-row">
+                        <div class="ps-search-profile__sel-tree-row-wrapper">
+                            <div ui-tree-handle class="ps-search-profile__sel-profile">
+                                <span class="ps-search-profile__sel-profile-code" data-ng-bind="action.searchProfileCode"></span>
+                            </div>
+                            <div class="ps-search-profile__sel-menu" data-uib-dropdown>
+                                <button type="button" data-uib-dropdown-toggle class="btn btn-link dropdown-toggle pull-right">
+                                    <span class="hyicon hyicon-more"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right text-left" role="menu">
+                                    <li ng-class="$first ? 'disabled' : '' ">
+                                        <a data-ng-click="($first) ? $event.stopPropagation() : setSearchActionRank(action, -1)" data-translate="personalizationsearchsmartedit.commercecustomization.search.actions.grid.options.moveup"></a>
+                                    </li>
+                                    <li ng-class="$last ? 'disabled' : '' ">
+                                        <a data-ng-click="($last) ? $event.stopPropagation() : setSearchActionRank(action, 1)" data-translate="personalizationsearchsmartedit.commercecustomization.search.actions.grid.options.movedown"></a>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    <li>
+                                        <a data-ng-click="removeSelectedSearchAction(action)" data-translate="personalizationsearchsmartedit.commercecustomization.search.actions.grid.options.delete"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <label data-ng-if="searchProfileActions.length" class="control-label ps-control-label__cust" data-translate="personalizationsearchsmartedit.commercecustomization.search.label.cust"></label>
+</div>

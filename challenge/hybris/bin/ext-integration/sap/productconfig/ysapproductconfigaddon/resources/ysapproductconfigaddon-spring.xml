@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+		     http://www.springframework.org/schema/util/spring-util-3.1.xsd		   
+		     http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- SystemSetup for the ysapproductconfigaddon <bean id="sapProductConfigSystemSetup" class="de.hybris.platform.sap.productconfig.frontend.setup.ProductConfigSetup" 
+		parent="abstractCoreSystemSetup"> </bean> -->
+
+	<context:annotation-config />
+
+	<bean id="yaddonCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2C</value>
+				<!-- <value>B2B</value> -->
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false" />
+				<property name="baseExtensionName" value="ysapproductconfigaddon" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="yaddonSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener">
+		<property name="extensionName" value="ysapproductconfigaddon" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultValidator" alias="sapProductConfigValidator" />
+	<bean id="sapProductConfigDefaultValidator" class="de.hybris.platform.sap.productconfig.frontend.validator.ProductConfigurationValidator">
+		<property name="csticValidators" ref="sapProductConfigCsticValidatorList" />
+		<property name="mergeProcessor" ref="sapConfigDataMergeProcessor" />
+		<property name="configModelCacheStrategy" ref="sapProductConfigDefaultConfigurationModelCacheStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCsticValidatorList" alias="sapProductConfigCsticValidatorList" />
+	<util:list id="sapProductConfigDefaultCsticValidatorList" value-type="de.hybris.platform.sap.productconfig.frontend.validator.CtsicValueValidator">
+		<ref bean="sapProductConfigDefaultNumericChecker" />
+		<ref bean="sapProductConfigMaxLengthValidator" />
+	</util:list>
+	<alias name="sapProductConfigDefaultNumericChecker" alias="sapProductConfigNumericChecker" />
+	<bean id="sapProductConfigDefaultNumericChecker" class="de.hybris.platform.sap.productconfig.frontend.validator.impl.NumericCheckerImpl">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultMaxLengthValidator" alias="sapProductConfigMaxLengthValidator" />
+	<bean id="sapProductConfigDefaultMaxLengthValidator" class="de.hybris.platform.sap.productconfig.frontend.validator.impl.MaxLengthValidatorImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultConflictChecker" alias="sapProductConfigConflictChecker" />
+	<bean id="sapProductConfigDefaultConflictChecker" class="de.hybris.platform.sap.productconfig.frontend.validator.ConflictCheckerImpl">
+	</bean>
+
+	<alias name="sapConfigDataDefaultMergeProcessor" alias="sapConfigDataMergeProcessor" />
+	<bean id="sapConfigDataDefaultMergeProcessor" class="de.hybris.platform.sap.productconfig.frontend.util.impl.ConfigDataMergeProcessorImpl"
+		scope="prototype">
+		<aop:scoped-proxy />
+		<property name="configFacade" ref="sapProductConfigFacade" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultBeforeViewExtender" alias="sapProductConfigBeforeViewExtender" />
+	<bean id="sapProductConfigDefaultBeforeViewExtender" class="de.hybris.platform.sap.productconfig.frontend.beforeview.ProductConfigDefaultBeforeViewExtender">
+	</bean>
+
+</beans>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <widget-extension widgetId="backoffice_content_container">
+        <widget id="backoffice-compareview" widgetDefinitionId="com.hybris.cockpitng.widgets.compare" slotId="perspectives" template="false">
+            <widget id="backoffice-compareview-viewname-generator" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                    slotId="cockpitWidgetChildrenInvisible" template="false">
+                <setting key="expression" type="String">'backoffice-compareview'</setting>
+                <setting key="socketDataType_$T" type="String">java.lang.String</setting>
+            </widget>
+            <widget id="backoffice-compareview-advancedsearchgroup" widgetDefinitionId="com.hybris.cockpitng.backoffice.referenceadvancedsearchgroup"
+                    slotId="cockpitWidgetChildrenInvisible" title="compareview.additems.title" template="true">
+                <instance-settings socketEventRoutingMode="LAST_USED">
+                    <create onInit="false" reuseExisting="false">
+                        <incoming-events>
+                            <socket-event id="referenceSearchCtx"/>
+                        </incoming-events>
+                    </create>
+                    <close>
+                        <outgoing-events>
+                            <socket-event id="selectedReferencesOutput"/>
+                            <socket-event id="cancelOutput"/>
+                        </outgoing-events>
+                    </close>
+                    <select onInit="false"/>
+                </instance-settings>
+                <setting key="/referenceCollectionBrowser/collectionBrowserConfigCtx" type="String">reference-collection-browser</setting>
+                <setting key="/referenceAdvancedSearch/displayInNonCollapsibleContainer" type="Boolean">true</setting>
+                <setting key="/referenceAdvancedSearch/disableSimpleSearch" type="Boolean">true</setting>
+                <setting key="/referenceAdvancedSearchEngine/defaultPageSize" type="Integer">50</setting>
+                <setting key="widgetStyleClass" type="String"></setting>
+                <setting key="widgetStyleAttribute" type="String"></setting>
+                <setting key="_width" type="String">70%</setting>
+                <setting key="_height" type="String">75%</setting>
+                <virtual-sockets/>
+            </widget>
+
+            <setting key="defaultTypeCode" value="Item"/>
+        </widget>
+    </widget-extension>
+
+    <widget-extension widgetId="hmc2list">
+        <virtual-sockets>
+            <output id="selectedItemsToCompare" type="de.hybris.platform.core.model.ItemModel" multiplicity="Collection"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <!-- CompareView selection -->
+    <widget-connection sourceWidgetId="hmc2list" outputId="selectedItemsToCompare"
+                       targetWidgetId="backoffice-compareview" inputId="setObjects"/>
+    <widget-connection sourceWidgetId="hmc2list" outputId="selectedItemsToCompare"
+                       targetWidgetId="backoffice-compareview-viewname-generator" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="backoffice-compareview-viewname-generator" outputId="genericOutput"
+                       targetWidgetId="backoffice_content_container" inputId="selectPerspectiveById"/>
+    <widget-connection sourceWidgetId="backoffice-compareview" outputId="selectedItem"
+                       targetWidgetId="collectionEditorAreaGroup" inputId="inputDataInput"/>
+    <widget-connection sourceWidgetId="backoffice-compareview" outputId="addItemsRequest"
+                       targetWidgetId="backoffice-compareview-advancedsearchgroup" inputId="referenceSearchCtx"/>
+    <widget-connection sourceWidgetId="backoffice-compareview-advancedsearchgroup" outputId="selectedReferencesOutput"
+                       targetWidgetId="backoffice-compareview" inputId="addObjects"/>
+
+</widgets>

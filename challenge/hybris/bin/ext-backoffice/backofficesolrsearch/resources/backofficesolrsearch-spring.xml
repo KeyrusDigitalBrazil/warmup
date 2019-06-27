@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <alias name="defaultSolrFieldSearchDAO" alias="solrFieldSearchDAO"/>
+    <bean id="defaultSolrFieldSearchDAO"
+          class="com.hybris.backoffice.solrsearch.daos.impl.DefaultSolrFieldSearchDAO">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+    </bean>
+    <alias name="defaultSolrFacetSearchConfigDAO" alias="solrFacetSearchConfigDAO"/>
+    <bean id="defaultSolrFacetSearchConfigDAO"
+          class="com.hybris.backoffice.solrsearch.daos.impl.DefaultSolrFacetSearchConfigDAO">
+        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+        <property name="typeService" ref="typeService"/>
+    </bean>
+
+    <alias name="defaultBackofficeFacetSearchConfigService" alias="backofficeFacetSearchConfigService"/>
+    <bean id="defaultBackofficeFacetSearchConfigService"
+          class="com.hybris.backoffice.solrsearch.services.impl.DefaultBackofficeFacetSearchConfigService">
+        <property name="solrFacetSearchConfigDAO" ref="solrFacetSearchConfigDAO"/>
+        <property name="facetSearchConfigService" ref="facetSearchConfigService"/>
+        <property name="typeService" ref="typeService"/>
+        <property name="configCache" ref="backofficeFacetSearchConfigCache"/>
+    </bean>
+
+    <bean id="backofficeIndexedTypeToSolrFacetSearchConfigValidator"
+          class="com.hybris.backoffice.solrsearch.validators.BackofficeIndexedTypeToSolrFacetSearchConfigValidator"/>
+
+    <bean id="backofficeIndexedTypeToSolrFacetSearchConfigValidatorMapping"
+          class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+        <property name="interceptor" ref="backofficeIndexedTypeToSolrFacetSearchConfigValidator"/>
+        <property name="typeCode" value="BackofficeIndexedTypeToSolrFacetSearchConfig"/>
+    </bean>
+
+    <alias name="defaultBackofficeValueResolver" alias="backofficeValueResolver"/>
+    <bean id="defaultBackofficeValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.BackofficeValueResolver" parent="abstractValueResolver">
+        <property name="userService" ref="userService"/>
+        <property name="qualifierProvider" ref="languageQualifierProvider"/>
+        <property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+        <!-- labelService proxy is set by labelServiceProxyExtender -->
+    </bean>
+
+    <alias name="defaultDateValueResolver" alias="dateValueResolver"/>
+    <bean id="defaultDateValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.DateValueResolver"
+          parent="abstractValueResolver">
+        <property name="modelService" ref="modelService"/>
+        <property name="qualifierProvider" ref="languageQualifierProvider"/>
+    </bean>
+
+    <alias name="defaultReferenceValueResolver" alias="referenceValueResolver"/>
+    <bean id="defaultReferenceValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.ReferenceValueResolver"
+          parent="abstractValueResolver">
+        <property name="modelService" ref="modelService"/>
+        <property name="qualifierProvider" ref="languageQualifierProvider"/>
+    </bean>
+
+    <bean id="collectionValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.CollectionValueResolver"
+          parent="abstractValueResolver">
+        <property name="modelService" ref="modelService"/>
+        <property name="qualifierProvider" ref="languageQualifierProvider"/>
+    </bean>
+
+    <alias name="defaultSuperCategoriesValueResolver" alias="superCategoriesValueResolver"/>
+    <bean id="defaultSuperCategoriesValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.SuperCategoriesValueResolver" parent="collectionValueResolver">
+    </bean>
+
+    <alias name="defaultClassificationCatalogValueResolver" alias="classificationCatalogValueResolver"/>
+    <bean id="defaultClassificationCatalogValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.ClassificationCatalogValueProvider">
+        <property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+    </bean>
+
+    <alias name="defaultClassificationCatalogVersionValueResolver" alias="classificationCatalogVersionValueResolver"/>
+    <bean id="defaultClassificationCatalogVersionValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.ClassificationCatalogVersionValueProvider">
+        <property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+    </bean>
+
+    <alias name="defaultTypeCodeValueResolver" alias="typeCodeValueResolver"/>
+    <bean id="defaultTypeCodeValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.TypeCodeValueResolver"
+          parent="abstractValueResolver">
+    </bean>
+
+    <!-- deprecated since version 6.2.0.0, use catalogLabelValueResolver instead -->
+    <alias name="defaultCatalogLabelValueResolver" alias="catalogValueResolver"/>
+    <!-- deprecated since version 6.2.0.0, use defaultCatalogLabelValueResolver instead -->
+    <alias name="defaultCatalogLabelValueResolver" alias="defaultCatalogValueResolver"/>
+
+    <alias name="defaultItemModelLabelValueResolver" alias="itemModelLabelValueResolver"/>
+    <bean id="defaultItemModelLabelValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.ItemModelLabelValueResolver" parent="abstractValueResolver">
+        <property name="modelService" ref="modelService"/>
+        <property name="qualifierProvider" ref="languageQualifierProvider"/>
+        <!-- labelService proxy is set by labelServiceProxyExtenderForCatalog -->
+    </bean>
+
+    <alias name="defaultCatalogLabelValueResolver" alias="catalogLabelValueResolver"/>
+    <bean id="defaultCatalogLabelValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.CatalogLabelValueResolver" parent="itemModelLabelValueResolver">
+    </bean>
+
+    <!-- deprecated since version 6.2.0.0, use catalogVersionLabelValueResolver instead -->
+    <alias name="defaultCatalogVersionLabelValueResolver" alias="catalogVersionValueResolver"/>
+    <!-- deprecated since version 6.2.0.0, use defaultCatalogVersionLabelValueResolver instead -->
+    <alias name="defaultCatalogVersionLabelValueResolver" alias="defaultCatalogVersionValueResolver"/>
+
+    <alias name="defaultCatalogVersionLabelValueResolver" alias="catalogVersionLabelValueResolver"/>
+    <bean id="defaultCatalogVersionLabelValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.CatalogVersionLabelValueResolver" parent="itemModelLabelValueResolver">
+    </bean>
+
+    <bean id="abstractItemModelPKValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.ItemModelPKValueResolver"
+          abstract="true" parent="abstractValueResolver">
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultItemModelPKValueResolver" alias="itemModelPKValueResolver"/>
+    <bean id="defaultItemModelPKValueResolver" parent="abstractItemModelPKValueResolver">
+    </bean>
+
+    <alias name="defaultCatalogPKValueResolver" alias="catalogPKValueResolver"/>
+    <bean id="defaultCatalogPKValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.CatalogPKValueResolver"
+          parent="abstractItemModelPKValueResolver"/>
+
+    <alias name="defaultCatalogVersionPKValueResolver" alias="catalogVersionPKValueResolver"/>
+    <bean id="defaultCatalogVersionPKValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.CatalogVersionPKValueResolver"
+          parent="abstractItemModelPKValueResolver"/>
+
+    <alias name="defaultEnumValueResolver" alias="solrEnumValueResolver"/>
+    <bean id="defaultEnumValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.EnumValueResolver"
+          parent="abstractValueResolver">
+        <property name="modelService"  ref="modelService" />
+    </bean>
+
+	<alias name="defaultBaseVariantCategoryAttributeValueProvider" alias="baseVariantCategoryAttributeValueProvider"/>
+    <bean id="defaultBaseVariantCategoryAttributeValueProvider"
+		  class="com.hybris.backoffice.solrsearch.providers.impl.DefaultProductCategoryAssignmentResolver">
+	</bean>
+
+    <alias name="defaultCategoryPKValueProvider" alias="categoryPKValueProvider"/>
+    <bean id="defaultCategoryPKValueProvider" class="com.hybris.backoffice.solrsearch.resolvers.CategoryPKValueProvider"
+          parent="categoryCodeValueProvider">
+        <property name="fieldNameProvider" ref="solrFieldNameProvider"/>
+    </bean>
+
+    <alias name="defaultVariantAwareCategoryCodeValueResolver" alias="variantAwareCategoryCodeValueResolver"/>
+    <bean id="defaultVariantAwareCategoryCodeValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.VariantAwareCategoryCodeValueResolver"
+          parent="abstractValueResolver">
+        <property name="categoryAttributeValueProvider" ref="baseVariantCategoryAttributeValueProvider"/>
+    </bean>
+
+    <alias name="defaultVariantAwareCategoryPKValueResolver" alias="variantAwareCategoryPKValueResolver"/>
+    <bean id="defaultVariantAwareCategoryPKValueResolver"
+          class="com.hybris.backoffice.solrsearch.resolvers.VariantAwareCategoryPKValueResolver"
+          parent="abstractValueResolver">
+        <property name="categoryAttributeValueProvider" ref="baseVariantCategoryAttributeValueProvider"/>
+    </bean>
+
+    <!-- DATA QUALITY -->
+    <bean id="defaultBackofficeDataQualityValueResolver" class="com.hybris.backoffice.solrsearch.resolvers.DataQualityValueResolver" parent="abstractValueResolver" abstract="true">
+        <property name="domainGroupId" value=""/>
+    </bean>
+
+    <alias name="defaultBackofficeIdentityProvider" alias="backofficeIdentityProvider"/>
+    <bean id="defaultBackofficeIdentityProvider"
+          class="com.hybris.backoffice.solrsearch.providers.BackofficeIdentityProvider"/>
+
+    <alias name="defaultSolrIndexIgnoredTypeCodes" alias="solrIndexIgnoredTypeCodes"/>
+    <util:set id="defaultSolrIndexIgnoredTypeCodes" value-type="java.lang.Integer">
+        <value>#{T(de.hybris.platform.core.Constants.TC).MetaInformation}</value>
+    </util:set>
+
+    <alias name="defaultBackofficeIndexerStrategy" alias="backofficeIndexerStrategy"/>
+    <bean id="defaultBackofficeIndexerStrategy" class="com.hybris.backoffice.solrsearch.indexer.impl.BackofficeIndexerStrategy"
+          parent="defaultIndexerStrategy">
+    </bean>
+
+    <alias name="backofficeIndexerStrategyFactory" alias="indexerStrategyFactory"/>
+    <bean id="backofficeIndexerStrategyFactory"
+          class="com.hybris.backoffice.solrsearch.indexer.impl.BackofficeIndexerStrategyFactory">
+        <property name="defaultIndexerStrategyFactory" ref="defaultIndexerStrategyFactory"/>
+        <property name="indexerStrategyBeanName" value="backofficeIndexerStrategy"/>
+        <property name="backofficeFacetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+    </bean>
+
+    <alias name="defaultBackofficeFacetSearchConfigCache" alias="backofficeFacetSearchConfigCache"/>
+    <bean id="defaultBackofficeFacetSearchConfigCache"
+          class="com.hybris.backoffice.solrsearch.cache.impl.DefaultBackofficeFacetSearchConfigCache" init-method="initialize">
+        <property name="invalidatingTypecodes">
+            <set value-type="java.lang.String">
+                <!--BackofficeIndexedTypeToSolrFacetSearchConfig -->
+                <value>6700</value>
+                <!--SolrFacetSearchConfig -->
+                <value>2200</value>
+                <!-- SolrIndexedType -->
+                <value>2207</value>
+                <!--SolrIndexedProperty-->
+                <value>2208</value>
+            </set>
+        </property>
+    </bean>
+
+
+    <alias name="backofficeSolrDocumentFactory" alias="solrDocumentFactory"/>
+    <bean id="backofficeSolrDocumentFactory" class="com.hybris.backoffice.solrsearch.indexer.impl.BackofficeSolrDocumentFactory"
+          parent="defaultSolrDocumentFactory">
+        <property name="backofficeFacetSearchConfigService" ref="backofficeFacetSearchConfigService"/>
+    </bean>
+
+    <alias name="defaultAfterInitializationEndBackofficeSolrSearchListener"
+           alias="afterInitializationEndBackofficeSolrSearchListener"/>
+    <bean id="defaultAfterInitializationEndBackofficeSolrSearchListener"
+          class="com.hybris.backoffice.solrsearch.events.AfterInitializationEndBackofficeSearchListener" lazy-init="false"
+          parent="abstractEventListener"/>
+
+    <alias name="defaultAfterInitializationStartBackofficeSolrSearchListener"
+           alias="afterInitializationStartBackofficeSolrSearchListener"/>
+    <bean id="defaultAfterInitializationStartBackofficeSolrSearchListener"
+          class="com.hybris.backoffice.solrsearch.events.AfterInitializationStartBackofficeSearchListener" lazy-init="false"
+          parent="abstractEventListener"/>
+
+    <alias name="defaultSolrIndexerJobsService" alias="solrIndexerJobsService"/>
+    <bean id="defaultSolrIndexerJobsService" class="com.hybris.backoffice.solrsearch.services.impl.DefaultSolrIndexerJobsService">
+        <property name="modelService" ref="modelService"/>
+        <property name="backofficeJobsDao" ref="backofficeJobsDao"/>
+        <property name="jobNames">
+            <set value-type="java.lang.String">
+                <value>backofficeSolrIndexerDeleteCronJob</value>
+            </set>
+        </property>
+    </bean>
+
+    <alias name="defaultBackofficeSolrSearchStartupHandler" alias="backofficeSolrSearchStartupHandler"/>
+    <bean id="defaultBackofficeSolrSearchStartupHandler"
+          class="com.hybris.backoffice.solrsearch.setup.BackofficeSolrSearchStartupHandler"
+          init-method="initialize" destroy-method="destroy" lazy-init="false">
+        <property name="afterInitializationEndBackofficeListener" ref="afterInitializationEndBackofficeSolrSearchListener"/>
+        <property name="solrIndexerJobsService" ref="solrIndexerJobsService"/>
+    </bean>
+
+    <alias name="backofficeSolrSearchSystemSetupConfig" alias="defaultBackofficeSolrSearchSystemSetupConfig" />
+    <bean id="backofficeSolrSearchSystemSetupConfig" class="com.hybris.backoffice.solrsearch.setup.impl.DefaultBackofficeSolrSearchSystemSetupConfig" >
+        <constructor-arg name="configStringResolver">
+            <bean class="com.hybris.backoffice.solrsearch.setup.impl.ConfigStringResolver" />
+        </constructor-arg>
+    </bean>
+
+    <alias name="backofficeSolrSearchSystemSetup" alias="defaultBackofficeSolrSearchSystemSetup" />
+    <bean id="backofficeSolrSearchSystemSetup" class="com.hybris.backoffice.solrsearch.setup.impl.DefaultBackofficeSolrSearchImpexImportSystemSetup">
+        <constructor-arg name="importService" ref="defaultImportService" />
+        <constructor-arg name="commonI18NService" ref="commonI18NService" />
+        <constructor-arg name="modelService" ref="modelService" />
+        <constructor-arg name="cronJobService" ref="cronJobService" />
+        <constructor-arg name="configurationService" ref="configurationService" />
+        <constructor-arg name="backofficeSolrSearchSystemSetupConfig" ref="defaultBackofficeSolrSearchSystemSetupConfig" />
+        <constructor-arg name="fileBasedImpExResourceFactory">
+            <bean class="com.hybris.backoffice.solrsearch.setup.impl.FileBasedImpExResourceFactory" />
+        </constructor-arg>
+    </bean>
+
+    <bean id="lowerCaseFormat" class="com.hybris.backoffice.solrsearch.resolvers.CaseFormat" >
+        <constructor-arg value="TO_LOWER" />
+    </bean>
+
+    <bean id="coreDataQualityValueResolver" parent="defaultBackofficeDataQualityValueResolver">
+		<property name="domainGroupId" value="pcmCoreAttributesCoverageGroup"/>
+	</bean>
+
+	<bean id="marketingDataQualityValueResolver" parent="defaultBackofficeDataQualityValueResolver">
+		<property name="domainGroupId" value="pcmMarketingAttributesCoverageGroup"/>
+	</bean>
+
+    <alias name="defaultBackofficeIndexedPropertyPopulator" alias="backofficeIndexedPropertyPopulator"/>
+    <bean id="defaultBackofficeIndexedPropertyPopulator"
+              class="com.hybris.backoffice.solrsearch.populators.BackofficeIndexedPropertyPopulator"/>
+
+    <bean id="defaultBackofficeIndexedPropertyPopulatorLoader"
+          class="com.hybris.backoffice.solrsearch.populators.BackofficeIndexedPropertyPopulatorLoader" />
+
+</beans>

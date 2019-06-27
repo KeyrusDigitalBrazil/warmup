@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="segmentValidator" class="de.hybris.platform.personalizationwebservices.validator.SegmentDataValidator" />
+
+	<bean id="customizationValidator"
+		  class="de.hybris.platform.personalizationwebservices.validator.CustomizationDataValidator">
+		<property name="validators">
+			<list>
+				<bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyOrTooLongValidator">
+					<property name="fieldPath" value="name"/>
+					<property name="maxLength" value="255"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="variationValidator" class="de.hybris.platform.personalizationwebservices.validator.VariationDataValidator">
+		<property name="validators">
+			<list>
+				<bean class="de.hybris.platform.webservicescommons.validators.FieldNotEmptyOrTooLongValidator">
+					<property name="fieldPath" value="name"/>
+					<property name="maxLength" value="255"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="customizationPackageValidator" class="de.hybris.platform.personalizationwebservices.validator.CustomizationPackageValidator" >
+		<property name="triggerValidator" ref="triggerValidator" />
+		<property name="variationValidator" ref="variationValidator" />
+		<property name="customizationValidator" ref="customizationValidator" />
+	</bean>
+	
+	<!-- action validation -->
+	<bean id="actionValidator" parent="abstractSubtypeValidator" >
+		<property name="markerInterface" value="de.hybris.platform.personalizationwebservices.validator.ActionValidator" />
+	</bean>
+	
+	<bean id="baseActionValidator" class="de.hybris.platform.personalizationwebservices.validator.ActionDataValidator" />
+
+	<bean id="actionsValidator" class="de.hybris.platform.personalizationwebservices.validator.ActionDataListValidator" >
+		<property name="actionValidator" ref="actionValidator" />
+	</bean>
+
+	<!-- trigger validation -->
+	<bean id="triggerValidator" parent="abstractSubtypeValidator" >
+		<property name="markerInterface" value="de.hybris.platform.personalizationwebservices.validator.TriggerValidator" />
+	</bean>
+	
+	<bean id="segmentTriggerValidator" class="de.hybris.platform.personalizationwebservices.validator.SegmentTriggerDataValidator" >
+		<property name="segmentValidator" ref="segmentValidator" />
+	</bean>
+	
+	<bean id="expressionTriggerValidator" class="de.hybris.platform.personalizationwebservices.validator.ExpressionTriggerDataValidator" >
+		<property name="cxExpressionTriggerService" ref="cxExpressionTriggerService" />
+		<property name="segmentFacade" ref="cxSegmentFacade" />
+	</bean>
+	
+	<bean name="segmentationIdValidator" class="de.hybris.platform.personalizationwebservices.validator.SegmentationIdValidator" >
+		<property name="segmentationHelper" ref="cxSegmentationHelper" />
+	</bean>
+	
+	
+</beans>

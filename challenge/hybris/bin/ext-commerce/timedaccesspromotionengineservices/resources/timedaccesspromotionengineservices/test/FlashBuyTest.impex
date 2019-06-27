@@ -1,0 +1,83 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+$primaryKieBase=primary-kie-base
+
+$productCatalog=electronicsProductCatalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Online'])[unique=true,default=$productCatalog:Online]
+
+
+INSERT_UPDATE PromotionGroup;identifier[unique=true]
+;flashBuyPromotionGroup
+
+INSERT_UPDATE RuleGroup;code[unique=true]
+;flashBuyPromotionRuleGroup
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];name[lang=en];description[lang=en];priority;status(code);ruleGroup(code);website(identifier);startDate[default=01-01-2000,dateformat=dd-MM-yyyy];endDate[default=01-01-2099,dateformat=dd-MM-yyyy];
+;rule1;rule1;description1;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule3;rule3;description3;1;UNPUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule2;rule2;description2;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule4;rule4;description4;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule5;rule5;description5;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule6;rule6;description6;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+;rule7;rule7;description7;1;PUBLISHED;flashBuyPromotionRuleGroup;flashBuyPromotionGroup
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;primary-kie-module;primary-kie-module;primary-kie-module;1.0.0;PROMOTION;true;0;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;$primaryKieBase;primary-kie-module;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsRule;uuid[unique=true];code;sourceRule(code);kieBase(name)[default=$primaryKieBase];ruleType(code)[default=PROMOTION];version[default=0];active[default=true];currentVersion[default=true]
+;drools_rule_1;drools_rule_1;rule1
+;drools_rule_3;drools_rule_3;rule3
+;drools_rule_2;drools_rule_2;rule2
+;drools_rule_4;drools_rule_4;rule4
+;drools_rule_5;drools_rule_5;rule5
+;drools_rule_6;drools_rule_6;rule6
+
+INSERT_UPDATE RuleBasedPromotion;code[unique=true];rule(uuid)
+;promotion1;drools_rule_1
+;promotion3;drools_rule_3
+;promotion2;drools_rule_2
+;promotion4;drools_rule_4
+;promotion5;drools_rule_5
+;promotion6;drools_rule_6
+
+INSERT_UPDATE FlashBuyCoupon;couponId[unique=true];rule(code);maxRedemptionsPerCustomer;maxTotalRedemptions;active;OriginalMaxOrderQuantity;product(code);maxProductQuantityPerOrder
+;couponId1;rule1;1;100;true;;
+;couponId2;;1;100;true;;
+;couponId3;rule3;1;100;true;;
+;couponId4;rule4;1;100;true;;
+;couponId5;rule5;1;100;false;;
+;couponId6;rule6;1;100;true;3;product1
+;couponId7;;1;100;true;;product3;1
+
+INSERT_UPDATE Catalog;id[unique=true]
+;$productCatalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active
+;$productCatalog;Online;true
+;$productCatalog;Staged;false
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;maxOrderQuantity
+;testproduct
+;testproduct3
+;product1;;3
+;product2;;3
+;product3;;5
+
+INSERT_UPDATE ProductForPromotionSourceRule;productCode[unique=true];rule(code);promotion(code)
+;testproduct;rule1;promotion1
+;testproduct3;rule3;promotion3
+;product1;rule6;promotion6
+;product2;rule6;promotion6
+

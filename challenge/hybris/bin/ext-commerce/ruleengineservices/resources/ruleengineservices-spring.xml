@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+           
+	<import resource="ruleengineservices-spring-rule.xml" />
+	<import resource="ruleengineservices-spring-compiler.xml" />
+	<import resource="ruleengineservices-spring-definitions.xml" />
+	
+	<alias name="defaultCommerceRuleEngineCacheService" alias="ruleEngineCacheService" />
+	<bean id="defaultCommerceRuleEngineCacheService" parent="defaultRuleEngineCacheService" class="de.hybris.platform.ruleengineservices.cache.impl.DefaultCommerceRuleEngineCacheService">
+		<property name="commerceRuleEngineCache" ref="ruleEngineCache" />
+	</bean>
+
+	<alias name="defaultCommerceRuleEngineCache" alias="ruleEngineCache" />
+	<bean id="defaultCommerceRuleEngineCache" class="de.hybris.platform.ruleengineservices.cache.impl.DefaultCommerceRuleEngineCache" parent="defaultRuleEngineCache">
+		<property name="raoCacheCreators" ref="commerceRuleEngineRaoCacheCreators"/>
+		<property name="raoProviders" ref="commerceRuleEngineRaoCacheProviders"/>
+	</bean>
+
+	<util:list id="commerceRuleEngineRaoCacheCreators">
+		<ref bean="ruleConfigurationRRDProvider" />
+		<ref bean="ruleGroupExecutionRRDProvider" />
+	</util:list>
+
+	<util:map id="commerceRuleEngineRaoCacheProviders" key-type="java.lang.Class">
+		<entry key="de.hybris.platform.ruleengineservices.rrd.RuleConfigurationRRD" value-ref="ruleConfigurationRRDTemplateProvider"/>
+		<entry key="de.hybris.platform.ruleengineservices.rrd.RuleGroupExecutionRRD" value-ref="ruleGroupExecutionRRDTemplateProvider"/>
+	</util:map>
+
+	<bean id="productUtils" class="de.hybris.platform.ruleengineservices.util.ProductUtils">
+	</bean>
+
+	<bean id="orderUtils" class="de.hybris.platform.ruleengineservices.util.OrderUtils">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<bean id="currencyUtils" class="de.hybris.platform.ruleengineservices.util.CurrencyUtils">
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<bean id="raoUtils" class="de.hybris.platform.ruleengineservices.util.RaoUtils"/>
+
+	<alias name="ruleengineAbstractPopulatingConverter" alias="abstractPopulatingConverter" />
+	<bean id="ruleengineAbstractPopulatingConverter" class="de.hybris.platform.converters.impl.AbstractPopulatingConverter"
+		abstract="true" />
+
+	<alias name="defaultRuleGroupExecutionRrdConverter" alias="ruleGroupExecutionRrdConverter" />
+	<bean id="defaultRuleGroupExecutionRrdConverter" class="de.hybris.platform.ruleengineservices.converters.DefaultRuleGroupExecutionRRDConverter">
+		<property name="ruleGroupExecutionRrdPopulator" ref="ruleGroupExecutionRrdPopulator"/>
+	</bean>
+	<alias name="defaultRuleGroupExecutionRrdPopulator" alias="ruleGroupExecutionRrdPopulator" />
+	<bean id="defaultRuleGroupExecutionRrdPopulator" 
+		class="de.hybris.platform.ruleengineservices.converters.populator.RuleGroupExecutionRrdPopulator">
+		<property name="configurationService" ref="configurationService" />
+		<property name="ruleGroupDao" ref="ruleGroupDao" />
+	</bean>
+
+	<alias name="defaultRuleGroupExecutionRrdTemplateConverter" alias="ruleGroupExecutionRrdTemplateConverter" />
+	<bean id="defaultRuleGroupExecutionRrdTemplateConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rrd.RuleGroupExecutionRRD" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleGroupExecutionRrdTemplatePopulator"/>
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultRuleGroupExecutionRrdTemplatePopulator" alias="ruleGroupExecutionRrdTemplatePopulator" />
+	<bean id="defaultRuleGroupExecutionRrdTemplatePopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.RuleGroupExecutionRrdTemplatePopulator"/>
+
+	<alias name="defaultRuleConfigurationRrdConverter" alias="ruleConfigurationRrdConverter" />
+	<bean id="defaultRuleConfigurationRrdConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rrd.RuleConfigurationRRD" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleConfigurationRrdPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultRuleConfigurationRrdPopulator" alias="ruleConfigurationRrdPopulator" />
+	<bean id="defaultRuleConfigurationRrdPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.RuleConfigurationRrdPopulator">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias name="defaultRuleConfigurationRrdTemplateConverter" alias="ruleConfigurationRrdTemplateConverter" />
+	<bean id="defaultRuleConfigurationRrdTemplateConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rrd.RuleConfigurationRRD" />
+		<property name="populators">
+			<list>
+				<ref bean="ruleConfigurationRrdTemplatePopulator"/>
+			</list>
+		</property>
+	</bean>
+	<alias name="defaultRuleConfigurationRrdTemplatePopulator" alias="ruleConfigurationRrdTemplatePopulator" />
+	<bean id="defaultRuleConfigurationRrdTemplatePopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.RuleConfigurationRrdTemplatePopulator"/>
+
+	<alias name="defaultCartRaoConverter" alias="cartRaoConverter" />
+	<bean id="defaultCartRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.CartRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="cartRaoPopulator" />
+			</list>
+		</property>		
+	</bean>
+	
+	<alias name="defaultCartRaoPopulator" alias="cartRaoPopulator" />
+	<bean id="defaultCartRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.CartRaoPopulator">
+		<property name="discountConverter" ref="discountValueRaoConverter" />
+		<property name="entryConverter" ref="orderEntryRaoConverter" />
+		<property name="userConverter" ref="userRaoConverter" />
+		<property name="paymentModeConverter" ref="paymentModeRaoConverter"/>
+	</bean>
+	
+	<alias name="defaultDeliveryModeRaoConverter" alias="deliveryModeRaoConverter" />
+	<bean id="defaultDeliveryModeRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.DeliveryModeRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="deliveryModeRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultDeliveryModeRaoPopulator" alias="deliveryModeRaoPopulator" />
+	<bean id="defaultDeliveryModeRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.DeliveryModeRaoPopulator"/>
+		
+	<alias name="defaultCampaignRaoConverter" alias="campaignRaoConverter" />
+	<bean id="defaultCampaignRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.CampaignRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="campaignRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCampaignRaoPopulator" alias="campaignRaoPopulator" />
+	<bean id="defaultCampaignRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.CampaignRaoPopulator"/>
+
+	<alias name="defaultPaymentModeRaoConverter" alias="paymentModeRaoConverter" />
+	<bean id="defaultPaymentModeRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.PaymentModeRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="paymentModeRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+		
+	<alias name="defaultPaymentModeRaoPopulator" alias="paymentModeRaoPopulator" />
+	<bean id="defaultPaymentModeRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.PaymentModeRaoPopulator"/>		
+	
+	<alias name="defaultUserRaoConverter" alias="userRaoConverter" />
+	<bean id="defaultUserRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.UserRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="userRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultUserRaoPopulator" alias="userRaoPopulator" />
+	<bean id="defaultUserRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.UserRaoPopulator">
+		<property name="userGroupConverter" ref="userGroupRaoConverter" />
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<alias name="defaultUserGroupRaoConverter" alias="userGroupRaoConverter" />
+	<bean id="defaultUserGroupRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.UserGroupRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="userGroupRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultUserGroupRaoPopulator" alias="userGroupRaoPopulator" />
+	<bean id="defaultUserGroupRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.UserGroupRaoPopulator">
+	</bean>
+
+	<alias name="defaultDiscountValueRaoConverter" alias="discountValueRaoConverter" />
+	<bean id="defaultDiscountValueRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.DiscountValueRAO" />
+		<property name="populators">
+			<ref bean="discountValueRaoPopulator"/>
+		</property>
+	</bean>
+	
+	<alias name="defaultDiscountValueRaoPopulator" alias="discountValueRaoPopulator" />
+	<bean id="defaultDiscountValueRaoPopulator" class="de.hybris.platform.ruleengineservices.converters.populator.DiscountValueRaoPopulator" />
+
+	<alias name="defaultOrderEntryRaoConverter" alias="orderEntryRaoConverter" />
+	<bean id="defaultOrderEntryRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.OrderEntryRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="orderEntryRaoPopulator"/>
+				<ref bean="orderEntryRaoEntryGroupNumbersPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultOrderEntryRaoPopulator" alias="orderEntryRaoPopulator" />
+	<bean id="defaultOrderEntryRaoPopulator" class="de.hybris.platform.ruleengineservices.converters.populator.OrderEntryRaoPopulator">
+		<property name="productConverter" ref="productRaoConverter" />
+		<property name="discountValueConverter" ref="discountValueRaoFromDiscountValueConverter"/>
+		<property name="currencyUtils" ref="currencyUtils"/>
+	</bean>
+
+	<alias name="defaultDiscountValueRaoFromDiscountValueConverter" alias="discountValueRaoFromDiscountValueConverter" />
+	<bean id="defaultDiscountValueRaoFromDiscountValueConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.DiscountValueRAO" />
+		<property name="populators">
+			<ref bean="discountValueRaoFromDiscountValuePopulator"/>
+		</property>
+	</bean>
+
+	<alias name="defaultDiscountValueRaoFromDiscountValuePopulator" alias="discountValueRaoFromDiscountValuePopulator" />
+	<bean id="defaultDiscountValueRaoFromDiscountValuePopulator" class="de.hybris.platform.ruleengineservices.converters.populator.DiscountValueRaoFromDiscountValuePopulator" />
+
+	<alias name="defaultOrderEntryRaoEntryGroupNumbersPopulator" alias="orderEntryRaoEntryGroupNumbersPopulator" />
+	<bean id="defaultOrderEntryRaoEntryGroupNumbersPopulator" class="de.hybris.platform.ruleengineservices.converters.populator.OrderEntryRaoEntryGroupNumbersPopulator"/>
+
+	<alias name="defaultProductRaoConverter" alias="productRaoConverter" />
+	<bean id="defaultProductRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.ProductRAO" />
+		<property name="populators">
+			<ref bean="productRaoPopulator"/>
+		</property>
+	</bean>
+	
+	<alias name="defaultProductRaoPopulator" alias="productRaoPopulator" />
+	<bean id="defaultProductRaoPopulator" class="de.hybris.platform.ruleengineservices.converters.populator.ProductRaoPopulator">
+			<property name="categoryConverter" ref="categoryRaoConverter" />
+			<property name="categoryService" ref="categoryService" />
+			<property name="productUtils" ref="productUtils"/>
+	</bean>
+	
+	<alias name="defaultCategoryRaoConverter" alias="categoryRaoConverter" />
+	<bean id="defaultCategoryRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.CategoryRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="categoryRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCategoryRaoPopulator" alias="categoryRaoPopulator" />
+	<bean id="defaultCategoryRaoPopulator"
+		class="de.hybris.platform.ruleengineservices.converters.populator.CategoryRaoPopulator">
+	</bean>
+
+	<alias name="defaultEntryGroupRaoPopulator" alias="entryGroupRaoPopulator"/>
+	<bean id="defaultEntryGroupRaoPopulator" class="de.hybris.platform.ruleengineservices.converters.populator.OrderEntryGroupRaoPopulator"/>
+
+	<alias name="defaultEntryGroupRaoConverter" alias="entryGroupRaoConverter" />
+	<bean id="defaultEntryGroupRaoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.ruleengineservices.rao.OrderEntryGroupRAO" />
+		<property name="populators">
+			<list>
+				<ref bean="entryGroupRaoPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultRuleGroupExecutionRRDProvider" alias="ruleGroupExecutionRRDProvider" />
+	<bean id="defaultRuleGroupExecutionRRDProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultRuleGroupExecutionRRDProvider">
+		<property name="ruleGroupExecutionRrdConverter" ref="ruleGroupExecutionRrdConverter"/>
+	</bean>
+	
+	<alias name="defaultRuleConfigurationRRDProvider" alias="ruleConfigurationRRDProvider" />
+	<bean id="defaultRuleConfigurationRRDProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultRuleConfigurationRRDProvider">
+		<property name="ruleConfigurationRrdConverter" ref="ruleConfigurationRrdConverter"/>
+	</bean>
+
+	<alias name="defaultRuleGroupExecutionRRDTemplateProvider" alias="ruleGroupExecutionRRDTemplateProvider" />
+	<bean id="defaultRuleGroupExecutionRRDTemplateProvider" class="de.hybris.platform.ruleengineservices.impl.DefaultRuleGroupExecutionRRDTemplateProvider">
+		<property name="ruleGroupExecutionRrdTemplateConverter" ref="ruleGroupExecutionRrdTemplateConverter"/>
+	</bean>
+	
+	<alias name="defaultRuleConfigurationRRDTemplateProvider" alias="ruleConfigurationRRDTemplateProvider" />
+	<bean id="defaultRuleConfigurationRRDTemplateProvider" class="de.hybris.platform.ruleengineservices.impl.DefaultRuleConfigurationRRDTemplateProvider">
+		<property name="ruleConfigurationRrdTemplateConverter" ref="ruleConfigurationRrdTemplateConverter"/>
+	</bean>
+
+	<alias name="defaultEvaluationTimeRRDProvider" alias="evaluationTimeRRDProvider" />
+	<bean id="defaultEvaluationTimeRRDProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultEvaluationTimeRRDProvider"/>
+
+	<alias name="defaultDeliveryModeRAOProvider" alias="deliveryModeRaoProvider" />
+	<bean id="defaultDeliveryModeRAOProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultDeliveryModeRAOProvider">
+		<property name="deliveryModeRaoConverter" ref="deliveryModeRaoConverter" />
+		<property name="deliveryModeDao" ref="deliveryModeDao" />
+		<property name="deliveryCostEvaluationStrategy" ref="deliveryCostEvaluationStrategy" />
+	</bean>
+
+	<alias name="defaultCartRAOProvider" alias="cartRAOProvider" />
+	<alias name="defaultCartRAOProvider" alias="cartRaoProvider" />
+	<bean id="defaultCartRAOProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultCartRAOProvider">
+		<property name="cartRaoConverter" ref="cartRaoConverter"/>
+		<property name="ruleEngineCalculationService" ref="ruleEngineCalculationService" />
+		<property name="factExtractorList" ref="cartRAOProviderExtractors"/>
+	</bean>
+	
+	<alias name="defaultCampaignRAOProvider" alias="campaignRaoProvider" />
+	<bean id="defaultCampaignRAOProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultCampaignRAOProvider">
+		<property name="campaignService" ref="campaignService" />
+		<property name="campaignRaoConverter" ref="campaignRaoConverter" />
+	</bean>
+	
+	
+	<alias alias="cartRAOProviderExtractors" name="defaultCartRAOProviderExtractors"/>
+	<util:list id="defaultCartRAOProviderExtractors"/>
+
+	<alias name="defaultEntryGroupRAOProvider" alias="entryGroupRaoProvider" />
+	<bean id="defaultEntryGroupRAOProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultEntryGroupRAOProvider">
+		<property name="entryGroupRaoConverter" ref="entryGroupRaoConverter" />
+		<property name="entryGroupService" ref="entryGroupService" />
+	</bean>
+	
+	<alias name="defaultDeliveryCostEvaluationStrategy" alias="deliveryCostEvaluationStrategy" />
+	<bean id="defaultDeliveryCostEvaluationStrategy" class="de.hybris.platform.ruleengineservices.calculation.impl.DefaultDeliveryCostEvaluationStrategy"/>
+
+	<alias name="defaultProductRAOProvider" alias="productRAOProvider" />
+	<alias name="defaultProductRAOProvider" alias="productRaoProvider" />
+	<bean id="defaultProductRAOProvider" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultProductRAOProvider">
+		<property name="productRaoConverter" ref="productRaoConverter"/>
+		<property name="factExtractorList" ref="productRAOProviderExtractors"/>
+		<property name="defaultOptions">
+			<list>
+				<value>INCLUDE_PRODUCT</value>
+				<value>EXPAND_CATEGORIES</value>
+			</list>
+		</property>
+	</bean>
+	
+	<alias alias="productRAOProviderExtractors" name="defaultProductRAOProviderExtractors"/>
+	<util:list id="defaultProductRAOProviderExtractors"/>
+	
+	
+	<alias name="defaultRuleEngineCalculationService" alias="ruleEngineCalculationService" />
+	<bean id="defaultRuleEngineCalculationService" class="de.hybris.platform.ruleengineservices.calculation.impl.DefaultRuleEngineCalculationService">
+		<property name="productConverter" ref="productRaoConverter" />
+		<property name="abstractOrderRaoToOrderConverter" ref="abstractOrderRaoToOrderConverter"/>
+		<property name="minimumAmountValidationStrategy" ref="minimumAmountValidationStrategy"/>
+		<property name="raoUtils" ref="raoUtils"/>
+		<property name="orderUtils" ref="orderUtils"/>
+		<property name="currencyUtils" ref="currencyUtils"/>
+	</bean>
+
+	<alias name="defaultMinimumAmountValidationStrategy" alias="minimumAmountValidationStrategy"/>
+	<bean id="defaultMinimumAmountValidationStrategy" class="de.hybris.platform.ruleengineservices.calculation.impl.DefaultMinimumAmountValidationStrategy">
+		<property name="orderLowerLimitAmount" value="0"/>
+		<property name="lineItemLowerLimitAmount" value="0"/>
+	</bean>
+	
+	<alias name="defaultEntriesSelectionStrategies" alias="entriesSelectionStrategies" />
+	<bean id="defaultEntriesSelectionStrategies" class="java.util.HashMap">
+		<constructor-arg>
+			<map key-type="de.hybris.platform.ruleengineservices.enums.OrderEntrySelectionStrategy">
+				<entry key="DEFAULT" value-ref="defaultEntriesSelectionStrategy"/>
+				<entry key="CHEAPEST" value-ref="cheapestEntriesSelectionStrategy"/>
+			</map>
+		</constructor-arg>
+	</bean>
+	
+	<alias name="defaultCheapestEntriesSelectionStrategy" alias="cheapestEntriesSelectionStrategy"/>
+	<bean id="defaultCheapestEntriesSelectionStrategy" class="de.hybris.platform.ruleengineservices.calculation.impl.CheapestEntriesSelectionStrategy"/>
+
+	<bean id="defaultEntriesSelectionStrategy" class="de.hybris.platform.ruleengineservices.calculation.impl.DefaultEntriesSelectionStrategy"/>
+
+	<alias name="defaultRuleActionService" alias="ruleActionService"/>
+	<bean id="defaultRuleActionService" class="de.hybris.platform.ruleengineservices.action.impl.DefaultRuleActionService" />
+	
+	<alias name="defaultAbstractOrderRaoToOrderConverter" alias="abstractOrderRaoToOrderConverter"/>
+	<bean id="defaultAbstractOrderRaoToOrderConverter" class="de.hybris.platform.ruleengineservices.converters.AbstractOrderRaoToOrderConverter">
+		<property name="calculationStrategies" ref="calculationStrategies"/>
+		<property name="abstractOrderRaoToCurrencyConverter" ref="abstractOrderRaoToCurrencyConverter"/>
+		<property name="orderEntryRaoToNumberedLineItemConverter" ref="orderEntryRaoToNumberedLineItemConverter"/>
+		<property name="raoUtils" ref="raoUtils"/>
+		<property name="orderUtils" ref="orderUtils"/>
+	</bean>
+	
+	<alias name="defaultAbstractOrderRaoToCurrencyConverter" alias="abstractOrderRaoToCurrencyConverter"/>
+	<bean id="defaultAbstractOrderRaoToCurrencyConverter" class="de.hybris.platform.ruleengineservices.converters.AbstractOrderRaoToCurrencyConverter">
+		<property name="currencyUtils" ref="currencyUtils"/>
+	</bean>
+	
+	<alias name="defaultOrderEntryRaoToNumberedLineItemConverter" alias="orderEntryRaoToNumberedLineItemConverter"/>
+	<bean id="defaultOrderEntryRaoToNumberedLineItemConverter" class="de.hybris.platform.ruleengineservices.converters.OrderEntryRaoToNumberedLineItemConverter">
+		<property name="abstractOrderRaoToCurrencyConverter" ref="abstractOrderRaoToCurrencyConverter"/>
+	</bean>
+
+	<util:map id="ruleConfigurationRaoProviders">
+        <entry key="de.hybris.platform.ruleengine.model.AbstractRuleEngineRuleModel"><util:list><ref bean="ruleConfigurationRRDProvider"/></util:list></entry>
+    </util:map>
+
+	<util:map id="ruleGroupRaoProviders">
+        <entry key="de.hybris.platform.ruleengine.model.AbstractRuleEngineRuleModel"><util:list><ref bean="ruleGroupExecutionRRDProvider"/></util:list></entry>
+    </util:map>
+    
+    <util:map id="raoProviders">
+	  <entry key="RULE_CONFIGURATION" value-ref="ruleConfigurationRaoProviders" />
+	  <entry key="RULE_GROUP" value-ref="ruleGroupRaoProviders" />
+    </util:map>
+
+	<alias name="defaultFactContextFactory" alias="factContextFactory"/>
+	<bean id="defaultFactContextFactory" class="de.hybris.platform.ruleengineservices.rao.providers.impl.DefaultFactContextFactory" >
+		<property name="raoProviders" ref="raoProviders"/>
+	</bean>
+	
+	<alias name="defaultExtendedOrderDao" alias="extendedOrderDao"/>
+	<bean id="defaultExtendedOrderDao" parent="defaultOrderDao"  class="de.hybris.platform.ruleengineservices.order.dao.impl.DefaultExtendedOrderDao" />
+	
+	<!-- ACTIONS -->
+
+	<bean id="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.AbstractRuleExecutableSupport" abstract="true">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="ruleEngineCalculationService" ref="ruleEngineCalculationService"/>
+		<property name="entriesSelectionStrategies" ref="entriesSelectionStrategies"/>
+		<property name="currencyUtils" ref="currencyUtils"/>
+		<property name="actionSupplementStrategies" ref="actionSupplementStrategies" />
+		<property name="raoUtils" ref="raoUtils"/>
+	</bean>
+	
+	<alias alias="actionSupplementStrategies" name="defaultActionSupplementStrategies"/>
+	<util:list id="defaultActionSupplementStrategies"/>
+
+	<alias alias="ruleChangeDeliveryModeRAOAction" name="defaultRuleChangeDeliveryModeRAOAction" />
+	<bean id="defaultRuleChangeDeliveryModeRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleChangeDeliveryModeRAOAction"/>
+
+	<alias alias="ruleFreeGiftRAOAction" name="defaultRuleFreeGiftRAOAction" />
+	<bean id="defaultRuleFreeGiftRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleFreeGiftRAOAction">
+		<property name="productService" ref="productService" />
+		<property name="ruleOrderEntryPercentageDiscountRAOAction" ref="ruleOrderEntryPercentageDiscountRAOAction"/>
+	</bean>
+
+	<alias alias="ruleOrderEntryFixedDiscountRAOAction" name="defaultRuleOrderEntryFixedDiscountRAOAction" />
+	<bean id="defaultRuleOrderEntryFixedDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderEntryFixedDiscountRAOAction"/>
+
+	<alias alias="ruleOrderEntryFixedPriceRAOAction" name="defaultRuleOrderEntryFixedPriceRAOAction" />
+	<bean id="defaultRuleOrderEntryFixedPriceRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderEntryFixedPriceRAOAction"/>
+
+	<alias alias="ruleOrderEntryPercentageDiscountRAOAction" name="defaultRuleOrderEntryPercentageDiscountRAOAction" />
+	<bean id="defaultRuleOrderEntryPercentageDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderEntryPercentageDiscountRAOAction"/>
+
+	<alias alias="ruleOrderFixedDiscountRAOAction" name="defaultRuleOrderFixedDiscountRAOAction" />
+	<bean id="defaultRuleOrderFixedDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderFixedDiscountRAOAction"/>
+
+	<alias alias="ruleOrderPercentageDiscountRAOAction" name="defaultRuleOrderPercentageDiscountRAOAction" />
+	<bean id="defaultRuleOrderPercentageDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderPercentageDiscountRAOAction"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleAddProductPercentageDiscountRAOAction" name="defaultRuleAddProductPercentageDiscountRAOAction" />
+	<bean id="defaultRuleAddProductPercentageDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleAddProductPercentageDiscountRAOAction"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleOrderPercentageDiscountExcludedProductsRAOAction" name="defaultRuleOrderPercentageDiscountExcludedProductsRAOAction" />
+	<bean id="defaultRuleOrderPercentageDiscountExcludedProductsRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderPercentageDiscountExcludedProductsRAOAction"/>
+
+	<alias alias="rulePartnerOrderEntryFixedDiscountRAOAction" name="defaultRulePartnerOrderEntryFixedDiscountRAOAction" />
+	<bean id="defaultRulePartnerOrderEntryFixedDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RulePartnerOrderEntryFixedDiscountRAOAction"/>
+
+	<alias alias="rulePartnerOrderEntryFixedPriceRAOAction" name="defaultRulePartnerOrderEntryFixedPriceRAOAction" />
+	<bean id="defaultRulePartnerOrderEntryFixedPriceRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RulePartnerOrderEntryFixedPriceRAOAction"/>
+
+	<alias alias="rulePartnerOrderEntryPercentageDiscountRAOAction" name="defaultRulePartnerOrderEntryPercentageDiscountRAOAction" />
+	<bean id="defaultRulePartnerOrderEntryPercentageDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RulePartnerOrderEntryPercentageDiscountRAOAction"/>
+
+	<alias alias="ruleTargetBundlePriceRAOAction" name="defaultRuleTargetBundlePriceRAOAction" />
+	<bean id="defaultRuleTargetBundlePriceRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleTargetBundlePriceRAOAction"/>
+
+	<alias alias="ruleTriggerMessageRAOAction" name="defaultRuleTriggerMessageRAOAction" />
+	<bean id="defaultRuleTriggerMessageRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleTriggerMessageRAOAction"/>
+	
+	<alias alias="ruleHaltRAOAction" name="defaultRuleHaltRAOAction" />
+	<bean id="defaultRuleHaltRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleHaltRAOAction"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleAddFreeProductDiscountRAOAction" name="defaultRuleAddFreeProductDiscountRAOAction" />
+	<bean id="defaultRuleAddFreeProductDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleAddFreeProductDiscountRAOAction"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleFreeGiftToBundleRAOAction" name="defaultRuleFreeGiftToBundleRAOAction" />
+	<bean id="defaultRuleFreeGiftToBundleRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleFreeGiftToBundleRAOAction">
+		<property name="productService" ref="productService" />
+		<property name="ruleOrderEntryPercentageDiscountRAOAction" ref="ruleOrderEntryPercentageDiscountRAOAction"/>
+	</bean>
+	
+	<alias alias="ruleOrderEntryGroupFixedDiscountRAOAction" name="defaultRuleOrderEntryGroupFixedDiscountRAOAction" />
+	<bean id="defaultRuleOrderEntryGroupFixedDiscountRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderEntryGroupFixedDiscountRAOAction"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleOrderEntryPercentageDiscountWithStrategyRAOAction" name="defaultRuleOrderEntryPercentageDiscountWithStrategyRAOAction" />
+	<bean id="defaultRuleOrderEntryPercentageDiscountWithStrategyRAOAction" parent="abstractRuleExecutableSupport" class="de.hybris.platform.ruleengineservices.rule.evaluation.actions.impl.RuleOrderEntryPercentageDiscountWithStrategyRAOAction"/>
+	
+	<!--  END RAO ACTIONS -->
+
+	<bean id="AbstractRule_deploymentsAttributeHandler" class="de.hybris.platform.ruleengineservices.dynamic.RuleDeploymentsAttributeHandler">
+		<description>deprecated since 18.08</description>
+		<property name="rulesModuleResolver" ref="rulesModuleResolver"/>
+	</bean>
+
+	<alias alias="ruleEngineSystemSetup" name="defaultRuleEngineSystemSetup" />
+	<bean id="defaultRuleEngineSystemSetup" parent="abstractEventListener" class="de.hybris.platform.ruleengineservices.maintenance.systemsetup.impl.DefaultRuleEngineSystemSetup">
+		<property name="modelService" ref="modelService" />
+		<property name="ruleMaintenanceService" ref="ruleMaintenanceService" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="ruleEngineService" ref="platformRuleEngineService" />
+	</bean>
+
+
+	<alias alias="deactivateDroolsRulesTask" name="defaultDeactivateDroolsRulesTask"/>
+	<bean id="defaultDeactivateDroolsRulesTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.DeactivateDroolsRulesTask">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias alias="decoratedDeactivateDroolsRulesTask" name="defaultDecoratedDeactivateDroolsRulesTask"/>
+	<bean id="defaultDecoratedDeactivateDroolsRulesTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.InterceptorUnawareMigrationTaskDecorator">
+		<constructor-arg index="0" ref="deactivateDroolsRulesTask"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="updateRuleStatusTask" name="defaultUpdateRuleStatusTask"/>
+	<bean id="defaultUpdateRuleStatusTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.UpdateRuleStatusTask">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias alias="decoratedUpdateRuleStatusTask" name="defaultDecoratedUpdateRuleStatusTask"/>
+	<bean id="defaultDecoratedUpdateRuleStatusTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.InterceptorUnawareMigrationTaskDecorator">
+		<constructor-arg index="0" ref="updateRuleStatusTask"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+
+	<alias alias="updateSourceRuleVersionTask" name="defaultUpdateSourceRuleVersionTask"/>
+	<bean id="defaultUpdateSourceRuleVersionTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.UpdateSourceRuleVersionTask">
+		<property name="ruleDao" ref="ruleDao" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias alias="decoratedSourceRuleVersionTask" name="defaultDecoratedSourceRuleVersionTask"/>
+	<bean id="defaultDecoratedSourceRuleVersionTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.InterceptorUnawareMigrationTaskDecorator">
+		<constructor-arg index="0" ref="updateSourceRuleVersionTask"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+	<alias alias="linkSourceRulesTask" name="defaultLinkSourceRulesTask"/>
+	<bean id="defaultLinkSourceRulesTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.LinkSourceRulesTask">
+		<property name="modelService" ref="modelService" />
+		<property name="ruleDao" ref="ruleDao" />
+		<property name="engineRuleDao" ref="engineRuleDao" />
+	</bean>
+
+	<alias alias="decoratedLinkSourceRulesTask" name="defaultDecoratedLinkSourceRulesTask"/>
+	<bean id="defaultDecoratedLinkSourceRulesTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.InterceptorUnawareMigrationTaskDecorator">
+		<constructor-arg index="0" ref="linkSourceRulesTask"/>
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+
+
+	<alias alias="activateRuleEngineTask" name="defaultActivateRuleEngineTask"/>
+	<bean id="defaultActivateRuleEngineTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.ActivateRuleEngineTask">
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+
+	<alias alias="reInitializeRuleModulesTask" name="defaultReInitializeRuleModulesTask"/>
+	<bean id="defaultReInitializeRuleModulesTask" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.ReInitializeRuleModulesTask">
+		<property name="ruleEngineService" ref="platformRuleEngineService" />
+		<property name="ruleService" ref="ruleService" />
+		<property name="rulesModuleDao" ref="rulesModuleDao" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="ruleMaintenanceService" ref="ruleMaintenanceService"/>
+		<property name="ruleDao" ref="ruleDao"/>
+	</bean>
+
+
+
+	<alias alias="ruleEngineMigration64" name="defaultRuleEngineMigration64"/>
+	<bean id="defaultRuleEngineMigration64" class="de.hybris.platform.ruleengineservices.setup.tasks.impl.MigrationTo64Procedure">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+		<property name="migrationTasks" >
+			<util:list value-type="de.hybris.platform.ruleengineservices.setup.tasks.MigrationTask">
+				<ref bean="decoratedDeactivateDroolsRulesTask"/>
+				<ref bean="decoratedUpdateRuleStatusTask"/>
+				<ref bean="decoratedSourceRuleVersionTask"/>
+				<ref bean="decoratedLinkSourceRulesTask"/>
+				<ref bean="activateRuleEngineTask"/>
+				<ref bean="reInitializeRuleModulesTask"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<alias alias="ruleEngineServicesMigrationSetup" name="defaultRuleEngineServicesMigrationSetup"/>
+	<bean id="defaultRuleEngineServicesMigrationSetup" class="de.hybris.platform.ruleengineservices.setup.RuleEngineServicesMigrationSetup">
+		<property name="migrationTasks" >
+			<util:list value-type="de.hybris.platform.ruleengineservices.setup.tasks.MigrationTask">
+				<ref bean="ruleEngineMigration64"/>
+			</util:list>
+		</property>
+	</bean>
+
+	<bean id="provideModifiedRuleCodesPostRulesModuleSwappingTask" class="de.hybris.platform.ruleengineservices.maintenance.tasks.impl.ProvideModifiedRuleCodesPostTask">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="moduleVersionResolver" ref="moduleVersionResolver"/>
+	</bean>
+
+	<bean depends-on="postRulesModuleSwappingTaskList" parent="listMergeDirective">
+		<property name="add" ref="provideModifiedRuleCodesPostRulesModuleSwappingTask"/>
+	</bean>
+
+	<bean id="updateRulesStatusPostRulesModuleSwappingTask" class="de.hybris.platform.ruleengineservices.maintenance.tasks.impl.UpdateRulesStatusPostRulesModuleSwappingTask">
+		<property name="ruleService" ref="ruleService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+	</bean>
+
+	<bean depends-on="postRulesModuleSwappingTaskList" parent="listMergeDirective">
+		<property name="add" ref="updateRulesStatusPostRulesModuleSwappingTask"/>
+		<property name="afterBeanNames" value="provideModifiedRuleCodesPostRulesModuleSwappingTask"/>
+	</bean>
+
+	<bean id="updateRulesDeploymentsPostRulesModuleSwappingTask" class="de.hybris.platform.ruleengineservices.maintenance.tasks.impl.UpdateRulesDeploymentsPostTask">
+		<property name="ruleService" ref="ruleService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="rulesModuleResolver" ref="rulesModuleResolver"/>
+	</bean>
+
+	<bean depends-on="postRulesModuleSwappingTaskList" parent="listMergeDirective">
+		<property name="add" ref="updateRulesDeploymentsPostRulesModuleSwappingTask"/>
+		<property name="afterBeanNames" value="updateRulesStatusPostRulesModuleSwappingTask"/>
+	</bean>
+
+	<alias name="defaultCampaignSourceRuleModelHistoricalContentCreator" alias="sourceRuleHistoricalContentCreator" />
+	<bean id="defaultCampaignSourceRuleModelHistoricalContentCreator" parent="defaultSourceRuleHistoricalContentCreator" class="de.hybris.platform.ruleengineservices.versioning.impl.CampaignSourceRuleModelHistoricalContentCreator"/>
+
+	<bean id="campaignHistoricalRuleContentProvider" class="de.hybris.platform.ruleengineservices.versioning.impl.CampaignHistoricalRuleContentProvider"/>
+
+	<bean depends-on="sourceRuleHistoricalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="campaignHistoricalRuleContentProvider"/>
+	</bean>
+
+	<alias alias="ruleEngineJobExecutionSynchronizer" name="defaultRuleEngineJobExecutionSynchronizer"/>
+	<bean id="defaultRuleEngineJobExecutionSynchronizer" class="de.hybris.platform.ruleengineservices.jobs.impl.DefaultRuleEngineJobExecutionSynchronizer">
+		<property name="modelService" ref="modelService"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+	</bean>
+
+	<alias alias="ruleEngineAfterCronJobFinishedEventListener" name="defaultRuleEngineAfterCronJobFinishedEventListener"/>
+	<bean id="defaultRuleEngineAfterCronJobFinishedEventListener" class="de.hybris.platform.ruleengineservices.jobs.events.RuleEngineAfterCronJobFinishedEventListener" parent="abstractEventListener">
+		<property name="modelService" ref="modelService"/>
+		<property name="ruleEngineJobExecutionSynchronizer" ref="ruleEngineJobExecutionSynchronizer"/>
+	</bean>
+
+	<alias alias="ruleEngineBeforeCronJobStartEventListener" name="defaultRuleEngineBeforeCronJobStartEventListener"/>
+	<bean id="defaultRuleEngineBeforeCronJobStartEventListener" class="de.hybris.platform.ruleengineservices.jobs.events.RuleEngineBeforeCronJobStartEventListener" parent="abstractEventListener">
+		<property name="modelService" ref="modelService"/>
+	</bean>
+
+	<!-- Cron Jobs -->
+	<alias alias="abstractRuleEngineCronJob" name="defaultAbstractRuleEngineCronJob"/>
+	<bean id="defaultAbstractRuleEngineCronJob" class="de.hybris.platform.ruleengineservices.jobs.impl.AbstractRuleEngineJob" parent="abstractJobPerformable" abstract="true">
+		<property name="ruleMaintenanceService" ref="ruleMaintenanceService"/>
+		<property name="ruleEngineJobExecutionSynchronizer" ref="ruleEngineJobExecutionSynchronizer"/>
+	</bean>
+
+
+	<alias alias="ruleEngineCompilePublishJobPerformable" name="defaultRuleEngineCompilePublishJobPerformable"/>
+	<bean id="defaultRuleEngineCompilePublishJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineCompilePublishJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<alias alias="ruleEngineUndeployJobPerformable" name="defaultRuleEngineUndeployJobPerformable"/>
+	<bean id="defaultRuleEngineUndeployJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineUndeployJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<alias alias="ruleEngineModuleSyncJobPerformable" name="defaultRuleEngineModuleSyncJobPerformable"/>
+	<bean id="defaultRuleEngineModuleSyncJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineModuleSyncJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<alias alias="ruleEngineModuleInitJobPerformable" name="defaultRuleEngineModuleInitJobPerformable"/>
+	<bean id="defaultRuleEngineModuleInitJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineModuleInitJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<alias alias="ruleEngineAllModulesInitJobPerformable" name="defaultRuleEngineAllModulesInitJobPerformable"/>
+	<bean id="defaultRuleEngineAllModulesInitJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineAllModulesInitJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<!-- deprecated since 18.11 -->
+	<alias alias="ruleEngineArchiveJobPerformable" name="defaultRuleEngineArchiveJobPerformable"/>
+	<bean id="defaultRuleEngineArchiveJobPerformable" class="de.hybris.platform.ruleengineservices.jobs.impl.RuleEngineArchiveJobPerformable"
+		  parent="abstractRuleEngineCronJob"/>
+
+	<alias alias="ruleEngineCronJobLauncher" name="defaultRuleEngineCronJobLauncher"/>
+	<bean id="defaultRuleEngineCronJobLauncher" class="de.hybris.platform.ruleengineservices.jobs.impl.DefaultRuleEngineCronJobLauncher">
+		<property name="ruleEngineJobService" ref="ruleEngineJobService"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="l10nService" ref="l10nService"/>
+		<property name="ruleEngineCronJobSupplierFactory" ref="ruleEngineCronJobSupplierFactory"/>
+		<property name="maximumNumberOfParallelCronJobs" value="#{configurationService.configuration.getProperty('ruleengineservices.cronjob.concurrent.max')}"/>
+	</bean>
+
+	<alias alias="ruleEngineCronJobSupplierFactory" name="defaultRuleEngineCronJobSupplierFactory"/>
+	<bean id="defaultRuleEngineCronJobSupplierFactory" class="de.hybris.platform.ruleengineservices.jobs.impl.DefaultRuleEngineCronJobSupplierFactory">
+		<property name="clusterService" ref="clusterService"/>
+		<property name="nodeId" value="#{configurationService.configuration.getProperty('ruleengineservices.cronjob.nodeid')}"/>
+		<property name="nodeGroup" value="#{configurationService.configuration.getProperty('ruleengineservices.cronjob.nodegroup')}"/>
+	</bean>
+
+	<alias alias="ruleEngineCronJobDAO" name="defaultRuleEngineCronJobDAO"/>
+	<bean id="defaultRuleEngineCronJobDAO" class="de.hybris.platform.ruleengineservices.jobs.impl.DefaultRuleEngineCronJobDAO">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	<alias alias="ruleEngineJobService" name="defaultRuleEngineJobService"/>
+	<bean id="defaultRuleEngineJobService" class="de.hybris.platform.ruleengineservices.jobs.impl.DefaultRuleEngineJobService">
+		<property name="modelService" ref="modelService"/>
+		<property name="ruleEngineCronJobDAO" ref="ruleEngineCronJobDAO"/>
+		<property name="triggerCronExpression" value="#{configurationService.configuration.getProperty('ruleengineservices.cronjob.trigger.cronexpression')}"/>
+		<property name="cronJobService" ref="cronJobService"/>
+	</bean>
+
+	<bean id="ruleEngineServicesSystemSetup" class="de.hybris.platform.ruleengineservices.setup.impl.RuleEngineServicesSystemSetup" parent="abstractRuleEngineSystemSetup" />
+
+	<alias alias="sharedParametersProvider" name="defaultSharedParametersProvider"/>
+	<bean id="defaultSharedParametersProvider" class="de.hybris.platform.ruleengineservices.util.impl.DefaultSharedParametersProvider">
+	</bean>
+	
+	<alias alias="ruleAllowedToEditPredicate" name="defaultRuleAllowedToEditPredicate"/>
+	<bean id="defaultRuleAllowedToEditPredicate" class="de.hybris.platform.ruleengineservices.util.DefaultRuleAllowedToEditPredicate">
+		<property name="ruleDao" ref="ruleDao"/>
+	</bean>
+</beans>

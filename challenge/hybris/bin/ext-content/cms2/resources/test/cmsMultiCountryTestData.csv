@@ -1,0 +1,196 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=MultiCountryTestContentCatalog
+$contentCatalogRegion=$contentCatalog-region
+$contentCatalogLocal=$contentCatalog-local
+
+$contentCVOnline=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=OnlineVersion])[default=$contentCatalog:OnlineVersion]
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=StagedVersion])[default=$contentCatalog:StagedVersion]
+$contentCVRegion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalogRegion]),CatalogVersion.version[default=StagedVersion])[default=$contentCatalogRegion:StagedVersion]
+$contentCVLocal=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalogLocal]),CatalogVersion.version[default=StagedVersion])[default=$contentCatalogLocal:StagedVersion]
+
+INSERT_UPDATE UserGroup;uid[unique=true]
+;customergroup
+
+UPDATE Customer;uid[unique=true];groups(uid)
+;anonymous;customergroup
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=en];conversion
+;pieces;pieces;pieces;1
+
+INSERT_UPDATE ContentCatalog;id[unique=true];supercatalog(id)
+;$contentCatalog;
+;$contentCatalogRegion;$contentCatalog
+;$contentCatalogLocal;$contentCatalogRegion
+
+INSERT_UPDATE CatalogVersion;version[unique=true];catalog(id)[unique=true];active
+;OnlineVersion;$contentCatalog;true
+;OnlineVersion;$contentCatalogRegion;true
+;OnlineVersion;$contentCatalogLocal;true
+;StagedVersion;$contentCatalog;false
+;StagedVersion;$contentCatalogRegion;false
+;StagedVersion;$contentCatalogLocal;false
+;StagedLocal;$contentCatalog;false
+;Empty;$contentCatalog;false
+
+INSERT_UPDATE CmsPageType;code[unique=true];restrictionTypes(code)
+;CatalogPage;
+;CategoryPage;
+;ContentPage;
+;ProductPage;
+
+# Template
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;CategoryPageTemplate;Category Page Template;;CategoryPage
+;;ProductDetailsPageTemplate;Product Details Page Template;;ProductPage
+;;ProductListPageTemplate;Product List Page Template;;CategoryPage
+;;ProductGridPageTemplate;Product Grid Page Template;;CategoryPage
+;;SearchResultsListPageTemplate;Search Results List Page Template;;ContentPage
+;;SearchResultsGridPageTemplate;Search Results Grid Page Template;;ContentPage
+;;SearchResultsEmptyPageTemplate;Search Results Empty Page Template;;ContentPage
+;;HomePageTemplate;Home Page Template;;ContentPage
+
+# Category Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='CategoryPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;
+;HeaderLinks;;;
+;SearchBox;;;
+;MiniCart;;;
+;NavigationBar;;;
+;Section1;;;
+;Section2;;;
+;Section3;;;
+;Section4;;;
+;Footer;;;
+
+# Home (Content) Page Template
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='HomePageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;
+;HeaderLinks;;;
+;SearchBox;;;
+;MiniCart;;;
+;NavigationBar;;;
+;Section1;;;
+;Section2;;;
+;Footer;;;
+
+# Create ContentSlots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;SiteLogoSlot;Default Site Logo Slot;true
+;;HomepageNavLinkSlot;Default Homepage Link;true
+;;MiniCartSlot;Mini Cart;true
+;;NavigationBarSlot;Navigation Bar;true
+;;FooterSlot;Footer;true
+;;HeaderLinksSlot;Header links;true
+;;SearchBoxSlot;Search Box;true
+
+INSERT_UPDATE ContentSlot;$contentCVOnline[unique=true];uid[unique=true];name;active
+;;FooterSlot;Footer;true
+
+# Localized ContentSlots
+INSERT_UPDATE ContentSlot;$contentCVRegion[unique=true];uid[unique=true];name;active;originalSlot(uid,$contentCVOnline)[unique=true]
+;;FooterSlot-region;Footer-region;true;FooterSlot
+
+# Localized ContentSlots
+INSERT_UPDATE ContentSlot;$contentCVLocal[unique=true];uid[unique=true];name;active;originalSlot(uid,$contentCVOnline)[unique=true]
+;;FooterSlot-local;Footer-local;true;FooterSlot
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='CategoryPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-CategoryPage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-CategoryPage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;MiniCart-CategoryPage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-CategoryPage;NavigationBar;;NavigationBarSlot;true
+;;Footer-CategoryPage;Footer;;FooterSlot;true
+;;HeaderLinks-CategoryPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-CategoryPage;SearchBox;;SearchBoxSlot;true
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='HomePageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-HomePage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-HomePage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;MiniCart-HomePage;MiniCart;;MiniCartSlot;true
+;;NavigationBar-HomePage;NavigationBar;;NavigationBarSlot;true
+;;Footer-HomePage;Footer;;FooterSlot;true
+;;HeaderLinks-HomePage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-HomePage;SearchBox;;SearchBoxSlot;true
+
+# CategoryPage
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV);
+;;TestCategoryPage;Test Category Page;CategoryPageTemplate;false;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2Slot-TestPage;Section2 Slot for Test Page;true;;;;
+;;Section3Slot-TestPage;Section3 Slot for Test Page;true;;;;
+;;Section4Slot-TestPage;Section3 Slot for Test Page;true;;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='TestCategoryPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2-TestPage;Section2;;Section2Slot-TestPage;;;
+;;Section3-TestPage;Section3;;Section3Slot-TestPage;;;
+;;Section4-TestPage;Section2;;Section4Slot-TestPage;;;
+
+# CategoryPage
+INSERT_UPDATE CategoryPage;$contentCVLocal[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCVLocal);
+;;TestCategoryPageLocal;Local Test Category Page;CategoryPageTemplate;false;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCVLocal[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2Slot-TestPage;Section2 Slot for Test Page;true;;;;
+;;Section3Slot-TestPage;Section3 Slot for Test Page;true;;;;
+;;Section4Slot-TestPage;Section3 Slot for Test Page;true;;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCVLocal[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCVLocal)[unique=true][default='TestCategoryPageLocal'];contentSlot(uid,$contentCVLocal)[unique=true];;;
+;;Section2-TestPage;Section2;;Section2Slot-TestPage;;;
+;;Section3-TestPage;Section3;;Section3Slot-TestPage;;;
+
+# Pages
+INSERT_UPDATE ContentPage;$contentCVOnline[unique=true];uid[unique=true];label;name;masterTemplate(uid,$contentCV);defaultPage[default='false'];homepage[default='false'];approvalStatus(code)[default='approved'];previewImage(code, $contentCV);pageStatus(code)[default='active']
+;;TestHomePageGlobal;TestHomePageGlobal;Test Home Page Global;CategoryPageTemplate;true;true;;;;
+
+# Pages
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];label;name;masterTemplate(uid,$contentCV);defaultPage[default='false'];homepage[default='false'];approvalStatus(code)[default='approved'];previewImage(code, $contentCV);pageStatus(code)[default='active']
+;;TestHomePage;TestHomePage;Test Home Page;CategoryPageTemplate;;;;;;
+;;TestHomePageGlobal;TestHomePageGlobal;Test Home Page Global;CategoryPageTemplate;true;true;;;;
+;;TestHomePageSingle;TestHomePageSingle;Test Home Page Single;CategoryPageTemplate;;;;;;
+;;TestHomePageCampaign1;TestHomePage;Test Home Page;CategoryPageTemplate;;;;;;
+;;TestHomePageCampaign2;TestHomePage;Test Home Page;CategoryPageTemplate;;;;;;
+;;TestHomePageCampaign3;TestHomePage;Test Home Page;CategoryPageTemplate;;;;;;
+;;TestHomePageSingleCampaign1;TestHomePageSingle;Test Home Page Single;CategoryPageTemplate;;;;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section1Slot-TestHomePageGlobal;Section1 Slot for TestHomePageGlobal;true;;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='TestHomePageGlobal'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section1-TestHomePageGlobal;Section1;;Section1Slot-TestHomePageGlobal;;;
+
+# Localized Pages
+INSERT_UPDATE ContentPage;$contentCVLocal[unique=true];uid[unique=true];label;name;masterTemplate(uid,$contentCV);originalPage(uid,$contentCV)[default='TestHomePage'];defaultPage;homepage[default='false'];approvalStatus(code)[default='approved'];previewImage(code, $contentCVLocal);pageStatus(code)[default='active']
+;;TestHomePageLocalUK;TestHomePageLocalUK;Test Home Page Local UK;CategoryPageTemplate;;true;true;;;;
+;;TestHomePageLocalDE;TestHomePageLocalDE;Test Home Page Local DE;CategoryPageTemplate;;false;;;;;
+;;TestHomePageLocalUS;TestHomePageLocalUS;Test Home Page Local US;CategoryPageTemplate;;true;;;;;
+
+INSERT_UPDATE ContentPage;$contentCVRegion[unique=true];uid[unique=true];label;name;masterTemplate(uid,$contentCV);originalPage(uid,$contentCV)[default='TestHomePageGlobal'];defaultPage;homepage;approvalStatus(code)[default='approved'];previewImage(code, $contentCVLocal);pageStatus(code)[default='active']
+;;TestHomePageRegionEU;TestHomePageGlobal;Test Home Page Region EU;CategoryPageTemplate;;true;true;;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCVRegion[unique=true];uid[unique=true];name;active;originalSlot(uid,$contentCV)[unique=true];cmsComponents(&componentRef);;;
+;;Section1Slot-TestHomePageRegionEU;Section1 Slot for TestHomePageRegionEU;true;Section1Slot-TestHomePageGlobal;;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCVRegion[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCVRegion)[unique=true][default='TestHomePageRegionEU'];contentSlot(uid,$contentCVRegion)[unique=true];;;
+;;Section1-TestHomePageRegionEU;Section1;;Section1Slot-TestHomePageRegionEU;;;
+
+INSERT_UPDATE ContentPage;$contentCVLocal[unique=true];uid[unique=true];label;name;masterTemplate(uid,$contentCV);originalPage(uid,$contentCVRegion)[default='TestHomePageRegionEU'];defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCVLocal);pageStatus(code)[default='active']
+;;TestHomePageLocalIT;TestHomePageLocalIT;Test Home Page Local IT;CategoryPageTemplate;;true;;;;

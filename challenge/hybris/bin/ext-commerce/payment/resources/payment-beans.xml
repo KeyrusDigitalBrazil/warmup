@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+
+	<enum class="de.hybris.platform.payment.dto.AvsComponents">
+		<value>POSTAL_CODE_MATCHED</value>
+		<value>POSTAL_CODE_NOT_MATCHED</value>
+		<value>ADDRESS_MATCHED</value>
+		<value>ADDRESS_NOT_MATCHED</value>
+		<!-- CPF = Cadastro de Pessoas Fisicas -->
+		<value>CPF_MATCHED</value>
+		<!-- CPF = Cadastro de Pessoas Fisicas -->
+		<value>CPF_NOT_MATCHED</value>
+		<!-- 9-Digit postal code -->
+		<value>POSTAL_CODE_9_MATCHED</value>
+		<!-- 9-Digit postal code -->
+		<value>POSTAL_CODE_9_NOT_MATCHED</value>
+		<!-- 5-Digit postal code -->
+		<value>POSTAL_CODE_5_MATCHED</value>
+		<!-- 5-Digit postal code -->
+		<value>POSTAL_CODE_5_NOT_MATCHED</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.payment.dto.AvsStatus">
+		<description>Enum defining the avs status</description>
+		<!-- Partial match -->
+		<value>PARTIAL_MATCH</value>
+		<!-- Matched -->
+		<value>MATCHED</value>
+		<!-- Not matched -->
+		<value>NOT_MATCHED</value>
+		<!-- AVS is not supported for this processor or card type -->
+		<value>NOT_SUPPORTED</value>
+		<!-- The processor returned an unrecognized value for the AVS response -->
+		<value>INVALID</value>
+		<!-- No AVS result -->
+		<value>NO_RESULT</value>
+		<!-- Unrecognized AVS result -->
+		<value>UNRECOGNIZED_RESULT</value>
+		<!-- System unavailable -->
+		<value>SYSTEM_UNAVAILABLE</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.payment.dto.Cv2AvsPolicy">
+		<description>Cv2 Avs Policy</description>
+		<value>CV2</value>
+		<value>POSTAL_CODE</value>
+		<value>ADDRESS</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.payment.dto.CvnStatus">
+		<!-- No result code was returned by the processor -->
+		<value>NO_RESULT</value>
+		<!-- An unrecognized result code was returned by the processor -->
+		<value>UNRECOGNIZED_RESULT</value>
+		<!-- Card verification is not supported (by issuing bank or by card association or for this processor or for this card type) -->
+		<value>NOT_SUPPORTED</value>
+		<!-- The CVN is on the card but was not included in the request -->
+		<value>NOT_PROVIDED</value>
+		<!-- The CVN was not processed by the processor for an unspecified reason -->
+		<value>NOT_PROCESSED</value>
+		<!-- The CVN did not match -->
+		<value>NOT_MATCHED</value>
+		<!-- The CVN matched -->
+		<value>MATCHED</value>
+		<!-- The CVN failed the processor's data validation check -->
+		<value>NOT_VALIDATED</value>
+		<!-- The transaction was determined to be suspicious by the issuing bank -->
+		<value>REJECTED</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.payment.dto.TransactionStatus">
+		<!-- Transaction was accepted -->
+		<value>ACCEPTED</value>
+		<!-- An Error occured -->
+		<value>ERROR</value>
+		<!-- Transaction was rejected by PSP, payment processor or bank. However sometimes it might still be continued under some conditions. For example transaction might be authorized by the issuing bank even when AVS check fails. Settlement of such transaction might still be possible -->
+		<value>REJECTED</value>
+		<!-- Manual transaction review is needed. This requires calling either PSP or processor or bank and proceed with transaction manually -->
+		<value>REVIEW</value>
+	</enum>
+	
+	<enum class="de.hybris.platform.payment.dto.TransactionStatusDetails">
+		<!-- The requested transaction amount must match the previous transaction amount. Correct the amount and resend the request -->
+		<value>AMOUNTS_MUST_MATCH</value>
+		<!-- The authorization has already been reversed -->
+		<value>AUTHORIZATION_ALREADY_REVERSED</value>
+		<!-- The authorization has already been settled -->
+		<value>AUTHORIZATION_ALREADY_SETTLED</value>
+		<!-- The authorization request was approved by the issuing bank but declined by PSP because it did not pass AVS check OR CVN check. Authorization may be settled, but manual order review is recommended for the possibility of fraud -->
+		<value>AUTHORIZATION_REJECTED_BY_PSP</value>
+		<!-- The requested amount exceeds the originally authorized amount -->
+		<value>AUTHORIZED_AMOUNT_EXCEEDED</value>
+		<!-- General decline of the card by the issuing bank -->
+		<value>BANK_DECLINE</value>
+		<!-- Thrown if the card is declined due to a timeout period not passing since last usage -->
+		<value>CARD_USED_TOO_RECENTLY</value>
+		<!-- Issuing Bank or Processor communication problem. Retry the transaction in few minutes -->
+		<value>COMMUNICATION_PROBLEM</value>
+		<!-- A credit for a capture that was previously voided was requested -->
+		<value>CREDIT_FOR_VOIDED_CAPTURE</value>
+		<!-- The card has reached the credit limit. Request a different card or other form of payment -->
+		<value>CREDIT_LIMIT_REACHED</value>
+		<!-- Manual review needed -->
+		<value>CUSTOMER_BLACKLISTED</value>
+		<!-- Thrown when the PSP detects a duplicate transaction request -->
+		<value>DUPLICATE_TRANSACTION</value>
+		<!-- Manual verification of transaction status (at the PSP, processor or bank) is recommended -->
+		<value>GENERAL_SYSTEM_ERROR</value>
+		<!-- The card type sent is invalid or does not correlate with the credit card number. Correct the data and resend the request -->
+		<value>INACTIVE_OR_INVALID_CARD</value>
+		<!-- The card type sent is invalid or does not correlate with the credit card number. Correct the data and resend the request -->
+		<value>INCORRECT_CARD_NUMBER_OR_TYPE</value>
+		<!-- Insufficient funds in the account. Request a different card or other form of payment -->
+		<value>INSUFFICIENT_FUNDS</value>
+		<!-- Invalid account number. Request a different card or other form of payment -->
+		<value>INVALID_ACCOUNT_NUMBER</value>
+		<!-- Expired card or incorrect card expiration date. Correct the date or request a different card or other form of payment -->
+		<value>INVALID_CARD_EXPIRATION_DATE</value>
+		<!-- The card type is not accepted by the payment processor. Contact the acquiring bank to check if the card in question is supported -->
+		<value>INVALID_CARD_TYPE</value>
+		<!-- Invalid card verification number. Correct the data and try again or request a different card or other form of payment -->
+		<value>INVALID_CVN</value>
+		<!-- Request data is invalid or incomplete. Correct the data and try again -->
+		<value>INVALID_REQUEST</value>
+		<!-- Invalid request ID. Request a new authorization, and if successful, proceed with the capture -->
+		<value>INVALID_REQUEST_ID</value>
+		<!-- Authorization for settlement is required. Request a new authorization, and if successful, proceed with the settlement -->
+		<value>NO_AUTHORIZATION_FOR_SETTLEMENT</value>
+		<!-- The transaction is not voidable -->
+		<value>NOT_VOIDABLE</value>
+		<!-- General decline of the card by the processor. Request a different card or other form of payment -->
+		<value>PROCESSOR_DECLINE</value>
+		<!-- General PSP configuration problem. Contact PSP support to correct the problem -->
+		<value>PSP_CONFIGURATION_PROBLEM</value>
+		<!-- Transaction must be processed manually by directly calling PSP or processor or bank -->
+		<value>REVIEW_NEEDED</value>
+		<!-- Stolen or lost card. Refer the transaction for manual review -->
+		<value>STOLEN_OR_LOST_CARD</value>
+		<!-- Success -->
+		<value>SUCCESFULL</value>
+		<!-- the customer must authenticate the transaction using 3D Secure -->
+		<value>THREE_D_SECURE_AUTHENTICATION_REQUIRED</value>
+		<!-- 3D secure is not supported for the current card scheme/issuer -->
+		<value>THREE_D_SECURE_NOT_SUPPORTED</value>
+		<!-- To avoid duplicating the transaction it should not be resent. Manual verification of transaction status (at the PSP, processor or bank) is recommended -->
+		<value>TIMEOUT</value>
+		<!-- The transaction has already been settled or reversed -->
+		<value>TRANSACTION_ALREADY_SETTLED_OR_REVERSED</value>
+		<!-- The PSP result code has not been mapped -->
+		<value>UNKNOWN_CODE</value>
+		<!-- Invalid subscription ID. Request a new authorization, and if successful, proceed with the capture -->
+		<value>INVALID_SUBSCRIPTION_ID</value>
+	</enum>
+	
+	<bean class="de.hybris.platform.payment.dto.BillingInfo" template="resources/copyable-template.vm">
+		<description>Billing address info</description>
+		<property name="city" type="String"/>
+		<property name="country" type="String"/>
+		<property name="email" type="String"/>
+		<property name="firstName" type="String"/>
+		<property name="lastName" type="String"/>
+		<property name="phoneNumber" type="String"/>
+		<property name="postalCode" type="String"/>
+		<property name="state" type="String"/>
+		<property name="street1" type="String"/>
+		<property name="street2" type="String"/>
+		<property name="ipAddress" type="String"/>
+		<property name="region" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.payment.dto.BasicCardInfo" template="resources/copyable-template.vm">
+		<description>BasicCardInfo is a dto holding the basic information of a credit card</description>
+		<property name="cardNumber" type="String"/>
+		<property name="expirationMonth" type="Integer"/>
+		<property name="expirationYear" type="Integer"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.payment.dto.CardInfo" extends="de.hybris.platform.payment.dto.BasicCardInfo" template="resources/copyable-template.vm">
+		<description>Informations about payment card</description>
+		<property name="cardHolderFullName" type="String"/>
+		<property name="issueNumber" type="String"/>
+		<property name="issueMonth" type="Integer"/>
+		<property name="issueYear" type="Integer"/>
+		<property name="cardType" type="de.hybris.platform.core.enums.CreditCardType"/>
+		<property name="billingInfo" type="de.hybris.platform.payment.dto.BillingInfo"/>
+		<property name="cv2Number" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.payment.dto.CardType" template="resources/immutable-template.vm">
+		<description>Type of payment card</description>
+		<property name="id" type="String"/>
+		<property name="code" type="de.hybris.platform.core.enums.CreditCardType"/>
+		<property name="description" type="String"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.payment.dto.NewSubscription">
+		<description>Informations about payment card</description>
+		<property name="subscriptionID" type="String"/>
+		<property name="transactionEntry" type="de.hybris.platform.payment.model.PaymentTransactionEntryModel"/>
+	</bean>
+</beans>

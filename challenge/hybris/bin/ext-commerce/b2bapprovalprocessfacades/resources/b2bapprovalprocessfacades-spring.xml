@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultB2BApproverFacade" alias="b2bApproverFacade" />
+	<bean id="defaultB2BApproverFacade"
+		class="de.hybris.platform.b2bapprovalprocessfacades.company.impl.DefaultB2BApproverFacade">
+		<property name="b2bApproverService" ref="b2bApproverService" />
+		<property name="b2bUnitService" ref="b2bUnitService" />
+		<property name="b2bUnitConverter" ref="b2bUnitConverter" />
+		<property name="b2bUserConverter" ref="b2bUserConverter" />
+		<property name="b2BCommerceUserService" ref="b2bCommerceUserService"/>
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter"/>
+		<property name="b2BUserConverter" ref="b2bUserConverter"/>
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<alias name="defaultB2BApprovalProcessFacade" alias="b2bApprovalProcessFacade"/>
+	<bean id="defaultB2BApprovalProcessFacade"
+		class="de.hybris.platform.b2bapprovalprocessfacades.company.impl.DefaultB2BApprovalProcessFacade">
+		<property name="b2bApprovalProcessService" ref="b2bApprovalProcessService" />
+	</bean>
+
+	<alias name="defaultB2BPermissionConverter" alias="b2bPermissionConverter" />
+	<bean id="defaultB2BPermissionConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bPermissionData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bPermissionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BPermissionPopulator" alias="b2bPermissionPopulator" />
+	<bean id="defaultB2BPermissionPopulator"
+		class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BPermissionPopulator">
+		<property name="currencyConverter" ref="currencyConverter" />
+		<property name="b2BPermissionTypeConverter" ref="b2bPermissionTypeConverter" />
+	</bean>
+
+	<alias name="defaultB2BPermissionTypeConverter" alias="b2bPermissionTypeConverter" />
+	<bean id="defaultB2BPermissionTypeConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bPermissionTypeData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bPermissionTypePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BPermissionTypePopulator" alias="b2bPermissionTypePopulator" />
+	<bean id="defaultB2BPermissionTypePopulator"
+		class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BPermissionTypePopulator">
+		<property name="typeService" ref="typeService" />
+	</bean>
+
+	<alias name="defaultB2BUserGroupPermissionPopulator" alias="b2bUserGroupPermissionPopulator" />
+	<bean id="defaultB2BUserGroupPermissionPopulator"
+		class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BUserGroupPermissionPopulator">
+		<property name="b2BPermissionConverter" ref="b2bPermissionConverter" />
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="b2bUserGroupConverter"/>
+		<property name="add" ref="b2bUserGroupPermissionPopulator"/>
+	</bean>
+	
+	<alias name="defaultB2BPermissionReverseConverter" alias="b2bPermissionReverseConverter"/>
+	<bean id="defaultB2BPermissionReverseConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.b2b.model.B2BPermissionModel"/>
+		<property name="populators">
+			<list>
+				<ref bean="b2bPermissionReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultB2BPermissionReversePopulator" alias="b2bPermissionReversePopulator" />
+	<bean id="defaultB2BPermissionReversePopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BPermissionsReversePopulator" >
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<alias name="defaultB2BPermissionFacade" alias="b2bPermissionFacade" />
+	<bean id="defaultB2BPermissionFacade" class="de.hybris.platform.b2bapprovalprocessfacades.company.impl.DefaultB2BPermissionFacade">
+		<property name="b2BCommercePermissionService" ref="b2bCommercePermissionService" />
+		<property name="b2BCommerceB2BUserGroupService" ref="b2bCommerceB2BUserGroupService" />
+		<property name="enumerationService" ref="enumerationService" />
+		<property name="modelService" ref="modelService" />
+		<property name="userService" ref="userService" />
+		<property name="b2BPermissionConverter" ref="b2bPermissionConverter" />
+		<property name="b2BPermissionTypeConverter" ref="b2bPermissionTypeConverter" />
+		<property name="b2BPermissionReverseConverter" ref="b2bPermissionReverseConverter" />
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="b2bUnitConverter"/>
+		<property name="add" ref="b2bUnitApprovalPopulator"/>
+	</bean>
+	
+	<alias name="defaultB2BUnitApprovalPopulator" alias="b2bUnitApprovalPopulator" />
+	<bean id="defaultB2BUnitApprovalPopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BUnitApprovalPopulator" >
+		<property name="b2BApprovalProcessService" ref="b2bApprovalProcessService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter"/>
+	</bean>
+	
+	<alias name="defaultB2BUserGroupEditPermissionsPopulator" alias="b2BUserGroupEditPermissionsPopulator" />
+	<bean id="defaultB2BUserGroupEditPermissionsPopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BUserGroupEditPermissionsPopulator" >
+		<property name="b2bCommerceB2bUserGroupService" ref="b2bCommerceB2BUserGroupService"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="b2BCustomerConverter"/>
+		<property name="add" ref="b2BUserGroupEditPermissionsPopulator"/>
+	</bean>
+	
+	<alias name="defaultB2BCustomerPermissionPopulator" alias="b2bCustomerPermissionPopulator" />
+	<bean id="defaultB2BCustomerPermissionPopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BCustomerPermissionPopulator" >
+		<property name="b2BPermissionConverter" ref="b2bPermissionConverter"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter"/>
+		<property name="add" ref="b2bCustomerPermissionPopulator"/>
+	</bean>
+	
+	<alias name="defaultB2BCustomerApproverPopulator" alias="b2bCustomerApproverPopulator" />
+	<bean id="defaultB2BCustomerApproverPopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BCustomerApproverPopulator" >
+		<property name="b2BUserGroupsLookUpStrategy" ref="b2bUserGroupsLookUpStrategy"/>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter"/>
+		<property name="add" ref="b2bCustomerApproverPopulator"/>
+	</bean>
+	
+	<!--  Bean declaration for Data classes with scope Prototype - START-->
+	<bean id="b2bPermissionData" class="de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionData" scope="prototype" />
+	<bean id="b2bPermissionTypeData" class="de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionTypeData" scope="prototype" />
+	<!--  Bean declaration for Data classes with scope Prototype - END-->
+	
+	<alias name="defaultB2BUnitApprovalReversePopulator" alias="b2bUnitApprovalReversePopulator" />
+	<bean id="defaultB2BUnitApprovalReversePopulator" class="de.hybris.platform.b2bapprovalprocessfacades.company.converters.populators.B2BUnitApprovalReversePopulator"/>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="b2bUnitReverseConverter"/>
+		<property name="add" ref="b2bUnitApprovalReversePopulator"/>
+	</bean>
+	
+</beans>

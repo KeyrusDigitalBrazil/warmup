@@ -1,0 +1,47 @@
+INSERT_UPDATE IntegrationObject; code[unique = true];
+; RevenueCloudCustomer
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique=true]; code[unique = true]; type(code)
+; RevenueCloudCustomer    ; Customer               ; Customer
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; RevenueCloudCustomer:Customer                ; customerID                     			 ; Customer:customerID             		 ;;true
+; RevenueCloudCustomer:Customer                ; revenueCloudCustomerId                      ; Customer:revenueCloudCustomerId       ;
+; RevenueCloudCustomer:Customer     	       ; sapIsReplicated		            		 ; Customer:sapIsReplicated       		 ; 
+
+
+##Add Revenue Cloud ID in Outbound Customer##
+; OutboundB2CCustomer:SAPCpiOutboundCustomer ; revenueCloudCustomerId  ; SAPCpiOutboundCustomer:revenueCloudCustomerId  ;                                          ;
+
+
+##Add Revenue Cloud ID in B2B Unit##
+; InboundB2BUnit:B2BUnit           ; revenueCloudCompanyId                   ; B2BUnit:revenueCloudCompanyId                 ;                                  ;
+
+
+##############################################
+#Set up Cronjob and Trigger for Customer import
+##############################################
+
+INSERT_UPDATE CronJob;code[unique=true];active;job(code);sessionLanguage(isocode)[default=en]
+;sapRevenueCloudCustomerImportCronJob;true;defaultSapRevenueCloudCustomerImportJob;
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+;sapRevenueCloudCustomerImportCronJob;0;0;0;-1;-1;-1;false;true;-1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

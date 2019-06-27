@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+    <!-- CMS Items -->
+    <alias name="defaultCmsRenderingCmsItemToDataContentConverter" alias="cmsRenderingCmsItemToDataContentConverter" />
+    <bean id="defaultCmsRenderingCmsItemToDataContentConverter" class="de.hybris.platform.cmsfacades.rendering.attributeconverters.CMSItemToDataContentConverter">
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+    </bean>
+
+    <alias name="defaultCmsRenderingCmsItemContentConverter" alias="cmsRenderingCmsItemContentConverter" />
+    <bean name="defaultCmsRenderingCmsItemContentConverter" parent="cmsAbstractContentConverter"
+          p:modelToDataConverter-ref="cmsRenderingCmsItemToDataContentConverter"
+          p:constrainedBy-ref="cmsItemAttributePredicate">
+    </bean>
+
+    <!-- Products -->
+    <alias name="defaultCmsRenderingProductToDataContentConverter" alias="cmsRenderingProductToDataContentConverter" />
+    <bean id="defaultCmsRenderingProductToDataContentConverter"
+          class="de.hybris.platform.cmsfacades.rendering.attributeconverters.ProductToDataContentConverter" />
+
+    <alias name="defaultCmsRenderingProductContentConverter" alias="cmsRenderingProductContentConverter" />
+    <bean name="defaultCmsRenderingProductContentConverter" parent="cmsAbstractContentConverter"
+          p:modelToDataConverter-ref="cmsRenderingProductToDataContentConverter"
+          p:constrainedBy-ref="cmsProductTypeAttributePredicate">
+    </bean>
+
+    <!-- Categories -->
+    <alias name="defaultCmsRenderingCategoryToDataContentConverter" alias="cmsRenderingCategoryToDataContentConverter" />
+    <bean id="defaultCmsRenderingCategoryToDataContentConverter"
+          class="de.hybris.platform.cmsfacades.rendering.attributeconverters.CategoryToDataContentConverter" />
+
+    <alias name="defaultCmsRenderingCategoryContentConverter" alias="cmsRenderingCategoryContentConverter" />
+    <bean name="defaultCmsRenderingCategoryContentConverter" parent="cmsAbstractContentConverter"
+          p:modelToDataConverter-ref="cmsRenderingCategoryToDataContentConverter"
+          p:constrainedBy-ref="cmsCategoryTypeAttributePredicate">
+    </bean>
+
+    <!-- Media -->
+    <alias name="defaultRenderingMediaToDataContentConverter" alias="cmsRenderingMediaToDataContentConverter" />
+    <bean id="defaultRenderingMediaToDataContentConverter"
+          class="de.hybris.platform.cmsfacades.rendering.attributeconverters.MediaToDataContentConverter" >
+        <property name="mediaModelConverter" ref="mediaModelConverter" />
+    </bean>
+
+    <alias name="defaultCmsRenderingMediaContentConverter" alias="cmsRenderingMediaContentConverter" />
+    <bean name="defaultCmsRenderingMediaContentConverter" parent="cmsAbstractContentConverter"
+          p:modelToDataConverter-ref="cmsRenderingMediaToDataContentConverter"
+          p:constrainedBy-ref="cmsMediaTypeAttributePredicate">
+    </bean>
+
+    <!-- Navigation Nodes -->
+    <alias name="defaultCmsRenderingNavigationNodeToDataContentConverter" alias="cmsRenderingNavigationNodeToDataContentConverter" />
+    <bean id="defaultCmsRenderingNavigationNodeToDataContentConverter"
+          class="de.hybris.platform.cmsfacades.rendering.attributeconverters.NavigationNodeToDataContentConverter">
+        <property name="navigationNodeModelToDataRenderingConverter" ref="cmsNavigationNodeModelToDataRenderingConverter" />
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+    </bean>
+
+    <alias name="defaultCmsRenderingNavigationNodeContentConverter" alias="cmsRenderingNavigationNodeContentConverter" />
+    <bean name="defaultCmsRenderingNavigationNodeContentConverter" parent="cmsAbstractContentConverter"
+          p:modelToDataConverter-ref="cmsRenderingNavigationNodeToDataContentConverter"
+          p:constrainedBy-ref="cmsNavigationNodeTypeAttributePredicate">
+    </bean>
+
+</beans>

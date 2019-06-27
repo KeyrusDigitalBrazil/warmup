@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- Campaign Personalization -->
+	<bean id="initiativeUserSegmentsProvider" class="com.hybris.ymkt.personalization.segment.InitiativeUserSegmentsProvider">
+		<property name="initiativeService" ref="initiativeService" />
+		<property name="userService" ref="userService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userContextService" ref="userContextService" />
+		<property name="segmentPrefix" value="#{configurationService.configuration.getProperty('personalizationymkt.segment.campaign.prefix')}" />
+		<property name="campaignEnabled" value="#{configurationService.configuration.getProperty('personalizationymkt.segment.campaign.enabled')}" />
+	</bean>
+	
+	<!-- Target Group Personalization -->
+	<bean id="targetGroupSegmentsProvider" class="com.hybris.ymkt.personalization.segment.TargetGroupSegmentsProvider">
+		<property name="targetGroupService" ref="targetGroupService" />
+		<property name="userService" ref="userService" />
+		<property name="userContextService" ref="userContextService" />
+		<property name="segmentPrefix" value="#{configurationService.configuration.getProperty('personalizationymkt.segment.targetGroup.prefix')}" />
+		<property name="targetGroupEnabled" value="#{configurationService.configuration.getProperty('personalizationymkt.segment.targetGroup.enabled')}" />
+	</bean>
+	
+	<!--  Target Group Service -->
+	<bean id="targetGroupService" class="com.hybris.ymkt.personalization.services.TargetGroupService">
+		<property name="ODataService" ref="ODataService_API_MKT_TARGET_GROUP_SRV" />
+	</bean>
+
+	<!-- cx process parameter strategies -->
+	<bean id="mapperPiwikStrategy" class="com.hybris.ymkt.personalization.strategy.CxYmktSessionPiwikStrategy" parent="abstractCxProcessParameterStrategy">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+				
+</beans>

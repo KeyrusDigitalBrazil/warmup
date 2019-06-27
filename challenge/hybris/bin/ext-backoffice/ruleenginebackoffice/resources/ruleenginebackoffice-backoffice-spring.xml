@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:cng="http://www.hybris.com/cockpitng/spring"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans
+           	http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util
+           	http://www.springframework.org/schema/util/spring-util.xsd
+			http://www.hybris.com/cockpitng/spring http://www.hybris.com/cockpitng/spring/cng-spring.xsd">
+
+	<bean id="ruleenginebackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" init-method="init" lazy-init="false">
+  		<property name="location" value="/ruleenginebackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+
+	<alias name="defaultVersionedRuleEditorAreaLogicHandler" alias="versionedRuleEditorAreaLogicHandler"/>
+	<bean id="defaultVersionedRuleEditorAreaLogicHandler" class="de.hybris.platform.ruleenginebackoffice.widgets.editor.handlers.VersionedRuleEditorAreaLogicHandler" parent="defaultEditorAreaLogicHandler">
+		<property name="eventQueue" ref="cockpitEventQueue"/>
+		<property name="ruleService" ref="ruleService"/>
+	</bean>
+
+	<alias name="defaultSaveDisallowedEditorAreaLogicHandler" alias="saveDisallowedEditorAreaLogicHandler"/>
+	<bean id="defaultSaveDisallowedEditorAreaLogicHandler" class="de.hybris.platform.ruleenginebackoffice.widgets.editor.handlers.SaveDisallowedEditorAreaLogicHandler" parent="defaultEditorAreaLogicHandler"/>
+
+  	<alias name="defaultRuleEngineAdvancedSearchInitHandler" alias="ruleEngineAdvancedSearchInitHandler"/>
+    <bean id="defaultRuleEngineAdvancedSearchInitHandler" class="de.hybris.platform.ruleenginebackoffice.widgets.RuleEngineAdvancedSearchInitializer"/>
+    
+    <alias name="defaultDroolsRuleUnboundSectionRenderer" alias="droolsRuleUnboundSectionRenderer"/>
+    <bean id="defaultDroolsRuleUnboundSectionRenderer"
+          class="de.hybris.platform.ruleenginebackoffice.renderer.EngineRuleUnboundSectionRenderer" parent="unboundSectionRenderer">
+       <property name="ruleTypeAttributeMapping" ref="ruleTypeAttributeMapping"/>
+    </bean>
+
+    <alias name="defaultRuleCompileForModuleComposer" alias="ruleCompileForModuleComposer" />
+    <bean id="defaultRuleCompileForModuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleCompileForModuleComposer" scope="prototype"/>
+
+    <alias name="defaultRuleCompileAllForModuleComposer" alias="ruleCompileAllForModuleComposer" />
+    <bean id="defaultRuleCompileAllForModuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleCompileAllForModuleComposer" scope="prototype"/>
+
+	<alias name="defaultRuleCompileWarningComposer" alias="ruleCompileWarningComposer" />
+    <bean id="defaultRuleCompileWarningComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleCompileWarningComposer" scope="prototype"/>
+
+    <alias name="defaultCloneRuleComposer" alias="cloneRuleComposer" />
+    <bean id="defaultCloneRuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleCloneComposer" scope="prototype"/>
+
+	<alias name="defaultArchiveRuleComposer" alias="archiveRuleComposer" />
+	<bean id="defaultArchiveRuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleArchiveComposer" scope="prototype"/>
+
+	<alias name="defaultRuleUndeployFromModuleComposer" alias="ruleUndeployFromModuleComposer" />
+	<bean id="defaultRuleUndeployFromModuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleUndeployFromModuleComposer" scope="prototype"/>
+
+	<alias name="defaultRulesModuleSyncComposer" alias="rulesModuleSyncComposer" />
+	<bean id="defaultRulesModuleSyncComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RulesModuleSyncComposer" scope="prototype"/>
+
+	<alias name="defaultRuleUndeploySelectedFromModuleComposer" alias="ruleUndeploySelectedFromModuleComposer" />
+	<bean id="defaultRuleUndeploySelectedFromModuleComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleUndeploySelectedFromModuleComposer" scope="prototype"/>
+
+	<alias name="defaultRuleAvailabilityListCellRenderer" alias="ruleAvailabilityListCellRenderer"/>
+	<bean id="defaultRuleAvailabilityListCellRenderer" class="de.hybris.platform.ruleenginebackoffice.widgets.listview.renderer.RuleAvailabilityListCellRenderer" scope="prototype"/>
+
+	<alias name="defaultRulesModuleCatalogVersionCellRenderer" alias="rulesModuleCatalogVersionCellRenderer"/>
+	<bean id="defaultRulesModuleCatalogVersionCellRenderer" class="de.hybris.platform.ruleenginebackoffice.widgets.listview.renderer.RulesModuleCatalogVersionCellRenderer" scope="prototype">
+		<property name="catalogVersionFinderStrategy" ref="catalogVersionFinderStrategy"/>
+	</bean>
+
+	<alias name="defaultRulesModuleDeploymentStatusCellRenderer" alias="rulesModuleDeploymentStatusCellRenderer"/>
+	<bean id="defaultRulesModuleDeploymentStatusCellRenderer" class="de.hybris.platform.ruleenginebackoffice.widgets.listview.renderer.RulesModuleDeploymentStatusCellRenderer" scope="prototype">
+		<property name="ruleEngineRulesModuleMonitor" ref="ruleEngineRulesModuleMonitor"/>
+	</bean>
+
+	<alias name="defaultCreateRuleFromTemplateComposer" alias="createRuleFromTemplateComposer" />
+	<bean id="defaultCreateRuleFromTemplateComposer" class="de.hybris.platform.ruleenginebackoffice.actions.RuleCreateFromTemplateComposer" scope="prototype"/>
+
+	<alias name="defaultRuleCodeValidator" alias="ruleCodeValidator" />
+    <bean id="defaultRuleCodeValidator" class="de.hybris.platform.ruleenginebackoffice.actions.common.DefaultRuleCodeValidator" scope="prototype"/>
+
+	<alias name="defaultCockpitComponentUtils" alias="cockpitComponentUtils"/>
+	<bean id="defaultCockpitComponentUtils" class="de.hybris.platform.ruleenginebackoffice.util.impl.DefaultComponentUtils">
+		<property name="cockpitEventQueue" ref="cockpitEventQueue"/>
+	</bean>
+
+	<alias name="defaultRuleEngineListViewCollectionBrowserMoldStrategy" alias="ruleEngineListViewCollectionBrowserMoldStrategy"/>
+	<bean id="defaultRuleEngineListViewCollectionBrowserMoldStrategy"
+		  class="de.hybris.platform.ruleenginebackoffice.widgets.collectionbrowser.mold.impl.RuleEngineListViewCollectionBrowserMoldStrategy"
+		  scope="prototype" parent="abstractMoldStrategy">
+		<property name="order" value="0"/>
+		<property name="resolverFactory" ref="expressionResolverFactory"/>
+	</bean>
+	
+	<cng:map-extender bean="backofficeCronJobHistoryIncludes" xmlns:cng="http://www.hybris.com/cockpitng/spring">
+		<cng:put key-type="java.lang.String" value-type="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+			<entry key="ruleEngineProcesses">
+				<bean class="de.hybris.platform.servicelayer.cronjob.CronJobHistoryInclude">
+					<property name="jobTypeCode" value="RuleEngineJob"/>
+				</bean>
+			</entry>
+		</cng:put>
+	</cng:map-extender>
+
+	<cng:list-extender bean="processItemRenderingStrategyRegistry" getter="strategiesList" setter="strategies" >
+		<cng:add value-type="com.hybris.backoffice.widgets.processes.ProcessItemRenderingStrategy">
+			<ref bean="ruleEngineProcessItemRenderingStrategy"/>
+		</cng:add>
+	</cng:list-extender>
+
+	<bean id="ruleEngineProcessItemRenderingStrategy" class="de.hybris.platform.ruleenginebackoffice.renderer.RuleEngineProcessItemRenderingStrategy"
+		  parent="processItemRenderingStrategy"/>
+
+	<alias name="ruleEngineAdvancedSearchConfiguration" alias="advancedSearchConfiguration"/>
+	<bean id="ruleEngineAdvancedSearchConfiguration" class="de.hybris.platform.ruleenginebackoffice.search.AdvancedSearchConfiguration">
+		<property name="applicableTypeCodes">
+			<list>
+				<value>RuleStatus</value>
+			</list>
+		</property>
+		<property name="operatorReplacements">
+			<map>
+				<entry key="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).EQUALS}" value="#{T(com.hybris.cockpitng.search.data.ValueComparisonOperator).IN}"/>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="ruleEngineSearchConfigurationApplicableToAttributePredicate" alias="advancedSearchConfigurationApplicableToAttributePredicate"/>
+	<bean id="ruleEngineSearchConfigurationApplicableToAttributePredicate" class="de.hybris.platform.ruleenginebackoffice.search.SearchConfigurationApplicableToAttributePredicate">
+		<property name="configuration" ref="advancedSearchConfiguration"/>
+	</bean>
+
+	<alias name="ruleEngineAdvancedSearchOperatorService" alias="advancedSearchOperatorService"/>
+	<bean id="ruleEngineAdvancedSearchOperatorService" class="de.hybris.platform.ruleenginebackoffice.search.RuleEngineAdvancedSearchOperatorService" parent="defaultAdvancedSearchOperatorService">
+		<property name="configuration" ref="advancedSearchConfiguration"/>
+		<property name="isApplicableCondition" ref="advancedSearchConfigurationApplicableToAttributePredicate"/>
+	</bean>
+
+	<alias name="ruleEngineAdvancedSearchRenderer" alias="advancedSearchRenderer"/>
+	<bean id="ruleEngineAdvancedSearchRenderer" class="de.hybris.platform.ruleenginebackoffice.search.RuleEngineAdvancedSearchRenderer" parent="defaultAdvancedSearchRenderer">
+		<property name="isApplicableCondition" ref="advancedSearchConfigurationApplicableToAttributePredicate"/>
+	</bean>
+
+	<alias name="ruleEngineGenericQueryBuilder" alias="genericQueryBuilder"/>
+	<bean id="ruleEngineGenericQueryBuilder" class="de.hybris.platform.ruleenginebackoffice.search.builder.RuleEngineGenericConditionQueryBuilder" parent="defaultGenericQueryBuilder"/>
+
+</beans>

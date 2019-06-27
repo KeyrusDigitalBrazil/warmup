@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+			
+	<alias name="sapDefaultExternalConfigurationParser" alias="sapExternalConfigurationParser" />
+	<bean id="sapDefaultExternalConfigurationParser" class="de.hybris.platform.sap.productconfig.cpiorderexchange.ssc.service.impl.DefaultExternalConfigurationParser">
+		<property name="runtimeEnvironment" value="${sapproductconfigcpiorderexchangessc.runtimeEnvironment}" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultOrderEntryMapperSSC" alias="sapProductConfigOrderEntryMapperSSC"/>
+   <bean id="sapProductConfigDefaultOrderEntryMapperSSC" class="de.hybris.platform.sap.productconfig.cpiorderexchange.ssc.service.impl.SSCConfigurationOrderEntryMapper">
+       	<property name="externalConfigurationParser" ref="sapExternalConfigurationParser" />
+   </bean>
+   
+   <alias name="sapProductConfigDefaultExternalConfigMapperServiceSSC" alias="sapProductConfigExternalConfigMapperServiceSSC" />
+	<bean id="sapProductConfigDefaultExternalConfigMapperServiceSSC"
+		class="de.hybris.platform.sap.productconfig.cpiorderexchange.impl.ConfigurationOrderMapperImpl">
+		<property name="orderEntryMapper" ref="sapProductConfigOrderEntryMapperSSC" />
+	</bean>
+	
+   <bean id="sapProductConfigCpiOrderMapperSSC" depends-on="sapCpiOrderMappers" parent="listMergeDirective">
+        <property name="add" ref="sapProductConfigExternalConfigMapperServiceSSC" />
+   </bean>				
+</beans>

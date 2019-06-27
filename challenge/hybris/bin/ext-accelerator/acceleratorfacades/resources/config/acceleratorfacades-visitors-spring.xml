@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans.xsd 
+			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Synchronization Visitors -->
+	
+	<alias name="defaultAbstractMediaContainerComponentModelVisitor" alias="abstractMediaContainerComponentModelVisitor"/>
+	<bean name="defaultAbstractMediaContainerComponentModelVisitor" class="de.hybris.platform.acceleratorfacades.component.synchronization.itemvisitors.impl.DefaultAbstractMediaContainerComponentModelVisitor"/>
+	
+	<alias name="defaultNavigationBarCollectionComponentModelVisitor" alias="navigationBarCollectionComponentModelVisitor"/>
+	<bean name="defaultNavigationBarCollectionComponentModelVisitor" class="de.hybris.platform.acceleratorfacades.component.synchronization.itemvisitors.impl.NavigationBarCollectionComponentModelVisitor"/>
+	
+	<alias name="defaultNavigationBarComponentModelVisitor" alias="navigationBarComponentModelVisitor"/>
+	<bean name="defaultNavigationBarComponentModelVisitor" class="de.hybris.platform.acceleratorfacades.component.synchronization.itemvisitors.impl.NavigationBarComponentModelVisitor"/>
+	
+	<alias name="defaultNavigationComponentModelVisitor" alias="navigationComponentModelVisitor"/>
+	<bean name="defaultNavigationComponentModelVisitor" class="de.hybris.platform.acceleratorfacades.component.synchronization.itemvisitors.impl.NavigationComponentModelVisitor"/>
+	
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.acceleratorcms.model.components.AbstractMediaContainerComponentModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="abstractMediaContainerComponentModelVisitor"/>
+	</bean>
+	
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.acceleratorcms.model.components.NavigationBarCollectionComponentModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="navigationBarCollectionComponentModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.acceleratorcms.model.components.NavigationBarComponentModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="navigationBarComponentModelVisitor"/>
+	</bean>
+
+	<bean depends-on="cmsVisitors" parent="mapMergeDirective">
+		<property name="key">
+			<util:constant static-field="de.hybris.platform.acceleratorcms.model.components.NavigationComponentModel._TYPECODE"/>
+		</property>
+		<property name="value" ref="navigationComponentModelVisitor"/>
+	</bean>
+
+</beans>

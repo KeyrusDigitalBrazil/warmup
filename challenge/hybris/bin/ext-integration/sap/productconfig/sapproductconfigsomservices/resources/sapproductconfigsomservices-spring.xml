@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd           
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <bean id="cPQDefaultCartRestorationServiceHook"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.hook.CPQDefaultCartRestorationServiceHook">
+        <property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService"/>
+        <property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker"/>
+    </bean>
+
+    <bean id="cPQDefaultCartRestorationServiceHookMergeDirective" depends-on="cartRestorationServiceHooks"
+          parent="listMergeDirective">
+        <property name="add" ref="cPQDefaultCartRestorationServiceHook"/>
+    </bean>
+
+
+    <alias name="sapOrdermgmtDefaultAbstractOrderEntryConverter"
+           alias="sapOrdermgmtAbstractOrderEntryConverter"/>
+    <bean id="sapOrdermgmtDefaultAbstractOrderEntryConverter" parent="abstractPopulatingConverter">
+        <lookup-method name="createTarget" bean="orderEntryData"/>
+        <property name="populators">
+            <list>
+                <ref bean="sapOrdermgmtAbstractOrderEntryPopulator"/>
+                <ref bean="sapOrdermgmtAbstractOrderEntryCPQPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias alias="sapOrdermgmtAbstractOrderEntryCPQPopulator" name="sapOrdermgmtDefaultAbstractOrderEntryCPQPopulator"/>
+    <bean id="sapOrdermgmtDefaultAbstractOrderEntryCPQPopulator"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.converters.populators.DefaultAbstractOrderEntryConfigurablePopulator">
+        <property name="productConfigurationService" ref="sapProductConfigConfigurationService"/>
+        <property name="productConfigurationOrderIntegrationService" ref="sapProductConfigConfigurationOrderIntegrationService"/>
+        <property name="sessionAccessService" ref="sapProductConfigSessionAccessService"/>
+        <property name="orderEntryConfigurationInfoConverter"
+                  ref="sapOrdermgmtOrderEntryConfigurationInfoConverter"/>
+        <property name="variantConfigurationInfoProvider" ref="sapProductConfigVariantConfigurationInfoProvider" />
+                <property name="productService" ref="productService" />
+    </bean>
+
+    <alias name="sapOrdermgmtDefaultProductIdReplacementForConfigurationErrorMsgMappingCallback"
+           alias="sapOrdermgmtProductIdReplacementForConfigurationErrorMsgMappingCallback"/>
+    <bean id="sapOrdermgmtDefaultProductIdReplacementForConfigurationErrorMsgMappingCallback" scope="prototype"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.messagemappingcallback.DefaultProductIdReplacementCPQErrorMsgMappingCallback">
+        <property name="productService" ref="productService"/>
+    </bean>
+
+    <alias name="sapOrdermgmtDefaultProductConfigurationService" alias="sapOrdermgmtProductConfigurationService"/>
+    <bean id="sapOrdermgmtDefaultProductConfigurationService"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.prodconf.impl.DefaultProductConfigurationService">
+        <property name="sessionAccessService" ref="sapProductConfigSessionAccessService"/>
+        <property name="productConfigurationService" ref="sapProductConfigConfigurationService"/>
+    </bean>
+
+    <alias alias="sapOrdermgmtOrderEntryConfigurationInfoPopulator"
+           name="sapOrdermgmtDefaultOrderEntryConfigurationInfoPopulator"/>
+    <bean id="sapOrdermgmtDefaultOrderEntryConfigurationInfoPopulator"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.converters.populators.DefaultAbstractOrderEntryConfigurationInfoPopulator">
+        <property name="maxNumberOfDisplayedCsticsInCart" value="${sapordermgmtservices.maxNumberOfDisplayedCsticsInCart}"/>
+        <property name="configurationInfoNameProvider" ref="sapOrdermgmtConfigurationInfoNameProvider"/>
+    </bean>
+
+    <util:list id="configurationInfoDataList" scope="prototype"
+               value-type="de.hybris.platform.commercefacades.order.data.ConfigurationInfoData"/>
+
+    <alias name="sapOrdermgmtDefaultOrderEntryConfigurationInfoConverter"
+           alias="sapOrdermgmtOrderEntryConfigurationInfoConverter"/>
+    <bean id="sapOrdermgmtDefaultOrderEntryConfigurationInfoConverter" parent="abstractPopulatingConverter">
+        <lookup-method name="createTarget" bean="configurationInfoDataList"/>
+        <property name="populators">
+            <list>
+                <ref bean="sapOrdermgmtOrderEntryConfigurationInfoPopulator"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias alias="sapOrdermgmtBolCartFacade" name="sapCPQOrdermgmtDefaultBolCartFacade"/>
+    <bean id="sapCPQOrdermgmtDefaultBolCartFacade"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.bolfacade.impl.CPQDefaultBolCartFacade"
+          parent="sapOrdermgmtDefaultBolCartFacade">
+    </bean>
+
+    <alias name="sapCPQOrdermgmtDefaultCartService" alias="sapOrdermgmtCartService"/>
+    <bean id="sapCPQOrdermgmtDefaultCartService"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.cart.impl.CPQDefaultCartService"
+          parent="sapOrdermgmtDefaultCartService">
+    </bean>
+
+    <alias alias="sapOrdermgmtConfigurationInfoNameProvider" name="sapOrdermgmtDefaultConfigurationInfoNameProvider"/>
+    <bean id="sapOrdermgmtDefaultConfigurationInfoNameProvider"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.converters.populators.DefaultConfigurationInfoNameProvider">
+    </bean>
+
+    <alias alias="sapProductConfigCartConfigurationRestrictionEvaluator"
+           name="sapOrdermgmtDefaultCartConfigurationRestrictionEvaluator"/>
+    <bean id="sapOrdermgmtDefaultCartConfigurationRestrictionEvaluator"
+          class="de.hybris.platform.sap.sapproductconfigsomservices.evaluator.SOMCartConfigurationRestrictionEvaluator"
+          scope="tenant">
+        <property name="baseStoreService" ref="baseStoreService"/>
+    </bean>
+
+    <alias name="cPQItemFactory" alias="itemFactory"/>
+    <bean id="cPQItemFactory" class="de.hybris.platform.sap.sapproductconfigsomservices.factory.impl.CPQItemFactory"></bean>
+</beans>

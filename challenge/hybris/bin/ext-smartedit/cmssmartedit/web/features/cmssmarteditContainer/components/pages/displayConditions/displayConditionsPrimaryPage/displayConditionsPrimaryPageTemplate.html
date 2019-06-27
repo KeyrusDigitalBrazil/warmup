@@ -1,0 +1,27 @@
+<div class="form-group form-group__inline">
+    <label class="control-label control-label__margin">{{ $ctrl.associatedPrimaryPageLabelI18nKey | translate }}</label>
+    <div data-ng-if="$ctrl.readOnly"
+        class="dc-associated-primary-page form-readonly-text form-readonly-text__tight">{{ ::$ctrl.associatedPrimaryPage.name }}
+    </div>
+    <div data-ng-if="!$ctrl.readOnly">
+        <ui-select id="display-conditions-primary-association-selector"
+            data-ng-model="$ctrl.associatedPrimaryPage"
+            class="form-control"
+            search-enabled="true"
+            theme="select2"
+            data-dropdown-auto-width="false"
+            data-ng-change="$ctrl.triggerOnPrimaryPageSelect()">
+            <ui-select-match id="select-type"
+                class="ySEPageRestr-picker--select__match">
+                {{ $ctrl.associatedPrimaryPage.name }}
+            </ui-select-match>
+            <ui-select-choices repeat="primaryPage in $ctrl.allPrimaryPages | filter:$select.search">
+                {{ primaryPage.name }}
+            </ui-select-choices>
+        </ui-select>
+        <span data-ng-show="$ctrl.associatedPrimaryPage.name"
+            class="help-inline">
+            <span class="help-block-inline">{{ 'se.cms.page.label.label' | translate }}: {{ $ctrl.associatedPrimaryPage.label }}</span>
+        </span>
+    </div>
+</div>

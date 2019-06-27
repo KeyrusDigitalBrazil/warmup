@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+   
+    <bean class="de.hybris.platform.b2bacceleratorfacades.search.data.ProductSearchStateData" extends="de.hybris.platform.commercefacades.search.data.SearchStateData">
+        <property name="populateVariants" type="Boolean"/>
+    </bean>
+    
+	<bean class="de.hybris.platform.b2bacceleratorfacades.search.data.BudgetSearchStateData" extends="de.hybris.platform.b2bcommercefacades.search.data.BudgetSearchStateData" deprecated="true"/>
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.checkout.data.PlaceOrderData">
+		<property name="securityCode" type="String" />
+		<property name="termsCheck" type="Boolean" />
+		<property name="negotiateQuote" type="Boolean" deprecated="Since 6.3. Please see quote functionality from commerce." />
+		<property name="quoteRequestDescription" type="String" deprecated="Since 6.3. Please see quote functionality from commerce." />
+		<property name="replenishmentOrder" type="Boolean" />
+		<property name="replenishmentStartDate" type="java.util.Date" />
+		<property name="replenishmentRecurrence" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BReplenishmentRecurrenceEnum" />
+		<property name="nDaysOfWeek" type="java.util.List&lt;de.hybris.platform.cronjob.enums.DayOfWeek>"/>
+		<property name="nDays" type="String" />	
+		<property name="nWeeks" type="String" />	
+		<property name="nthDayOfMonth" type="String" />	
+	</bean>
+
+    <bean class="de.hybris.platform.commercefacades.order.data.CartModificationListData">
+        <property name="cartModifications" type="java.util.List&lt;CartModificationData>"/>
+    </bean>
+
+
+    <bean class="de.hybris.platform.b2bacceleratorfacades.product.data.CartEntryData">
+        <!--<description>POJO representation of product quantity for the order forms (SKU-QTY).</description>-->
+        <property name="entryNumber" type="Long"/>
+        <property name="sku" type="String"/>
+        <property name="quantity" type="Long"/>
+    </bean>
+
+    <bean class="de.hybris.platform.b2bacceleratorfacades.product.data.ProductQuantityData">
+		<!--<description>POJO representation of product quantity for the order forms (SKU-QTY).</description>-->
+		<property name="sku" type="String"/>
+		<property name="quantity" type="Integer"/>
+	</bean>
+
+   <bean class="de.hybris.platform.commercefacades.order.data.CartData" extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="costCenter" type="de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData"/>
+		<property name="paymentType" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData"/>
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="b2BComment" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData"/>
+		<property name="b2bCustomerData" type="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<property name="quoteAllowed" type="java.lang.Boolean" deprecated="Since 6.3."/>
+	</bean>
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData" deprecated="Since 6.3. Use {@link de.hybris.platform.commercefacades.comment.data.CommentData} instead.">
+		<property name="comment" type="String"/>
+		<property name="code" type="String"/>
+		<property name="timeStamp" type="java.util.Date"/>
+		<property name="ownerData" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BDaysOfWeekData">
+		<property name="name" type="String"/>
+		<property name="code" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderApprovalData">
+		<property name="workflowActionModelCode" type="String"/>
+		<property name="b2bOrderData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="permissionTypes" type="java.util.List&lt;String>"/>
+		<property name="allDecisions" type="java.util.List&lt;String>"/>
+		<property name="selectedDecision" type="String"/>
+		<property name="approvalComments" type="String"/>
+		<property name="approvalDecisionRequired" type="boolean"/>
+		<property name="orderHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>"/>
+		<property name="quotesApprovalHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>" deprecated="Since 6.3. Please see quote functionality from commerce."/>
+		<property name="merchantApprovalHistoryEntriesData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData>"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderData" extends="de.hybris.platform.commercefacades.order.data.AbstractOrderData">
+		<property name="costCenter" type="de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData"/>
+		<property name="paymentType" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData"/>
+		<property name="b2BComment" type="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData"/>
+		<property name="b2bCustomerData" type="de.hybris.platform.commercefacades.user.data.CustomerData"/>
+		<!--TODO: rename to b2bCommentData -->
+		<property name="b2bCommentData" type="java.util.List&lt;de.hybris.platform.b2bacceleratorfacades.order.data.B2BCommentData>"/>
+		<property name="quoteExpirationDate" type="java.util.Date" deprecated="Since 6.3. Use {@link de.hybris.platform.commercefacades.order.data.AbstractOrderData#expirationTime} instead."/>
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="triggerData" type="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData"/>
+		<property name="b2bPermissionResult" type="java.util.List&lt;de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionResultData>"/>
+		<property name="jobCode" type="String"/>
+	</bean>
+	<bean class="de.hybris.platform.commercefacades.order.data.OrderHistoryData">
+		<property name="purchaseOrderNumber" type="String"/>
+		<property name="b2bPermissionResults" type="java.util.List&lt;de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionResultData>"/>
+		<property name="managers" type="java.util.List&lt;de.hybris.platform.commercefacades.user.data.PrincipalData>"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BOrderHistoryEntryData">
+		<property name="b2bOrderData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="description" type="String"/>
+		<property name="timeStamp" type="java.util.Date"/>
+		<property name="previousOrderVersionData" type="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="ownerData" type="de.hybris.platform.commercefacades.user.data.PrincipalData"/>
+	</bean>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPaymentTypeData">
+		<property name="code" type="String"/>
+		<property name="displayName" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.ScheduledCartData" extends="de.hybris.platform.commercefacades.order.data.CartData">
+		<property name="active" type="boolean"/>
+		<property name="triggerData" type="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData"/>
+		<property name="firstOrderDate" type="java.util.Date"/>
+		<property name="jobCode" type="String"/>
+	</bean>
+	<enum class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BReplenishmentRecurrenceEnum">
+		<value>DAILY</value>
+		<value>WEEKLY</value>
+		<value>MONTHLY</value>
+	</enum>
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.TriggerData">
+		<property name="weekInterval" type="Integer"/>
+		<property name="day" type="Integer"/>
+		<property name="daysOfWeek" type="java.util.List&lt;de.hybris.platform.cronjob.enums.DayOfWeek>"/>
+		<property name="relative" type="java.lang.Boolean"/>
+		<property name="activationTime" type="java.util.Date"/>
+		<property name="month" type="Integer"/>
+		<property name="displayTimeTable" type="String"/>
+		<property name="creationTime" type="java.util.Date"/>
+		<property name="hour" type="Integer"/>
+		<property name="minute" type="Integer"/>
+	</bean>
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BUnitNodeData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.company.data.B2BUnitNodeData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitNodeData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BUnitNodeData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.commercefacades.user.data.CustomerData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.company.data.UserData" extends="de.hybris.platform.b2bcommercefacades.company.data.UserData" deprecated="Since 6.0. Use {@link de.hybris.platform.commercefacades.user.data.CustomerData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData-->	
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BBudgetData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData -->	
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BCostCenterData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionData -->	
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionData" extends="de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionResultData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionResultData" extends="de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionResultData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionResultData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionTypeData -->		
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BPermissionTypeData" extends="de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionTypeData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bapprovalprocessfacades.company.data.B2BPermissionTypeData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BSelectionData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BSelectionData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BSelectionData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BSelectionData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUnitData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData} instead." />
+	
+	<!--Deprecated. Please use de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData -->
+	<bean class="de.hybris.platform.b2bacceleratorfacades.order.data.B2BUserGroupData" extends="de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData" deprecated="Since 6.0. Use {@link de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData} instead." />
+	
+</beans>

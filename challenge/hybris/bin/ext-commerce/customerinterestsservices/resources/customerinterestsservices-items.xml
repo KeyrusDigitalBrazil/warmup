@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<relations>
+		<relation autocreate="true" localized="false" code="Customer2ProductInterest">
+			<sourceElement qualifier="customer" type="Customer" cardinality="one"></sourceElement>
+			<targetElement qualifier="productInterests" type="ProductInterest" cardinality="many"></targetElement>
+		</relation>
+		<relation autocreate="true" localized="false" code="Product2ProductInterest">
+			<sourceElement qualifier="product" type="Product" cardinality="one"></sourceElement>
+			<targetElement qualifier="productInterests" type="ProductInterest" cardinality="many"></targetElement>
+		</relation>		
+	</relations>
+
+	<itemtypes>
+		<itemtype code="ProductInterest" autocreate="true" generate="true">
+			<deployment table="ProductInterests" typecode="9865" />
+			<attributes>
+
+				<attribute qualifier="expiryDate" type="java.util.Date">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="baseStore" type="BaseStore">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+
+				<attribute qualifier="notificationType" type="NotificationType">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="emailEnabled" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+					<model>
+						<getter name="emailEnabled" default="true" deprecated="true" deprecatedSince="6.7"/>
+						<setter name="emailEnabled" default="true" deprecated="true" deprecatedSince="6.7"/>
+					</model>
+				</attribute>
+
+				<attribute qualifier="smsEnabled" type="java.lang.Boolean">
+					<modifiers read="true" write="true" optional="true" />
+					<persistence type="property" />
+					<model>
+						<getter name="smsEnabled" default="true" deprecated="true" deprecatedSince="6.7"/>
+						<setter name="smsEnabled" default="true" deprecated="true" deprecatedSince="6.7"/>
+					</model>
+				</attribute>
+				<attribute qualifier="notificationChannels" type="NotificationChannels">                       
+                    <modifiers optional="false" />
+                    <persistence type="property"/>
+                </attribute>
+				<attribute qualifier="baseSite" type="BaseSite">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+					<description>Attribute contains base site object that will be used in the process.</description>
+				</attribute>
+				
+				<attribute qualifier="language" type="Language">
+					<modifiers read="true" write="true" optional="false" />
+					<persistence type="property" />
+				</attribute>				
+
+			</attributes>
+			<indexes>
+				<index name="IdxProductInterestForNotification">
+					<key attribute="notificationType" />
+					<key attribute="customer" />
+					<key attribute="baseStore" />
+					<key attribute="baseSite" />
+					<key attribute="product" />
+				</index>
+			</indexes>
+
+		</itemtype>
+
+		<itemtype code="ProductInterestsProcess" autocreate="true" generate="true" extends="BusinessProcess">
+			<description>Represents The Customer Interests Process</description>
+			<attributes>
+				<attribute qualifier="language" type="Language">
+					<persistence type="property" />
+					<description>Attribute contains language that will be used in the process.</description>
+				</attribute>
+
+				<attribute qualifier="productInterest" type="ProductInterest">
+					<persistence type="property" />
+					<description>Attribute contains the product back in stock interests</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

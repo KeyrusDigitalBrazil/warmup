@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultB2BCostCenterFacade" alias="costCenterFacade" />
+	<bean id="defaultB2BCostCenterFacade"
+		class="de.hybris.platform.b2bcommercefacades.company.impl.DefaultB2BCostCenterFacade">
+		<property name="b2bCostCenterService" ref="b2bCostCenterService"/>
+		<property name="b2bCommerceCostCenterService" ref="b2bCommerceCostCenterService"/>
+		<property name="b2bCostCenterConverter" ref="b2bCostCenterConverter"/>
+		<property name="b2bCostCenterReverseConverter" ref="b2bCostCenterReverseConverter"/>
+		<property name="b2bBudgetService" ref="b2BBudgetService"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultB2BBudgetFacade" alias="budgetFacade" />
+	<bean id="defaultB2BBudgetFacade"
+		class="de.hybris.platform.b2bcommercefacades.company.impl.DefaultB2BBudgetFacade">
+		<property name="b2BBudgetConverter" ref="b2bBudgetConverter"/>
+		<property name="b2BBudgetService" ref="b2BBudgetService"/>
+		<property name="b2BCostCenterConverter" ref="b2bCostCenterConverter"/>
+		<property name="b2BBudgetReversePopulator" ref="b2bBudgetReversePopulator"/>
+		<property name="costCenterFacade" ref="costCenterFacade"/>
+		<property name="modelService" ref="modelService"/>
+	</bean>
+	
+	<alias name="defaultB2BUserFacade" alias="b2bUserFacade" />
+	<bean id="defaultB2BUserFacade" class="de.hybris.platform.b2bcommercefacades.company.impl.DefaultB2BUserFacade">
+		<property name="b2BCommerceUserService" ref="b2bCommerceUserService"/>
+		<property name="b2BCommerceB2BUserGroupService" ref="b2bCommerceB2BUserGroupService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter"/>
+		<property name="b2BCustomerReverseConverter" ref="b2BCustomerReverseConverter"/>
+		<property name="b2BUnitConverter" ref="b2bUnitConverter"/>
+		<property name="b2BUserGroupConverter" ref="b2bUserGroupConverter"/>
+	</bean>
+
+	<alias name="defaultB2BUserGroupFacade" alias="b2bUserGroupFacade" />
+	<bean id="defaultB2BUserGroupFacade" class="de.hybris.platform.b2bcommercefacades.company.impl.DefaultB2BUserGroupFacade">
+		<property name="b2BCommerceB2BUserGroupService" ref="b2bCommerceB2BUserGroupService" />
+		<property name="b2BCommerceUnitService" ref="b2bCommerceUnitService" />
+		<property name="b2BCommerceUserService" ref="b2bCommerceUserService" />
+		<property name="userService" ref="userService" />
+		<property name="modelService" ref="modelService" />
+		<property name="b2BUserConverter" ref="b2bUserConverter" />
+		<property name="b2BUserGroupConverter" ref="b2bUserGroupConverter" />
+		<property name="b2BUserGroupsLookUpStrategy" ref="b2bUserGroupsLookUpStrategy" />
+	</bean>
+	
+	<alias name="defaultB2BUnitFacade" alias="b2bUnitFacade" />
+	<bean id="defaultB2BUnitFacade" class="de.hybris.platform.b2bcommercefacades.company.impl.DefaultB2BUnitFacade">
+		<property name="b2BUnitService" ref="b2bUnitService" />
+		<property name="b2BCommerceUnitService" ref="b2bCommerceUnitService" />
+		<property name="b2BUnitConverter" ref="b2bUnitConverter" />
+		<property name="unitTreeConverter" ref="b2bUnitNodeConverter" />
+		<property name="b2BUserConverter" ref="b2bUserConverter" />
+		<property name="addressReverseConverter" ref="addressReverseConverter" />
+		<property name="b2BUnitReverseConverter" ref="b2bUnitReverseConverter" />
+		<property name="modelService" ref="modelService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="userService" ref="userService" />
+		<property name="orgUnitHierarchyService" ref="orgUnitHierarchyService"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+	
+	<alias name="defaultB2BCostCenterConverter" alias="b2bCostCenterConverter"/>
+	<bean id="defaultB2BCostCenterConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="b2bCostCenterData"/>
+		<property name="populators">
+			<list>
+			    <ref bean="b2bCostCenterPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultB2BCostCenterPopulator" alias="b2bCostCenterPopulator"/>
+	<bean id="defaultB2BCostCenterPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BCostCenterPopulator" >
+		<property name="b2bBudgetConverter" ref="b2bBudgetConverter"/>
+		<property name="currencyConverter" ref="currencyConverter"/>
+		<property name="addressConverter" ref="addressConverter"/>
+	</bean>
+	
+	<alias name="defaultB2BCostCenterReverseConverter" alias="b2bCostCenterReverseConverter"/>
+	<bean id="defaultB2BCostCenterReverseConverter" parent="abstractPopulatingConverter" >
+		<property name="targetClass" value="de.hybris.platform.b2b.model.B2BCostCenterModel"/>
+		<property name="populators">
+			<list>
+			    <ref bean="b2bCostCenterReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultB2BCostCenterReversePopulator" alias="b2bCostCenterReversePopulator" />
+	<bean id="defaultB2BCostCenterReversePopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BCostCenterReversePopulator" >
+	    <property name="b2bUnitService" ref="b2bUnitService"/>
+	    <property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<alias name="defaultB2BBudgetConverter" alias="b2bBudgetConverter"/>
+	<bean id="defaultB2BBudgetConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="b2bBudgetData"/>
+		<property name="populators">
+			<list>
+				<ref bean="b2bBudgetPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BBudgetPopulator" alias="b2bBudgetPopulator" />
+	<bean id="defaultB2BBudgetPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BBudgetPopulator" >
+		<property name="currencyConverter" ref="currencyConverter"/>
+	</bean>
+	
+	<alias name="defaultB2BBudgetReversePopulator" alias="b2bBudgetReversePopulator" />
+	<bean id="defaultB2BBudgetReversePopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BBudgetReversePopulator" >
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+	
+	<alias name="defaultB2BCustomerConverter" alias="b2BCustomerConverter" />												   
+	<bean id="defaultB2BCustomerConverter" parent="defaultCustomerConverter">
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="customerConverter"/>
+		<property name="add" ref="b2bCustomerPopulator"/>
+	</bean>
+
+	<bean id="b2bCustomerPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BCustomerPopulator" >
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+		<property name="currencyConverter" ref="currencyConverter"/>
+		<property name="b2BUserGroupsLookUpStrategy" ref="b2bUserGroupsLookUpStrategy"/>
+	</bean>
+	
+	<alias name="defaultB2BCustomerReverseConverter" alias="b2BCustomerReverseConverter"/>
+	<bean id="defaultB2BCustomerReverseConverter" parent="abstractPopulatingConverter" >
+		<property name="targetClass" value="de.hybris.platform.b2b.model.B2BCustomerModel"/>
+		<property name="populators">
+			<list>
+			    <ref bean="b2BCustomerReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultB2BCustomerReversePopulator" alias="b2BCustomerReversePopulator"/>
+	<bean id="defaultB2BCustomerReversePopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BCustomerReversePopulator" >
+		<property name="customerNameStrategy" ref="customerNameStrategy"/>
+		<property name="b2BCommerceB2BUserGroupService" ref="b2bCommerceB2BUserGroupService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2BUserGroupsLookUpStrategy" ref="b2bUserGroupsLookUpStrategy"/>
+		<property name="b2BUnitService" ref="b2bUnitService"/>	
+	</bean>
+	
+	<alias name="defaultB2BUnitConverter" alias="b2bUnitConverter"/>
+	<bean id="defaultB2BUnitConverter" parent="abstractPopulatingConverter" >
+		<lookup-method name="createTarget" bean="b2bUnitData"/>
+		<property name="populators">
+			<list>
+				<ref bean="b2bUnitPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BUnitPopulator" alias="b2bUnitPopulator" />
+	<bean id="defaultB2BUnitPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BUnitPopulator" >
+		<property name="b2BUnitService" ref="b2bUnitService"/>
+		<property name="userService" ref="userService"/>
+		<property name="b2BBudgetConverter" ref="b2bBudgetConverter"/>
+		<property name="b2BCostCenterConverter" ref="b2bCostCenterConverter"/>
+		<property name="principalConverter" ref="principalConverter"/>
+		<property name="addressConverter" ref="addressConverter"/>
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter"/>
+	</bean>
+	
+	<alias name="defaultB2BUnitReverseConverter" alias="b2bUnitReverseConverter"/>
+	<bean id="defaultB2BUnitReverseConverter" parent="abstractPopulatingConverter" >
+		<property name="targetClass" value="de.hybris.platform.b2b.model.B2BUnitModel"/>
+		<property name="populators">
+			<list>
+			    <ref bean="b2bUnitReversePopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BUnitReversePopulator" alias="b2bUnitReversePopulator" />
+	<bean id="defaultB2BUnitReversePopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BUnitReversePopulator" >
+		<property name="b2bUnitService" ref="b2bUnitService"/>
+		<property name="b2bCommerceUnitService" ref="b2bCommerceUnitService"/>
+	</bean>
+	
+	<alias name="defaultB2BUnitNodeConverter" alias="b2bUnitNodeConverter" />
+	<bean id="defaultB2BUnitNodeConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bUnitNodeData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bUnitNodePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BUnitNodePopulator" alias="b2bUnitNodePopulator" />
+	<bean id="defaultB2BUnitNodePopulator"
+		class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BUnitNodePopulator">
+		<property name="b2BUnitService" ref="b2bUnitService" />
+		<lookup-method name="lookupChildNodeConverter" bean="b2bUnitNodeConverter" />
+	</bean>
+	
+	<alias name="defaultB2BUserGroupConverter" alias="b2bUserGroupConverter" />
+	<bean id="defaultB2BUserGroupConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="b2bUserGroupData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bUserGroupPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BUserGroupPopulator" alias="b2bUserGroupPopulator" />
+	<bean id="defaultB2BUserGroupPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BUserGroupPopulator">
+		<property name="b2BCustomerConverter" ref="b2BCustomerConverter" />
+	</bean>
+	
+	<alias name="defaultB2BUserConverter" alias="b2bUserConverter" />
+	<bean id="defaultB2BUserConverter" parent="abstractPopulatingConverter">
+		<lookup-method name="createTarget" bean="customerData"/>
+		<property name="populators">
+			<list>
+				<ref bean="b2bUserPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BUserPopulator" alias="b2bUserPopulator" />
+	<bean id="defaultB2BUserPopulator" class="de.hybris.platform.b2bcommercefacades.company.converters.populators.B2BUserPopulator">
+		<property name="b2BUnitService" ref="b2bUnitService" />
+		<property name="userService" ref="userService" />
+		<property name="messageSource" ref="messageSource" />
+		<property name="i18nService" ref="i18NService" />
+		<property name="b2BUserGroupsLookUpStrategy" ref="b2bUserGroupsLookUpStrategy"/>
+	</bean>
+	
+	<alias name="defaultB2BQuoteFacade" alias="b2bQuoteFacade"/>
+	<bean id="defaultB2BQuoteFacade" class="de.hybris.platform.b2bcommercefacades.order.impl.DefaultB2BQuoteFacade" parent="defaultOrderFacade">
+		<property name="quoteService" ref="b2bQuoteService" />
+	</bean>
+	
+	<!-- Bean declaration for Data classes with scope Prototype - START -->
+	<bean id="b2bBudgetData" class="de.hybris.platform.b2bcommercefacades.company.data.B2BBudgetData" scope="prototype" />
+	<bean id="b2bCostCenterData" class="de.hybris.platform.b2bcommercefacades.company.data.B2BCostCenterData" scope="prototype" />
+	<bean id="b2bUnitNodeData" class="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitNodeData" scope="prototype" />
+	<bean id="b2bUserGroupData" class="de.hybris.platform.b2bcommercefacades.company.data.B2BUserGroupData" scope="prototype" />
+	<bean id="b2bUnitData" class="de.hybris.platform.b2bcommercefacades.company.data.B2BUnitData" scope="prototype" />
+	<!--  Bean declaration for Data classes with scope Prototype - END-->
+	
+	<!-- The keys of the map are CustomerList.additionalColumnsKeys of the added columns and the values of the map are the EL syntax of CustomerData DTO. -->
+	<bean id="b2bCustomerListAdditionalColumnsMergeDirective" depends-on="customerListAdditionalColumnsMap" parent="mapMergeDirective" >
+		<property name="sourceMap">
+			<map>
+				<entry key="UNIT" value="unit.name" />
+			</map>
+		</property>
+	</bean>
+</beans>

@@ -1,0 +1,38 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$lang=en
+
+$usCurrency=USD
+$productCatalog=productCatalog
+$catalog-id=testCatalog
+$catalog-version=Online
+$onlineProduct=catalogVersion(catalog(id[$catalog-id]),version[$catalog-version])[unique=true,default='$catalog-id:$catalog-version']
+$store1Uid=testStore1
+$store2Uid=testStore2
+$siteUid=testSite
+$vendor=electro
+$defaultPassword=12341234
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;
+;en;true;;;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=en];;;;;;;
+;en;English;;;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid);
+;customergroup;;
+
+INSERT_UPDATE Customer;originalUid[unique=true];uid[unique=true];title(code);name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);mobileNumber;password[default=$defaultPassword]
+;a@sap.com;a@sap.com;;a sap user;sap user;en;USD;customergroup;18108050323
+;c@sap.com;c@sap.com;;c sap user;sap user;en;USD;customergroup;18108050322

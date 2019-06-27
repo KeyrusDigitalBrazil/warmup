@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		   http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<alias name="initiateYaasConfigurationY2ySyncExecutionService" alias="syncExecutionService"/>
+	<bean id="initiateYaasConfigurationY2ySyncExecutionService" parent="defaultSyncExecutionService"
+		  class="de.hybris.platform.initiateyaasconfigurationsync.service.impl.InitiateYaasConfigurationY2ySyncExecutionService">
+		<property name="changeDetectionService" ref="changeDetectionService"/>
+	</bean>
+
+	 <alias name="defaultConfigurationSyncServicee" alias="configurationSyncService"/>
+	<bean id="defaultConfigurationSyncServicee" class="de.hybris.platform.initiateyaasconfigurationsync.service.impl.DefaultYaasConfigurationSyncService">
+		<property name="jobDao" ref="jobDao"/>
+		<property name="y2ySyncYaasConfigurationsJobCode" value="${yaas.configuration.job.code}"/>
+		<property name="syncExecutionService" ref="syncExecutionService"/>
+	</bean>
+
+</beans>

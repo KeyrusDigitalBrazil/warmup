@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<bean id="b2bDocumentData" class="de.hybris.platform.accountsummaryaddon.document.data.B2BDocumentData" scope="prototype" />
+	
+	<bean id="b2bAmountBalanceData" class="de.hybris.platform.accountsummaryaddon.document.data.B2BAmountBalanceData" scope="prototype" />
+	
+	<bean id="b2bDocumentPaymentInfoData" class="de.hybris.platform.accountsummaryaddon.document.data.B2BDocumentPaymentInfoData" scope="prototype" />
+	
+	<bean id="b2bDragAndDropData" class="de.hybris.platform.accountsummaryaddon.document.data.B2BDragAndDropData" scope="prototype" />
+	
+	<bean id="mediaData" class="de.hybris.platform.accountsummaryaddon.document.data.MediaData" scope="prototype" />
+	
+	<bean id="accountSummaryInfoData" class="de.hybris.platform.accountsummaryaddon.data.AccountSummaryInfoData" scope="prototype" />
+			
+	<alias name="defaultAmountFormatter" alias="amountFormatter" />
+	<bean id="defaultAmountFormatter" class="de.hybris.platform.accountsummaryaddon.formatters.impl.DefaultAmountFormatter" />
+
+	<util:map id="accountStatusSearchByList" map-class="java.util.HashMap" 
+			key-type="java.lang.String" value-type="java.lang.Class">
+		<entry key="documentNumber" value="java.lang.String" />
+		<entry key="documentType" value="java.lang.String" />
+		<entry key="date" value="java.util.Date" />
+		<entry key="dueDate" value="java.util.Date" />
+		<entry key="amount" value=" java.math.BigDecimal" />
+		<entry key="openAmount" value=" java.math.BigDecimal" />
+	</util:map>
+		
+	<util:constant id="DATE" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.DATE"/>
+	<util:constant id="DUEDATE" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.DUEDATE"/>
+	<util:constant id="AMOUNT" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.AMOUNT"/>
+	<util:constant id="OPENAMOUNT" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.OPENAMOUNT"/>
+	<util:constant id="DOCUMENTTYPE" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.DOCUMENTTYPE"/>
+	<util:constant id="DOCUMENTTYPECODE" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentTypeModel.CODE"/>
+	<util:constant id="STATUS" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.STATUS"/>
+	<util:constant id="DOCUMENTNUMBER" static-field="de.hybris.platform.accountsummaryaddon.model.B2BDocumentModel.DOCUMENTNUMBER"/>
+	
+	<bean id="documentNumberRangeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.RangeCriteria" scope="prototype">
+		<constructor-arg ref="DOCUMENTNUMBER"/>
+	</bean>
+	<bean id="documentNumberCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.SingleValueCriteria" scope="prototype">
+		<constructor-arg ref="DOCUMENTNUMBER"/>
+	</bean>
+	<bean id="documentTypeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.DocumentTypeCriteria" scope="prototype">
+		<constructor-arg ref="DOCUMENTTYPE"/>
+	</bean>
+	<bean id="dateRangeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.DateRangeCriteria" scope="prototype">
+		<constructor-arg ref="DATE"/>
+	</bean>
+	<bean id="dueDateRangeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.DateRangeCriteria" scope="prototype">
+		<constructor-arg ref="DUEDATE"/>
+	</bean>
+	<bean id="amountRangeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.AmountRangeCriteria" scope="prototype">
+		<constructor-arg ref="AMOUNT"/>
+	</bean>
+	<bean id="openAmountRangeCriteria" class="de.hybris.platform.accountsummaryaddon.document.criteria.AmountRangeCriteria" scope="prototype">
+		<constructor-arg ref="OPENAMOUNT"/>
+	</bean>
+	
+	<util:map id="filterByList" map-class="java.util.LinkedHashMap" 
+			key-type="java.lang.String" value-type="de.hybris.platform.accountsummaryaddon.document.criteria.FilterByCriteria">
+		<entry key="documentNumber" value-ref="documentNumberCriteria" />
+		<entry key="documentNumberRange" value-ref="documentNumberRangeCriteria" />
+		<entry key="documentType" value-ref="documentTypeCriteria" />
+		<entry key="dateRange" value-ref="dateRangeCriteria" />
+		<entry key="dueDateRange" value-ref="dueDateRangeCriteria" />
+		<entry key="amountRange" value-ref="amountRangeCriteria" />
+		<entry key="openAmountRange" value-ref="openAmountRangeCriteria" />
+	</util:map>
+
+	<alias alias="pagedB2BDocumentDao" name="defaultPagedB2BDocumentDao" />
+	<bean id="defaultPagedB2BDocumentDao" class="de.hybris.platform.accountsummaryaddon.document.dao.impl.DefaultPagedB2BDocumentDao">
+		<property name="pagedFlexibleSearchService" ref="pagedFlexibleSearchService" />
+		<property name="b2bDocumentSortMap" ref="b2bDocumentSortMap" />
+	</bean>
+	
+	<util:map id="b2bDocumentSortMap" map-class="java.util.LinkedHashMap" 
+			key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="byDocumentDateAsc" value-ref="DATE"/>
+		<entry key="byDocumentDateDesc" value-ref="DATE"/>
+		<entry key="byDueDateAsc" value-ref="DUEDATE"/>
+		<entry key="byDueDateDesc" value-ref="DUEDATE"/>
+		<entry key="byOriginalAmountAsc" value-ref="AMOUNT"/>
+		<entry key="byOriginalAmountDesc" value-ref="AMOUNT"/>
+		<entry key="byOpenAmountAsc" value-ref="OPENAMOUNT"/>
+		<entry key="byOpenAmountDesc" value-ref="OPENAMOUNT"/>
+		<entry key="byDocumentTypeAsc" value-ref="DOCUMENTTYPECODE"/>
+		<entry key="byDocumentTypeDesc" value-ref="DOCUMENTTYPECODE"/>
+		<entry key="byDocumentStatusAsc" value-ref="STATUS"/>
+		<entry key="byDocumentStatusDesc" value-ref="STATUS"/>
+		<entry key="byDocumentNumberAsc" value-ref="DOCUMENTNUMBER"/>
+		<entry key="byDocumentNumberDesc" value-ref="DOCUMENTNUMBER"/>
+	</util:map>
+
+	<alias alias="b2bDocumentDao" name="defaultB2BDocumentDao" />
+	<bean id="defaultB2BDocumentDao" class="de.hybris.platform.accountsummaryaddon.document.dao.impl.DefaultB2BDocumentDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+	
+	<alias alias="b2bDocumentPaymentInfoDao" name="defaultB2BDocumentPaymentInfoDao" />
+	<bean id="defaultB2BDocumentPaymentInfoDao" class="de.hybris.platform.accountsummaryaddon.document.dao.impl.DefaultB2BDocumentPaymentInfoDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+	
+
+	<alias alias="b2bDocumentTypeDao" name="defaultB2BDocumentTypeDao" />
+	<bean id="defaultB2BDocumentTypeDao" class="de.hybris.platform.accountsummaryaddon.document.dao.impl.DefaultB2BDocumentTypeDao">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<alias name="defaultB2BDocumentPopulator" alias="b2bDocumentPopulator" />
+	<bean id="defaultB2BDocumentPopulator" class="de.hybris.platform.accountsummaryaddon.document.populators.B2BDocumentPopulator">
+		<property name="currencyConverter" ref="currencyConverter" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+		<property name="mediaConverter" ref="mediaConverter" />
+		<property name="amountFormatter" ref="amountFormatter" />
+	</bean>
+	
+	<alias name="defaultB2BDocumentPaymentInfoPopulator" alias="b2bDocumentPaymentInfoPopulator" />
+	<bean id="defaultB2BDocumentPaymentInfoPopulator" class="de.hybris.platform.accountsummaryaddon.document.populators.B2BDocumentPaymentInfoPopulator">
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+		<property name="amountFormatter" ref="amountFormatter" />
+	</bean>
+
+	<alias name="defaultMediaConverter" alias="mediaConverter" />
+	<bean id="defaultMediaConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.accountsummaryaddon.document.data.MediaData" />
+		<property name="populators">
+			<list>
+				<ref bean="mediaPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultMediaPopulator" alias="mediaPopulator" />
+	<bean id="defaultMediaPopulator" class="de.hybris.platform.accountsummaryaddon.document.populators.B2BMediaPopulator" />
+
+	<alias name="defaultB2BDocumentConverter" alias="b2bDocumentConverter" />
+	<bean id="defaultB2BDocumentConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.accountsummaryaddon.document.data.B2BDocumentData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bDocumentPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BAmountBalanceConverter" alias="b2bAmountBalanceConverter" />
+	<bean id="defaultB2BAmountBalanceConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.accountsummaryaddon.document.data.B2BAmountBalanceData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bAmountBalancePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BAmountBalancePopulator" alias="b2bAmountBalancePopulator" />
+	<bean id="defaultB2BAmountBalancePopulator" class="de.hybris.platform.accountsummaryaddon.document.populators.B2BAmountBalancePopulator" >
+		<property name="b2bDocumentService" ref="b2bDocumentService" />
+		<property name="pastDueBalanceDateRangeService" ref="pastDueBalanceDateRangeService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService" />
+		<property name="amountFormatter" ref="amountFormatter" />
+	</bean>
+	
+	<alias name="defaultB2BDocumentPaymentInfoConverter" alias="b2bDocumentPaymentInfoConverter" />
+	<bean id="defaultB2BDocumentPaymentInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.accountsummaryaddon.document.data.B2BDocumentPaymentInfoData" />
+		<property name="populators">
+			<list>
+				<ref bean="b2bDocumentPaymentInfoPopulator" />
+			</list>
+		</property>
+	</bean>
+		
+	<alias name="defaultAccountSummaryInfoPopulator" alias="accountSummaryInfoPopulator" />
+	<bean id="defaultAccountSummaryInfoPopulator" class="de.hybris.platform.accountsummaryaddon.populators.AccountSummaryInfoPopulator">
+		<property name="b2bUnitConverter" ref="b2bUnitConverter"/>
+		<property name="b2bAmountBalanceConverter" ref="b2bAmountBalanceConverter" />
+		<property name="userService" ref="userService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="amountFormatter" ref="amountFormatter" />
+	</bean>
+	
+	<alias name="defaultAccountSummaryInfoConverter" alias="accountSummaryInfoConverter" />
+	<bean id="defaultAccountSummaryInfoConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.accountsummaryaddon.data.AccountSummaryInfoData" />
+		<property name="populators">
+			<list>
+				<ref bean="accountSummaryInfoPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultB2BDocumentService" alias="b2bDocumentService" />
+	<bean name="defaultB2BDocumentService" class="de.hybris.platform.accountsummaryaddon.document.service.impl.DefaultB2BDocumentService">
+		<property name="pagedB2BDocumentDao" ref="pagedB2BDocumentDao" />
+		<property name="b2bDocumentDao" ref="b2bDocumentDao" />
+		<property name="modelService" ref="modelService" />
+	</bean>
+	
+	<alias name="defaultB2BDocumentPaymentInfoService" alias="b2bDocumentPaymentInfoService" />
+    <bean name="defaultB2BDocumentPaymentInfoService" class="de.hybris.platform.accountsummaryaddon.document.service.impl.DefaultB2BDocumentPaymentInfoService">
+    	<property name="b2bDocumentPaymentInfoDao" ref="b2bDocumentPaymentInfoDao" />
+    	<property name="modelService" ref="modelService" />
+    	<property name="flexibleSearchService" ref="flexibleSearchService" />
+    </bean>
+
+	<alias name="defaultB2BDocumentTypeService" alias="b2bDocumentTypeService" />
+	<bean name="defaultB2BDocumentTypeService" class="de.hybris.platform.accountsummaryaddon.document.service.impl.DefaultB2BDocumentTypeService">
+		<property name="b2bDocumentTypeDao" ref="b2bDocumentTypeDao" />
+	</bean>
+
+	<alias name="defaultB2BAccountSummaryFacade" alias="b2bAccountSummaryFacade" />
+	<bean name="defaultB2BAccountSummaryFacade" class="de.hybris.platform.accountsummaryaddon.facade.impl.DefaultB2BAccountSummaryFacade">
+		<property name="b2bDocumentService" ref="b2bDocumentService" />
+		<property name="b2bDocumentPaymentInfoService" ref="b2bDocumentPaymentInfoService" />
+		<property name="b2bDocumentTypeService" ref="b2bDocumentTypeService" />
+		<property name="b2bDocumentConverter" ref="b2bDocumentConverter" />
+		<property name="b2bDocumentPaymentInfoConverter" ref="b2bDocumentPaymentInfoConverter" />
+		<property name="b2bAmountBalanceConverter" ref="b2bAmountBalanceConverter"/>
+		<property name="b2BCommerceUnitService" ref="b2bCommerceUnitService"/>
+		<property name="accountSummaryInfoConverter" ref="accountSummaryInfoConverter"/>
+	</bean>
+
+	<alias name="defaultPastDueBalanceDateRangeService" alias="pastDueBalanceDateRangeService" />
+	<bean name="defaultPastDueBalanceDateRangeService" class="de.hybris.platform.accountsummaryaddon.document.service.impl.DefaultPastDueBalanceDateRangeService" />
+
+	<bean id="accountSummaryCoreDataImportedEventListener" parent="abstractCoreDataImportedEventListener">
+		<property name="supportedChannels">
+			<list value-type="de.hybris.platform.commerceservices.enums.SiteChannel">
+				<value>B2B</value>
+			</list>
+		</property>
+		<property name="addonExtensionMetadata">
+			<bean class="de.hybris.platform.addonsupport.data.AddonExtensionMetadata">
+				<property name="suffixChannel" value="false" />
+				<property name="baseExtensionName" value="accountsummaryaddon" />
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="accountSummaryaddonSampleDataEventListener" parent="abstractGenericAddOnSampleDataEventListener"  >
+		<property name="extensionName" value="accountsummaryaddon" />
+	</bean>
+	
+	<bean id="deleteDocumentFileJobPerformable" class="de.hybris.platform.accountsummaryaddon.cronjob.DeleteDocumentFileJobPerformable"
+		parent="abstractJobPerformable" />
+
+	<!-- uppercase interceptor -->
+	<bean id="b2bDocumentPrepareInterceptor" class="de.hybris.platform.accountsummaryaddon.interceptor.B2BDocumentPrepareInterceptor"
+		autowire="byName" />
+
+	<bean id="MyPrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2bDocumentPrepareInterceptor" />
+		<property name="typeCode" value="B2BDocument" />
+	</bean>
+
+	<!-- validate document payment interceptor -->
+	<bean id="b2bDocumentValidateInterceptor" class="de.hybris.platform.accountsummaryaddon.interceptor.B2BDocumentPaymentValidateInterceptor"
+		autowire="byName" />
+
+	<bean id="MyValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="b2bDocumentValidateInterceptor" />
+		<property name="typeCode" value="B2BDocumentPaymentInfo" />
+	</bean>
+
+	<bean id="b2bPaymentMethodDynamicAttributeHandler" class="de.hybris.platform.accountsummaryaddon.attributehandlers.B2BPaymentMethodDynamicAttributeHandler"/>
+	<bean id="b2bUseDocumentReferenceDynamicAttributeHandler" class="de.hybris.platform.accountsummaryaddon.attributehandlers.B2BUseDocumentReferenceDynamicAttributeHandler"/>
+	
+</beans>
+

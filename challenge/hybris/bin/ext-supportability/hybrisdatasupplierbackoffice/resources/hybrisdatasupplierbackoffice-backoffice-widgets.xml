@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- [y] hybris Platform Copyright 
+	(c) 2017 SAP SE or an SAP affiliate company. All rights reserved. This software 
+	is the confidential and proprietary information of SAP ("Confidential Information"). 
+	You shall not disclose such Confidential Information and shall use it only 
+	in accordance with the terms of the license agreement you entered into with 
+	SAP. -->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+	<widget-extension widgetId="backofficeMainSlot">
+		<widget id="generic_data_supplier_conditionevaluator"
+			widgetDefinitionId="com.hybris.cockpitng.conditionevaluator" slotId="cockpitWidgetChildrenInvisible"
+			template="false">
+			<widget id="generic_data_supplier_propertyextractor"
+				widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+				slotId="cockpitWidgetChildrenInvisible" template="false">
+				<setting key="expression" type="String" value="id"></setting>
+				<setting key="socketDataType_$T" type="String" value="java.lang.String"></setting>
+				<setting key="widgetStyleAttribute" type="String" value=""></setting>
+				<setting key="widgetStyleClass" type="String" value=""></setting>
+				<virtual-sockets />
+			</widget>
+			<setting key="expression" type="String"
+				value="#root.id EQ 'GenericDataSupplierGenerationWizard'"></setting>
+			<setting key="socketDataType_$T" type="String"
+				value="com.hybris.backoffice.navigation.NavigationNode"></setting>
+			<setting key="widgetStyleAttribute" type="String" value=""></setting>
+			<setting key="widgetStyleClass" type="String" value=""></setting>
+			<virtual-sockets />
+		</widget>
+
+	</widget-extension>
+	<widget-connection
+		sourceWidgetId="STUB_com.hybris.wizard.widgets.action.OpenWizardAction"
+		outputId="wizardContext" targetWidgetId="configurableFlow" inputId="context" />
+	<widget-connection sourceWidgetId="explorerTree"
+		outputId="nodeSelected" targetWidgetId="generic_data_supplier_conditionevaluator"
+		inputId="input" />
+	<widget-connection sourceWidgetId="generic_data_supplier_conditionevaluator"
+		outputId="true" targetWidgetId="generic_data_supplier_propertyextractor"
+		inputId="genericInput" />
+	<widget-connection sourceWidgetId="generic_data_supplier_propertyextractor"
+		outputId="genericOutput" targetWidgetId="configurableFlow" inputId="contextType" />
+</widgets>

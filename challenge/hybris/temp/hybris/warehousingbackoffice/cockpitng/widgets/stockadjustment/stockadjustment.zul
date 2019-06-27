@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<widget xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd"
+        sclass="oms-widget-stockadjustment-configuration" height="100%" width="100%"
+        id="stockadjustmentview">
+
+	<separator width="100%" sclass="oms-widget-stockadjustment-configuration--separator"/>
+
+    <hlayout sclass="oms-widget-stockadjustment-header">
+        <hbox sclass="oms-widget-stockadjustment-body">
+            <vbox>
+                <label value="${labels.warehousingbackoffice.stockadjustment.product.code}" width="100%"/>
+                <textbox sclass="oms-widget-stockadjustment-input-text-box" readonly="true" id="productCode"
+                         width="260px"/>
+            </vbox>
+        </hbox>
+        <hbox sclass="oms-widget-stockadjustment-body">
+            <vbox>
+                <label value="${labels.warehousingbackoffice.stockadjustment.warehouse.name}" width="100%"/>
+                <textbox sclass="oms-widget-stockadjustment-input-text-box" readonly="true" id="warehouseName"
+                         width="260px"/>
+            </vbox>
+        </hbox>
+        <hbox sclass="oms-widget-stockadjustment-body">
+            <vbox>
+                <label value="${labels.warehousingbackoffice.stockadjustment.bin}" width="100%"/>
+                <textbox sclass="oms-widget-stockadjustment-input-text-box" readonly="true" id="bin"
+                         width="260px"/>
+            </vbox>
+        </hbox>
+    </hlayout>
+
+	<separator width="100%" sclass="oms-widget-stockadjustment-configuration--separator"/>
+
+    <hlayout width="100%" sclass="oms-widget-stockadjustment-list-container-h">
+        <div sclass="oms-widget-stockadjustment-list-container">
+            <grid id="stockAdjustments" width="100%" height="100%">
+                <columns>
+                    <column width="22%" sclass="oms-widget-stockadjustment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.stockadjustment.reason.code}"/>
+                    </column>
+                    <column width="8%" sclass="oms-widget-stockadjustment-listbox-header" style="text-align: center;">
+                        <label value="${labels.warehousingbackoffice.stockadjustment.quantity}"/>
+                    </column>
+                    <column width="30%" sclass="oms-widget-stockadjustment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.stockadjustment.comments}"/>
+                        <label sclass="oms-widget-stockadjustment-listbox-header-italic" value="${labels.warehousingbackoffice.stockadjustment.optional}"/>
+                    </column>
+                    <column width="1%" style="background-color:white;"/>
+                    <column width="13%" sclass="oms-widget-stockadjustment-button-header">
+                        <button id="addadjustment"
+                                label="${labels.warehousingbackoffice.stockadjustment.button.addadjustment}"
+                                sclass="oms-widget-stockadjustment-configuration-addadjustment-button y-add-btn"/>
+                    </column>
+                </columns>
+                <rows>
+                    <template name="model">
+                        <row>
+                            <vbox>
+                                <combobox xmlns:w="client" w:onSelect="CockpitNG.sendEvent(this.uuid,'onCustomChange',this._value)"
+                                    model="${each.stockAdjustmentReasonsModel}" placeholder="${labels.warehousingbackoffice.stockadjustment.popup.placeholder.reason}"
+                                    readonly="true">
+                                    <template name="model">
+                                        <comboitem label="${each}"/>
+                                    </template>
+                                </combobox>
+                                <label value="${each.localizedStringReason}" visible="false" width="100%" style="padding-left:7px;"/>
+                            </vbox>
+                            <vbox align="center" width="100%" sclass="oms-widget-stockadjustment-listbox-container">
+                                <intbox value="${each.quantity}"
+                                        constraint="no empty,no negative: Quantity Must be Greater Than Zero"/>
+                                <label value="${each.quantity}" visible="false" width="100%"/>
+                            </vbox>
+                            <vbox>
+                                <textbox value="${each.comment}" maxlength="255" placeholder="${labels.warehousingbackoffice.stockadjustment.popup.placeholder.comment}" width="300px"/>
+                                <label value="${each.comment}" visible="false" width="100%" style="padding-left:8px;"/>
+                            </vbox>
+                            <vbox>
+                                <hbox/>
+                            </vbox>
+                            <hbox style="padding-left:12px;">
+                                <button image="/widgetJarResource/de.hybris.platform.warehousingbackoffice.widgets.stockadjustment/icons/Icon_check.svg" style="background-color:transparent;" />
+                                <button image="/widgetJarResource/de.hybris.platform.warehousingbackoffice.widgets.stockadjustment/icons/Icon_edit.svg" visible="false" style="background-color:transparent;"/>
+                                <button image="/widgetJarResource/de.hybris.platform.warehousingbackoffice.widgets.stockadjustment/icons/Icon_remove.svg" style="background-color:transparent;"/>
+                            </hbox>
+                        </row>
+                    </template>
+                </rows>
+            </grid>
+        </div>
+    </hlayout>
+
+    <div sclass="oms-widget-stockleveladjustment-configuration-footer oms-widget-footer"> 
+        <button id="reset"
+                label="${labels.warehousingbackoffice.stockadjustment.button.reset}"
+                sclass="y-btn-secondary oms-widget-stockadjustment-configuration-button oms-widget-stockadjustment-configuration-revert-button"/>
+        <button id="confirm"
+                label="${labels.warehousingbackoffice.stockadjustment.button.confirm}"
+                sclass="y-btn-primary oms-widget-stockadjustment-configuration-button oms-widget-stockadjustment-configuration-save-button"/>
+    </div>
+
+</widget>

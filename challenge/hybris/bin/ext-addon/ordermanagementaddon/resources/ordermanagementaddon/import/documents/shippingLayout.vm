@@ -1,0 +1,122 @@
+##messageSource=classpath:/ordermanagementaddon/messages/document-shippinglabel_$lang.properties
+<html>
+<head>
+	<style type='text/css'>@media screen, print {
+		table {
+			width: 96%;
+			margin: 25px 10px 0;
+            font-family: "Open Sans", sans-serif;
+            color: #151c22;
+		}
+
+		th {
+			padding: 5px 5px 5px 15px;
+			font-weight: bold;
+			text-align: left;
+		}
+
+		td {
+			padding: 5px 0 5px 15px;
+		}
+
+		td.title {
+            vertical-align: top;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        td.headline{
+            font-size: 27px;
+            font-weight: 600;
+            color: #1e2830;
+        }
+		
+		div.pick-slip-border{
+            border-top: 1px solid #e5e9ed;
+        }
+
+        .sitelogo>img{
+            max-width: 250px;
+        }
+
+        body>table{
+            max-width: 1200px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+	}</style>
+</head>
+<body>
+<table>
+    <tr>
+        <td colspan="2" class="sitelogo">
+			${ctx.cmsSlotContents.SiteLogo}
+        </td>
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.TopContent}</a>
+        </td>
+    </tr>
+    <tr>
+		#foreach($packInfo in $ctx.consignment.packaginginfos)
+			<table>
+				<tr>
+					<td colspan="2" class="headline">Mock Priority Mail</td>
+				</tr>
+    			<tr>
+        			<td colspan="2"><strong>$!{ctx.messages.date}</strong> ${ctx.date}</td>
+        			<td colspan="2">Page $foreach.count of $ctx.consignment.packaginginfos.size()</td>
+    			</tr>
+    			<tr>
+        			<td colspan="4"><strong>$!{ctx.messages.trackingNumber}</strong> $!{ctx.escapeHtml($ctx.consignment.trackingID)}</td>
+    			</tr>
+				<tr>
+					<td colspan="3" class="title">$!{ctx.messages.packInfo}</td>
+					<td>
+						$!{ctx.messages.packInfoWidth} $!{ctx.escapeHtml($packInfo.width)}<br/>
+						$!{ctx.messages.packInfoHeight} $!{ctx.escapeHtml($packInfo.height)}<br/>
+						$!{ctx.messages.packInfoLength} $!{ctx.escapeHtml($packInfo.length)}
+					</td>
+				</tr>
+				<tr>
+					<td class="title">From</td>
+					<td colspan="3">
+            			$!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.firstname)} $!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.lastname)}<br/>
+            			$!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.line1)} $!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.line2)}<br/>
+            			$!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.town)}, $!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.region)} $!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.postalcode)}<br/>
+						$!{ctx.escapeHtml($ctx.consignment.deliveryPointOfService.address.country.name)}
+
+					</td>
+				</tr>
+				<tr>
+					<td class="title">Ship To</td>
+					<td colspan=3>
+            			$!{ctx.escapeHtml($ctx.consignment.shippingAddress.firstname)} $!{ctx.escapeHtml($ctx.consignment.shippingAddress.lastname)}<br/>
+            			$!{ctx.escapeHtml($ctx.consignment.shippingAddress.streetname)}<br/>
+            			$!{ctx.escapeHtml($ctx.consignment.shippingAddress.town)}, $!{ctx.escapeHtml($ctx.consignment.shippingAddress.region.name)} $!{ctx.escapeHtml($ctx.consignment.shippingAddress.postalcode)}<br/>
+						$!{ctx.escapeHtml($ctx.consignment.shippingAddress.country.name)}
+        			</td>
+				</tr>
+				<tr>
+					<td colspan=4>
+						<p style="text-align:center;">
+                   			<img src="${ctx.mediaBaseUrl}$!{ctx.getBarcodeMediaImageURL($ctx.consignment)}" />
+						</p>
+					</td>
+				</tr>
+				<tr>
+                	<td colspan="4"><div class="pick-slip-border"></div></td>
+            	</tr>
+			</table>
+
+		#end
+    </tr>
+    <tr>
+        <td align="center" valign="middle">
+            <a href="${ctx.baseUrl}" style="display:block; margin-top:10px;margin-bottom:10px;">${ctx.cmsSlotContents.BottomContent}</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

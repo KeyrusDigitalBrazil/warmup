@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="ysmarteditmodule_buildcallbacks">
+
+    <patternset id="extension.ysmarteditmodule.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="build/"/>
+        <exclude name="smartedit-build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+    <patternset id="extension.ysmarteditmodule.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="build/"/>
+        <exclude name="smartedit-build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+    <patternset id="extension.ysmarteditmodule.production.filter">
+        <patternset refid="extension.production.filter"/>
+        <exclude name="build/"/>
+        <exclude name="smartedit-build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+    </patternset>
+
+    <macrodef name="ysmarteditmodule_before_clean">
+        <sequential>
+            <if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+                <then>
+                    <delete dir="${ext.ysmarteditmodule.path}${file.separator}temp"/>
+                    <delete dir="${ext.ysmarteditmodule.path}${file.separator}jsTarget"/>
+                    <delete dir="${ext.ysmarteditmodule.path}${file.separator}web${file.separator}webroot${file.separator}ysmarteditmodule${file.separator}js"/>
+                    <unLinkSmarteditBundle target="${ext.ysmarteditmodule.path}"></unLinkSmarteditBundle>
+                    <removeNodeModulesSymlink path="${ext.ysmarteditmodule.path}"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="ysmarteditmodule_before_build">
+        <sequential>
+        	<copy file="${ext.ysmarteditmodule.path}${file.separator}gitignore"
+			      tofile="${ext.ysmarteditmodule.path}${file.separator}.gitignore" overwrite="true" failonerror="false"/>
+            <if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+                <then>
+                    <linkSmarteditBundle target="${ext.ysmarteditmodule.path}"></linkSmarteditBundle>
+                    <gruntBuild path="${ext.ysmarteditmodule.path}" phase="packageSkipTests"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="ysmarteditmodule_before_yunit">
+        <sequential>
+            <if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+                <then>
+                    <gruntBuild path="${ext.ysmarteditmodule.path}" phase="test_only"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="ysmarteditmodule_before_extgen">
+        <sequential>
+            <!--save .gitignore that is excluded from extgen -->
+            <copy file="${ext.ysmarteditmodule.path}${file.separator}.gitignore"
+			      tofile="${ext.ysmarteditmodule.path}${file.separator}gitignore" overwrite="true" failonerror="false"/>
+            <if>
+                <and>
+                    <available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+                    <available file="${ext.ysmarteditmodule.path}${file.separator}smartedit-build" type="dir"/>
+                </and>
+                <then>
+                    <gruntBuild path="${ext.ysmarteditmodule.path}" phase="clean"/>
+                    <safeUnLink targetPath="${ext.ysmarteditmodule.path}/node_modules"/>
+                    <unLinkSmarteditBundle target="${ext.ysmarteditmodule.path}"></unLinkSmarteditBundle>
+                    <removeNodeModulesSymlink path="${ext.ysmarteditmodule.path}"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+</project>

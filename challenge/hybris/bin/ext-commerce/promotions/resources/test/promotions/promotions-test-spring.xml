@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+           
+    <!-- uncomment below beans for Promotions Performance Improvement -->
+
+    <!--<bean id="caching.promotions.manager" class="de.hybris.platform.promotions.jalo.CachingPromotionsManager" init-method="init" destroy-method="destroy">-->
+    	  <!--<property name="cache" ref="testPromotionsCachingStrategy"/>-->
+	<!--</bean>-->
+
+	<alias alias="testPromotionsCachingStrategy" name="defaultPromotionsCachingStrategy"/>
+	<bean id="defaultPromotionsCachingStrategy" class="de.hybris.platform.promotions.jalo.DefaultCachingStrategy">
+		<property name="sessionService" ref="sessionService"/>
+	</bean>
+	
+    <!-- Override the Cart so that calls to get promotion results can be intercepted -->
+    <bean id="de.hybris.platform.jalo.order.Cart" class="de.hybris.platform.promotions.jalo.order.PromotionCart" scope="prototype" />       
+           
+</beans>

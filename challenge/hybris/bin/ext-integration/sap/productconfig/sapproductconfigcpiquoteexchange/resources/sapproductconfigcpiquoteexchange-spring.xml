@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<!-- Quote Outbound Mapper -->
+	<alias alias="sapProductConfigOutboundQuoteMapper" name="sapProductConfigDefaultOutboundQuoteMapper" />
+	<bean id="sapProductConfigDefaultOutboundQuoteMapper"
+		class="de.hybris.platform.sap.productconfig.cpiquoteexchange.service.outbound.ProductConfigSCPIQuoteMapperImpl">
+	</bean>
+
+	<bean id="sapProductConfigOutboundQuoteMapperListMergeDirective"
+		depends-on="sapCpiQuoteMappers" parent="listMergeDirective">
+		<property name="add" ref="sapProductConfigOutboundQuoteMapper" />
+	</bean>
+
+
+	<!-- Quote Entry Outbound Mapper -->
+	<alias alias="sapProductConfigOutboundQuoteEntryMapper" name="sapProductConfigDefaultOutboundQuoteEntryMapper" />
+	<bean id="sapProductConfigDefaultOutboundQuoteEntryMapper"
+		class="de.hybris.platform.sap.productconfig.cpiquoteexchange.service.outbound.ProductConfigSCPIQuoteEntryMapperImpl" />
+
+	<bean id="sapProductConfigOutboundQuoteEntryMapperListMergeDirective"
+		depends-on="sapCpiQuoteEntryMappers" parent="listMergeDirective">
+		<property name="add" ref="sapProductConfigOutboundQuoteEntryMapper" />
+	</bean>
+
+
+	<!-- Quote Entry Inbound Helper -->
+	<alias alias="sapProductConfigInboundQuoteEntryHook" name="sapProductConfigDefaultInboundQuoteEntryHook" />
+	<bean id="sapProductConfigDefaultInboundQuoteEntryHook"
+		class="de.hybris.platform.sap.productconfig.cpiquoteexchange.service.inbound.ProductConfigSCPIQuoteEntryInboundHookImpl">
+		<property name="configurationDeepCopyHandler" ref="sapProductConfigConfigurationDeepCopyHandler" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="modelService" ref="modelService" />
+		<property name="productConfigurationPersistenceService" ref="sapProductConfigProductConfigurationPersistenceService" />
+	</bean>
+
+	<bean id="sapProductConfigInboundQuoteEntryHookListMergeDirective"
+		depends-on="sapInboundQuoteEntryHelpers" parent="listMergeDirective">
+		<property name="add" ref="sapProductConfigInboundQuoteEntryHook" />
+	</bean>
+</beans>

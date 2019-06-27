@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+   <alias name="defaultProductCarouselFacade" alias="productCarouselFacade"/>
+	<bean id="defaultProductCarouselFacade" class="de.hybris.platform.acceleratorfacades.productcarousel.impl.DefaultProductCarouselFacade" >
+		<property name="productFacade" ref="productFacade"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="productCarouselRendererService" ref="productCarouselRendererService"/>
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+	  	<property name="modelService" ref="modelService" />
+	  	<property name="productConverter" ref="mockProductConverter"/>
+		<property name="productConfiguredPopulator" ref="productConfiguredPopulator"/>
+		<property name="cmsPreviewService" ref="cmsPreviewService" />
+	</bean>
+	
+	<alias name="defaultProductFacade" alias="productFacade"/>
+	<bean id="defaultProductFacade" class="de.hybris.platform.commercefacades.product.impl.DefaultProductFacade">
+		<property name="productService" ref="productService"/>
+		<property name="customerReviewService" ref="customerReviewService"/>
+		<property name="userService" ref="userService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+
+		<property name="customerReviewConverter" ref="customerReviewConverter"/>
+		<property name="productConverter" ref="mockProductConverter"/>
+		<property name="productConfiguredPopulator" ref="productConfiguredPopulator"/>
+
+		<property name="commerceProductReferenceService" ref="commerceProductReferenceService"/>
+		<property name="referenceDataProductReferenceConverter" ref="referenceDataProductReferenceConverter"/>
+		<property name="referenceProductConfiguredPopulator" ref="productConfiguredPopulator"/>
+        <property name="productConfigurationConverter" ref="orderEntryProductInfoConverter"/>
+        <property name="configurationHandlerFactory" ref="productConfigurationHandlerFactory"/>
+        <property name="configuratorSettingsService" ref="configuratorSettingsService"/>
+    </bean>
+	
+	<bean id="mockProductConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.commercefacades.product.data.ProductData"/>
+		<property name="populators">
+			<list>
+				<ref bean="productPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+</beans>

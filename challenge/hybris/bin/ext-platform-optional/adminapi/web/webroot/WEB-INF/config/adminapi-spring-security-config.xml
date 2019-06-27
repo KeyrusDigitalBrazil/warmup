@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	          http://www.springframework.org/schema/security/oauth2 http://www.springframework.org/schema/security/spring-security-oauth2.xsd
+       http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <context:annotation-config/>
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven>
+        <mvc:message-converters register-defaults="false">
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter" p:writeAcceptCharset="false"/>
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter"/>
+            <bean class="org.springframework.security.oauth2.http.converter.jaxb.JaxbOAuth2AccessTokenMessageConverter"/>
+            <bean class="org.springframework.security.oauth2.http.converter.jaxb.JaxbOAuth2ExceptionMessageConverter"/>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+
+    <oauth:resource-server id="resourceServerFilter"
+                           token-services-ref="oauthTokenServices"
+                           entry-point-ref="oauthAuthenticationEntryPoint"/>
+
+
+    <alias name="defaultOauthAuthenticationEntryPoint" alias="oauthAuthenticationEntryPoint"/>
+    <bean id="defaultOauthAuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint"
+          p:realmName="hybris" p:typeName="Bearer" p:exceptionRenderer-ref="oauth2ExceptionRender"/>
+
+
+    <authentication-manager id="authenticationManager" xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider ref="wsAuthenticationProvider"/>
+    </authentication-manager>
+
+
+    <bean id="fixation"
+          class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy"/>
+
+
+    <bean id="adminapiDecisionManager" class="org.springframework.security.access.vote.UnanimousBased"
+          xmlns="http://www.springframework.org/schema/beans">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter"/>
+                <bean class="org.springframework.security.access.vote.RoleVoter"/>
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <import resource="classpath*:*security-adminapi.xml"/>
+
+    <sec:http
+            pattern="/#{ T(de.hybris.platform.adminapi.components.util.AdminApiConfigurationUtil).provideSwaggerApiDocumentationEndpoint()}"
+            security="none"/>
+    <sec:http pattern="/swagger-resources/**" security="none"/>
+    <sec:http pattern="/swagger-ui.html" security="none"/>
+    <sec:http pattern="/webjars/*swagger*/**" security="none"/>
+
+    <sec:http pattern="/**" create-session="never"
+              entry-point-ref="oauthAuthenticationEntryPoint"
+              access-decision-manager-ref="adminapiDecisionManager" use-expressions="false">
+        <sec:anonymous enabled="false"/>
+        <sec:intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY"/>
+
+        <sec:custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+        <sec:access-denied-handler ref="oauthAccessDeniedHandler"/>
+
+        <sec:headers>
+            <sec:content-type-options/>
+            <sec:hsts include-subdomains="true" max-age-seconds="16070400"/>
+            <sec:xss-protection/>
+            <sec:frame-options disabled="true"/>
+        </sec:headers>
+        <sec:csrf disabled="true"/>
+    </sec:http>
+
+
+    <bean id="oauth2SecurityFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+        <constructor-arg>
+            <list>
+                <ref bean="corsFilter"/>
+                <ref bean="log4jFilter"/>
+                <ref bean="tenantActivationFilter"/>
+                <ref bean="sessionFilter"/>
+                <ref bean="springSecurityFilterChain"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+
+</beans>

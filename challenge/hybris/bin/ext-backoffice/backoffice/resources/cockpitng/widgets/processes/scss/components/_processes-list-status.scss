@@ -1,0 +1,107 @@
+@import "../support/_processes-mixins.scss";
+
+.yw-processes-list-item {
+    &-icon {
+        width: $processes__list-item-icon--size;
+        height: $processes__list-item-icon--size;
+        margin: $processes__list-item-icon--margin;
+        position: absolute;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-image: url('images/icon-sync-blue.png');
+        
+        .yw-processes-unseen & {
+            @include _addIndicatorDot ($processes__header-process-icon-unseen--bg-color, inherit, $processes__list-item-indicator--top, $processes__list-item-indicator--right, $processes__header-process-icon-unseen--size, $processes__header-process-icon-spinner-before--space);
+        }
+    }
+    &-content {
+        &:before {
+            border-top: $processes__list-item--border;
+            @if $processes__list-item-default--bg-color != $processes__sidebar--bg-color {
+                background-color: $processes__list-item-default--bg-color;
+            }@else {
+                background-color: transparent;
+            }
+            position: absolute;
+            display: block;
+            content: "";
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            z-index: -1;                                
+        }
+        &-progress {
+            height: $processes__list-item-progress--height;
+            background-color: $processes__list-item-progress-default--bg-color;
+            margin: $processes__list-item-progress--margin;
+            position: static;
+
+            &:before {
+                height: $processes__list-item-progress--height;
+                background-color: $processes__list-item-progress-before--bg-color;
+                left: $processes__list-item-progress-before--left;
+                right: $processes__list-item-progress-before--right;
+                z-index: -1;
+                position: absolute;
+                content: "";
+                display: block;
+            }
+        }
+
+        &-progressbar-bar {
+            height: $processes__list-item-progress--height;
+            width: 100%;
+            background-color: grey;
+        }
+        &-progressbar-progress {
+            height: $processes__list-item-progress--height;
+            width: 0;
+            background-color: $processes__list-item-progress-default--bg-color;
+        }
+        .yw-processes &-status {
+            font-weight: inherit;
+            
+            &.z-label {
+                margin-right: $processes__list-item-status-label--margin-right;
+                float: right;
+                display: inline-block;
+                background: none;
+                position: relative;
+                text-transform: uppercase;
+                text-align: right;
+            }
+        }
+    }
+    .yw-processes &-status {
+        &-info.z-label {
+            color: $processes__list-item-status-info-text--color;
+            font-weight: $processes__list-item-status-info-text--font-weight;
+            text-align: left;
+            display: block;
+            white-space: normal;
+            position: relative;
+        }
+         &-running {
+            @include _statusColoring ($processes__item-status-running--color, true);
+         }
+         &-runningrestart {
+            @include _statusColoring ($processes__item-status-run-restart--color, true);
+         }
+         &-aborted {
+            @include _statusColoring ($processes__item-status-aborted--color);
+         }
+         &-finished {
+            @include _statusColoring ($processes__item-status-finished--color);
+         }
+         &-failed {
+            @include _statusColoring ($processes__item-status-aborted--color);
+         }
+         &-paused {
+            @include _statusColoring ($processes__item-status-paused--color);
+         }
+         &-unknown {
+            @include _statusColoring ($processes__item-status-unknown--color);
+        }
+    }
+}

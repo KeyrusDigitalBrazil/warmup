@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" 
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	
+	<!-- Service -->
+	<alias name="genericComponentTypeStructureService" alias="cmsComponentTypeStructureService"/>
+	
+	<bean id="genericComponentTypeStructureService" class="de.hybris.platform.cmsfacades.types.service.impl.GenericComponentTypeStructureService">
+		<property name="typeService" ref="typeService" />
+		<property name="componentTypeStructureRegistry" ref="componentTypeStructureRegistry" />
+		<property name="typeBlacklistSet" ref="cmsStructureTypeBlacklistSet" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="composedTypeToStructureConverter" ref="cmsGenericComposedTypeToStructureConverter" />
+	</bean>
+
+	<alias name="defaultAttributePopulatorsProvider" alias="attributePopulatorsProvider"/>
+	<bean id="defaultAttributePopulatorsProvider" class="de.hybris.platform.cmsfacades.types.service.impl.DefaultAttributePopulatorsProvider">
+		<property name="componentTypeStructureRegistry" ref="componentTypeStructureRegistry" />
+		<property name="attributePredicatePopulatorListMap" ref="cmsAttributePredicatePopulatorListMap" />
+	</bean>
+
+	<!-- Prototype beans -->
+	<alias name="defaultCmsComponentTypeStructurePrototype" alias="cmsComponentTypeStructurePrototype"/>
+	<bean id="defaultCmsComponentTypeStructurePrototype" class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeStructure" scope="prototype">
+		<property name="populators">
+			<util:set id="defaultComponentTypePopulators">
+				<ref bean="basicComponentTypePopulator" />
+				<ref bean="i18nComponentTypePopulator" />
+			</util:set>
+		</property>
+	</bean>
+	<alias name="defaultCmsComponentTypeStructureAttributePrototype" alias="cmsComponentTypeStructureAttributePrototype"/>
+	<bean id="defaultCmsComponentTypeStructureAttributePrototype" class="de.hybris.platform.cmsfacades.types.service.impl.DefaultComponentTypeAttributeStructure" scope="prototype">
+		<property name="populators">
+			<util:set id="defaultComponentTypeAttributePopulators">
+				<ref bean="basicComponentTypeAttributePopulator" />
+				<ref bean="i18nComponentTypeAttributePopulator" />
+			</util:set>
+		</property>
+	</bean>
+
+	<!-- Converters and Populators -->
+	<alias name="defaultCmsGenericComposedTypeToStructureConverter" alias="cmsGenericComposedTypeToStructureConverter"/>
+	<bean id="defaultCmsGenericComposedTypeToStructureConverter" class="de.hybris.platform.cmsfacades.types.converter.GenericComposedTypeToStructureConverter">
+	   <property name="attributePopulatorsProvider" ref="attributePopulatorsProvider" />
+		<property name="structureTypeBlacklistAttributeMap" ref="cmsStructureTypeBlacklistAttributeMap" />
+		<property name="typeDataClassFunction" ref="structureTypeDataClassFunction" />
+		<property name="componentTypeStructureObjectFactory">
+			   <bean class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+					   <property name="targetBeanName" value="cmsComponentTypeStructurePrototype" />
+			   </bean>
+	   </property>
+	   <property name="componentTypeAttributeStructureObjectFactory">
+			   <bean class="org.springframework.beans.factory.config.ObjectFactoryCreatingFactoryBean">
+					   <property name="targetBeanName" value="cmsComponentTypeStructureAttributePrototype" />
+			   </bean>
+	   </property>
+	</bean>
+	
+	<alias name="defaultStructureTypeDataClassFunction" alias="structureTypeDataClassFunction"/>
+	<bean id="defaultStructureTypeDataClassFunction" class="de.hybris.platform.cmsfacades.types.service.populator.StructureTypeDataClassFunction">
+		<property name="typeClassPackage" value="de.hybris.platform.cmsfacades.data" />
+		<property name="typeClassSuffix" value="Data" />
+	</bean>
+</beans>

@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Bean Post Processors -->
+	<bean class="de.hybris.platform.ruleengine.infrastructure.PostRuleEngineInitializeBeanPostProcessor"/>
+
+	<bean class="de.hybris.platform.ruleengine.infrastructure.PrototypedBeanPostProcessor"/>
+	<!-- END Bean Post Processors -->
+
+	<alias name="defaultRuleEngineBootstrap" alias="ruleEngineBootstrap" />
+	<bean id="defaultRuleEngineBootstrap" class="de.hybris.platform.ruleengine.init.impl.DefaultRuleEngineBootstrap">
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="ruleEngineKieModuleSwapper" ref="ruleEngineKieModuleSwapper"/>
+		<property name="ruleEngineCacheService" ref="ruleEngineCacheService"/>
+		<property name="ruleEngineContainerRegistry" ref="ruleEngineContainerRegistry"/>
+		<property name="kieModuleService" ref="kieModuleService"/>
+	</bean>
+
+	<alias name="defaultRuleEngineContextForCatalogVersionsFinderStrategy" alias="ruleEngineContextForCatalogVersionsFinderStrategy" />
+	<bean id="defaultRuleEngineContextForCatalogVersionsFinderStrategy" class="de.hybris.platform.ruleengine.strategies.impl.DefaultRuleEngineContextForCatalogVersionsFinderStrategy">
+		<property name="catalogVersionToRuleEngineContextMappingDao" ref="catalogVersionToRuleEngineContextMappingDao" />
+    </bean>
+
+    <alias name="defaultRuleEngineContextFinderStrategy" alias="ruleEngineContextFinderStrategy" />
+    <bean id="defaultRuleEngineContextFinderStrategy" class="de.hybris.platform.ruleengine.strategies.impl.DefaultRuleEngineContextFinderStrategy">
+		<property name="rulesModuleDao" ref="rulesModuleDao" />
+		<property name="ruleEngineContextDao" ref="ruleEngineContextDao" />
+		<property name="catalogVersionService" ref="catalogVersionService"/>
+		<property name="ruleEngineContextForCatalogVersionsFinderStrategy" ref="ruleEngineContextForCatalogVersionsFinderStrategy"/>
+    </bean>
+
+	<alias name="defaultCatalogVersionFinderStrategy" alias="catalogVersionFinderStrategy"/>
+	<bean id="defaultCatalogVersionFinderStrategy" class="de.hybris.platform.ruleengine.strategies.impl.DefaultCatalogVersionFinderStrategy">
+		<property name="ruleEngineContextDao" ref="ruleEngineContextDao"/>
+		<property name="catalogVersionToRuleEngineContextMappingDao" ref="catalogVersionToRuleEngineContextMappingDao"/>
+	</bean>
+
+	<alias name="defaultRulesModuleResolver" alias="rulesModuleResolver" />
+	<bean id="defaultRulesModuleResolver" class="de.hybris.platform.ruleengine.strategies.impl.DefaultRulesModuleResolver">
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="engineRulesRepository" ref="engineRulesRepository"/>
+	</bean>
+	
+	<alias name="defaultDroolsKIEBaseFinderStrategy" alias="droolsKIEBaseFinderStrategy" />
+	<bean id="defaultDroolsKIEBaseFinderStrategy" class="de.hybris.platform.ruleengine.strategies.impl.DefaultDroolsKIEBaseFinderStrategy" />
+
+	<bean id="tenantAwareThreadFactory" class="de.hybris.platform.core.TenantAwareThreadFactory">
+		<constructor-arg name="tenant" ref="tenantFactory"/>
+	</bean>
+
+	<alias name="defaultIncrementalRuleEngineUpdateStrategy" alias="incrementalRuleEngineUpdateStrategy"/>
+	<bean id="defaultIncrementalRuleEngineUpdateStrategy" class="de.hybris.platform.ruleengine.init.impl.DefaultIncrementalRuleEngineUpdateStrategy">
+		<property name="engineRulesRepository" ref="engineRulesRepository"/>
+		<property name="totalNumOfRulesThreshold" value="#{configurationService.configuration.getProperty('ruleengine.incremental.update.total.threshold')}"/>
+		<property name="fractionOfRulesThreshold" value="#{configurationService.configuration.getProperty('ruleengine.incremental.update.fraction.threshold')}"/>
+	</bean>
+
+	<alias name="defaultRuleEngineKieModuleSwapper" alias="ruleEngineKieModuleSwapper"/>
+	<bean id="defaultRuleEngineKieModuleSwapper" class="de.hybris.platform.ruleengine.init.impl.DefaultRuleEngineKieModuleSwapper" destroy-method="beforeDestroy">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="currentTenant" ref="tenantFactory" />
+		<property name="tenantAwareThreadFactory" ref="tenantAwareThreadFactory"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="ruleEngineCacheService" ref="ruleEngineCacheService"/>
+		<property name="concurrentMapFactory" ref="initConcurrentMapFactory"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="rulePublishingSpliterator" ref="rulePublishingSpliterator"/>
+		<property name="contentMatchRulesFilter" ref="contentMatchRulesFilter"/>
+		<property name="incrementalRuleEngineUpdateStrategy" ref="incrementalRuleEngineUpdateStrategy"/>
+		<property name="ruleEngineBootstrap" ref="ruleEngineBootstrap"/>
+		<property name="suspendResumeTaskManager" ref="suspendResumeTaskManager"/>
+		<property name="kieModuleService" ref="kieModuleService"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+	</bean>
+
+	<bean id="initConcurrentMapFactory" class="de.hybris.platform.ruleengine.init.ConcurrentMapFactory">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias name="defaultModuleReleaseIdAware" alias="moduleReleaseIdAware" />
+	<bean id="defaultModuleReleaseIdAware" class="de.hybris.platform.ruleengine.drools.impl.DefaultModuleReleaseIdAware" abstract="true">
+		<property name="ruleEngineKieModuleSwapper" ref="ruleEngineKieModuleSwapper"/>
+	</bean>
+
+	<alias name="defaultKieSessionHelper" alias="kieSessionHelper" />
+	<bean id="defaultKieSessionHelper" class="de.hybris.platform.ruleengine.drools.impl.DefaultKieSessionHelper" parent="moduleReleaseIdAware">
+		<property name="ruleExecutionCounterClass" value="de.hybris.platform.ruleengine.impl.RuleMatchCountListener"/>
+	</bean>
+
+	<bean id="defaultRuleEngineTaskProcessor" class="de.hybris.platform.ruleengine.concurrency.impl.DefaultRuleEngineTaskProcessor">
+		<property name="tenant" ref="tenantFactory"/>
+		<property name="tenantAwareThreadFactory" ref="tenantAwareThreadFactory"/>
+		<property name="suspendResumeTaskManager" ref="suspendResumeTaskManager"/>
+	</bean>
+
+	<alias name="defaultPlatformRuleEngineService" alias="platformRuleEngineService" />
+	<bean id="defaultPlatformRuleEngineService" class="de.hybris.platform.ruleengine.impl.DefaultPlatformRuleEngineService">
+		<property name="kieSessionHelper" ref="kieSessionHelper"/>
+		<property name="eventService" ref="eventService" />
+		<property name="modelService" ref="modelService" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="droolsKIEBaseFinderStrategy" ref="droolsKIEBaseFinderStrategy"/>
+		<property name="ruleEngineKieModuleSwapper" ref="ruleEngineKieModuleSwapper"/>
+		<property name="ruleEngineCacheService" ref="ruleEngineCacheService"/>
+		<property name="concurrentMapFactory" ref="initConcurrentMapFactory"/>
+		<property name="engineRulesPersistingTaskProcessor" ref="defaultRuleEngineTaskProcessor"/>
+		<property name="ruleEngineBootstrap" ref="ruleEngineBootstrap"/>
+		<property name="ruleEngineContainerRegistry" ref="ruleEngineContainerRegistry"/>
+		<property name="engineRulesRepository" ref="engineRulesRepository"/>
+		<property name="postRulesModuleSwappingTasksProvider" ref="postRulesModuleSwappingTasksProvider"/>
+	</bean>
+
+	<alias name="defaultRuleEngineContainerRegistry" alias="ruleEngineContainerRegistry" />
+	<bean id="defaultRuleEngineContainerRegistry" class="de.hybris.platform.ruleengine.init.impl.DefaultRuleEngineContainerRegistry">
+		<property name="concurrentMapFactory" ref="initConcurrentMapFactory"/>
+		<property name="keepOnlyOneContainerVersion" value="#{configurationService.configuration.getProperty('ruleengine.containerregistry.keep.only.one.module.version')}"/>
+	</bean>
+
+	<alias name="defaultRuleGlobalsBeanProvider" alias="ruleGlobalsBeanProvider" />
+	<bean id="defaultRuleGlobalsBeanProvider" class="de.hybris.platform.ruleengine.cache.impl.DefaultRuleGlobalsBeanProvider"/>
+
+	<alias name="defaultRuleEngineCacheService" alias="ruleEngineCacheService" />
+	<bean id="defaultRuleEngineCacheService" class="de.hybris.platform.ruleengine.cache.impl.DefaultRuleEngineCacheService">
+		<property name="ruleEngineCache" ref="ruleEngineCache" />
+	</bean>
+
+	<alias name="defaultRuleEngineCache" alias="ruleEngineCache" />
+	<bean id="defaultRuleEngineCache" class="de.hybris.platform.ruleengine.cache.impl.DefaultRuleEngineCache">
+		<property name="configurationService" ref="configurationService" />
+		<property name="ruleGlobalsBeanProvider" ref="ruleGlobalsBeanProvider"/>
+	</bean>
+
+	<bean id="onTenantStartupProcessor"
+		  class="de.hybris.platform.ruleengine.event.OnTenantStartupProcessor">
+		<property name="ruleEngineBootstrap" ref="ruleEngineBootstrap"/>
+		<property name="configurationService" ref="configurationService" />
+		<property name="excludedTenants" ref="onTenantStartupProcessorExcludedTenants"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="ruleEngineService" ref="platformRuleEngineService"/>
+		<property name="ruleEngineInitRetryTemplate" ref="ruleEngineInitRetryTemplate"/>
+	</bean>
+
+	<util:set id="onTenantStartupProcessorExcludedTenants" value-type="java.lang.String">
+		<value>junit</value>
+	</util:set>
+
+	<bean id="onRuleEngineInitializedProcessor" class="de.hybris.platform.ruleengine.event.OnRuleEngineInitializedEventListener"
+		  parent="abstractEventListener">
+		<property name="platformRuleEngineService" ref="platformRuleEngineService" />
+		<property name="rulesModuleDao" ref="rulesModuleDao" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<alias name="defaultEngineRuleDao" alias="engineRuleDao" />
+	<bean id="defaultEngineRuleDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultEngineRuleDao" parent="abstractItemDao">
+		<property name="timeService" ref="timeService" />
+	</bean>
+
+	<alias name="defaultCatalogVersionToRuleEngineContextMappingDao" alias="catalogVersionToRuleEngineContextMappingDao" />
+	<bean id="defaultCatalogVersionToRuleEngineContextMappingDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultCatalogVersionToRuleEngineContextMappingDao" parent="abstractItemDao"/>
+
+	<alias name="defaultRuleEngineContextDao" alias="ruleEngineContextDao" />
+	<bean id="defaultRuleEngineContextDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultRuleEngineContextDao" parent="abstractItemDao"/>
+
+	<alias name="defaultRulesModuleDao" alias="rulesModuleDao" />
+	<bean id="defaultRulesModuleDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultRulesModuleDao" parent="abstractItemDao"/>
+
+	<alias name="defaultDroolsKIEBaseDao" alias="droolsKIEBaseDao" />
+	<bean id="defaultDroolsKIEBaseDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultDroolsKIEBaseDao" parent="abstractItemDao" />
+
+	<alias name="defaultRuleModelChecksumCalculator" alias="ruleModelChecksumCalculator" />
+	<bean id="defaultRuleModelChecksumCalculator" class="de.hybris.platform.ruleengine.versioning.impl.RuleEngineRuleModelChecksumCalculator"/>
+
+	<alias name="defaultRuleEngineRulePrepareInterceptor" alias="ruleEngineRulePrepareInterceptor" />
+	<bean id="defaultRuleEngineRulePrepareInterceptor" class="de.hybris.platform.ruleengine.dao.interceptors.RuleEngineRulePrepareInterceptor">
+		<property name="ruleModelChecksumCalculator" ref="ruleModelChecksumCalculator"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="historicalContentCreator" ref="ruleModelHistoricalContentCreator"/>
+		<property name="moduleVersioningService" ref="moduleVersioningService"/>
+	</bean>
+
+	<alias name="defaultRuleEngineRulePrepareInterceptorMapping" alias="ruleEngineRulePrepareInterceptorMapping" />
+	<bean id="defaultRuleEngineRulePrepareInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ruleEngineRulePrepareInterceptor" />
+		<property name="typeCode" value="AbstractRuleEngineRule" />
+	</bean>
+
+	<alias name="defaultRuleEngineRuleValidateInterceptor" alias="ruleEngineRuleValidateInterceptor" />
+	<bean id="defaultRuleEngineRuleValidateInterceptor" class="de.hybris.platform.ruleengine.dao.interceptors.RuleEngineRuleValidateInterceptor">
+		<property name="validator" ref="ruleEngineRuleModelValidator"/>
+	</bean>
+
+	<alias name="defaultRuleEngineRuleValidateInterceptorMapping" alias="ruleEngineRuleValidateInterceptorMapping" />
+	<bean id="defaultRuleEngineRuleValidateInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ruleEngineRuleValidateInterceptor" />
+		<property name="typeCode" value="AbstractRuleEngineRule" />
+	</bean>
+
+	<alias name="defaultRuleEngineRuleRemoveInterceptor" alias="ruleEngineRuleRemoveInterceptor" />
+	<bean id="defaultRuleEngineRuleRemoveInterceptor" class="de.hybris.platform.ruleengine.dao.interceptors.RuleEngineRuleRemoveInterceptor">
+		<property name="ruleModelRemoveHandler" ref="ruleModelRemoveHandler"/>
+	</bean>
+
+	<alias name="defaultRuleEngineRuleRemoveInterceptorMapping" alias="ruleEngineRuleRemoveInterceptorMapping" />
+	<bean id="defaultRuleEngineRuleRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ruleEngineRuleRemoveInterceptor" />
+		<property name="typeCode" value="AbstractRuleEngineRule" />
+	</bean>
+
+	<alias name="defaultRuleGroupRemoveInterceptor" alias="ruleGroupRemoveInterceptor" />
+	<bean id="defaultRuleGroupRemoveInterceptor" class="de.hybris.platform.ruleengine.dao.interceptors.RuleGroupRemoveInterceptor">
+		<property name="l10NService" ref="l10nService" />
+	</bean>
+
+	<alias name="defaultRuleGroupRemoveInterceptorMapping" alias="ruleGroupRemoveInterceptorMapping" />
+	<bean id="defaultRuleGroupRemoveInterceptorMapping" class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="ruleGroupRemoveInterceptor" />
+		<property name="typeCode" value="RuleGroup" />
+	</bean>
+
+	<alias name="defaultRuleEngineRuleModelValidator" alias="ruleEngineRuleModelValidator" />
+	<bean id="defaultRuleEngineRuleModelValidator" class="de.hybris.platform.ruleengine.versioning.impl.RuleEngineRuleModelValidator">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="ruleModelChecksumCalculator" ref="ruleModelChecksumCalculator"/>
+	</bean>
+
+	<alias name="defaultRuleModelRemoveHandler" alias="ruleModelRemoveHandler" />
+	<bean id="defaultRuleModelRemoveHandler" class="de.hybris.platform.ruleengine.versioning.impl.RuleEngineRuleModelRemoveHandler">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+	</bean>
+
+	<alias name="defaultRuleModelHistoricalContentCreator" alias="ruleModelHistoricalContentCreator" />
+	<bean id="defaultRuleModelHistoricalContentCreator" class="de.hybris.platform.ruleengine.versioning.impl.RuleEngineRuleModelHistoricalContentCreator">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="historicalRuleContentProviders" ref="historicalRuleContentProviders"/>
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias alias="historicalRuleContentProviders" name="defaultHistoricalRuleContentProviders"/>
+	<util:list id="defaultHistoricalRuleContentProviders"/>
+
+	<bean id="ruleEngineHistoricalRuleContentProvider" class="de.hybris.platform.ruleengine.versioning.impl.RuleEngineHistoricalRuleContentProvider"/>
+
+	<bean depends-on="historicalRuleContentProviders" parent="listMergeDirective">
+		<property name="add" ref="ruleEngineHistoricalRuleContentProvider"/>
+	</bean>
+
+	<alias name="defaultModuleVersioningService" alias="moduleVersioningService" />
+	<bean id="defaultModuleVersioningService" class="de.hybris.platform.ruleengine.versioning.impl.DefaultModuleVersioningService"/>
+
+	<alias name="defaultContentMatchRulesFilter" alias="contentMatchRulesFilter" />
+	<bean id="defaultContentMatchRulesFilter" class="de.hybris.platform.ruleengine.init.impl.DefaultContentMatchRulesFilter">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="moduleVersionResolver" ref="moduleVersionResolver"/>
+		<property name="engineRulesRepository" ref="engineRulesRepository"/>
+	</bean>
+
+	<!-- concurrency -->
+	<alias alias="ruleEngineSpliteratorStrategy" name="defaultRuleEngineSpliteratorStrategy" />
+	<bean id="defaultRuleEngineSpliteratorStrategy" class="de.hybris.platform.ruleengine.concurrency.impl.DefaultRuleEngineSpliteratorStrategy">
+		<property name="configurationService" ref="configurationService"/>
+	</bean>
+
+	<alias alias="ruleEngineConcurrencyTaskContext" name="defaultRuleEngineConcurrencyTaskContext" />
+	<bean id="defaultRuleEngineConcurrencyTaskContext" class="de.hybris.platform.ruleengine.concurrency.impl.DefaultTaskContext" scope="prototype">
+		<property name="configurationService" ref="configurationService"/>
+		<property name="currentTenant" ref="tenantFactory"/>
+		<property name="threadFactory" ref="tenantAwareThreadFactory"/>
+		<property name="ruleEngineSpliteratorStrategy" ref="ruleEngineSpliteratorStrategy"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="concurrentMapFactory" ref="initConcurrentMapFactory"/>
+	</bean>
+
+	<!-- end concurrency -->
+
+	<alias alias="rulePublishingSpliterator" name="defaultRulePublishingSpliterator" />
+	<bean id="defaultRulePublishingSpliterator" class="de.hybris.platform.ruleengine.init.impl.DefaultRulePublishingSpliterator">
+		<property name="taskContext" ref="ruleEngineConcurrencyTaskContext"/>
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="ruleEngineBootstrap" ref="ruleEngineBootstrap"/>
+		<property name="suspendResumeTaskManager" ref="suspendResumeTaskManager"/>
+	</bean>
+
+	<alias alias="ruleEngineRulesModuleMonitor" name="defaultRuleEngineRulesModuleMonitor" />
+	<bean id="defaultRuleEngineRulesModuleMonitor" class="de.hybris.platform.ruleengine.monitor.impl.DefaultRuleEngineRulesModuleMonitor">
+		<property name="ruleEngineBootstrap" ref="ruleEngineBootstrap"/>
+	</bean>
+
+	<bean id="AbstractRulesModule_catalogVersionsAttributeHandler" class="de.hybris.platform.ruleengine.dynamic.RuleModuleCatalogVersionAttributeHandler">
+		<property name="catalogVersionFinderStrategy" ref="catalogVersionFinderStrategy"/>
+	</bean>
+
+	<alias alias="engineRulesRepository" name="defaultEngineRulesRepository" />
+	<bean id="defaultEngineRulesRepository" class="de.hybris.platform.ruleengine.util.impl.DefaultEngineRulesRepository">
+		<property name="engineRuleDao" ref="engineRuleDao"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+		<property name="moduleVersionResolver" ref="moduleVersionResolver"/>
+	</bean>
+
+	<alias name="droolsModuleVersionResolver" alias="moduleVersionResolver" />
+	<bean id="droolsModuleVersionResolver" class="de.hybris.platform.ruleengine.versioning.impl.DroolsKieModuleVersionResolver"/>
+
+	<alias alias="postRulesModuleSwappingTasksProvider" name="defaultPostRulesModuleSwappingTasksProvider"/>
+	<bean id="defaultPostRulesModuleSwappingTasksProvider" class="de.hybris.platform.ruleengine.init.tasks.impl.DefaultPostRulesModuleSwappingTasksProvider">
+		<property name="postRulesModuleSwappingTasks" ref="postRulesModuleSwappingTaskList"/>
+	</bean>
+
+	<bean id="removeOldKieModulePostRulesModuleSwappingTask" class="de.hybris.platform.ruleengine.init.tasks.impl.RemoveOldKieModulePostRulesModuleSwappingTask">
+		<property name="ruleEngineKieModuleSwapper" ref="ruleEngineKieModuleSwapper"/>
+	</bean>
+
+	<alias alias="postRulesModuleSwappingTaskList" name="defaultPostRulesModuleSwappingTaskList"/>
+	<util:list id="defaultPostRulesModuleSwappingTaskList">
+		<ref bean="removeOldKieModulePostRulesModuleSwappingTask"/>
+	</util:list>
+
+	<alias alias="suspendResumeTaskManager" name="defaultSuspendResumeTaskManager"/>
+	<bean id="defaultSuspendResumeTaskManager" class="de.hybris.platform.ruleengine.concurrency.impl.DefaultSuspendResumeTaskManager">
+		<property name="currentTenant" ref="tenantFactory"/>
+		<property name="suspendResumeService" ref="suspendResumeService"/>
+	</bean>
+
+	<alias alias="ruleEngineInitRetryBackOffPolicy" name="defaultRuleEngineInitRetryBackOffPolicy" />
+	<bean id="defaultRuleEngineInitRetryBackOffPolicy" class="org.springframework.retry.backoff.FixedBackOffPolicy">
+		<property name="backOffPeriod" value="${ruleengine.init.retry.backoffperiod:2000}"/>
+	</bean>
+
+	<alias alias="ruleEngineInitRetryPolicy" name="defaultRuleEngineInitRetryPolicy" />
+	<bean id="defaultRuleEngineInitRetryPolicy" class="org.springframework.retry.policy.SimpleRetryPolicy">
+		<constructor-arg index="0" value="${ruleengine.init.retry.maxattempts:5}"/>
+		<constructor-arg index="1">
+			<map>
+				<entry key="java.lang.IllegalStateException" value="true"/>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<alias alias="ruleEngineInitRetryTemplate" name="defaultRuleEngineInitRetryTemplate" />
+	<bean id="defaultRuleEngineInitRetryTemplate" class="org.springframework.retry.support.RetryTemplate">
+		<property name="backOffPolicy" ref="ruleEngineInitRetryBackOffPolicy"/>
+		<property name="retryPolicy" ref="ruleEngineInitRetryPolicy"/>
+	</bean>
+	
+	<alias name="defaultDroolsKIEModuleMediaDao" alias="droolsKIEModuleMediaDao" />
+	<bean id="defaultDroolsKIEModuleMediaDao" class="de.hybris.platform.ruleengine.dao.impl.DefaultDroolsKIEModuleMediaDao" parent="abstractItemDao" />
+	
+	<alias alias="kieModuleService" name="defaultKieModuleService" />
+	<bean id="defaultKieModuleService" class="de.hybris.platform.ruleengine.drools.impl.DefaultKieModuleService">
+		<property name="droolsKIEModuleMediaDao" ref="droolsKIEModuleMediaDao"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="mediaService" ref="mediaService"/>
+		<property name="configurationService" ref="configurationService"/>
+		<property name="useCMC" value="#{configurationService.configuration.getProperty('ruleengine.centralized.module.compilation.enabled')}"/>
+	</bean>
+	
+	<bean id="kieModuleCleanupJob" parent="abstractGenericMaintenanceJobPerformable" >
+		<property name="maintenanceCleanupStrategy" ref="kieModuleCleanupStrategy"/>
+	</bean>
+
+	<alias alias="kieModuleCleanupStrategy" name="defaultKieModuleCleanupStrategy" />
+    <bean id="defaultKieModuleCleanupStrategy"  class="de.hybris.platform.ruleengine.cronjob.DefaultKieModuleCleanupStrategy">
+      <property name="modelService" ref="modelService"/>
+      <property name="mediaService" ref="mediaService"/>
+      <property name="configurationService" ref="configurationService"/>
+    </bean>
+
+	<!-- Base rule engine system setup bean -->
+	<bean id="abstractRuleEngineSystemSetup"
+		  class="de.hybris.platform.ruleengine.setup.AbstractRuleEngineSystemSetup"
+		  abstract="true">
+		<property name="importService" ref="importService"/>
+		<property name="commonI18NService" ref="commonI18NService"/>
+	</bean>
+
+	<bean id="ruleEngineSystemSetupInitialization" class="de.hybris.platform.ruleengine.setup.impl.RuleEngineSystemSetup" parent="abstractRuleEngineSystemSetup" />
+</beans>

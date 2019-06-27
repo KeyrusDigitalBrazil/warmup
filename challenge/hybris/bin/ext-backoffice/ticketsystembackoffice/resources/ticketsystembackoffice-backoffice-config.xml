@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config xmlns="http://www.hybris.com/cockpit/config"
+ 		xmlns:explorer-tree="http://www.hybris.com/cockpitng/config/explorertree"
+ 		xmlns:simple-search="http://www.hybris.com/cockpitng/config/simplesearch"		
+		xmlns:advanced-search="http://www.hybris.com/cockpitng/config/advancedsearch"
+ 		xmlns:list-view="http://www.hybris.com/cockpitng/component/listView"
+		xmlns:editorArea="http://www.hybris.com/cockpitng/component/editorArea"
+		xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config"
+		xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+
+    <context merge-by="module" parent="auto" component="explorer-tree">
+        <explorer-tree:explorer-tree>
+            <explorer-tree:navigation-node id="hmc_ticketsystemgroup">
+                <explorer-tree:type-node code="CsTicket" id="hmc_type_tree_csticket"/>
+                <explorer-tree:type-node code="CsTicketEventEmailConfiguration" id="CsTicketEventEmailConfiguration"/>
+            </explorer-tree:navigation-node>
+        </explorer-tree:explorer-tree>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicketEventEmailConfiguration" component="listview">
+        <list-view:list-view>
+            <list-view:column qualifier="code"/>
+            <list-view:column qualifier="recipientType"/>
+            <list-view:column qualifier="subject"/>
+        </list-view:list-view>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CommentType" component="listview">
+        <list-view:list-view >
+            <list-view:column qualifier="code"/>
+            <list-view:column qualifier="domain"/>
+            <list-view:column qualifier="name"/>
+            <list-view:column qualifier="metaType"/>
+        </list-view:list-view>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicket" component="listview">
+        <list-view:list-view >
+            <list-view:column qualifier="ticketID"/>
+            <list-view:column qualifier="headline"/>
+            <list-view:column qualifier="customer"/>
+            <list-view:column qualifier="order"/>
+            <list-view:column qualifier="state"/>
+            <list-view:column qualifier="priority"/>
+            <list-view:column qualifier="category"/>
+        </list-view:list-view>
+    </context>
+    <context merge-by="type" parent="Comment" type="CsTicketEvent" component="listview">
+        <list-view:list-view >
+            <list-view:column qualifier="text"/>
+        </list-view:list-view>
+    </context>
+    <context merge-by="type" parent="AbstractOrder" type="Order" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.order.tickets">
+                <editorArea:section name="hmc.section.order.tickets"/>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicketEventEmailConfiguration" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.ticketeventemail.config">
+                <editorArea:section name="hmc.tab.section.ticketeventemail.properties">
+                    <editorArea:attribute qualifier="code"/>
+                    <editorArea:attribute qualifier="subject"/>
+                    <editorArea:attribute qualifier="eventType"/>
+                    <editorArea:attribute qualifier="alteredAttributes"/>
+                    <editorArea:attribute qualifier="recipientType"/>
+                </editorArea:section>
+                <editorArea:section name="hmc.tab.section.ticketeventemail.layout">
+                    <editorArea:attribute qualifier="plainTextTemplate"/>
+                    <editorArea:attribute qualifier="htmlTemplate"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CommentType" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.common">
+                <editorArea:section name="hmc.section.common">
+                    <editorArea:attribute qualifier="code"/>
+                    <editorArea:attribute qualifier="domain"/>
+                    <editorArea:attribute qualifier="name"/>
+                    <editorArea:attribute qualifier="metaType"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicket" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.ticket.details">
+                <editorArea:section name="hmc.tab.section.ticket.details">
+                    <editorArea:attribute qualifier="ticketID"/>
+                    <editorArea:attribute qualifier="headline"/>
+                    <editorArea:attribute qualifier="category"/>
+                    <editorArea:attribute qualifier="state"/>
+                    <editorArea:attribute qualifier="priority"/>
+                    <editorArea:attribute qualifier="baseSite"/>
+                </editorArea:section>
+                <editorArea:section name="hmc.tab.section.ticket.associated">
+                    <editorArea:attribute qualifier="order" label="hmc.section.customer.tickets.associateTo"/>
+                    <editorArea:attribute qualifier="customer"/>
+                </editorArea:section>
+                <editorArea:section name="hmc.tab.section.ticket.assigned">
+                    <editorArea:attribute qualifier="assignedAgent"/>
+                    <editorArea:attribute qualifier="assignedGroup"/>
+                </editorArea:section>
+            </editorArea:tab>
+            <editorArea:tab name="hmc.tab.ticket.history">
+                <editorArea:section name="hmc.tab.section.ticket.history">
+                    <editorArea:attribute qualifier="resolution"/>
+                    <editorArea:attribute qualifier="events"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="User" type="Customer" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.customer.tickets" position="6">
+                <editorArea:section name="hmc.section.customer.tickets">
+                	<editorArea:panel name="" colspan="2" rowspan="2">
+                    	<editorArea:attribute qualifier="tickets" />
+                    </editorArea:panel>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="UserGroup" type="CsAgentGroup" component="editor-area">
+        <editorArea:editorArea>
+            <editorArea:tab name="hmc.tab.csagentgroup.tickets">
+                <editorArea:section name="hmc.section.csagentgroup.tickets">
+                    <editorArea:attribute qualifier="name"/>
+                    <editorArea:attribute qualifier="emailDistributionList"/>
+                    <editorArea:attribute qualifier="ticketstores"/>
+                </editorArea:section>
+            </editorArea:tab>
+        </editorArea:editorArea>
+    </context>
+    <context merge-by="type" parent="AbstractOrder" type="Order" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="module" parent="auto" type="Item" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicketEventEmailConfiguration" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list>
+                <advanced-search:field name="code" selected="true"/>
+                <advanced-search:field name="eventType" selected="false"/>
+                <advanced-search:field name="htmlTemplate" selected="false"/>
+                <advanced-search:field name="plainTextTemplate" selected="false"/>
+                <advanced-search:field name="recipientType" selected="true"/>
+                <advanced-search:field name="subject" selected="true"/>
+                <advanced-search:field name="comments" selected="false"/>
+                <advanced-search:field name="creationtime" selected="false"/>
+                <advanced-search:field name="itemtype" selected="false"/>
+                <advanced-search:field name="modifiedtime" selected="false"/>
+                <advanced-search:field name="owner" selected="false"/>
+                <advanced-search:field editor="java.lang.Long" name="pk" selected="false"/>
+            </advanced-search:field-list>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CommentType" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list>
+                <advanced-search:field name="code" selected="true"/>
+                <advanced-search:field name="domain" selected="true"/>
+                <advanced-search:field name="metaType" selected="true"/>
+                <advanced-search:field name="name" selected="true"/>
+                <advanced-search:field name="comments" selected="false"/>
+                <advanced-search:field name="creationtime" selected="false"/>
+                <advanced-search:field name="itemtype" selected="false"/>
+                <advanced-search:field name="modifiedtime" selected="false"/>
+                <advanced-search:field name="owner" selected="false"/>
+                <advanced-search:field editor="java.lang.Long" name="pk" selected="false"/>
+            </advanced-search:field-list>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="GenericItem" type="CsTicket" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list>
+                <advanced-search:field name="assignedAgent" selected="false"/>
+                <advanced-search:field name="assignedGroup" selected="false"/>
+                <advanced-search:field name="category" selected="false"/>
+                <advanced-search:field name="customer" selected="false"/>
+                <advanced-search:field name="headline" selected="false"/>
+                <advanced-search:field name="order" selected="false"/>
+                <advanced-search:field name="priority" selected="false"/>
+                <advanced-search:field name="resolution" selected="false"/>
+                <advanced-search:field name="state" selected="false"/>
+                <advanced-search:field name="ticketID" selected="true"/>
+                <advanced-search:field name="comments" selected="false"/>
+                <advanced-search:field name="creationtime" selected="false"/>
+                <advanced-search:field name="itemtype" selected="false"/>
+                <advanced-search:field name="modifiedtime" selected="false"/>
+                <advanced-search:field name="owner" selected="false"/>
+                <advanced-search:field editor="java.lang.Long" name="pk" selected="false"/>
+            </advanced-search:field-list>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="User" type="Customer" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="CsTicketEvent" type="CsCustomerEvent" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="UserGroup" type="CsAgentGroup" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="CsCustomerEvent" type="CsTicketResolutionEvent" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context merge-by="type" parent="Comment" type="CsTicketEvent" component="advanced-search">
+        <advanced-search:advanced-search>
+            <advanced-search:field-list/>
+        </advanced-search:advanced-search>
+    </context>
+    <context type="CsTicketEventEmailConfiguration" component="base" parent="GenericItem" merge-by="type">
+        <y:base>
+            <y:labels>
+                <y:label>code + (subject!=null ? " - " + subject : "")</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="CommentType" component="base" parent="GenericItem" merge-by="type">
+        <y:base>
+            <y:labels>
+                <y:label>code</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="CsCustomerEvent" component="base" parent="CsTicketEvent" merge-by="type">
+        <y:base>
+            <y:labels>
+                <y:label>code + (interventionType!=null ? " - " + @labelService.getObjectLabel(interventionType) : "") + (reason!=null ? " (" + reason + ")" : "")</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="CsTicketResolutionEvent" component="base" parent="CsCustomerEvent" merge-by="type">
+        <y:base>
+            <y:labels>
+                <y:label>code + (resolutionType!=null ? " - " + resolutionType : "") + (reason!=null ? " (" + reason + ")" : "")</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+    <context type="CsTicketEvent" component="base" parent="Comment" merge-by="type">
+        <y:base>
+            <y:labels>
+                <y:label>code</y:label>
+            </y:labels>
+        </y:base>
+    </context>
+	<context type="CsTicket" component="base" parent="GenericItem" merge-by="type">
+		<y:base>
+			<y:labels>
+				<y:label>ticketID + (headline!=null ? " - " + headline : "")</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+	<!-- CxPersonalizationProcessCleanupCronJob configuration -->
+	<!-- Editor area configuration -->
+	<context type="CSTicketStagnationCronJob" merge-by="type" parent="CronJob" component="editor-area">
+		<editorArea:editorArea>
+			<editorArea:essentials>
+				<editorArea:essentialSection name="hmc.essential">
+					<editorArea:attribute qualifier="stagnationPeriod" label="ticketsystembackoffice.csticketstagnationcronjob.stagnationPeriod"/>
+					<editorArea:attribute qualifier="eligibleStates" label="ticketsystembackoffice.csticketstagnationcronjob.eligibleStates" />
+				</editorArea:essentialSection>
+			</editorArea:essentials>
+		</editorArea:editorArea>
+	</context>
+	<context merge-by="type" type="CsTicket" component="create-wizard">
+		<wz:flow id="csTicketWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="csTicketPrepare">
+				<wz:initialize property="newItem" type="ctx.TYPE_CODE"/>
+			</wz:prepare>
+			<wz:step id="step1" label="create.csTicket.essential.label" sublabel="create.csTicket.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="ticketID"/>
+						<wz:property qualifier="headline"/>
+						<wz:property qualifier="category"/>
+						<wz:property qualifier="state"/>
+						<wz:property qualifier="priority"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:next visible="!#empty(newItem.ticketID) AND !#empty(newItem.headline) AND newItem.category != null AND newItem.state != null AND newItem.priority != null"/>
+					<wz:done visible="!#empty(newItem.ticketID) AND !#empty(newItem.headline) AND newItem.category != null AND newItem.state != null AND newItem.priority != null">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="create.csTicket.association.label" sublabel="create.csTicket.association.sublabel">
+				<wz:content id="step2.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="order"/>
+						<wz:property qualifier="customer"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:next visible="!#empty(newItem.ticketID) AND !#empty(newItem.headline) AND newItem.category != null AND newItem.state != null AND newItem.priority != null"/>
+					<wz:done visible="!#empty(newItem.ticketID) AND !#empty(newItem.headline) AND newItem.category != null AND newItem.state != null AND newItem.priority != null">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step3" label="create.csTicket.assignment.label" sublabel="create.csTicket.assignment.sublabel">
+				<wz:content id="step2.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="assignedAgent"/>
+						<wz:property qualifier="assignedGroup"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:done visible="!#empty(newItem.ticketID) AND !#empty(newItem.headline) AND newItem.category != null AND newItem.state != null AND newItem.priority != null">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	<context merge-by="type" type="CsTicketEventEmailConfiguration" component="create-wizard">
+		<wz:flow id="csTicketEventEmailConfigurationWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="csTicketEventEmailConfigurationPrepare">
+				<wz:initialize property="newItem" type="ctx.TYPE_CODE"/>
+			</wz:prepare>
+			<wz:step id="step1" label="create.csTicketEventEmailConfiguration.essential.label" sublabel="create.csTicketEventEmailConfiguration.essential.sublabel">
+				<wz:content id="step1.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="code"/>
+						<wz:property qualifier="subject"/>
+						<wz:property qualifier="eventType"/>
+						<wz:property qualifier="alteredAttributes"/>
+						<wz:property qualifier="recipientType"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:next visible="!#empty(newItem.code)"/>
+					<wz:done visible="!#empty(newItem.code)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+			<wz:step id="step2" label="create.csTicketEventEmailConfiguration.layout.label" sublabel="create.csTicketEventEmailConfiguration.layout.sublabel">
+				<wz:content id="step2.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="plainTextTemplate"/>
+						<wz:property qualifier="htmlTemplate"/>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step2.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:done visible="!#empty(newItem.code)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+</config>

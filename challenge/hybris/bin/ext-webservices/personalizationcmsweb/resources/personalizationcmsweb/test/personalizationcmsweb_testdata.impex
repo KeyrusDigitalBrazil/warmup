@@ -1,0 +1,63 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword = 12341234
+$regulargroup = regulargroup
+$customergroup = customergroup
+$contentCatalog = testCatalog
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalog]), CatalogVersion.version[default = Online])[default = $contentCatalog:Online]
+
+INSERT_UPDATE PageTemplate; $contentCV[unique = true]; uid[unique = true]; name; frontendTemplateName; restrictedPageTypes(code); active[default = true]
+; ; LandingPage2Template ; Landing Page 2 Template ; layout/landingLayout2Page ; CategoryPage,ContentPage
+
+INSERT_UPDATE ContentPage; $contentCV[unique = true]; uid[unique = true]; name; masterTemplate(uid, $contentCV); label; defaultPage[default = 'true']; approvalStatus(code)[default = 'approved']; homepage[default = 'true']
+; ; homepage ; Homepage ; LandingPage2Template ; homepage
+
+INSERT_UPDATE SimpleResponsiveBannerComponent; $contentCV[unique = true]; uid[unique = true]; name; urlLink; &componentRef
+; ; bannerHomePage1       ; Homepage banner component 1 ; ; HompageBannerComponent1
+; ; bannerHomePage2       ; Homepage banner component 2 ; ; HompageBannerComponent2
+; ; bannerHomePage3       ; Homepage banner component 3 ; ; HompageBannerComponent3
+; ; newPersonalizedBanner ; Homepage banner component 3 ; ; newPersonalizedBanner
+
+INSERT_UPDATE CxCmsComponentContainer; $contentCV[unique = true]; uid[unique = true]; sourceId; name; defaultCmsComponent(&componentRef); &componentRef
+; ; container1 ; container1 ; container1 ; HompageBannerComponent3 ; Section1SlotHomepageCxContainer
+; ; container2 ; container2 ; container2 ; HompageBannerComponent1 ; Section2SlotHomepageCxContainer
+
+
+INSERT_UPDATE ContentSlot; $contentCV[unique = true]; uid[unique = true]; active; cmsComponents(&componentRef)
+; ; Section1Slot-Homepage ; true ; HompageBannerComponent1,HompageBannerComponent3
+; ; Section2Slot-Homepage ; true ; Section2SlotHomepageCxContainer
+; ; templateSlot1         ; true ; HompageBannerComponent2
+
+# ContentSlotForPage 
+INSERT_UPDATE ContentSlotForPage; $contentCV[unique = true]; uid[unique = true]; position[unique = true]; page(uid, $contentCV)[unique = true][default = 'homepage']; contentSlot(uid, $contentCV)[unique = true];;;
+; ; Section1-Homepage ; Section1 ; ; Section1Slot-Homepage ; ; ;
+; ; Section2-Homepage ; Section2 ; ; Section2Slot-Homepage ; ; ;
+
+INSERT_UPDATE ContentSlotForTemplate; $contentCV[unique = true]; uid[unique = true]; position[unique = true]; pageTemplate(uid, $contentCV)[unique = true][default = 'LandingPage2Template']; contentSlot(uid, $contentCV)[unique = true]; allowOverwrite
+; ; templateSlot1fortemplate ; position1 ; ; templateSlot1 ; true
+
+
+INSERT_UPDATE CxCustomizationsGroup; code; $contentCV[unique = true]
+; default ;
+
+#Cx Customizations
+INSERT_UPDATE CxCustomization; code[unique = true]; name; $contentCV[unique = true]; group(code, $contentCV)[default = 'default']; status(code)[default = ENABLED]
+; customization1 ; customization1 ; ; ; ; ;
+
+
+INSERT_UPDATE CxVariation; code[unique = true]; name; $contentCV[unique = true]; enabled[default = true]; customization(code, $contentCV)[unique = true]; status(code)[default = ENABLED]
+; variation1 ; variation1 ; ; ; customization1 ;
+
+INSERT_UPDATE CxCmsAction; code[unique = true]; $contentCV[unique = true]; componentId; variation(code, $contentCV)[unique = true]; target; type(code); containerId;
+; cmsaction1 ; ; newPersonalizedBanner ; variation1 ; cxCmsActionPerformable ; PLAIN ; container2
+

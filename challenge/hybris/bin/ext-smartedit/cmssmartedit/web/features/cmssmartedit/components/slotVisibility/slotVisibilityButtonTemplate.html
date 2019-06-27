@@ -1,0 +1,41 @@
+<div class="slot-visibility-button-template">
+    <div class="btn-group slot-visibility-button-template__btn-group"
+        data-uib-dropdown
+        data-dropdown-append-to="'#smarteditoverlay'"
+        data-is-open="ctrl.isComponentListOpened">
+        <button type="button"
+            data-uib-dropdown-toggle
+            class="btn btn-primary slot-visibility-button-template__btn se-slot-ctx-menu__divider"
+            data-ng-if="ctrl.buttonVisible"
+            data-ng-class="{'ySEVisibilityOpen': ctrl.isComponentListOpened}"
+            id="slot-visibility-button-{{::ctrl.slotId}}">
+            <img class="slot-visibility-button-template__btn__img "
+                data-ng-src="{{ ctrl.eyeImageUrl }}" />{{ ::ctrl.hiddenComponentCount }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right slot-visibility-button-template__menu"
+            data-uib-dropdown-menu
+            data-ng-click="ctrl.onInsideClick($event)"
+            role="menu"
+            id="slot-visibility-list-{{::ctrl.slotId}}">
+            <li class="slot-visibility-button-template__menu__title"
+                data-translate="se.cms.slotvisibility.list.title"></li>
+            <li class="slot-visibility-component slot-visibility-button-template__menu__component"
+                data-ng-repeat="component in ctrl.hiddenComponents track by $index">
+
+                <span data-y-popover
+                    data-ng-if="component.isExternal"
+                    data-trigger="'hover'"
+                    data-template="ctrl.getTemplateInfoForExternalComponent()">
+                    <slot-visibility-component data-component="component"
+                        data-component-id="{{::component.uid}}"
+                        data-slot-id="{{::ctrl.slotId}}"></slot-visibility-component>
+                </span>
+
+                <slot-visibility-component data-component="component"
+                    data-ng-if="!component.isExternal"
+                    data-component-id="{{::component.uid}}"
+                    data-slot-id="{{::ctrl.slotId}}"></slot-visibility-component>
+            </li>
+        </ul>
+    </div>
+</div>

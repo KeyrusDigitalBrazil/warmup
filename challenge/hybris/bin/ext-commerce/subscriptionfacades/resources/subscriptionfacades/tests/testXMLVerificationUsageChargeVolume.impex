@@ -1,0 +1,82 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"P1";;
+;"P2";;
+;"P3";;
+;"P4";;
+;"P5";;
+;"P6";;
+;"P7";;
+;"P8";;
+;"P9";;
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;P1;P1;testCategory0;;monthly
+;P2;P2;testCategory0;;monthly
+;P3;P3;testCategory0;;monthly
+;P3;P3;testCategory0;;monthly
+;P4;P4;testCategory0;;monthly
+;P5;P5;testCategory0;;monthly
+;P6;P6;testCategory0;;monthly
+;P7;P7;testCategory0;;monthly
+;P8;P8;testCategory0;;monthly
+;P9;P9;testCategory0;;monthly
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;PP1;;;USD;P1
+;PP2;;;USD;P2
+;PP3;;;USD;P3
+;PP4;;;USD;P4
+;PP5;;;USD;P5
+;PP6;;;USD;P6
+;PP7;;;USD;P7
+;PP8;;;USD;P8
+;PP9;;;USD;P9
+
+INSERT VolumeUsageCharge;id[unique=true];name[lang=$lang];usageUnit(id);subscriptionPricePlanUsage(name[lang=$lang, unique=true]);$catalogversion
+;VC1;VC1;video;PP1
+;VC2;VC2;video;PP2
+;VC3;VC3;video;PP3
+;VC4;VC4;video;PP4
+;VC5;VC5;video;PP5
+;VC6;VC6;video;PP6
+;VC71;VC71;video;PP7
+;VC72;VC72;minute;PP7
+;VC81;VC81;video;PP8
+;VC82;VC82;minute;PP8
+;VC91;VC91;video;PP9
+;VC92;VC92;minute;PP9
+
+INSERT OverageUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;$catalogversion
+;OC1;VC1;15
+;OC6;VC6;11
+;OC71;VC71;15
+;OC72;VC72;25
+;OC91;VC91;11
+
+INSERT TierUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;tierStart;tierEnd;$catalogversion
+;TC2;VC2;11;1;1
+;TC3;VC3;11;1;2
+;TC41;VC4;11;1;2
+;TC42;VC4;12;3;3
+;TC51;VC5;11;1;2
+;TC52;VC5;12;3;4
+;TC61;VC6;12;1;2
+;TC62;VC6;13;3;3
+;TC81;VC81;11;1;2
+;TC82;VC82;12;3;4
+;TC92;VC92;12;3;4
+
+
+
+

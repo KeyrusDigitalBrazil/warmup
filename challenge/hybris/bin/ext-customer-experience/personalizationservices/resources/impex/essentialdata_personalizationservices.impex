@@ -1,0 +1,197 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Import essential data
+$defaultCatalog = Default
+$defaultCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $defaultCatalog]), CatalogVersion.version[default = Staged])[default = $defaultCatalog:Staged]
+
+# variables for constraints on calculation configuration
+$annotationMin = annotation[default = javax.validation.constraints.Min]
+$annotationSize = annotation[default = javax.validation.constraints.Size]
+$severityError = severity(code[default = ERROR], itemtype(code[default = Severity]))
+$periodicTargetModel = target[default = 'de.hybris.platform.personalizationservices.model.config.CxPeriodicVoterConfigModel']
+$urlTargetModel = target[default = 'de.hybris.platform.personalizationservices.model.config.CxUrlVoterConfigModel']
+$cxConfigTargetModel = target[default = 'de.hybris.platform.personalizationservices.model.config.CxConfigModel']
+
+INSERT_UPDATE UserGroup; UID[unique = true]; description                    ; name
+                       ; cxmanagergroup    ; Personalization Manager Group  ; Personalization Manager Group
+                       ; cxreadonlygroup   ; Personalization ReadOnly Group ; Personalization ReadOnly Group
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID            ; MemberOfGroups ; Password ; Target                                 ; read ; change ; create ; remove ; change_perm
+UserGroup ; cxmanagergroup ;                ;          ;                                        ;      ;        ;        ;        ;
+          ;                ;                ;          ; CxSegment                              ; +    ; +      ; +      ; +      ; - ;
+          ;                ;                ;          ; CxSegment.userToSegments               ; +    ; -      ; -      ; -      ; - ;
+          ;                ;                ;          ; CxUserToSegment                        ; +    ; -      ; -      ; -      ; - ;
+          ;                ;                ;          ; CxCustomizationsGroup                  ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxCustomization                        ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxVariation                            ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxAbstractAction                       ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxAbstractTrigger                      ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxPersonalizationProcessCleanupCronJob ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxConfig                               ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxAbstractCalcConfig                   ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxUrlVoterConfig                       ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; CxPeriodicVoterConfig                  ; +    ; +      ; +      ; +      ; + ;
+          ;                ;                ;          ; ConsentTemplate                        ; +    ;        ;        ;        ;   ;
+$END_USERRIGHTS; ; ; ; ; ; ; ; ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID             ; MemberOfGroups ; Password ; Target                                 ; read ; change ; create ; remove ; change_perm
+UserGroup ; cxreadonlygroup ;                ;          ;                                        ;      ;        ;        ;        ;
+          ;                 ;                ;          ; CxSegment                              ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxSegment.userToSegments               ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxUserToSegment                        ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxCustomizationsGroup                  ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxCustomization                        ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxVariation                            ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxAbstractAction                       ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxAbstractTrigger                      ; +    ; -      ; -      ; -      ; - ; ;
+          ;                 ;                ;          ; CxPersonalizationProcessCleanupCronJob ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxConfig                               ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxAbstractCalcConfig                   ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxPeriodicVoterConfig                  ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; CxUrlVoterConfig                       ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; ContentPage                            ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                ;          ; PageTemplate                           ; +    ; -      ; -      ; -      ; - ;
+$END_USERRIGHTS; ; ; ; ; ; ; ; ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID           ; MemberOfGroups ; Password ; Target         ; read ; change ; create ; remove ; change_perm
+UserGroup ; employeegroup ;                ;          ;                ;      ;        ;        ;        ;
+          ;               ;                ;          ; CxMapperScript ; -    ; -      ; -      ; -      ; - ;
+$END_USERRIGHTS; ; ; ; ; ; ; ; ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID           ; MemberOfGroups ; Password ; Target         ; read ; change ; create ; remove ; change_perm
+UserGroup ; customergroup ;                ;          ;                ;      ;        ;        ;        ;
+          ;               ;                ;          ; CxMapperScript ; -    ; -      ; -      ; -      ; - ;
+$END_USERRIGHTS; ; ; ; ; ; ; ; ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID             ; MemberOfGroups                 ; Password ; Target                                 ; read ; change ; create ; remove ; change_perm
+UserGroup ; cxmanagergroup  ;                                ;          ;                                        ;      ;        ;        ;        ;
+# general
+          ;                 ;                                ;          ; Item                                   ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; UserGroup                              ; +    ; +      ;        ;        ;   ;
+          ;                 ;                                ;          ; Employee                               ; +    ; +      ;        ;        ;   ;
+          ;                 ;                                ;          ; ItemSyncTimestamp                      ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; SyncItemJob                            ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; Type                                   ; +    ;        ;        ;        ;   ;
+# access rights for Products, Store, Site and Catalogs;;;;;;;;;
+          ;                 ;                                ;          ; Product                                ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; Category                               ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; VariantType                            ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; BaseSite                               ; +    ; +      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; BaseStore                              ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; Catalog                                ; +    ;        ;        ;        ;   ;
+          ;                 ;                                ;          ; CatalogVersion                         ; +    ; +      ;        ;        ;   ;
+          ;                 ;                                ;          ; ContentCatalog                         ; +    ; +      ; +      ; +      ; + ;
+# cms2 items
+          ;                 ;                                ;          ; AbstractComponentContainer             ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; AbstractComponentContainer.itemtype    ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; AbstractCMSComponent                   ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; AbstractCMSComponent.itemtype          ;      ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; AbstractCMSAction                      ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; AbstractCMSAction.itemtype             ;      ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; CMSItem                                ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSItem.itemtype                       ;      ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; CMSPageType                            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSRelation                            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSCatalogRestriction                  ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSCategoryRestriction                 ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSProductRestriction                  ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CatalogPage                            ; +    ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; CategoryPage                           ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ContentPage                            ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ProductPage                            ;      ;        ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ContentSlot                            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ContentSlotForPage                     ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ContentSlotForTemplate                 ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ContentSlotName                        ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ComponentTypeGroup                     ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ElementsForContainer                   ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ElementsForSlot                        ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; Media                                  ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CockpitUIScriptConfigMedia             ; -    ; -      ; -      ; -      ; - ;
+          ;                 ;                                ;          ; MediaContainer                         ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; MediaContext                           ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; MediaFormat                            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; MediaFormatMapping                     ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; PageRestrictions                       ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CatalogsForCMSSite                     ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; AvailableSlotsForTemplate              ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; RestrictionsForPages                   ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CatalogsForRestriction                 ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CategoriesForRestriction               ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; ProductsForRestriction                 ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; UsersForRestriction                    ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; UserGroupsForRestriction               ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; PreviewDataToCatalogVersion            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; PreviewData                            ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSSite                                ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; CMSVersion                             ; +    ; +      ; +      ; +      ; + ;
+          ;                 ;                                ;          ; BusinessProcess                        ; +    ; +      ; +      ; +      ; + ;
+$END_USERRIGHTS; ; ; ; ; ; ; ; ;
+
+INSERT_UPDATE CxCustomizationsGroup; code               ; $defaultCV[unique = true];
+                                   ; default            ;                          ;
+
+######### Result Cleanup CronJobs START #########
+INSERT_UPDATE CxPersonalizationProcessCleanupCronJob; code[unique = true]                      ; job(code)                                      ; singleExecutable; sessionLanguage(isocode); maxProcessAge; processStates(code)[default = SUCCEEDED]
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.servicelayer.cronjob.CronJobService service = de.hybris.platform.core.Registry.getApplicationContext().getBean(""cronJobService"");
+try
+{
+	service.getCronJob(code);
+    line.clear();
+}
+catch (Exception ex) {}
+";
+                                                    ; cleanupCxPersonalizationProcessesCronJob ; cleanupCxPersonalizationProcessJobsPerformable ; false           ; de                      ; 120          ; SUCCEEDED,FAILED,ERROR
+
+INSERT_UPDATE CxResultsCleaningCronJob; code[unique = true]     ; job(code)                      ; singleExecutable; sessionLanguage(isocode); anonymous; maxResultsAge;
+"#% beforeEach:
+String code = line.get(new Integer(1));
+de.hybris.platform.servicelayer.cronjob.CronJobService service = de.hybris.platform.core.Registry.getApplicationContext().getBean(""cronJobService"");
+try
+{
+	service.getCronJob(code);
+    line.clear();
+}
+catch (Exception ex) {}
+";
+                                      ; cleanupCxResultsCronJob ; cleanupCxResultsJobPerformable ; false           ; de                      ; true     ; 120          ;
+
+INSERT_UPDATE Trigger; cronJob(code)[unique = true]             ; second; minute; hour; day; month; year; relative; active; maxAcceptableDelay
+# Run the cleanupCxPersonalizationProcessesCronJob every 30 minutes
+                     ; cleanupCxPersonalizationProcessesCronJob ; 0     ; 30    ; -1  ; -1 ; -1   ; -1  ; true    ; true  ; -1
+# Run the cleanupCxResultsCronJob at 4:05 AM every day
+                     ; cleanupCxResultsCronJob                  ; 0     ; 5     ; 4   ; -1 ; -1   ; -1  ; false   ; false ; -1
+######### Result Cleanup CronJobs END #########
+
+# Import constraints for backoffice calculation configuration
+INSERT_UPDATE MinConstraint; id[unique = true]                         ; active[allownull = true]; type(code)            ; qualifier            ; value; descriptor(enclosingType(code), qualifier) ; $periodicTargetModel; $annotationMin; $severityError
+                           ; cxPeriodicVoterConfigUserMinTime          ; true                    ; CxPeriodicVoterConfig ; userMinTime          ; 0    ; CxPeriodicVoterConfig:userMinTime          ;                     ;               ;
+                           ; cxPeriodicVoterConfigUserMinRequestNumber ; true                    ; CxPeriodicVoterConfig ; userMinRequestNumber ; 0    ; CxPeriodicVoterConfig:userMinRequestNumber ;                     ;               ;
+
+INSERT_UPDATE SizeConstraint; id[unique = true]                   ; active[allownull = true]; type(code)            ; qualifier; descriptor(enclosingType(code), qualifier); $periodicTargetModel; $annotationSize; $severityError; min; max
+                            ; cxPeriodicVoterConfigSizeConstraint ; true                    ; CxPeriodicVoterConfig ; actions  ; CxPeriodicVoterConfig:actions             ;                     ;                ;               ; 1  ; 255
+
+INSERT_UPDATE SizeConstraint; id[unique = true]              ; active[allownull = true]; type(code)       ; qualifier; descriptor(enclosingType(code), qualifier); $urlTargetModel; $annotationSize; $severityError; min; max
+                            ; cxUrlVoterConfigSizeConstraint ; true                    ; CxUrlVoterConfig ; actions  ; CxUrlVoterConfig:actions                  ;                ;                ;               ; 1  ; 255
+
+INSERT_UPDATE RegExpConstraint; id[unique = true]              ; active[allownull = true]; type(code)       ; qualifier; descriptor(enclosingType(code), qualifier); notEmpty ; $urlTargetModel; $severityError; annotation[default = de.hybris.platform.validation.annotations.RegExp]
+; cxUrlRegexpConstraint ; true                    ; CxUrlVoterConfig ; urlRegexp  ; CxUrlVoterConfig:urlRegexp                  ;true ;                ;                ;               ;
+
+INSERT_UPDATE NotBlankConstraint; id[unique = true]              ; active[allownull = true]; type(code)       ; qualifier; descriptor(enclosingType(code), qualifier); $cxConfigTargetModel; $severityError;annotation[default = de.hybris.platform.validation.annotations.NotBlank]
+; cxConfigCalculationProcessConstraint ; true                    ; CxConfig ; calculationProcess  ; CxConfig:calculationProcess                  ;                ;                ;               ;

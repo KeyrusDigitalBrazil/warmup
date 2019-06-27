@@ -1,0 +1,96 @@
+<div data-ng-class="{'perso-segments-tree__layout': ctrl.isContainer(node), 'perso-segments-tree__empty-container': ctrl.isContainerWithDropzone(node), 'perso-segments-tree__collapsed-container': collapsed }">
+    <div class="perso-segments-tree"
+        data-ng-class="{'perso-segments-tree__node': ctrl.isItem(node), 'perso-segments-tree__container': ctrl.isContainer(node)}">
+        <div data-ng-if="ctrl.isContainer(node)">
+            <div class="perso-segments-tree__toggle"
+                data-ng-click="ctrl.toggle(this)"
+                title="{{collapsed ? 'personalization.commons.icon.title.expand' : 'personalization.commons.icon.title.collapse' | translate}}">
+                <span class="glyphicon perso-segments-tree__glyphicon"
+                    data-ng-class="{'glyphicon-chevron-right': collapsed, 'glyphicon-chevron-down': !collapsed}"></span>
+            </div>
+            <div class="perso-segments-tree__dropdown">
+                <ui-select data-ng-model="node.operation"
+                    theme="select2"
+                    title=""
+                    search-enabled="false">
+                    <ui-select-match>
+                        <span data-ng-bind="$select.selected.name | translate"></span>
+                    </ui-select-match>
+                    <ui-select-choices repeat="item in ctrl.actions"
+                        position="down">
+                        <span data-ng-bind="item.name | translate"></span>
+                    </ui-select-choices>
+                </ui-select>
+            </div>
+        </div>
+        <div data-ng-if="ctrl.isItem(node)"
+            ui-tree-handle
+            class="perso-segments-tree__node-content"
+            data-ng-bind="node.selectedSegment.code"></div>
+
+        <div data-ng-if="ctrl.isDropzone(node)"
+            class="perso-segments-tree__empty-container-node">
+            <div class="perso-segments-tree__empty-container-node-text"
+                data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.segments.dropzone"></div>
+        </div>
+
+        <div data-ng-if="ctrl.isContainer(node)"
+            ui-tree-handle
+            class="perso-segments-tree__angular-ui-tree-handle--empty"></div>
+        <div data-nodrag>
+            <span class="pull-right">
+                <a data-ng-if="ctrl.isItem(node)"
+                    class="perso-segments-tree__actions perso-segments-tree__node-icon"
+                    data-ng-click="ctrl.duplicateItem(node)"
+                    title="{{'personalization.commons.icon.title.duplicate' | translate}}">
+                    <span class="hyicon hyicon-duplicate"></span>
+                </a>
+                <a data-ng-if="!ctrl.isTopContainer(this)"
+                    class="perso-segments-tree__actions"
+                    data-ng-click="ctrl.removeItem(this)">
+                    <div data-ng-if="ctrl.isContainer(node)"
+                        class="btn btn-link perso-segments-tree__container-btn-icon"
+                        title="{{'personalization.commons.icon.title.remove' | translate}}">
+                        <span class="hyicon hyicon-removelg"></span>
+                    </div>
+                    <div data-ng-if="ctrl.isItem(node)"
+                        class="perso-segments-tree__node-icon"
+                        title="{{'personalization.commons.icon.title.remove' | translate}}">
+                        <span class="hyicon hyicon-removelg"></span>
+                    </div>
+                </a>
+            </span>
+            <a data-ng-if="ctrl.isContainer(node)"
+                class="btn btn-link perso-segments-tree__btn"
+                data-ng-click="ctrl.newSubItem(this, 'container')">
+                <span class="pe-customization-modal__sliderpanel__btn-link"
+                    data-translate="personalization.modal.customizationvariationmanagement.targetgrouptab.segments.group.button"></span>
+            </a>
+        </div>
+    </div>
+
+    <ol data-ng-if="ctrl.isItem(node)"
+        ui-tree-nodes
+        data-nodrop-enabled="true"
+        data-ng-model="node.nodes"
+        data-ng-class="{hidden: collapsed}">
+        <li data-ng-repeat="node in node.nodes"
+            ui-tree-node
+            data-collapsed="true"
+            data-expand-on-hover="500"
+            data-ng-include="'personalizationsmarteditSegmentNodeTemplate.html'">
+        </li>
+    </ol>
+    <ol data-ng-if="ctrl.isContainer(node)"
+        ui-tree-nodes
+        data-ng-model="node.nodes"
+        data-ng-class="{hidden: collapsed}">
+        <li data-ng-repeat="node in node.nodes"
+            ui-tree-node
+            data-collapsed="true"
+            data-expand-on-hover="500"
+            data-ng-include="'personalizationsmarteditSegmentNodeTemplate.html'">
+        </li>
+    </ol>
+
+</div>

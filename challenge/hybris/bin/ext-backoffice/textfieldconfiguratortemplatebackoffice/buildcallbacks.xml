@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+ All hybris buildcallbacks.xml macrodefinitions:
+
+ Build/Documentation
+
+	 before/after ant macro "clean"
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_clean"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_build"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_compile_core">
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_compile_web" />
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_compile_web" />
+
+ Preparing extension
+
+	 will be called in the beginning of the ant call and only once (also when using multiple
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_only_once_prepare"/>
+
+ Creating ear module/production
+
+	 before/after ant macro "ear"
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_ear"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_production" />
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_production" />
+
+ JUnit Test
+
+	 before/after ant macro "yunitinit"
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_yunitinit" />
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_yunit" />
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_yunit" />
+
+ Distribution package
+
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_dist"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_dist_copy"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_dist_copy"/>
+
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.textfieldconfiguratortemplatebackoffice.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.textfieldconfiguratortemplatebackoffice.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+
+ Backoffice module
+
+ 	 before/after ant macro "backoffice" - internal target; only for use when extensin is a backoffice module
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_clean_backoffice"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_clean_backoffice"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_before_compile_backoffice"/>
+		 <macrodef name="textfieldconfiguratortemplatebackoffice_after_compile_backoffice"/>
+
+--><project name="textfieldconfiguratortemplatebackoffice_buildcallbacks">
+	<property name="textfieldconfiguratortemplatebackofficeWebFragmentSrc" value="${ext.textfieldconfiguratortemplatebackoffice.path}/resources/web-fragment.xml"/>
+	<property name="textfieldconfiguratortemplatebackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_textfieldconfiguratortemplatebackoffice.jar"/>
+
+	
+
+	
+
+	<macrodef name="textfieldconfiguratortemplatebackoffice_after_clean">
+		<sequential>
+			<textfieldconfiguratortemplatebackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="textfieldconfiguratortemplatebackoffice_after_build">
+		<sequential>
+			<textfieldconfiguratortemplatebackoffice_remove_web_fragment/>
+			<textfieldconfiguratortemplatebackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="textfieldconfiguratortemplatebackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${textfieldconfiguratortemplatebackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${textfieldconfiguratortemplatebackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="textfieldconfiguratortemplatebackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${textfieldconfiguratortemplatebackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${textfieldconfiguratortemplatebackofficeWebFragmentDestJar}">
+							<metainf file="${textfieldconfiguratortemplatebackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<patternset id="textfieldconfiguratortemplatebackoffice.localization.pattern">
+		<!-- core -->
+		<include name="**/*locales*_en.properties"/>
+		<exclude name="**/unittest/**/*"/>
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties"/>
+		<include name="**/labels_en.properties"/>
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties"/>
+		<include name="**/*messages.properties"/>
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties"/>
+
+		<!-- csv and impex -->
+		<include name="**/*_en.csv"/>
+		<include name="**/*_en.impex"/>
+
+		<include name="**/lang-en.properties"/>
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties"/>
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties"/>
+	</patternset>
+
+</project>

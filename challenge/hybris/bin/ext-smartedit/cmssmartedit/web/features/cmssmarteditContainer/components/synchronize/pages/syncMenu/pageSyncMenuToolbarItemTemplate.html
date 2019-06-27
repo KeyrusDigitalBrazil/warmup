@@ -1,0 +1,45 @@
+<div class="toolbar-action"
+    data-uib-dropdown
+    data-auto-close="outsideClick"
+    data-is-open="$ctrl.toolbarItem.isOpen"
+    data-item-key="{{ $ctrl.toolbarItem.key }}">
+    <button type="button"
+        class="btn btn-default toolbar-action--button"
+        data-uib-dropdown-toggle
+        aria-pressed="false">
+        <span class="hyicon hyicon-sync se-toolbar-menu-ddlb--button__icon"></span>
+        <div class="se-toolbar-sync-wrapper">
+            <span class="toolbar-action--button--txt"
+                data-ng-class="{'se-toolbar-menu-ddlb--button__txt': $ctrl.isNotInSync }">
+                {{ $ctrl.toolbarItem.name | translate }}
+            </span>
+            <span data-ng-if="$ctrl.isNotInSync"
+                class="hyicon hyicon-caution se-toolbar-menu-ddlb--button__caution">
+            </span>
+        </div>
+    </button>
+    <div data-uib-dropdown-menu
+        class="dropdown-menu-left btn-block toolbar-action--include">
+        <div ng-if="$ctrl.toolbarItem.isOpen && $ctrl.isReady">
+            <ul class="se-toolbar-menu-content se-toolbar-menu-content__page-sync"
+                role="menu">
+                <li role="menuitem">
+                    <div class="se-toolbar-menu-content--wrapper">
+                        <div class="se-toolbar-menu-content--header">
+                            <div class="se-toolbar-menu-content--header__title se-page-sync__header-content">
+                                <span data-translate="se.cms.synchronization.page.title"></span>
+                                <y-help class="se-page-sync__y-help"
+                                    data-ng-if="!$ctrl.syncPageConditions.canSyncHomepage && !$ctrl.syncPageConditions.pageHasNoDepOrNoSyncStatus"
+                                    data-template="$ctrl.helpTemplate"></y-help>
+                            </div>
+                        </div>
+                        <div class="se-toolbar-menu-content--body">
+                            <page-synchronization-panel data-cms-page="$ctrl.cmsPage"
+                                data-uri-context="$ctrl.uriContext"></page-synchronization-panel>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

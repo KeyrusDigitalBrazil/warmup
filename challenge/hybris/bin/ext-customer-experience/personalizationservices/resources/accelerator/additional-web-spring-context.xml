@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="configurableUrlPersonalizationVoter" class="de.hybris.platform.personalizationservices.voters.impl.ConfigurableUrlVoter">
+		<property name="cxConfigurationService" ref="cxConfigurationService" />
+	</bean>
+
+	<!-- Deprecated since 1808 NewSessionVoter and PeriodicVoter cover this functionality -->
+	<!--bean id="anonymousPersonalizationVoter" class="de.hybris.platform.personalizationservices.voters.impl.AnonymousVoter">
+		<property name="cxConfigurationService" ref="cxConfigurationService" />
+		<property name="userService" ref="userService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="timeService" ref="timeService" />
+	</bean-->
+
+    <bean id="personalizationPeriodicVoter" class="de.hybris.platform.personalizationservices.voters.impl.PeriodicVoter">
+        <property name="cxConfigurationService" ref="cxConfigurationService" />
+        <property name="userService" ref="userService" />
+        <property name="sessionService" ref="sessionService" />
+        <property name="timeService" ref="timeService" />
+    </bean>
+
+	<bean id="newSessionPersonalizationVoter" class="de.hybris.platform.personalizationservices.voters.impl.NewSessionVoter">
+    	<property name="cxConfigurationService" ref="cxConfigurationService" />
+	</bean>
+
+	<alias name="defaultCxPersonalizationFilter" alias="cxPersonalizationFilter"/>
+   	<bean id="defaultCxPersonalizationFilter" class="de.hybris.platform.personalizationservices.filter.CxPersonalizationFilter">
+   		<property name="cxRecalculationService" ref="cxRecalculationService" />
+   		<property name="sessionService" ref="sessionService" />
+    </bean>
+
+	<bean depends-on="storefrontTenantDefaultFilterChainList" parent="listMergeDirective">
+    	<property name="add" ref="cxPersonalizationFilter" />
+    	<property name="afterBeanNames">
+   			<list value-type="java.lang.String">
+            	<value>springSecurityFilterChain</value>
+        	</list>
+    	</property>
+	</bean>
+</beans>

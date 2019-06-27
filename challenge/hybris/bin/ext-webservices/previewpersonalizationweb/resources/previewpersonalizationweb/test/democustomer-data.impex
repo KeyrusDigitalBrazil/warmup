@@ -1,0 +1,161 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Import essential data for the tests
+#
+# Includes:
+# * Users
+# * Languages
+# * Currencies
+# * Titles
+# * Warehouses
+
+# Users
+$defaultPassword=1234
+
+$regulargroup=regulargroup
+$customergroup=customergroup
+
+$defaultCurrency=EUR
+$defaultLanguage=en
+$deliveryCountries=US
+
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$testCategory0-id=testCategory0
+$testCategory1-id=testCategory1
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+$prices=europe1prices[translator=de.hybris.platform.europe1.jalo.impex.Europe1PricesTranslator]
+
+$testsiteUID=testSite
+$storeUid=testStore
+
+$contentCatalog=testCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append]
+;$regulargroup;customergroup
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;testoauthcustomer;customergroup;;Demo Customer
+
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;;;
+;en;true;;;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=en];;;;;;;
+;en;English;;;;;;;
+
+INSERT_UPDATE Unit;unitType[unique=true];code[unique=true];name[lang=en];conversion;;;
+;pieces;pieces;pieces;1
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;EUR;Euro;true;true;1;2;E
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active;;;;;;
+;US;United States of America;true;;;;;;
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=en];defaultCatalog;;;;;;
+;$catalog-id;$catalog-id;true;;;;;;
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true];active;defaultCurrency(isocode);;;;;;
+;$catalog-id;$catalog-version;true;EUR;;;;;;
+
+# Base Store
+INSERT_UPDATE BaseStore;uid[unique=true];catalogs(id)
+;$storeUid;$catalog-id,
+
+INSERT_UPDATE CMSSite;uid[unique=true];defaultCatalog(id);urlPatterns;active;stores(uid)
+;testCmsSite;$catalog-id;(?i)^https?://[^/]+(/[^?]*)?\?(.*\&)?(site=testCmsSite)(|\&.*)$;true;$storeUid
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true]	;resourceIds	;scope		;authorizedGrantTypes											;authorities			;clientSecret	;registeredRedirectUri
+								;mobile_android			;hybris			;basic,previewwebservices		;authorization_code,refresh_token,password,client_credentials	;ROLE_CLIENT			;secret	;http://localhost:9001/authorizationserver/oauth2_callback;
+
+
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append];
+;cxmanagergroup;employeegroup;
+;previewmanagergroup;employeegroup;
+
+INSERT_UPDATE Employee;UID[unique=true];password[default=$defaultPassword];groups(uid)[mode=append];
+;cmsmanager;;cxmanagergroup,previewmanagergroup;
+;randomuser;;
+
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;segment1;
+;segment2;
+;segment3;
+;segment4;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;customer1@hybris.com;customergroup;;Miljenko Calhoun0
+;customer2@hybris.com;customergroup;;Miljenko Calhoun1
+;customer3@hybris.com;customergroup;;Miljenko Calhoun2
+;customer4@hybris.com;customergroup;;Miljenko Calhoun3
+
+
+INSERT_UPDATE CxUserToSegment;user(uid)[unique=true];segment(code)[unique=true];affinity;
+;customer1@hybris.com;segment1;1;
+;customer2@hybris.com;segment1;1;
+;customer3@hybris.com;segment1;1;
+;customer1@hybris.com;segment2;1;
+;customer2@hybris.com;segment2;1;
+;customer1@hybris.com;segment3;1;
+;customer3@hybris.com;segment3;1;
+;customer4@hybris.com;segment3;1;
+;customer1@hybris.com;segment4;1;
+;customer2@hybris.com;segment4;1;
+;customer3@hybris.com;segment4;1;
+;customer4@hybris.com;segment4;1;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+;default;
+
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='default'];status(code)[default=ENABLED]
+;customization1;customization1;;
+;customization2;customization2;;
+;customization3;customization3;;
+;customization4;customization4;;
+;customization5;customization5;;
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];enabled[default=true];customization(code,$contentCV);rank;status(code)[default=ENABLED]
+;variation0;variation0;;;customization1;1;
+;variation1;variation1;;;customization1;5;
+;variation2;variation2;;;customization1;6;
+;variation3;variation3;;;customization1;7;
+;variation4;variation4;;;customization1;8;
+;variation5;variation5;;;customization1;9;
+;variation6;variation6;;;customization1;10;
+;variation7;variation7;;;customization1;11;
+;variation8;variation8;;;customization1;12;
+;variation9;variation9;;;customization1;13;
+
+UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];variations(code,$contentCV);
+;customization1;customization1;;variation0,variation1,variation2,variation3,variation4,variation5,variation6,variation7,variation8,variation9;
+
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCV[unique=true];variation(code,$contentCV)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger0;;variation0;segment1;
+;trigger1;;variation1;segment2;
+;trigger2;;variation2;segment3;
+;trigger3;;variation3;segment4;
+;trigger4;;variation4;segment1;
+;trigger5;;variation5;segment2;
+;trigger6;;variation6;segment3;
+;trigger7;;variation7;segment4;
+;trigger8;;variation8;segment1;
+;trigger9;;variation9;segment2;
+

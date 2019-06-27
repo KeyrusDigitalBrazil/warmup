@@ -1,0 +1,699 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<alias name="sapProductConfigDefaultCPSProviderFactory" alias="sapProductConfigCPSProviderFactory" />
+	<bean id="sapProductConfigDefaultCPSProviderFactory"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.impl.DefaultRuntimeProviderFactoryImpl">
+		<property name="configurationProvider" ref="sapProductConfigConfigurationProviderCPS" />
+		<property name="pricingProvider" ref="sapProductConfigPricingProviderCPS" />
+		<property name="analyticsProvider" ref="sapProductConfigAnalyticsProvider" />
+		<property name="productCsticAndValueParameterProvider"
+			ref="sapProductConfigDefaultProductCsticAndValueParameterProviderCPS" />
+		<property name="pricingParameter" ref="sapProductConfigPricingParametersCPS" />
+	</bean>
+
+	<bean id="sapProductConfigRegisteredProviderFactoriesCPSListMergeDirective"
+		depends-on="sapProductConfigRegisteredProviderFactories" parent="listMergeDirective">
+		<property name="add" value="sapProductConfigCPSProviderFactory" />
+	</bean>
+
+	<alias name="sapProductConfigConfigurationProviderCPS" alias="sapProductConfigConfigurationProviderEnforceCPS" />
+	<alias name="sapProductConfigConfigurationProviderCPS" alias="sapProductConfigConfigurationProvider" />
+	<bean id="sapProductConfigConfigurationProviderCPS" scope="prototype"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSConfigurationProvider">
+		<property name="configModelConverter" ref="sapProductConfigCPSConfigurationConverter" />
+		<property name="charonFacade" ref="sapProductConfigCharonFacade" />
+		<property name="charonKbDeterminationFacade" ref="sapProductConfigCharonKbDeterminationFacade" />
+		<property name="externalConfigurationFromVariantStrategy" ref="sapProductConfigurationCPSConfigFromVariantStrategy" />
+		<property name="configurationChangeAdapter" ref="sapProductConfigCPSConfigurationChangeAdapter" />
+		<property name="configurationModificationHandler" ref="sapProductConfigCPSConfigurationModificationHandler" />
+	</bean>
+
+	<alias name="sapProductConfigPricingProviderCPS" alias="sapProductConfigPricingProvider" />
+	<bean id="sapProductConfigPricingProviderCPS" scope="prototype"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSPricingProvider">
+		<property name="pricingHandler" ref="sapProductConfigCPSPricingHandler" />
+		<property name="masterDataService" ref="sapProductConfigMasterDataService" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultCharonFacade" alias="sapProductConfigCharonFacade" />
+	<bean id="sapProductConfigDefaultCharonFacade"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CharonFacadeImpl">
+		<property name="commerceExternalConfigurationStrategy" ref="sapProductConfigurationCPSExtConfigStrategy" />
+		<property name="kbKeyComparator" ref="sapProductConfigKnowledgeBaseKeyComparator" />
+		<property name="responseStrategy" ref="sapProductConfigCPSResponseAttributeStrategy" />
+		<property name="requestErrorHandler" ref="sapProductConfigRequestErrorHandler" />
+		<property name="yaasServiceFactory" ref="yaasServiceFactory" />
+		<property name="contextSupplier" ref="sapProductConfigurationCPSContextSupplier" />
+		<property name="cache" ref="sapProductConfigCPSCache" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="configurationParentReferenceStrategy" ref="sapProductConfigCPSConfigurationParentReferenceStrategy" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultCPSConfigurationParentReferenceStrategy" alias="sapProductConfigCPSConfigurationParentReferenceStrategy" />
+	<bean id="sapProductConfigDefaultCPSConfigurationParentReferenceStrategy"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.strategy.impl.CPSConfigurationParentReferenceStrategyImpl">
+	</bean>
+	<alias name="sapProductConfigDefaultCPSResponseAttributeStrategy" alias="sapProductConfigCPSResponseAttributeStrategy" />
+	<bean id="sapProductConfigDefaultCPSResponseAttributeStrategy"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.session.impl.CPSResponseAttributeStrategyImpl">
+		<property name="cpsCache" ref="sapProductConfigCPSCache" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultKnowledgeBaseKeyComparator" alias="sapProductConfigKnowledgeBaseKeyComparator" />
+	<bean id="sapProductConfigDefaultKnowledgeBaseKeyComparator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.masterdata.service.impl.KnowledgebaseKeyComparatorImpl">
+		<property name="masterDataService" ref="sapProductConfigMasterDataService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConfigurationChangeAdapter" alias="sapProductConfigCPSConfigurationChangeAdapter" />
+	<bean id="sapProductConfigDefaultCPSConfigurationChangeAdapter"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSConfigurationChangeAdapterImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConfigurationModificationHandler"
+		alias="sapProductConfigCPSConfigurationModificationHandler" />
+	<bean id="sapProductConfigDefaultCPSConfigurationModificationHandler"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.ConfigurationModificationHandlerImpl">
+		<property name="configurationMasterDataService" ref="sapProductConfigMasterDataService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCharonKbDeterminationFacade" alias="sapProductConfigCharonKbDeterminationFacade" />
+	<bean id="sapProductConfigDefaultCharonKbDeterminationFacade"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CharonKbDeterminationFacadeImpl">
+		<property name="requestErrorHandler" ref="sapProductConfigRequestErrorHandler" />
+		<property name="knowledgeBasesCacheAccessService" ref="sapProductConfigCPSKnowledgeBaseHeadersCacheAccessService" />
+		<property name="commerceExternalConfigurationStrategy" ref="sapProductConfigurationCPSExtConfigStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultMasterDataContainerResolver" alias="sapProductConfigMasterDataContainerResolver" />
+	<bean id="sapProductConfigDefaultMasterDataContainerResolver"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.masterdata.service.impl.MasterDataContainerResolverImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultServiceVersionProvider" alias="sapProductConfigServiceVersionProvider" />
+	<bean id="sapProductConfigDefaultServiceVersionProvider"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.ServiceVersionProviderImpl">
+		<property name="yaasConfigurationService" ref="yaasConfigurationService" />
+	</bean>
+
+
+	<!-- Core Populators -->
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicPopulator" alias="sapProductConfigCPSCharacteristicPopulator" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.CharacteristicPopulator">
+		<property name="valueConverter" ref="sapProductConfigCPSValueConverter" />
+		<property name="possibleValueConverter" ref="sapProductConfigCPSPossibleValueConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConfigurationPopulator" alias="sapProductConfigCPSConfigurationPopulator" />
+	<bean id="sapProductConfigDefaultCPSConfigurationPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ConfigurationPopulator">
+		<property name="instanceModelConverter" ref="sapProductConfigCPSInstanceConverter" />
+		<property name="conflictModelConverter" ref="sapProductConfigCPSConflictConverter" />
+		<property name="masterDataService" ref="sapProductConfigMasterDataService" />
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+		<property name="versionProvider" ref="sapProductConfigServiceVersionProvider" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSInstancePopulator" alias="sapProductConfigCPSInstancePopulator" />
+	<bean id="sapProductConfigDefaultCPSInstancePopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.InstancePopulator">
+		<property name="instanceModelConverter" ref="sapProductConfigCPSInstanceConverter" />
+		<property name="characteristicConverter" ref="sapProductConfigCPSCharacteristicConverter" />
+		<property name="characteristicGroupConverter" ref="sapProductConfigCPSCharacteristicGroupConverter" />
+		<property name="variantConditionConverter" ref="sapProductConfigCPSVariantConditionConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSPossibleValuePopulator" alias="sapProductConfigCPSPossibleValuePopulator" />
+	<bean id="sapProductConfigDefaultCPSPossibleValuePopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PossibleValuePopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSValuePopulator" alias="sapProductConfigCPSValuePopulator" />
+	<bean id="sapProductConfigDefaultCPSValuePopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ValuePopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConflictPopulator" alias="sapProductConfigCPSConflictPopulator" />
+	<bean id="sapProductConfigDefaultCPSConflictPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ConflictPopulator">
+		<property name="conflictAssumptionConverter" ref="sapProductConfigCPSChoiceConverter" />
+		<property name="conflictTextParser" ref="sapProductConfigCPSConflictTextParser" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConflictAssumptionPopulator" alias="sapProductConfigCPSConflictAssumptionPopulator" />
+	<bean id="sapProductConfigDefaultCPSConflictAssumptionPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ConflictAssumptionPopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSVariantConditionPopulator" alias="sapProductConfigCPSVariantConditionPopulator" />
+	<bean id="sapProductConfigDefaultCPSVariantConditionPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.VariantConditionPopulator">
+	</bean>
+
+	<!-- Master Data Populators -->
+
+	<alias name="sapProductConfigDefaultCPSInstanceMasterDataPopulator" alias="sapProductConfigCPSInstanceMasterDataPopulator" />
+	<bean id="sapProductConfigDefaultCPSInstanceMasterDataPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.InstanceMasterDataPopulator">
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSValueMasterDataPopulator" alias="sapProductConfigCPSValueMasterDataPopulator" />
+	<bean id="sapProductConfigDefaultCPSValueMasterDataPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ValueMasterDataPopulator">
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSPossibleValueMasterDataPopulator"
+		alias="sapProductConfigCPSPossibleValueMasterDataPopulator" />
+	<bean id="sapProductConfigDefaultCPSPossibleValueMasterDataPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PossibleValueMasterDataPopulator">
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicGroupMasterDataPopulator"
+		alias="sapProductConfigCPSCharacteristicGroupMasterDataPopulator" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicGroupMasterDataPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.CharacteristicGroupMasterDataPopulator">
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicMasterDataPopulator"
+		alias="sapProductConfigCPSCharacteristicMasterDataPopulator" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicMasterDataPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.CharacteristicMasterDataPopulator">
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+		<property name="textConverterBase" ref="sapProductConfigurationTextConverterBase" />
+	</bean>
+
+	<!-- Converters -->
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicConverter" alias="sapProductConfigCPSCharacteristicConverter" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameCsticModel}" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigCPSCharacteristicPopulator" />
+				<ref bean="sapProductConfigCPSCharacteristicMasterDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicGroupConverter"
+		alias="sapProductConfigCPSCharacteristicGroupConverter" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicGroupConverter"
+		parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameCsticGroupModel}" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigCPSCharacteristicGroupMasterDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConfigurationConverter" alias="sapProductConfigCPSConfigurationConverter" />
+	<bean id="sapProductConfigDefaultCPSConfigurationConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameConfigModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSConfigurationPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSConflictConverter" alias="sapProductConfigCPSConflictConverter" />
+	<bean id="sapProductConfigDefaultCPSConflictConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameSolvableConflictModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSConflictPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSChoiceConverter" alias="sapProductConfigCPSChoiceConverter" />
+	<bean id="sapProductConfigDefaultCPSChoiceConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameConflictingAssumptionModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSConflictAssumptionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSInstanceConverter" alias="sapProductConfigCPSInstanceConverter" />
+	<bean id="sapProductConfigDefaultCPSInstanceConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameInstanceModel}" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigCPSInstancePopulator" />
+				<ref bean="sapProductConfigCPSInstanceMasterDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSPossibleValueConverter" alias="sapProductConfigCPSPossibleValueConverter" />
+	<bean id="sapProductConfigDefaultCPSPossibleValueConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameCsticValueModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSPossibleValuePopulator" />
+			</list>
+		</property>
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigCPSPossibleValueMasterDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSValueConverter" alias="sapProductConfigCPSValueConverter" />
+	<bean id="sapProductConfigDefaultCPSValueConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameCsticValueModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSValuePopulator" />
+			</list>
+		</property>
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigCPSValueMasterDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSVariantConditionConverter" alias="sapProductConfigCPSVariantConditionConverter" />
+	<bean id="sapProductConfigDefaultCPSVariantConditionConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="#{sapProductConfigModelFactory.targetClassNameVariantConditionModel}" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSVariantConditionPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Knowlegde Base Converters/Populators for Cache -->
+	<alias name="sapProductConfigDefaultCPSKnowledgeBaseCacheContainerPopulator"
+		alias="sapProductConfigCPSKnowledgeBaseCacheContainerPopulator" />
+	<bean id="sapProductConfigDefaultCPSKnowledgeBaseCacheContainerPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.KnowledgeBaseCacheContainerPopulator">
+		<property name="productConverter" ref="sapProductConfigCPSProductCacheContainerConverter" />
+		<property name="classConverter" ref="sapProductConfigCPSClassCacheContainerConverter" />
+		<property name="characteristicConverter" ref="sapProductConfigCPSCharacteristicCacheContainerConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSKnowledgeBaseCacheContainerConverter"
+		alias="sapProductConfigCPSKnowledgeBaseCacheContainerConverter" />
+	<bean id="sapProductConfigDefaultCPSKnowledgeBaseCacheContainerConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataKnowledgeBaseContainer" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSKnowledgeBaseCacheContainerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSProductCacheContainerConverter"
+		alias="sapProductConfigCPSProductCacheContainerConverter" />
+	<bean id="sapProductConfigDefaultCPSProductCacheContainerConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataProductContainer" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSProductCacheContainerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSProductCacheContainerPopulator"
+		alias="sapProductConfigCPSProductCacheContainerPopulator" />
+	<bean id="sapProductConfigDefaultCPSProductCacheContainerPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ProductCacheContainerPopulator">
+		<property name="characteristicSpecificConverter" ref="sapProductConfigCPSCharacteristicSpecificCacheContainerConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicSpecificCacheContainerConverter"
+		alias="sapProductConfigCPSCharacteristicSpecificCacheContainerConverter" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicSpecificCacheContainerConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicSpecificContainer" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSCharacteristicSpecificCacheContainerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicSpecificCacheContainerPopulator"
+		alias="sapProductConfigCPSCharacteristicSpecificCacheContainerPopulator" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicSpecificCacheContainerPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.CharacteristicSpecificCacheContainerPopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSClassCacheContainerConverter"
+		alias="sapProductConfigCPSClassCacheContainerConverter" />
+	<bean id="sapProductConfigDefaultCPSClassCacheContainerConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataClassContainer" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSClassCacheContainerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSClassCacheContainerPopulator"
+		alias="sapProductConfigCPSClassCacheContainerPopulator" />
+	<bean id="sapProductConfigDefaultCPSClassCacheContainerPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.ClassCacheContainerPopulator">
+		<property name="characteristicSpecificConverter" ref="sapProductConfigCPSCharacteristicSpecificCacheContainerConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicCacheContainerConverter"
+		alias="sapProductConfigCPSCharacteristicCacheContainerConverter" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicCacheContainerConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.masterdata.cache.CPSMasterDataCharacteristicContainer" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigCPSCharacteristicCacheContainerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCharacteristicCacheContainerPopulator"
+		alias="sapProductConfigCPSCharacteristicCacheContainerPopulator" />
+	<bean id="sapProductConfigDefaultCPSCharacteristicCacheContainerPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.CharacteristicCacheContainerPopulator">
+	</bean>
+
+	<!-- Other beans -->
+
+	<alias name="sapProductConfigDefaultMasterDataService" alias="sapProductConfigMasterDataService" />
+	<bean id="sapProductConfigDefaultMasterDataService"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.masterdata.service.impl.ConfigurationMasterDataServiceImpl">
+		<property name="i18NService" ref="i18NService" />
+		<property name="cacheAccessService" ref="sapProductConfigCPSMasterDataCacheAccessService" />
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+	</bean>
+
+	<alias alias="sapProductConfigProductCsticAndValueParameterProvider"
+		name="sapProductConfigDefaultProductCsticAndValueParameterProviderCPS" />
+	<bean id="sapProductConfigDefaultProductCsticAndValueParameterProviderCPS"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.ProductCsticAndValueParameterProviderCPSImpl">
+		<property name="configMasterDataService" ref="sapProductConfigMasterDataService" />
+		<property name="charonKbDeterminationFacade" ref="sapProductConfigCharonKbDeterminationFacade" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="cpsBaseSiteProvider" ref="sapProductConfigCpsBaseSiteProvider" />
+		<property name="configuratorSettingsService" ref="configuratorSettingsService" />
+		<property name="productDao" ref="productDao" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCpsBaseSiteProvider" alias="sapProductConfigCpsBaseSiteProvider" />
+	<bean id="sapProductConfigDefaultCpsBaseSiteProvider"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSBaseSiteProvider">
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultRequestErrorHandler" alias="sapProductConfigRequestErrorHandler" />
+	<bean id="sapProductConfigDefaultRequestErrorHandler"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.RequestErrorHandlerImpl">
+		<property name="cache" ref="sapProductConfigCPSCache" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCookieCacheAccess" alias="sapProductConfigCPSCookieCacheAccess" />
+	<bean id="sapProductConfigDefaultCPSCookieCacheAccess"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.cache.impl.ProductConfigurationEHCacheAccessImpl">
+		<property name="cache" ref="sapProductConfigCPSCookieCacheRegion" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultCPSConfigurationCacheAccess" alias="sapProductConfigCPSConfigurationCacheAccess" />
+	<bean id="sapProductConfigDefaultCPSConfigurationCacheAccess"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.cache.impl.ProductConfigurationEHCacheAccessImpl">
+		<property name="cache" ref="sapProductConfigCPSConfigurationCacheRegion" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSMasterDataCacheAccessService"
+		alias="sapProductConfigCPSMasterDataCacheAccessService" />
+	<bean id="sapProductConfigDefaultCPSMasterDataCacheAccessService"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.MasterDataCacheAccessServiceImpl">
+		<property name="cache" ref="sapProductConfigCPSMasterDataCacheAccess" />
+		<property name="loader" ref="sapProductConfigCPSKnowledgeBaseContainerCacheValueLoader" />
+		<property name="keyGenerator" ref="sapProductConfigCPSCacheKeyGenerator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSMasterDataCacheAccess" alias="sapProductConfigCPSMasterDataCacheAccess" />
+	<bean id="sapProductConfigDefaultCPSMasterDataCacheAccess"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.cache.impl.ProductConfigurationEHCacheAccessImpl">
+		<property name="cache" ref="sapProductConfigCPSMasterDataCacheRegion" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSCacheKeyGenerator" alias="sapProductConfigCPSCacheKeyGenerator" />
+	<bean id="sapProductConfigDefaultCPSCacheKeyGenerator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.CPSCacheKeyGeneratorImpl">
+		<property name="yaasConfigurationService" ref="yaasConfigurationService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="userIdProvider" ref="sapProductConfigUserIdProvider" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSKnowledgeBaseContainerCacheValueLoader"
+		alias="sapProductConfigCPSKnowledgeBaseContainerCacheValueLoader" />
+	<bean id="sapProductConfigDefaultCPSKnowledgeBaseContainerCacheValueLoader"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.KnowledgeBaseContainerCacheValueLoader">
+		<property name="knowledgeBaseConverter" ref="sapProductConfigCPSKnowledgeBaseCacheContainerConverter" />
+		<property name="yaasServiceFactory" ref="yaasServiceFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultKnowledgeBaseHeadersCacheAccessService"
+		alias="sapProductConfigCPSKnowledgeBaseHeadersCacheAccessService" />
+	<bean id="sapProductConfigDefaultKnowledgeBaseHeadersCacheAccessService"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.KnowledgeBaseHeadersCacheAccessServiceImpl">
+		<property name="cache" ref="sapProductConfigCPSKnowledgeBaseHeadersCacheAccess" />
+		<property name="loader" ref="sapProductConfigCPSKnowledgeBaseHeadersCacheValueLoader" />
+		<property name="keyGenerator" ref="sapProductConfigCPSCacheKeyGenerator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSKnowledgeBaseHeadersCacheAccess"
+		alias="sapProductConfigCPSKnowledgeBaseHeadersCacheAccess" />
+	<bean id="sapProductConfigDefaultCPSKnowledgeBaseHeadersCacheAccess"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.cache.impl.ProductConfigurationEHCacheAccessImpl">
+		<property name="cache" ref="sapProductConfigCPSKbDeterminationCacheRegion" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSKnowledgeBaseHeadersCacheValueLoader"
+		alias="sapProductConfigCPSKnowledgeBaseHeadersCacheValueLoader" />
+	<bean id="sapProductConfigDefaultCPSKnowledgeBaseHeadersCacheValueLoader"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.KnowledgeBaseHeadersCacheValueLoader">
+		<property name="yaasServiceFactory" ref="yaasServiceFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPSValuePricesCacheAccess" alias="sapProductConfigCPSValuePricesCacheAccess" />
+	<bean id="sapProductConfigDefaultCPSValuePricesCacheAccess"
+		class="de.hybris.platform.sap.productconfig.runtime.interf.cache.impl.ProductConfigurationEHCacheAccessImpl">
+		<property name="cache" ref="sapProductConfigCPSValuePricesCacheRegion" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultCPSCache" alias="sapProductConfigCPSCache" />
+	<bean id="sapProductConfigDefaultCPSCache" class="de.hybris.platform.sap.productconfig.runtime.cps.cache.impl.CPSCacheImpl">
+	<property name="valuePricesCache" ref="sapProductConfigCPSValuePricesCacheAccess" />
+	<property name="cookieCache" ref="sapProductConfigCPSCookieCacheAccess" />
+	<property name="configurationCache" ref="sapProductConfigCPSConfigurationCacheAccess" />
+	<property name="keyGenerator" ref="sapProductConfigCPSCacheKeyGenerator" />
+	</bean>
+
+	<!-- converters/populators for pricing -->
+	<alias name="sapProductConfigDefaultPricingDocumentInputConverter" alias="sapProductConfigPricingDocumentInputConverter" />
+	<bean id="sapProductConfigDefaultPricingDocumentInputConverter"
+		parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingDocumentInput" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigPricingDocumentInputPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingDocumentInputPopulator" alias="sapProductConfigPricingDocumentInputPopulator" />
+	<bean id="sapProductConfigDefaultPricingDocumentInputPopulator"
+		parent="sapProductConfigAbstractPricingDocumentInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PricingDocumentInputPopulator">
+		<property name="pricingItemInputConverter" ref="sapProductConfigPricingItemInputConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultAbstractPricingDocumentInputPopulator"
+		alias="sapProductConfigAbstractPricingDocumentInputPopulator" />
+	<bean id="sapProductConfigDefaultAbstractPricingDocumentInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.AbstractPricingDocumentInputPopulator">
+		<property name="i18NService" ref="commonI18NService" />
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersCPS" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultPricingItemInputConverter" alias="sapProductConfigPricingItemInputConverter" />
+	<bean id="sapProductConfigDefaultPricingItemInputConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemInput" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigPricingItemInputPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingItemInputPopulator" alias="sapProductConfigPricingItemInputPopulator" />
+	<bean id="sapProductConfigDefaultPricingItemInputPopulator" parent="sapProductConfigAbstractPricingItemInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PricingItemInputPopulator">
+		<property name="configurationModificationHandler" ref="sapProductConfigCPSConfigurationModificationHandler" />
+	</bean>
+
+	<!-- pricing -->
+	<alias name="sapProductConfigCPSDefaultPricingHandler" alias="sapProductConfigCPSPricingHandler" />
+	<bean id="sapProductConfigCPSDefaultPricingHandler"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.pricing.impl.PricingHandlerImpl">
+		<property name="pricingDocumentInputConverter" ref="sapProductConfigPricingDocumentInputConverter" />
+		<property name="pricingDocumentInputKBConverter" ref="sapProductConfigPricingDocumentInputKBConverter" />
+		<property name="pricesMapConverter" ref="sapProductConfigPricesMapConverter" />
+		<property name="charonPricingFacade" ref="sapProductConfigCharonPricingFacade" />
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersCPS" />
+		<property name="configModelFactory" ref="sapProductConfigModelFactory" />
+		<property name="cache" ref="sapProductConfigCPSCache" />
+		<property name="masterDataResolver" ref="sapProductConfigMasterDataContainerResolver" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="charonFacade" ref="sapProductConfigCharonFacade" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCharonPricingFacade" alias="sapProductConfigCharonPricingFacade" />
+	<bean id="sapProductConfigDefaultCharonPricingFacade"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CharonPricingFacadeImpl">
+		<property name="requestErrorHandler" ref="sapProductConfigRequestErrorHandler" />
+		<property name="yaasServiceFactory" ref="yaasServiceFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingParametersCPS" alias="sapProductConfigPricingParameters" />
+	<alias name="sapProductConfigDefaultPricingParametersCPS" alias="sapProductConfigPricingParametersCPS" />
+	<bean id="sapProductConfigDefaultPricingParametersCPS" parent="sapProductConfigDefaultPricingParameters"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.pricing.impl.DefaultPricingConfigurationParameterCPS">
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingDocumentInputKBConverter"
+		alias="sapProductConfigPricingDocumentInputKBConverter" />
+	<bean id="sapProductConfigDefaultPricingDocumentInputKBConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass"
+			value="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingDocumentInput" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigPricingDocumentInputKBPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingDocumentInputKBPopulator"
+		alias="sapProductConfigPricingDocumentInputKBPopulator" />
+	<bean id="sapProductConfigDefaultPricingDocumentInputKBPopulator"
+		parent="sapProductConfigAbstractPricingDocumentInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PricingDocumentInputKBPopulator">
+		<property name="pricingItemInputKBProductConverter" ref="sapProductConfigPricingItemInputKBProductConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingItemInputKBProductConverter"
+		alias="sapProductConfigPricingItemInputKBProductConverter" />
+	<bean id="sapProductConfigDefaultPricingItemInputKBProductConverter" parent="sapProductConfiAbstractContextualPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.runtime.cps.model.pricing.PricingItemInput" />
+		<property name="contextualPopulators">
+			<list>
+				<ref bean="sapProductConfigPricingItemInputKBProductPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingItemInputKBProductPopulator"
+		alias="sapProductConfigPricingItemInputKBProductPopulator" />
+	<bean id="sapProductConfigDefaultPricingItemInputKBProductPopulator"
+		parent="sapProductConfigAbstractPricingItemInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PricingItemInputKBProductPopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultAbstractPricingItemInputPopulator"
+		alias="sapProductConfigAbstractPricingItemInputPopulator" />
+	<bean id="sapProductConfigDefaultAbstractPricingItemInputPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.AbstractPricingItemInputPopulator">
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersCPS" />
+		<property name="configurationParameterB2B" value="#{getObject('sapproductconfigParametersB2B')}" />
+		<property name="productService" ref="productService" />
+		<property name="i18NService" ref="commonI18NService" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricesMapConverter" alias="sapProductConfigPricesMapConverter" />
+	<bean id="sapProductConfigDefaultPricesMapConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="java.util.HashMap" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigPricesMapPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricesMapPopulator" alias="sapProductConfigPricesMapPopulator" />
+	<bean id="sapProductConfigDefaultPricesMapPopulator"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.populator.impl.PricesMapPopulator">
+	</bean>
+
+
+	<alias name="sapProductConfigurationDefaultCPSContextSupplier" alias="sapProductConfigurationCPSContextSupplier" />
+	<bean id="sapProductConfigurationDefaultCPSContextSupplier"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSContextSupplierImpl">
+		<property name="pricingConfigurationParameter" ref="sapProductConfigPricingParametersCPS" />
+		<property name="configurationParameterB2B" value="#{getObject('sapproductconfigParametersB2B')}" />
+	</bean>
+
+	<alias name="sapProductConfigurationDefaultCPSExtConfigStrategy" alias="sapProductConfigurationCPSExtConfigStrategy" />
+	<bean id="sapProductConfigurationDefaultCPSExtConfigStrategy"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.strategy.impl.CommerceExternalConfigurationStrategyImpl">
+		<property name="unitService" ref="unitService" />
+	</bean>
+
+	<alias name="sapProductConfigurationDefaultCPSConfigFromVariantStrategy"
+		alias="sapProductConfigurationCPSConfigFromVariantStrategy" />
+	<bean id="sapProductConfigurationDefaultCPSConfigFromVariantStrategy"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.strategy.impl.ExternalConfigurationFromVariantStrategyImpl">
+		<property name="classificationService" ref="classificationService" />
+		<property name="masterDataCacheAccessService" ref="sapProductConfigCPSMasterDataCacheAccessService" />
+		<property name="i18NService" ref="i18NService" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+		<property name="classType" value="${sapproductconfigruntimecps.variantclasstype}" />
+		<property name="configurationProductUtil" ref="sapProductConfigProductUtil" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultCPSConflictTextParser" alias="sapProductConfigCPSConflictTextParser" />
+	<bean id="sapProductConfigDefaultCPSConflictTextParser"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.impl.CPSConflictTextParserImpl">
+	</bean>
+
+	<!-- event listeners -->
+	<bean id="sapProductConfigCPSLoginEventListener"
+		class="de.hybris.platform.sap.productconfig.runtime.cps.event.impl.CPSUserChangedEventListener" parent="abstractEventListener">
+	</bean>
+</beans>

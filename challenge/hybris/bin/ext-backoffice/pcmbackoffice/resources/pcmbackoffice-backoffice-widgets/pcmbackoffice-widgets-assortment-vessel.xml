@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd" required-parameters="slot">
+
+	<!--
+
+		#set( $slotName = $slot + "Slot" )
+
+	-->
+
+	<requires resource="pcmbackoffice-widgets-assortment.xml"/>
+	<requires resource="pcmbackoffice-widgets-general.xml"/>
+
+	<widget-extension widgetId="pcmbackoffice-assortment-view">
+		
+		<widget id="pcmbackoffice-assortment-view-vessel-$slot"
+			        widgetDefinitionId="com.hybris.cockpitng.extendedsplitlayout" slotId="$slotName"
+			        template="false">
+			<widget id="pcmbackoffice-assortment-view-vessel-contextpopulator-$slot"
+			        widgetDefinitionId="com.hybris.cockpitng.contextpopulator"
+			        slotId="cockpitWidgetChildrenInvisible" template="false">
+				<setting key="contextPopulator" type="String">catalogContextPopulator</setting>
+				<virtual-sockets/>
+			</widget>
+			<widget id="pcmbackoffice-assortment-view-vessel-explorertree-$slot"
+			        widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree" slotId="firstSlot"
+			        template="false">
+				<widget id="pcmbackoffice-assortment-view-vessel-advancedsearchinitializer-$slot"
+				        widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine.genericinitializer"
+				        slotId="cockpitWidgetChildrenInvisible" template="false">
+					<setting key="navigationNodeId" type="String">_y_et_root__catalogs</setting>
+					<setting key="requiredTypeCode" type="String">Product</setting>
+					<setting key="handlerBeanId" type="String">catalogTreeFilterAdvancedSolrSearchInitializer</setting>
+					<virtual-sockets/>
+				</widget>
+				<widget id="pcmbackoffice-assortment-view-vessel-catalogselector-$slot" widgetDefinitionId="com.hybris.backoffice.cockpitng.widgets.catalogSelector"
+				        slotId="toolbar" template="false">
+					<virtual-sockets/>
+				</widget>
+				<setting key="explorerTreeConfigCtx" type="String">pcmbackoffice-catalogFilterTree</setting>
+				<setting key="showToolbar" type="Boolean">true</setting>
+				<setting key="showPrimaryActions" type="Boolean">true</setting>
+				<setting key="primaryActionsConfigCtx">pcmbackoffice-actions-explorer-tree-toolbar-primary</setting>
+				<setting key="showSecondaryActions" type="Boolean">true</setting>
+				<setting key="secondaryActionsConfigCtx">pcmbackoffice-actions-explorer-tree-toolbar-secondary</setting>
+				<setting key="widgetMold" type="String">light</setting>
+				<setting key="refreshStrategies" type="String">explorerTreeRefreshStrategies</setting>
+				<setting key="minSearchInputLength" type="Integer">3</setting>
+				<virtual-sockets>
+					<input id="chosenLayout" type="java.lang.String"/>
+					<output id="com.hybris.cockpitng.action.splitlayoutchooser.success"
+					        type="java.lang.String"/>
+					<output id="selectedCatalogItemsToEdit" multiplicity="List" type="java.lang.Object" />
+				</virtual-sockets>
+			</widget>
+			<widget id="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+			        slotId="secondSlot" template="false">
+				<widget id="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" widgetDefinitionId="com.hybris.cockpitng.fulltextsearch"
+				        slotId="toolbarCenter" template="false">
+					<setting key="fieldQueryEnabled" type="Boolean">false</setting>
+					<setting key="fulltextSearchConfigCtxCode" type="String">pcmbackoffice-assortment-fulltext-search</setting>
+					<setting key="simpleSearchConfigCtxCode">pcmbackoffice-assortment-simple-search</setting>
+					<virtual-sockets/>
+				</widget>
+				<widget id="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+				        slotId="cockpitWidgetChildrenInvisible" template="false">
+					<virtual-sockets/>
+				</widget>
+				<setting key="actionSlotComponentId" type="String">pcmbackoffice-assortment-listviewactions</setting>
+				<setting key="sendItemsOnSelect" type="Boolean">false</setting>
+				<setting key="multiSelect" type="Boolean">true</setting>
+				<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+				<setting key="pagingPosition">bottom</setting>
+				<setting key="collectionBrowserConfigCtx">pcmbackoffice-assortment-collection-browser</setting>
+				<setting key="gridViewConfigCtx">pcmbackoffice-grid-view</setting>
+				<setting key="treeViewConfigCtx" type="String">pcmbackoffice-collection-browser-tree</setting>
+				<setting key="colConfigCtxCode" type="String">pcmbackoffice-listview</setting>
+				<virtual-sockets>
+					<output id="selectedItemsToEdit" type="java.lang.Object"/>
+				</virtual-sockets>
+			</widget>
+			<setting key="splitLayoutConfigCtx" type="String">pcmbackoffice-assortment-split-layout-$slot</setting>
+			<virtual-sockets/>
+		</widget>
+
+	</widget-extension>
+
+	<widget-extension widgetId="pcmbackoffice-editorArea-quicklist">
+		<virtual-sockets>
+			<output id="itemsRemoved_pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" type="java.lang.Object" multiplicity="List"/>
+		</virtual-sockets>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-catalogselector-$slot" outputId="selection"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" inputId="setTreeContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="nodeSelected"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchinitializer-$slot" inputId="nodeSelected"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchinitializer-$slot" outputId="outContext"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" inputId="initContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" outputId="pageable"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" inputId="pageable"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" outputId="searchData"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" inputId="searchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" outputId="searchContextChanged"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" inputId="changeSearchContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" outputId="autosuggestions"
+						targetWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" inputId="autosuggestions"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" outputId="fullTextSearchData"
+						targetWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" inputId="fullTextSearchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" outputId="autosuggestionQuery"
+						targetWidgetId="pcmbackoffice-assortment-view-vessel-advancedsearchengine-$slot" inputId="autosuggestionQuery"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="com.hybris.cockpitng.action.splitlayoutchooser.success"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-$slot" inputId="chooseLayout"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="nodeSelected"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" inputId="deselectAllItems"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-$slot" outputId="selectedLayout"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" inputId="chosenLayout"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-catalogselector-$slot" outputId="syncCatalogVersion"
+					   targetWidgetId="synchronizationPopup" inputId="inputObject"/>
+
+	<!--AV vessel context populator-->
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" outputId="selectedItemsToEdit"
+	                   targetWidgetId="pcmbackoffice-selection-filter" inputId="input"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" outputId="selectedItemsToEdit"
+					   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="items"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" outputId="selectedItemsToEdit"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" outputId="selectedItemsToEdit"
+					   targetWidgetId="pcmbackoffice-state-save-initial-propextractor" inputId="genericInput"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="dataSelected"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-contextpopulator-$slot" inputId="data"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-contextpopulator-$slot" outputId="context"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" inputId="selectionContext"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-contextpopulator-$slot" outputId="context"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" inputId="selectionContext"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-editorArea-quicklist" outputId="itemsRemoved"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-collectionbrowser-$slot" inputId="deselectItems"/>
+
+	<!-- Catalog tree to PCM details EA -->
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="selectedCatalogItemsToEdit"
+	                   targetWidgetId="pcmbackoffice-selection-filter" inputId="input"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="selectedCatalogItemsToEdit"
+	                   targetWidgetId="pcmbackoffice-editorArea-quicklist" inputId="items"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view-vessel-explorertree-$slot" outputId="selectedCatalogItemsToEdit"
+	                   targetWidgetId="pcmbackoffice-collectionBrowser-propextractor-first-selected-item" inputId="genericInput"/>
+
+	<!-- Connect main assortment view layout with it's children-->
+	<widget-connection sourceWidgetId="pcmbackoffice-search-init" outputId="genericOutput"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-fulltextsearch-$slot" inputId="type"/>
+
+	<!-- Connect main assortment view layout with it's children-->
+	<widget-connection sourceWidgetId="pcmbackoffice-assortment-view" outputId="selectedLayout"
+	                   targetWidgetId="pcmbackoffice-assortment-view-vessel-$slot" inputId="parentLayout"/>
+
+</widgets>

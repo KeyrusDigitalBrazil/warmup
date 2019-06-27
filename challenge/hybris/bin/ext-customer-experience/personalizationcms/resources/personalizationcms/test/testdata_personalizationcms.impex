@@ -1,0 +1,113 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Users
+$defaultPassword=12341234
+$regulargroup=regulargroup
+$customergroup=customergroup
+$contentCatalog=testCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Online])[default=$contentCatalog:Online]
+
+
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;active[default=true]
+;;page1Template;Landing Page 1 Template
+;;page2Template;Landing Page 2 Template
+;;page3Template;Landing Page 2 Template
+;;page4Template;Landing Page 2 Template
+
+# Create Customer Group
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid)[mode=append];
+;$regulargroup;customergroup;
+
+INSERT_UPDATE Customer;uid[unique=true];groups(uid);password[default=$defaultPassword];name
+;customer1@hybris.com;customergroup;;Miljenko Calhoun
+;cxcontextcustomer@hybris.com;customergroup;;Cxer Contexter
+
+INSERT_UPDATE CxSegment;code[unique=true];
+;segment1;
+
+INSERT_UPDATE CxUserToSegment;segment(code)[unique=true];user(uid)[unique=true];affinity;
+;segment1;customer1@hybris.com;1;
+
+INSERT_UPDATE CxCustomizationsGroup;code;$contentCV[unique=true]
+;default;
+
+#Cx Customizations
+INSERT_UPDATE CxCustomization;code[unique=true];name;$contentCV[unique=true];group(code,$contentCV)[default='default'];enabledStartDate[dateformat=dd.MM.yyyy];enabledEndDate[dateformat=dd.MM.yyyy];status(code)[default=ENABLED]
+;customization1;customization1;;;;;
+;customization2;customization2;;;;;
+;customization3;customization3;;;;;
+;customization4;customization4;;;;;
+;customization5;customization5;;;;;DISABLED
+;customization6;customization6;;;;;DISABLED
+
+INSERT_UPDATE CxVariation;code[unique=true];name;$contentCV[unique=true];enabled[default=true];customization(code,$contentCV)[unique=true];status(code)[default=ENABLED]
+;variation1;variation1;;;customization1;
+;variation2;variation2;;;customization2;
+;variation3;variation3;;;customization3;
+;variation4;variation4;;;customization4;
+;variation5;variation5;;;customization5;
+;variation6;variation6;;;customization6;
+
+
+INSERT_UPDATE CxSegmentTrigger;code[unique=true];$contentCV[unique=true];variation(code,$contentCV)[unique=true];segments(code);groupBy(code)[default='OR'];
+;trigger1;;variation1;segment1;
+;trigger1;;variation2;segment1;
+;trigger1;;variation3;segment1;
+;trigger1;;variation4;segment1;
+;trigger1;;variation5;segment1;
+;trigger1;;variation6;segment1;
+
+INSERT_UPDATE CxCmsAction;code[unique=true];$contentCV[unique=true];componentId;variation(code,$contentCV)[unique=true];target;type(code);containerId;
+;cmsaction1;;cxcomponent1;variation1;cxCmsActionPerformable;PLAIN;container1
+;cmsaction2;;cxcomponent2;variation2;cxCmsActionPerformable;PLAIN;container2
+;cmsaction3;;cxcomponent1;variation1;cxCmsActionPerformable;PLAIN;container1
+;cmsaction4;;cxcomponent2;variation2;cxCmsActionPerformable;PLAIN;container2
+;cmsaction5;;cxcomponent3;variation3;cxCmsActionPerformable;PLAIN;container3
+;cmsaction8;;cxcomponent4;variation4;cxCmsActionPerformable;PLAIN;container4
+;cmsaction9;;cxcomponent5;variation5;cxCmsActionPerformable;PLAIN;container5
+;cmsaction10;;cxcomponent6;variation6;cxCmsActionPerformable;PLAIN;container1
+
+INSERT_UPDATE CxCmsComponentContainer;$contentCV[unique=true];uid[unique=true];sourceId;name;&containerRef
+;;container1;container1;container1;container1;
+;;container2;container2;container2;container2;
+;;container3;container3;container3;container3;
+;;container4;container4;container4;container4;
+;;container5;container5;container5;container5;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&containerRef)
+;;contentSlot1;container1
+;;contentSlot2;container1
+;;contentSlot3;container2
+;;contentSlot4;container3,container4
+;;contentSlot5;container5
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='false']
+;;page1;page1;page1Template;page1
+;;page2;page2;page2Template;page2
+;;page3;page3;page3Template;page3
+;;page4;page4;page4Template;page4
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];;;
+;;contentSlotForPage11;1;page1;contentSlot1;;;
+;;contentSlotForPage22;2;page1;contentSlot2;;;
+;;contentSlotForPage31;1;page3;contentSlot1;;;
+;;contentSlotForPage32;2;page3;contentSlot2;;;
+;;contentSlotForPage33;3;page3;contentSlot3;;;
+;;contentSlotForPage44;4;page4;contentSlot5;;;
+
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;page13TemplateSlot;1;page2Template;contentSlot3;true
+;;page14TemplateSlot;2;page2Template;contentSlot4;true
+;;page31TemplateSlot;1;page3Template;contentSlot1;true
+;;page32TemplateSlot;2;page3Template;contentSlot4;true
+

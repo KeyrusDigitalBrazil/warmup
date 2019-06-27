@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<collectiontypes>
+		<collectiontype elementtype="AbstractRulesModule" code="AbstractRulesModuleList" autocreate="true" type="list" />
+	</collectiontypes>
+
+	<enumtypes>
+
+		<enumtype code="RuleType" autocreate="true" generate="true" dynamic="true">
+			<value code="DEFAULT" />
+		</enumtype>
+
+		<enumtype code="DroolsEqualityBehavior" autocreate="true"
+			generate="true" dynamic="false">
+			<value code="EQUALITY" />
+			<value code="IDENTITY" />
+		</enumtype>
+
+		<enumtype code="DroolsEventProcessingMode" autocreate="true"
+			generate="true" dynamic="false">
+			<value code="STREAM" />
+			<value code="CLOUD" />
+		</enumtype>
+
+		<enumtype code="DroolsSessionType" autocreate="true"
+			generate="true" dynamic="false">
+			<value code="STATEFUL" />
+			<value code="STATELESS" />
+		</enumtype>
+
+	</enumtypes>
+
+	<relations>
+
+		<relation generate="true" localized="false" code="DroolsKIEModule2Base" autocreate="true">
+			<sourceElement type="DroolsKIEModule" qualifier="kieModule" cardinality="one" >
+				<modifiers initial="true" write="false" optional="false" />
+			</sourceElement>
+			<targetElement type="DroolsKIEBase" qualifier="kieBases" cardinality="many" >
+				<modifiers partof="true" />
+			</targetElement>
+		</relation>
+
+		<relation generate="true" localized="false" code="DroolsKIEBase2Session"
+			autocreate="true">
+			<sourceElement type="DroolsKIEBase" qualifier="kieBase"
+				cardinality="one" />
+			<targetElement type="DroolsKIESession" qualifier="kieSessions"
+				cardinality="many" />
+		</relation>
+
+		<relation generate="true" localized="false" code="DroolsKIEBase2Rule"
+			autocreate="true">
+			<sourceElement type="DroolsKIEBase" qualifier="kieBase"
+				cardinality="one" />
+			<targetElement type="DroolsRule" qualifier="rules"
+				cardinality="many" collectiontype="set"/>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+		<itemtype code="AbstractRuleEngineRule" abstract="true" generate="true"
+			jaloclass="de.hybris.platform.ruleengine.jalo.AbstractRuleEngineRule" extends="GenericItem" autocreate="true">
+			<description>AbstractRuleEngineRule is an abstraction for a rule being executed in the rule engine.</description>
+			<deployment table="EngineRules" typecode="5100" />
+			<attributes>
+				<attribute qualifier="uuid" type="java.lang.String">
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="code" type="java.lang.String">
+					<description>unique rule code</description>
+					<modifiers optional="false" initial="true" write="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<description>Is rule active</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="ruleContent" type="java.lang.String">
+					<description>contains rule syntax</description>
+					<modifiers optional="true" />
+					<persistence type="property">
+						<columntype database="oracle">
+							<value>CLOB</value>
+						</columntype>
+						<columntype database="mysql">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sqlserver">
+							<value>TEXT</value>
+						</columntype>
+						<columntype database="sap">
+							<value>NCLOB</value>
+						</columntype>
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute qualifier="ruleType" type="RuleType">
+					<description>Rule type</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="checksum" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers optional="true"/>
+                </attribute>
+                <attribute qualifier="currentVersion" type="java.lang.Boolean">
+					<description>Is this rule current?</description>
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>Boolean.TRUE</defaultvalue>
+				</attribute>
+				<attribute qualifier="version" type="java.lang.Long">
+				    <description>unique rule version</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false" />
+                </attribute>
+			</attributes>
+			<indexes>
+				<index name="IdxEngineRuleActive">
+					<key attribute="active" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="DroolsRule"
+			jaloclass="de.hybris.platform.ruleengine.jalo.DroolsRule"
+			extends="AbstractRuleEngineRule" autocreate="true" generate="true">
+			<attributes>
+
+				<attribute qualifier="rulePackage" type="java.lang.String">
+					<description>The package name of the rule as defined in the drl file content.</description>
+					<persistence type="property" />
+				</attribute>
+
+				<attribute qualifier="globals" type="String2StringMapType">
+					<description>
+					Contains a map of all globals and their respective spring bean id as needed by this rule. 
+					The key is the name under which the global will be registered, the value is id/alias of 
+					the spring bean to use as a global.</description>
+					<persistence type="property" />
+				</attribute>
+				
+			</attributes>
+			<indexes>
+				<index name="IdxEngineRulePkg">
+					<key attribute="rulePackage" />
+				</index>
+			</indexes>
+			
+		</itemtype>
+
+		<itemtype code="AbstractRulesModule" jaloclass="de.hybris.platform.ruleengine.jalo.AbstractRulesModule"
+			extends="GenericItem" autocreate="true" generate="true" abstract="true">
+			<deployment table="RulesModule" typecode="5101" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers initial="true" optional="false" write="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="ruleType" type="RuleType">
+					<modifiers optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="active" type="java.lang.Boolean">
+					<description>Is module active</description>
+					<modifiers optional="false"/>
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="version" type="java.lang.Long">
+				    <description>unique module version</description>
+                    <persistence type="property"/>
+                    <modifiers optional="false"/>
+                </attribute>
+				<attribute qualifier="catalogVersions" type="CatalogVersionCollection">
+					<description>Catalog version if mapped.</description>
+					<modifiers write="false" />
+					<persistence type="dynamic" />
+				</attribute>
+				<attribute qualifier="allowedTargets" type="AbstractRulesModuleList">
+					<description>List of the allowed module targets to perform synchronisation to.</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="lockAcquired" type="java.lang.Boolean">
+					<description>Lock indicator used to indicate whether module is taking part in a blocking type operation.</description>
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IdxAbstractRuleModuleUnique" unique="true">
+					<key attribute="name"/>
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="AbstractRuleEngineContext" jaloclass="de.hybris.platform.ruleengine.jalo.AbstractRuleEngineContext"
+			extends="GenericItem" autocreate="true" generate="true" abstract="true">
+			<deployment table="RuleEngineContext" typecode="5102" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers optional="false" unique="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="DroolsKIEModule"
+			jaloclass="de.hybris.platform.ruleengine.jalo.DroolsKIEModule"
+			extends="AbstractRulesModule" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="mvnGroupId" type="java.lang.String">
+					<modifiers optional="false"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="mvnArtifactId" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="mvnVersion" type="java.lang.String">
+					<modifiers optional="false" unique="true"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="deployedMvnVersion" type="java.lang.String">
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="defaultKIEBase" type="DroolsKIEBase">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IdxDroolsKIEModuleUnique" unique="true">
+					<key attribute="mvnArtifactId"/>
+				</index>
+			</indexes>
+		</itemtype>
+		
+		<itemtype code="DroolsKIEModuleMedia" jaloclass="de.hybris.platform.ruleengine.jalo.DroolsKIEModuleMedia"
+			extends="Media" autocreate="true" generate="true">
+		 	<deployment table="DroolsKIEModuleMedia" typecode="5251" />
+			<attributes>
+				<attribute qualifier="kieModuleName" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="releaseId" type="java.lang.String">
+					<persistence type="property" />
+					<modifiers optional="false" />
+				</attribute>
+				<attribute qualifier="catalog" type="Catalog" generate="false" redeclare="true">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="catalogVersion" type="CatalogVersion" generate="false" redeclare="true">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+			<indexes>
+				<index name="IdxDroolsKIEModuleMediaLookup" unique="true">
+					<key attribute="kieModuleName" />
+					<key attribute="releaseId" />
+				</index>
+			</indexes>
+		</itemtype>
+
+		<itemtype code="DroolsKIEBase"
+			jaloclass="de.hybris.platform.ruleengine.jalo.DroolsKIEBase"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="DroolsKIEBase" typecode="5200" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers initial="true" optional="false" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="equalityBehavior" type="DroolsEqualityBehavior">
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("DroolsEqualityBehavior","EQUALITY")
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="eventProcessingMode" type="DroolsEventProcessingMode">
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("DroolsEventProcessingMode","STREAM")
+					</defaultvalue>
+				</attribute>
+				<attribute qualifier="defaultKIESession" type="DroolsKIESession">
+					<description>Default DroolsKIESession for DroolsKIEBase.</description>
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DroolsKIESession"
+			jaloclass="de.hybris.platform.ruleengine.jalo.DroolsKIESession"
+			extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="DroolsKIESession" typecode="5201" />
+			<attributes>
+				<attribute qualifier="name" type="java.lang.String">
+					<modifiers initial="true" optional="false" write="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sessionType" type="DroolsSessionType">
+					<modifiers optional="false" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("DroolsSessionType","STATELESS")
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="DroolsRuleEngineContext"
+			jaloclass="de.hybris.platform.ruleengine.jalo.DroolsRuleEngineContext"
+			extends="AbstractRuleEngineContext" autocreate="true" generate="true">
+			<attributes>
+				<attribute qualifier="kieSession" type="DroolsKIESession">
+					<modifiers optional="false" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="ruleFiringLimit" type="java.lang.Long">
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="CatalogVersionToRuleEngineContextMapping" extends="GenericItem" autocreate="true" generate="true">
+			<deployment table="CatVer2RulesContext" typecode="5202" />
+			<attributes>
+				<attribute qualifier="catalogVersion" type="CatalogVersion">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="context" type="AbstractRuleEngineContext">
+					<modifiers optional="false"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+	</itemtypes>
+</items>

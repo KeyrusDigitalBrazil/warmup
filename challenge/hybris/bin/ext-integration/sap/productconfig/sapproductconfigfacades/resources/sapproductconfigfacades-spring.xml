@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/util 
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="properties" ref="hybrisProperties" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigPricing" alias="sapProductConfigConfigPricing" />
+	<bean id="sapProductConfigDefaultConfigPricing" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigPricingImpl">
+		<property name="priceDataFactory" ref="priceDataFactory" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultBaseFacade" alias="sapProductConfigBaseFacade" />
+	<bean id="sapProductConfigDefaultBaseFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationBaseFacadeImpl">
+		<property name="configurationService" ref="sapProductConfigConfigurationService" />
+		<property name="productService" ref="productService" />
+		<property name="productDao" ref="productDao" />
+		<property name="classificationCacheStrategy" ref="sapProductConfigClassificationCacheStrategy" />
+		<property name="csticTypeMapper" ref="sapProductConfigCsticTypeMapper" />
+		<property name="configPricing" ref="sapProductConfigConfigPricing" />
+		<property name="conflictPopulator" ref="sapProductConfigConflictPopulator" />
+		<property name="offerVariantSearch" value="${sapproductconfigfacades.offerVariantSearch}" />
+		<property name="configurationVariantUtil" ref="sapProductConfigVariantUtil" />
+		<property name="uiKeyGenerator" ref="sapProductConfigUiKeyGenerator" />
+		<property name="pricingService" ref="sapProductConfigPricingService" />
+		<property name="analyticsService" ref="sapProductConfigAnalyticsService" />
+		<property name="messagesMapper" ref="sapProductConfigMessageMapper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPricingFacade" alias="sapProductConfigPricingFacade" />
+	<bean id="sapProductConfigDefaultPricingFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationPricingFacadeImpl">
+		<property name="pricingService" ref="sapProductConfigPricingService" />
+		<property name="configurationService" ref="sapProductConfigConfigurationService" />
+		<property name="priceSummaryConverter" ref="sapProductConfigPriceSummaryConverter" />
+		<property name="deltaPriceConverter" ref="sapProductConfigDeltaPriceConverter" />
+		<property name="uiKeyGenerator" ref="sapProductConfigUiKeyGenerator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultFacade" alias="sapProductConfigFacade" />
+	<bean id="sapProductConfigDefaultFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationFacadeImpl"
+		parent="sapProductConfigBaseFacade">
+		<property name="configConsistenceChecker" ref="sapProductConfigConsistenceChecker" />
+		<property name="productLinkStrategy" ref="sapProductConfigProductLinkStrategy" />
+		<property name="configurationAbstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCartIntegrationFacade" alias="sapProductConfigCartIntegrationFacade" />
+	<bean id="sapProductConfigDefaultCartIntegrationFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationCartIntegrationFacadeImpl"
+		parent="sapProductConfigBaseFacade">
+		<property name="cartService" ref="cartService" />
+		<property name="modelService" ref="modelService" />
+		<property name="commerceCartService" ref="commerceCartService" />
+		<property name="configInfoPopulator" ref="sapProductConfigOrderEntryInfoModelPopulator" />
+		<property name="configurationPricingOrderIntegrationService" ref="sapProductConfigConfigurationOrderIntegrationService" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configurationAbstractOrderIntegrationStrategy" ref="sapProductConfigConfigurationAbstractOrderIntegrationStrategy" />
+		<property name="productConfigurationPricingStrategy" ref="sapProductConfigConfigurationPricingStrategy" />
+		<property name="configCopyStrategy" ref="sapProductConfigConfigurationCopyStrategy" />
+		<property name="configLifecycleStrategy" ref="sapProductConfigConfigurationLifecycleStrategy" />
+		<property name="productLinkStrategy" ref="sapProductConfigProductLinkStrategy" />
+		<property name="cartModificationConverter" ref="cartModificationConverter" />
+		<property name="configConsistenceChecker" ref="sapProductConfigDefaultConsistenceChecker" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCsticTypeMapper" alias="sapProductConfigCsticTypeMapper" />
+	<bean id="sapProductConfigDefaultCsticTypeMapper" class="de.hybris.platform.sap.productconfig.facades.impl.CsticTypeMapperImpl">
+		<property name="uiTypeFinder" ref="sapProductConfigUiTypeFinder" />
+		<property name="nameProvider" ref="sapProductConfigClassificationSystemCPQAttributesProvider" />
+		<property name="valueFormatTranslator" ref="sapProductConfigValueFormatTranslator" />
+		<property name="intervalHandler" ref="sapProductConfigIntervalInDomainHelper" />
+		<property name="pricingFactory" ref="sapProductConfigConfigPricing" />
+		<property name="uiKeyGenerator" ref="sapProductConfigUiKeyGenerator" />
+		<property name="providerFactory" ref="sapProductConfigProviderFactory" />
+		<property name="messagesMapper" ref="sapProductConfigMessageMapper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConsistenceChecker" alias="sapProductConfigConsistenceChecker" />
+	<bean id="sapProductConfigDefaultConsistenceChecker" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigConsistenceCheckerImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultMessageMapper" alias="sapProductConfigMessageMapper" />
+	<bean id="sapProductConfigDefaultMessageMapper" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationMessageMapperImpl">
+		<property name="valueFormatTranslator" ref="sapProductConfigValueFormatTranslator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultUiTypeFinder" alias="sapProductConfigUiTypeFinder" />
+	<bean id="sapProductConfigDefaultUiTypeFinder" class="de.hybris.platform.sap.productconfig.facades.impl.UiTypeFinderImpl">
+		<property name="dropDownListThreshold" value="${sapproductconfigfacades.dropDownListThreshold}" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultValueFormatTranslator" alias="sapProductConfigValueFormatTranslator" />
+	<bean id="sapProductConfigDefaultValueFormatTranslator" class="de.hybris.platform.sap.productconfig.facades.impl.ValueFormatTranslatorImpl">
+		<property name="i18NService" ref="i18NService" />
+	</bean>
+
+	<alias name="sapProductConfigAddToCartStrategy" alias="commerceAddToCartStrategy" />
+	<bean name="sapProductConfigAddToCartStrategy" class="de.hybris.platform.sap.productconfig.facades.strategy.ProductConfigAddToCartStrategy"
+		parent="defaultCommerceAddToCartStrategy">
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+	</bean>
+
+	<bean id="sapProductConfigDefaultAbstractOrderPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.AbstractOrderConfigurationPopulator"
+		abstract="true">
+	</bean>
+
+	<alias name="sapProductConfigDefaultCartPopulator" alias="sapProductConfigCartPopulator" />
+	<bean id="sapProductConfigDefaultCartPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.CartConfigurationPopulator"
+		parent="sapProductConfigDefaultAbstractOrderPopulator">
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configurationAbstractOrderIntegrationStrategy" ref="sapProductConfigConfigurationAbstractOrderIntegrationStrategy" />
+		<property name="modelService" ref="modelService" />
+		<property name="productConfigurationService" ref="sapProductConfigConfigurationService" />
+		<property name="priceDataFactory" ref="priceDataFactory" />
+		<property name="configurationPricingOrderIntegrationService" ref="sapProductConfigConfigurationOrderIntegrationService" />
+		<property name="cartPopulator" ref="cartPopulator" />
+		<property name="commerceCartService" ref="commerceCartService" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+		<property name="productConfigurationPricingStrategy" ref="sapProductConfigConfigurationPricingStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultQuotePopulator" alias="sapProductConfigQuotePopulator" />
+	<bean id="sapProductConfigDefaultQuotePopulator" class="de.hybris.platform.sap.productconfig.facades.populator.QuoteConfigurationPopulator"
+		parent="sapProductConfigDefaultAbstractOrderPopulator">
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultOrderEntryInfoModelPopulator" alias="sapProductConfigOrderEntryInfoModelPopulator" />
+	<bean id="sapProductConfigDefaultOrderEntryInfoModelPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.ConfigurationOrderEntryProductInfoModelPopulator">
+		<property name="classificationCacheStrategy" ref="sapProductConfigClassificationCacheStrategy" />
+		<property name="nameProvider" ref="sapProductConfigClassificationSystemCPQAttributesProvider" />
+		<property name="maxNumberOfDisplayedCsticsInCart" value="${sapproductconfigfacades.maxNumberOfDisplayedCsticsInCart}" />
+	</bean>
+
+<alias name="sapProductConfigDefaultVariantConfigurationInfoProvider" alias="sapProductConfigVariantConfigurationInfoProvider" />
+	<bean id="sapProductConfigDefaultVariantConfigurationInfoProvider" class="de.hybris.platform.sap.productconfig.facades.impl.VariantConfigurationInfoProviderImpl">
+		<property name="classificationPopulator" ref="productClassificationPopulator" />
+		<property name="featureProvider" ref="sapProductConfigFeatureProvider" />
+		<property name="maxNumberOfDisplayedCsticsInCart" value="${sapproductconfigfacades.maxNumberOfDisplayedCsticsInCart}" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultAbstractOrderVariantPopulator" alias="sapProductConfigAbstractOrderVariantPopulator" />
+	<bean id="sapProductConfigDefaultAbstractOrderVariantPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.AbstractOrderProductVariantPopulator">
+		<property name="variantConfigurationInfoProvider" ref="sapProductConfigVariantConfigurationInfoProvider" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultCartVariantPopulator" alias="sapProductConfigCartVariantPopulator" />
+	<bean id="sapProductConfigDefaultCartVariantPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.CartProductVariantPopulator"
+		parent="sapProductConfigAbstractOrderVariantPopulator" />
+
+	<alias name="sapProductConfigDefaultQuoteVariantPopulator" alias="sapProductConfigQuoteVariantPopulator" />
+	<bean id="sapProductConfigDefaultQuoteVariantPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.QuoteProductVariantPopulator"
+		parent="sapProductConfigAbstractOrderVariantPopulator" />
+
+	<alias name="sapProductConfigDefaultOrderVariantPopulator" alias="sapProductConfigOrderVariantPopulator" />
+	<bean id="sapProductConfigDefaultOrderVariantPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.OrderProductVariantPopulator"
+		parent="sapProductConfigAbstractOrderVariantPopulator" />
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter" />
+		<property name="add" ref="sapProductConfigCartVariantPopulator" />
+	</bean>
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="quoteConverter" />
+		<property name="add" ref="sapProductConfigQuoteVariantPopulator" />
+	</bean>
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderConverter" />
+		<property name="add" ref="sapProductConfigOrderVariantPopulator" />
+	</bean>
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="savedCartConverter" />
+		<property name="add" ref="sapProductConfigCartVariantPopulator" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultFeatureProvider" alias="sapProductConfigFeatureProvider" />
+	<bean id="sapProductConfigDefaultFeatureProvider" class="de.hybris.platform.sap.productconfig.facades.populator.FeatureProvider">
+	</bean>
+
+	<alias name="sapProductConfigDefaultConflictPopulator" alias="sapProductConfigConflictPopulator" />
+	<bean id="sapProductConfigDefaultConflictPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.SolvableConflictPopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultOverviewValuePopulator" alias="sapProductConfigOverviewValuePopulator" />
+	<bean id="sapProductConfigDefaultOverviewValuePopulator" class="de.hybris.platform.sap.productconfig.facades.populator.ConfigurationOverviewValuePopulator">
+		<property name="nameProvider" ref="sapProductConfigClassificationSystemCPQAttributesProvider" />
+		<property name="configPricing" ref="sapProductConfigConfigPricing" />
+		<property name="valueFormatTranslator" ref="sapProductConfigValueFormatTranslator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultOverviewInstancePopulator" alias="sapProductConfigOverviewInstancePopulator" />
+	<bean id="sapProductConfigDefaultOverviewInstancePopulator" class="de.hybris.platform.sap.productconfig.facades.populator.ConfigurationOverviewInstancePopulator">
+		<property name="configurationOverviewValuePopulator" ref="sapProductConfigOverviewValuePopulator" />
+		<property name="visibleValueFilter" ref="sapProductConfigVisibleValueFilter" />
+		<property name="overviewGroupFilter" ref="sapProductConfigOverviewGroupFilter" />
+		<property name="nameProvider" ref="sapProductConfigClassificationSystemCPQAttributesProvider" />
+		<property name="productDao" ref="productDao" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultOverviewPopulator" alias="sapProductConfigOverviewPopulator" />
+	<bean id="sapProductConfigDefaultOverviewPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.ConfigurationOverviewPopulator">
+		<property name="configurationOverviewInstancePopulator" ref="sapProductConfigOverviewInstancePopulator" />
+		<property name="overviewFilterList" ref="sapProductConfigOverviewFilterList" />
+		<property name="classificationCacheStrategy" ref="sapProductConfigClassificationCacheStrategy" />
+		<property name="configPricing" ref="sapProductConfigConfigPricing" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultVariantOverviewPopulator" alias="sapProductConfigVariantOverviewPopulator" />
+	<bean id="sapProductConfigDefaultVariantOverviewPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.VariantOverviewPopulator">
+		<property name="classificationPopulator" ref="productClassificationPopulator" />
+		<property name="variantOverviewValuePopulator" ref="sapProductConfigVariantOverviewValuePopulator" />
+		<property name="featureProvider" ref="sapProductConfigFeatureProvider" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultVariantOverviewValuePopulator" alias="sapProductConfigVariantOverviewValuePopulator" />
+	<bean id="sapProductConfigDefaultVariantOverviewValuePopulator" class="de.hybris.platform.sap.productconfig.facades.populator.VariantOverviewValuePopulator">
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigOverviewFacade" alias="sapProductConfigOverviewFacade" />
+	<bean id="sapProductConfigDefaultConfigOverviewFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationOverviewFacadeImpl">
+		<property name="configurationService" ref="sapProductConfigConfigurationService" />
+		<property name="productService" ref="productService" />
+		<property name="configurationOverviewPopulator" ref="sapProductConfigOverviewPopulator" />
+		<property name="variantOverviewPopulator" ref="sapProductConfigVariantOverviewPopulator" />
+		<property name="pricingService" ref="sapProductConfigPricingService" />
+	</bean>
+
+	<bean name="sapProductConfigModifyCartPopulatorList" parent="modifyPopulatorList">
+		<property name="list" ref="cartConverter" />
+		<property name="add" ref="sapProductConfigCartPopulator" />
+	</bean>
+
+	<alias name="sapProductConfigExtendedCartConverter" alias="extendedCartConverter" />
+	<bean id="sapProductConfigExtendedCartConverter" parent="accExtendedCartConverter">
+		<property name="populators">
+			<list merge="true">
+				<ref bean="sapProductConfigCartPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- do not call config cart populator for saved carts, to avoid that all configs of all saved carts get instantiated, when saved 
+		cart list is accessed -->
+	<alias name="sapProductConfigDefaultSavedCartFacade" alias="saveCartFacade" />
+	<bean id="sapProductConfigDefaultSavedCartFacade" parent="defaultSaveCartFacade">
+		<property name="cartConverter" ref="savedCartConverter" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultSavedCartConverter" alias="savedCartConverter" />
+	<bean id="sapProductConfigDefaultSavedCartConverter" parent="defaultCartConverter" />
+
+	<bean name="sapProductConfigModifySavedCartPopulatorList" parent="modifyPopulatorList">
+		<property name="list" ref="savedCartConverter" />
+		<property name="remove" ref="sapProductConfigCartPopulator" />
+	</bean>
+	<!-- end saved cart fix -->
+
+	<bean name="sapProductConfigModifyQuotePopulatorList" parent="modifyPopulatorList">
+		<property name="list" ref="quoteConverter" />
+		<property name="add" ref="sapProductConfigQuotePopulator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultSessionAccessFacade" alias="sapProductConfigSessionAccessFacade" />
+	<bean id="sapProductConfigDefaultSessionAccessFacade" class="de.hybris.platform.sap.productconfig.facades.impl.SessionAccessFacadeImpl">
+		<property name="sessionAccessService" ref="sapProductConfigSessionAccessService" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configModelCacheStrategy" ref="sapProductConfigDefaultConfigurationModelCacheStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultOverviewFilterList" alias="sapProductConfigOverviewFilterList" />
+	<bean id="sapProductConfigDefaultOverviewFilterList" class="de.hybris.platform.sap.productconfig.facades.filters.OverviewFilterList">
+		<property name="filters">
+			<list>
+				<ref bean="sapProductConfigUserAssignedValueFilter" />
+				<ref bean="sapProductConfigPriceRelevantValueFilter" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultAbstractConfigOverviewFilter" alias="sapProductConfigAbstractConfigOverviewFilter" />
+	<bean id="sapProductConfigDefaultAbstractConfigOverviewFilter" class="de.hybris.platform.sap.productconfig.facades.filters.AbstractConfigOverviewFilter"
+		abstract="true" />
+
+	<alias name="sapProductConfigDefaultUserAssignedValueFilter" alias="sapProductConfigUserAssignedValueFilter" />
+	<bean id="sapProductConfigDefaultUserAssignedValueFilter" class="de.hybris.platform.sap.productconfig.facades.filters.UserAssignedValueFilter"
+		parent="sapProductConfigAbstractConfigOverviewFilter" />
+
+	<alias name="sapProductConfigDefaultPriceRelevantValueFilter" alias="sapProductConfigPriceRelevantValueFilter" />
+	<bean id="sapProductConfigDefaultPriceRelevantValueFilter" class="de.hybris.platform.sap.productconfig.facades.filters.PriceRelevantValueFilter"
+		parent="sapProductConfigAbstractConfigOverviewFilter" />
+
+	<alias name="sapProductConfigDefaultVisibleValueFilter" alias="sapProductConfigVisibleValueFilter" />
+	<bean id="sapProductConfigDefaultVisibleValueFilter" class="de.hybris.platform.sap.productconfig.facades.filters.VisibleValueFilter"
+		parent="sapProductConfigAbstractConfigOverviewFilter" />
+
+	<alias name="sapProductConfigDefaultOverviewGroupFilter" alias="sapProductConfigOverviewGroupFilter" />
+	<bean id="sapProductConfigDefaultOverviewGroupFilter" class="de.hybris.platform.sap.productconfig.facades.filters.DefaultOverviewGroupFilter" />
+
+	<alias name="sapProductConfigDefaultCPQImageFormatMapping" alias="sapProductConfigCPQImageFormatMapping" />
+	<bean id="sapProductConfigDefaultCPQImageFormatMapping" class="de.hybris.platform.sap.productconfig.facades.impl.CPQImageFormatMappingImpl">
+		<property name="mapping">
+			<map>
+				<!-- Image mapping is empty as we don't know what formats are defined -->
+			</map>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPQCsticImageFormatMapping" alias="sapProductConfigCPQCsticImageFormatMapping" />
+	<bean id="sapProductConfigDefaultCPQCsticImageFormatMapping" parent="sapProductConfigCPQImageFormatMapping">
+		<property name="mapping">
+			<map>
+				<entry key="192Wx96H">
+					<util:constant static-field="de.hybris.platform.sap.productconfig.facades.CPQImageType.CSTIC_IMAGE" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultCPQCsticValueImageFormatMapping" alias="sapProductConfigCPQCsticValueImageFormatMapping" />
+	<bean id="sapProductConfigDefaultCPQCsticValueImageFormatMapping" parent="sapProductConfigCPQImageFormatMapping">
+		<property name="mapping">
+			<map>
+				<entry key="96Wx96H">
+					<util:constant static-field="de.hybris.platform.sap.productconfig.facades.CPQImageType.VALUE_IMAGE" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultClassificationSystemCPQAttributesProvider" alias="sapProductConfigClassificationSystemCPQAttributesProvider" />
+	<bean id="sapProductConfigDefaultClassificationSystemCPQAttributesProvider" class="de.hybris.platform.sap.productconfig.facades.impl.ClassificationSystemCPQAttributesProviderImpl">
+		<property name="classificationService" ref="classificationSystemService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="uiTypeFinder" ref="sapProductConfigUiTypeFinder" />
+		<property name="valueFormatTranslator" ref="sapProductConfigValueFormatTranslator" />
+		<property name="cpqCsticImageFormatMapping" ref="sapProductConfigCPQCsticImageFormatMapping" />
+		<property name="cpqCsticValueImageFormatMapping" ref="sapProductConfigCPQCsticValueImageFormatMapping" />
+		<property name="imagePopulator" ref="imagePopulator" />
+		<property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+
+	<bean id="sapProductConfigDefaultCPQConfigurationsPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.CPQConfigurationsPopulator" />
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryProductInfoConverter" />
+		<property name="add" ref="sapProductConfigDefaultCPQConfigurationsPopulator" />
+	</bean>
+
+	<alias name="sapProductConfigVariantDefaultFacade" alias="sapProductConfigVariantFacade" />
+	<bean id="sapProductConfigVariantDefaultFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationVariantFacadeImpl">
+		<property name="variantSerachService" ref="sapProductConfigVariantSearchService" />
+		<property name="productService" ref="productService" />
+		<property name="imagePopulator" ref="productPrimaryImagePopulator" />
+		<property name="pricePopulator" ref="productPricePopulator" />
+	</bean>
+
+	<!-- We want to activate the standard product facade, as for PDP we don't want the base product to be replaced with the variant -->
+	<!-- This means we deactivate defaultProductVariantFacade -->
+	<alias name="defaultProductFacade" alias="productVariantFacade" />
+
+
+	<alias name="sapProductConfigDefaultProductBasicPopulator" alias="sapProductConfigProductBasicPopulator" />
+	<bean id="sapProductConfigDefaultProductBasicPopulator" parent="baseProductPopulator"
+		class="de.hybris.platform.sap.productconfig.facades.populator.CPQProductBasicPopulator">
+		<property name="configurationVariantUtil" ref="sapProductConfigVariantUtil" />
+	</bean>
+
+	<bean id="productBasicPopulatorListConfig" depends-on="productBasicPopulatorList" parent="listMergeDirective">
+		<property name="add" ref="sapProductConfigProductBasicPopulator" />
+		<property name="listPropertyDescriptor" value="populators" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="productConverter" />
+		<property name="add" ref="sapProductConfigProductBasicPopulator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultProductVariantMatrixPopulator" alias="productVariantMatrixPopulator" />
+	<bean id="sapProductConfigDefaultProductVariantMatrixPopulator" parent="defaultProductVariantMatrixPopulator"
+		class="de.hybris.platform.sap.productconfig.facades.populator.CPQProductVariantMatrixPopulator">
+		<property name="configurationVariantUtil" ref="sapProductConfigVariantUtil" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultUiTrackingRecorder" alias="sapProductConfigUiTrackingRecorder" />
+	<bean id="sapProductConfigDefaultUiTrackingRecorder" class="de.hybris.platform.sap.productconfig.facades.tracking.impl.UiTrackingRecorderImpl"
+		parent="sapProductConfigAbstractTrackingRecorder">
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultUiKeyGenerator" alias="sapProductConfigUiKeyGenerator" />
+	<bean id="sapProductConfigDefaultUiKeyGenerator" class="de.hybris.platform.sap.productconfig.facades.impl.UniqueUIKeyGeneratorImpl">
+	</bean>
+
+	<alias name="sapProductConfigDefaultIntervalInDomainHelper" alias="sapProductConfigIntervalInDomainHelper" />
+	<bean id="sapProductConfigDefaultIntervalInDomainHelper" class="de.hybris.platform.sap.productconfig.facades.impl.IntervalInDomainHelperImpl">
+		<property name="valueFormatTranslator" ref="sapProductConfigValueFormatTranslator" />
+	</bean>
+
+
+	<alias name="sapProductConfigDefaultQuoteIntegrationFacade" alias="sapProductConfigQuoteIntegrationFacade" />
+	<bean id="sapProductConfigDefaultQuoteIntegrationFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationQuoteIntegrationFacadeImpl">
+		<property name="quoteService" ref="quoteService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="userService" ref="userService" />
+		<property name="quoteUserIdentificationStrategy" ref="quoteUserIdentificationStrategy" />
+		<property name="configurationAbstractOrderIntegrationHelper" ref="sapProductConfigConfigurationAbstractOrderIntegrationHelper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultOrderIntegrationFacade" alias="sapProductConfigOrderIntegrationFacade" />
+	<bean id="sapProductConfigDefaultOrderIntegrationFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationOrderIntegrationFacadeImpl">
+		<property name="customerAccountService" ref="customerAccountService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="userService" ref="userService" />
+		<property name="configurationAbstractOrderIntegrationHelper" ref="sapProductConfigConfigurationAbstractOrderIntegrationHelper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultSavedCartIntegrationFacade" alias="sapProductConfigSavedCartIntegrationFacade" />
+	<bean id="sapProductConfigDefaultSavedCartIntegrationFacade" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationSavedCartIntegrationFacadeImpl">
+		<property name="userService" ref="userService" />
+		<property name="commerceCartService" ref="commerceCartService" />
+		<property name="configurationAbstractOrderIntegrationHelper" ref="sapProductConfigConfigurationAbstractOrderIntegrationHelper" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultConfigurationAbstractOrderIntegrationHelper" alias="sapProductConfigConfigurationAbstractOrderIntegrationHelper" />
+	<bean id="sapProductConfigDefaultConfigurationAbstractOrderIntegrationHelper" class="de.hybris.platform.sap.productconfig.facades.impl.ConfigurationAbstractOrderIntegrationHelperImpl">
+		<property name="productConfigurationService" ref="sapProductConfigConfigurationService" />
+		<property name="abstractOrderEntryLinkStrategy" ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configurationAbstractOrderIntegrationStrategy" ref="sapProductConfigConfigurationAbstractOrderIntegrationStrategy" />
+		<property name="variantOverviewPopulator" ref="sapProductConfigVariantOverviewPopulator" />
+		<property name="cpqConfigurableChecker" ref="sapProductConfigCPQConfigurableChecker" />
+		<property name="configPricing" ref="sapProductConfigDefaultConfigPricing" />
+		<property name="configurationVariantUtil" ref="sapProductConfigVariantUtil" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPriceSummaryPopulator" alias="sapProductConfigPriceSummaryPopulator" />
+	<bean id="sapProductConfigDefaultPriceSummaryPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.PriceSummaryPopulator">
+		<property name="configPricing" ref="sapProductConfigConfigPricing" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultDeltaPricePopulator" alias="sapProductConfigDeltaPricePopulator" />
+	<bean id="sapProductConfigDefaultDeltaPricePopulator" class="de.hybris.platform.sap.productconfig.facades.populator.DeltaPricePopulator">
+		<property name="configPricing" ref="sapProductConfigConfigPricing" />
+		<property name="uiKeyGenerator" ref="sapProductConfigUiKeyGenerator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultPriceSummaryConverter" alias="sapProductConfigPriceSummaryConverter" />
+	<bean id="sapProductConfigDefaultPriceSummaryConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.facades.PricingData" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigPriceSummaryPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultDeltaPriceConverter" alias="sapProductConfigDeltaPriceConverter" />
+	<bean id="sapProductConfigDefaultDeltaPriceConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.sap.productconfig.facades.PriceValueUpdateData" />
+		<property name="populators">
+			<list>
+				<ref bean="sapProductConfigDeltaPricePopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="sapProductConfigDefaultAnalyticsPopulator" alias="sapProductConfigAnalyticsPopulator" />
+	<bean id="sapProductConfigDefaultAnalyticsPopulator" class="de.hybris.platform.sap.productconfig.facades.populator.analytics.AnalyticsPopulator">
+		<property name="uiKeyGenerator" ref="sapProductConfigUiKeyGenerator" />
+	</bean>
+
+	<alias name="sapProductConfigDefaultAnalyticsFacade" alias="sapProductConfigAnalyticsFacade" />
+	<bean id="sapProductConfigDefaultAnalyticsFacade" class="de.hybris.platform.sap.productconfig.facades.analytics.impl.ConfigurationAnalyticsFacadeImpl">
+		<property name="analyticsPopulator" ref="sapProductConfigAnalyticsPopulator" />
+		<property name="analyticsService" ref="sapProductConfigAnalyticsService" />
+	</bean>
+</beans>

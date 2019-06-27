@@ -1,0 +1,41 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# ImpEx for Promotions for Powertools Store
+$defaultPromoGrp=powertoolsPromoGrp
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);
+;promotions-module;hybris-rules;promotions;1.0.0;PROMOTION;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;promotions-production;promotions-module;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)
+;promotions-session-production;promotions-production;STATELESS
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit
+;promotions-production-context;promotions-session-production;200;
+
+UPDATE DroolsKIEModule;name[unique=true];defaultKIEBase(name)
+;promotions-module;promotions-production
+
+UPDATE DroolsKIEBase;name[unique=true];defaultKIESession(name)
+;promotions-production;promotions-session-production
+
+
+INSERT_UPDATE RuleGroup;code[unique=true]
+;orderPromotionRuleGroup
+;productPromotionRuleGroup
+;customerPromotionRuleGroup
+
+INSERT_UPDATE PromotionSourceRule;code[unique=true];priority;maxAllowedRuns;stackable[default=false];ruleGroup(code);conditions;actions;website(Identifier)[default=$defaultPromoGrp]
+;3_percent_off_orders_over_3250_CNY;40;1;false;orderPromotionRuleGroup;"[{""children"":[],""parameters"":{""value"":{""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""uuid"":""0472c08a-3a9a-4696-aba1-9e044d540a49"",""value"":{""CNY"":3250}},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""ff8d6f47-d08b-41a4-8eac-86168d132da3"",""value"":""GREATER_THAN""}},""definitionId"":""y_cart_total""}]";"[{""parameters"":{""value"":{""type"":""java.math.BigDecimal"",""uuid"":""3ae37229-4a94-4aba-821b-aaf640c19423"",""value"":3}},""definitionId"":""y_order_percentage_discount""}]";;
+;4875_CNY_off_orders_over_65000_CNY;30;1;true;orderPromotionRuleGroup;"[{""children"":[],""parameters"":{""value"":{""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""uuid"":""5b438fb1-6548-448f-acba-0ccff49021ef"",""value"":{""CNY"":65000}},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""9f4b12b5-9cd2-40cc-b163-9f3786b5fa7b"",""value"":""GREATER_THAN""}},""definitionId"":""y_cart_total""}]";"[{""parameters"":{""value"":{""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""uuid"":""368d4c9e-74db-4f12-a17c-a96282d5d7ac"",""value"":{""CNY"":4875}}},""definitionId"":""y_order_fixed_discount""}]";;
+;drill_screwdriver_sander_for_fixed_price_CNY;140;1;true;productPromotionRuleGroup;"[{""children"":[{""children"":[],""parameters"":{""quantity"":{""type"":""java.lang.Integer"",""uuid"":""75ee0f18-7d60-4066-8205-0114ae96df66"",""value"":1},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""2bc2fbd3-8ba0-42fa-82a2-186d96695bd8"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""type"":""List(ItemType(Product))"",""uuid"":""b5a259e7-3ca9-4b90-8dec-8fec881c0c43"",""value"":[""3881014""]}},""definitionId"":""y_qualifying_products""}],""parameters"":{""id"":{""type"":""java.lang.String"",""uuid"":""087e3e06-65e2-435b-aae6-cd53ea701b4b"",""value"":""container_y""}},""definitionId"":""y_container""},{""children"":[{""children"":[],""parameters"":{""quantity"":{""type"":""java.lang.Integer"",""uuid"":""cc2f5d43-aab4-4668-a2da-8d4f52a4d886"",""value"":1},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""080b98d0-d5db-4db4-aa1d-9d345e099ae2"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""type"":""List(ItemType(Product))"",""uuid"":""52036986-3035-4cfc-bab9-98682bd4cc57"",""value"":[""2116266""]}},""definitionId"":""y_qualifying_products""}],""parameters"":{""id"":{""type"":""java.lang.String"",""uuid"":""394dc38b-9cba-490d-ac09-3a940521c406"",""value"":""container_z""}},""definitionId"":""y_container""},{""children"":[{""children"":[],""parameters"":{""quantity"":{""type"":""java.lang.Integer"",""uuid"":""a8a1e4e1-a85f-4630-a966-01c2d3fafdf0"",""value"":1},""operator"":{""type"":""Enum(de.hybris.platform.ruledefinitions.AmountOperator)"",""uuid"":""ef2aeafd-900f-40a4-9e88-28f9069c1dc6"",""value"":""GREATER_THAN_OR_EQUAL""},""products"":{""type"":""List(ItemType(Product))"",""uuid"":""df427ae1-7ce7-4120-b88b-c1d8ee24ed4e"",""value"":[""3794514""]}},""definitionId"":""y_qualifying_products""}],""parameters"":{""id"":{""type"":""java.lang.String"",""uuid"":""8fdc6a0a-a462-446a-bf8b-10eca4b2679a"",""value"":""container_x""}},""definitionId"":""y_container""}]";"[{""parameters"":{""selection_strategy"":{""type"":""Enum(de.hybris.platform.ruleengineservices.enums.OrderEntrySelectionStrategy)"",""uuid"":""2d080fd6-b41e-42ae-ac85-c8954554910a"",""value"":""CHEAPEST""},""value"":{""type"":""Map(ItemType(Currency),java.math.BigDecimal)"",""uuid"":""750675bc-00f5-4bbb-b139-b184069bb6b5"",""value"":{""CNY"":357}},""qualifying_containers"":{""type"":""Map(java.lang.String,java.lang.Integer)"",""uuid"":""45cb4072-558b-436b-a33a-f3a388017263"",""value"":{""container_x"":1,""container_y"":1,""container_z"":1}}},""definitionId"":""y_target_bundle_price""}]";;

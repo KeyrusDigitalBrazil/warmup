@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+
+    <!-- ############ Rendering ################ -->
+
+
+    <!-- ### CMS Item Rendering Converter ### -->
+    <alias name="defaultCmsRenderingCMSItemConverter" alias="cmsRenderingCMSItemConverter" />
+    <bean name="defaultCmsRenderingCMSItemConverter" parent="baseCMSItemConverter">
+        <property name="attributeStrategyConverter" ref="cmsRenderingAttributeStrategyConverterProvider" />
+        <property name="attributeValueToRepresentationStrategy" ref="cmsRenderingAttributeValueToRepresentationStrategy" />
+        <property name="composedTypeToAttributeCollectionConverter" ref="cmsRenderingComposedTypeToAttributeCollectionConverter" />
+        <property name="customPopulators" ref="cmsRenderingCmsItemConverterCustomPopulators" />
+        <property name="nestedOrPartOfAttributePredicate" ref="renderingCmsNestedOrPartOfAttributePredicate" />
+    </bean>
+
+    <alias name="defaultRenderingCmsItemConverterCustomPopulators" alias="cmsRenderingCmsItemConverterCustomPopulators" />
+    <util:list id="defaultRenderingCmsItemConverterCustomPopulators" >
+        <ref bean="cmsContainerModelToDataRenderingPopulator" />
+    </util:list>
+
+    <!-- ## Strategies ## -->
+    <alias name="renderingAttributeValueToRepresentationStrategy" alias="cmsRenderingAttributeValueToRepresentationStrategy" />
+    <bean name="renderingAttributeValueToRepresentationStrategy" class="de.hybris.platform.cmsfacades.rendering.strategies.RenderingAttributeValueToRepresentationStrategy">
+        <property name="modelService" ref="modelService"/>
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+        <property name="attributeContainsCMSComponentsPredicate" ref="cmsAttributeContainsCMSComponentsPredicate" />
+        <property name="simpleCmsComponentAttributeConverter" ref="cmsRenderingCmsItemToDataContentConverter" />
+        <property name="collectionToRepresentationConverter" ref="cmsCollectionToRepresentationConverter" />
+        <property name="cmsComponentModelToDataRenderingConverter" ref="cmsComponentModelToDataRenderingConverter" />
+    </bean>
+
+    <alias name="renderingAttributeStrategyConverterProvider" alias="cmsRenderingAttributeStrategyConverterProvider"/>
+    <bean name="renderingAttributeStrategyConverterProvider" class="de.hybris.platform.cms2.cmsitems.converter.impl.DefaultAttributeStrategyConverterProvider" parent="baseAttributeStrategyConverterProvider">
+        <property name="attributeContentConverters" ref="cmsRenderingAttributeContentConverterList"/>
+    </bean>
+
+
+    <!-- ## Predicates ## -->
+    <alias name="defaultAttributeContainsCMSComponentsPredicate" alias="cmsAttributeContainsCMSComponentsPredicate" />
+    <bean name="defaultAttributeContainsCMSComponentsPredicate" class="de.hybris.platform.cmsfacades.rendering.predicates.attributes.AttributeContainsCMSComponentsPredicate">
+        <property name="cmsAttributeTypeService" ref="cmsAttributeTypeService" />
+        <property name="typeService" ref="typeService" />
+    </bean>
+
+    <!-- ## Converters and Populators ## -->
+    <!-- Pages -->
+    <alias name="defaultCmsPageModelToDataRenderingConverter" alias="cmsPageModelToDataRenderingConverter" />
+    <bean id="defaultCmsPageModelToDataRenderingConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.AbstractPageData" />
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsPageModelToDataRenderingPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultPageModelToDataRenderingPopulator" alias="cmsPageModelToDataRenderingPopulator" />
+    <bean id="defaultPageModelToDataRenderingPopulator" class="de.hybris.platform.cmsfacades.rendering.populators.PageModelToDataRenderingPopulator" >
+        <property name="cmsPageService" ref="cmsPageService" />
+        <property name="contentSlotModelToDataRenderingConverter" ref="cmsSlotModelToDataRenderingConverter" />
+    </bean>
+
+    <alias name="defaultContainerModelToDataRenderingPopulator" alias="cmsContainerModelToDataRenderingPopulator" />
+    <bean id="defaultContainerModelToDataRenderingPopulator" class="de.hybris.platform.cmsfacades.rendering.populators.ContainerModelToDataRenderingPopulator" >
+        <property name="cmsComponentContainerRegistry" ref="cmsComponentContainerRegistry" />
+    </bean>
+
+    <!-- Slots -->
+    <alias name="defaultCmsSlotModelToDataRenderingConverter" alias="cmsSlotModelToDataRenderingConverter" />
+    <bean id="defaultCmsSlotModelToDataRenderingConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.PageContentSlotData" />
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsSlotModelToDataRenderingPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultSlotModelToDataRenderingPopulator" alias="cmsSlotModelToDataRenderingPopulator" />
+    <bean id="defaultSlotModelToDataRenderingPopulator" class="de.hybris.platform.cmsfacades.rendering.populators.ContentSlotModelToDataRenderingPopulator" >
+        <property name="cmsComponentModelToDataRenderingConverter" ref="cmsComponentModelToDataRenderingConverter" />
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+        <property name="uniqueIdentifierAttributeToDataContentConverter" ref="cmsUniqueIdentifierAttributeToDataContentConverter" />
+    </bean>
+
+    <!-- Components -->
+    <alias name="defaultCMSComponentModelToDataRenderingConverter" alias="cmsComponentModelToDataRenderingConverter" />
+    <bean id="defaultCMSComponentModelToDataRenderingConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.AbstractCMSComponentData" />
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsComponentModelToDataRenderingPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCMSComponentModelToDataRenderingPopulator" alias="cmsComponentModelToDataRenderingPopulator" />
+    <bean id="defaultCMSComponentModelToDataRenderingPopulator" class="de.hybris.platform.cmsfacades.rendering.populators.CMSComponentModelToDataRenderingPopulator" >
+        <property name="cmsItemConverter" ref="cmsRenderingCMSItemConverter" />
+        <property name="uniqueIdentifierAttributeToDataContentConverter" ref="cmsUniqueIdentifierAttributeToDataContentConverter" />
+    </bean>
+
+    <!-- Navigation Nodes -->
+    <alias name="defaultCMSNavigationNodeModelToDataRenderingConverter" alias="cmsNavigationNodeModelToDataRenderingConverter" />
+    <bean id="defaultCMSNavigationNodeModelToDataRenderingConverter" parent="abstractPopulatingConverter">
+        <property name="targetClass" value="de.hybris.platform.cmsfacades.data.NavigationNodeData" />
+        <property name="populators">
+            <list merge="true">
+                <ref bean="cmsNavigationNodeModelToDataRenderingPopulator" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultCMSNavigationNodeModelToDataRenderingPopulator" alias="cmsNavigationNodeModelToDataRenderingPopulator" />
+    <bean id="defaultCMSNavigationNodeModelToDataRenderingPopulator" class="de.hybris.platform.cmsfacades.rendering.populators.NavigationNodeModelToDataRenderingPopulator">
+        <property name="navigationEntryModelToDataConverter" ref="cmsNavigationEntryModelToDataConverter" />
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+    </bean>
+
+    <!-- ## Blacklist ## -->
+    <alias name="renderingComposedTypeToAttributeCollectionConverter" alias="cmsRenderingComposedTypeToAttributeCollectionConverter" />
+    <bean name="renderingComposedTypeToAttributeCollectionConverter" class="de.hybris.platform.cmsfacades.cmsitems.converter.ComposedTypeToAttributeCollectionConverter">
+        <property name="blacklistedTypes" ref="cmsRenderingBlacklistedTypesList" />
+        <property name="typeBlacklistedAttributeMap" ref="cmsRenderingTypeBlacklistedAttributeMap" />
+    </bean>
+
+    <alias name="defaultRenderingBlacklistedTypesList" alias="cmsRenderingBlacklistedTypesList" />
+    <util:list id="defaultRenderingBlacklistedTypesList">
+        <value>GenericItem</value>
+        <value>BridgeAbstraction</value>
+        <value>LocalizableItem</value>
+        <value>ExtensibleItem</value>
+        <value>Item</value>
+    </util:list>
+
+    <alias name="defaultRenderingTypeBlacklistedAttributeMap" alias="cmsRenderingTypeBlacklistedAttributeMap" />
+    <util:map key-type="java.lang.String" value-type="java.lang.String" id="defaultRenderingTypeBlacklistedAttributeMap">
+        <entry key="Item" value="pk, itemtype, creationtime, modifiedtime" />
+		<entry key="CMSItem" value="catalogVersion, uid, name" />
+		<entry key="AbstractCMSComponent" value="typeCode, visible, restrictions, slots, onlyOneRestrictionMustApply, restricted, actions, type" />
+		<entry key="SimpleCMSComponent" value="containers" />
+		<entry key="ProductCarouselComponent" value="products"/>
+		<entry key="CMSLinkComponent" value="navigationNodes,pages"/>
+		<entry key="BannerComponent" value="rotatingComponent"/>
+        <entry key="AbstractCMSComponentContainer" value="currentCMSComponents,simpleCMSComponents"/>
+    </util:map>
+
+    <!-- ## Attribute Converters ## -->
+    <alias name="renderingAttributeContentConverterList" alias="cmsRenderingAttributeContentConverterList"/>
+    <util:list id="renderingAttributeContentConverterList">
+        <!-- primitive content converters -->
+        <ref bean="cmsBooleanContentConverter"/>
+        <ref bean="cmsDateContentConverter"/>
+        <ref bean="cmsDoubleContentConverter"/>
+        <ref bean="cmsFloatContentConverter"/>
+        <ref bean="cmsIntegerContentConverter"/>
+        <ref bean="cmsLongContentConverter"/>
+        <ref bean="cmsStringContentConverter"/>
+        <ref bean="cmsEnumContentConverter"/>
+
+        <!-- cms item default content converter -->
+        <ref bean="cmsRenderingCmsItemContentConverter"/>
+
+        <!-- other content converters -->
+        <ref bean="cmsRenderingMediaContentConverter"/>
+        <ref bean="cmsRenderingNavigationNodeContentConverter" />
+        <ref bean="cmsRenderingCategoryContentConverter"/>
+        <ref bean="cmsRenderingProductContentConverter"/>
+        <ref bean="cmsUserGroupContentConverter"/>
+        <ref bean="cmsCatalogVersionContentConverter"/>
+        <ref bean="cmsPageTypeContentConverter"/>
+        <ref bean="cmsLinkTargetContentConverter"/>
+        <ref bean="cmsNavigationEntryContentConverter"/>
+    </util:list>
+
+    <!-- ## Others ## -->
+    <alias name="defaultRestrictionContextProvider" alias="cmsRestrictionContextProvider" />
+    <bean name="defaultRestrictionContextProvider" class="de.hybris.platform.cmsfacades.rendering.impl.DefaultRestrictionContextProvider">
+        <property name="sessionService" ref="sessionService" />
+    </bean>
+
+    <alias name="defaultRenderingCmsNestedOrPartOfAttributePredicate" alias="renderingCmsNestedOrPartOfAttributePredicate"/>
+    <bean id="defaultRenderingCmsNestedOrPartOfAttributePredicate" class="de.hybris.platform.cmsfacades.common.predicate.attributes.NestedOrPartOfAttributePredicate">
+        <property name="nestedAttributePredicates">
+            <set>
+                <ref bean="cmsAttributeContainsCMSComponentsPredicate" />
+            </set>
+        </property>
+    </bean>
+
+    <!-- Restriction aware service -->
+    <alias name="defaultRestrictionAwareService" alias="cmsRestrictionAwareService"  />
+    <bean id="defaultRestrictionAwareService" class="de.hybris.platform.cmsfacades.common.service.impl.DefaultRestrictionAwareService">
+        <property name="restrictionContextProvider" ref="cmsRestrictionContextProvider" />
+    </bean>
+
+    <!-- Page model supplier list -->
+    <alias name="renderingPageModelSuppliers" alias="cmsRenderingPageModelSuppliers" />
+    <util:list id="renderingPageModelSuppliers">
+        <ref bean="cmsRenderingCatalogPageModelSupplier" />
+        <ref bean="cmsRenderingCategoryPageModelSupplier" />
+        <ref bean="cmsRenderingContentPageModelSupplier" />
+        <ref bean="cmsRenderingProductPageModelSupplier" />
+    </util:list>
+
+    <!-- Page rendering validator list -->
+    <alias name="renderingPageCheckers" alias="cmsRenderingPageCheckers" />
+    <util:list id="renderingPageCheckers">
+        <ref bean="cmsRenderingCatalogPageChecker" />
+        <ref bean="cmsRenderingCategoryPageChecker" />
+        <ref bean="cmsRenderingContentPageChecker" />
+        <ref bean="cmsRenderingProductPageChecker" />
+    </util:list>
+
+    <!-- Page rendering validator -->
+    <alias name="defaultRenderingPageValidator" alias="cmsRenderingPageValidator" />
+    <bean id="defaultRenderingPageValidator" class="de.hybris.platform.cmsfacades.rendering.validators.page.impl.DefaultRenderingPageValidator" >
+        <property name="typeCodeExistsPredicate" ref="typeCodeExistsPredicate" />
+        <property name="renderingPageCheckers" ref="cmsRenderingPageCheckers" />
+    </bean>
+
+    <!-- Component rendering validator -->
+    <alias name="defaultRenderingComponentValidator" alias="cmsRenderingComponentValidator" />
+    <bean id="defaultRenderingComponentValidator" class="de.hybris.platform.cmsfacades.rendering.validators.component.DefaultRenderingComponentValidator">
+        <property name="categoryCodeExistsPredicate" ref="cmsCategoryCodeExistsPredicate"/>
+        <property name="productCodeExistsPredicate" ref="cmsProductCodeExistsPredicate" />
+        <property name="catalogCodeExistsPredicate" ref="cmsCatalogCodeExistsPredicate" />
+    </bean>
+
+    <!-- Rendering visibility service and rules -->
+    <alias name="defaultRenderingVisibilityService" alias="cmsRenderingVisibilityService" />
+    <bean id="defaultRenderingVisibilityService" class="de.hybris.platform.cmsfacades.rendering.visibility.impl.DefaultRenderingVisibilityService">
+        <property name="renderingVisibilityRules" ref="cmsRenderingVisibilityRules" />
+    </bean>
+
+    <alias name="defaultCMSComponentRenderingVisibilityRule" alias="cmsComponentRenderingVisibilityRule" />
+    <bean id="defaultCMSComponentRenderingVisibilityRule" class="de.hybris.platform.cmsfacades.rendering.visibility.impl.CMSComponentRenderingVisibilityRule">
+        <property name="cmsRestrictionService" ref="cmsRestrictionService" />
+        <property name="restrictionContextProvider" ref="cmsRestrictionContextProvider" />
+    </bean>
+
+    <alias name="defaultCMSNavigationNodeRenderingVisibilityRule" alias="cmsNavigationNodeRenderingVisibilityRule" />
+    <bean id="defaultCMSNavigationNodeRenderingVisibilityRule" class="de.hybris.platform.cmsfacades.rendering.visibility.impl.CMSNavigationNodeRenderingVisibilityRule" />
+
+    <alias name="renderingVisibilityRules" alias="cmsRenderingVisibilityRules"/>
+    <util:list id="renderingVisibilityRules">
+        <ref bean="cmsComponentRenderingVisibilityRule" />
+        <ref bean="cmsNavigationNodeRenderingVisibilityRule" />
+    </util:list>
+
+    <!-- Page rendering service -->
+    <alias name="defaultPageRenderingService" alias="cmsPageRenderingService" />
+    <bean id="defaultPageRenderingService" class="de.hybris.platform.cmsfacades.rendering.impl.DefaultPageRenderingService">
+        <property name="pageModelToDataRenderingConverter" ref="cmsPageModelToDataRenderingConverter" />
+        <property name="facadeValidationService" ref="facadeValidationService" />
+        <property name="renderingPageValidator" ref="cmsRenderingPageValidator" />
+        <property name="restrictionAwareService" ref="cmsRestrictionAwareService"/>
+        <property name="cmsDataFactory" ref="cmsDataFactory" />
+        <property name="renderingPageModelSuppliers" ref="cmsRenderingPageModelSuppliers" />
+    </bean>
+
+    <!-- Component rendering service -->
+    <alias name="defaultComponentRenderingService" alias="cmsComponentRenderingService" />
+    <bean id="defaultComponentRenderingService" class="de.hybris.platform.cmsfacades.rendering.impl.DefaultComponentRenderingService">
+        <property name="cmsDataFactory" ref="cmsDataFactory" />
+        <property name="cmsComponentService" ref="cmsComponentService" />
+        <property name="restrictionAwareService" ref="cmsRestrictionAwareService"/>
+        <property name="componentRenderingConverter" ref="cmsComponentModelToDataRenderingConverter" />
+        <property name="facadeValidationService" ref="facadeValidationService" />
+        <property name="renderingComponentValidator" ref="cmsRenderingComponentValidator" />
+        <property name="renderingVisibilityService" ref="cmsRenderingVisibilityService" />
+    </bean>
+</beans>

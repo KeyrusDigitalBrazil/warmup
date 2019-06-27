@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="sapOrdermgmtDefaultCartIntegrationFacade" alias="sapProductConfigCartIntegrationFacade" />
+	<bean id="sapOrdermgmtDefaultCartIntegrationFacade"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.impl.DefaultCartIntegrationFacade"
+		parent="sapProductConfigBaseFacade">
+		<property name="cartService" ref="sapOrdermgmtCartService"></property>
+		<property name="sessionAccessService" ref="sapProductConfigSessionAccessService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="backendAvailabilityService" ref="sapOrdermgmtBackendAvailabilityService" />
+		<property name="productConfigDefaultCartIntegrationFacade"
+			ref="sapProductConfigDefaultCartIntegrationFacade" />
+		<property name="cartRestorationFacade" ref="sapOrdermgmtCartRestorationFacade" />
+		<property name="abstractOrderEntryLinkStrategy"
+			ref="sapProductConfigAbstractOrderEntryLinkStrategy" />
+		<property name="configCopyStrategy" ref="sapProductConfigConfigurationCopyStrategy" />
+		<property name="productLinkStrategy" ref="sapProductConfigProductLinkStrategy"/>		
+	</bean>
+
+	<alias name="sapOrdermgmtDefaultOrderIntegrationFacade" alias="sapProductConfigOrderIntegrationFacade" />
+	<bean id="sapOrdermgmtDefaultOrderIntegrationFacade"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.impl.DefaultConfigurationOrderIntegrationFacade">
+		<property name="orderService" ref="sapOrdermgmtOrderService"></property>
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="productConfigurationService" ref="sapProductConfigConfigurationService" />
+		<property name="sapProductConfigCartIntegrationFacade"
+			ref="sapProductConfigDefaultOrderIntegrationFacade" />
+	</bean>
+
+	<alias name="sapOrdermgmtAddToCartStrategy" alias="commerceAddToCartStrategy" />
+	<bean name="sapOrdermgmtAddToCartStrategy"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.impl.CommerceConfigAddToCartStrategy"
+		parent="sapProductConfigAddToCartStrategy">
+	</bean>
+
+	<bean id="cPQSapCartFacadeHook"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.hook.CPQSapCartFacadeHook">
+		<property name="productConfigurationSomService" ref="sapOrdermgmtProductConfigurationService" />
+		<property name="productConfigurationService" ref="sapProductConfigConfigurationService" />
+	</bean>
+
+	<bean id="cPQSapCartFacadeHookMergeDirective" depends-on="sapCartFacadeHooks"
+		parent="listMergeDirective">
+		<property name="add" ref="cPQSapCartFacadeHook" />
+	</bean>
+
+	<bean id="cPQCartRestorationFacadeHook"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.hook.CPQCartRestorationFacadeHook">
+		<property name="modelService" ref="modelService" />
+		<property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />
+
+	</bean>
+
+	<bean id="cPQCartRestorationFacadeHookMergeDirective" depends-on="cartRestorationFacadeHooks"
+		parent="listMergeDirective">
+		<property name="add" ref="cPQCartRestorationFacadeHook" />
+	</bean>
+
+	<alias name="sapOrdermgmtDefaultStandardOrderEntryPopulator"
+		alias="sapOrderEntryPopulator" />
+	<bean id="sapOrdermgmtDefaultStandardOrderEntryPopulator" parent="orderEntryPopulator"
+		class="de.hybris.platform.sap.sapordermgmtcfgfacades.cart.populator.DefaultStandardOrderEntryPopulator">
+		<property name="productConfigurationService" ref="sapOrdermgmtProductConfigurationService" />
+	</bean>
+
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="orderEntryConverter" />
+		<property name="add" ref="sapOrderEntryPopulator" />
+	</bean>
+
+</beans>

@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+    <widget-extension widgetId="backofficeMainSlot">
+    	<widget id="organizationBackofficePerspective" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="perspectives" title="organization.perspective.name" template="false" access="orgemployeerole">
+    		<widget id="organizationExplorerTree" widgetDefinitionId="com.hybris.cockpitng.widgets.common.explorertree" slotId="leftSlot" template="false" title="organization.perspective.name">
+				<widget id="organizationExplorerTreeConditionEvaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator" slotId="cockpitWidgetChildrenInvisible" template="false">
+					<widget id="organizationExplorerTreePropExtractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor" slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="expression" type="String">code</setting>
+						<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+						<virtual-sockets />
+					</widget>
+					<setting key="expression" type="String">#root instanceof T(com.hybris.cockpitng.tree.node.TypeNode) and #root.id NE 'organization.typenode.units.sales'</setting>
+					<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+					<virtual-sockets />
+				</widget>
+				<widget id="organizationSalesUnitConditionEvaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator" slotId="cockpitWidgetChildrenInvisible" template="false">
+					<widget id="isSalesUnit" widgetDefinitionId="de.hybris.organizationbackoffice.widgets.OrgSalesUnit" slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="widgetStyleAttribute" type="String"></setting>
+						<setting key="widgetStyleClass" type="String"></setting>
+						<virtual-sockets />
+					</widget>
+					<setting key="expression" type="String">#root.id EQ 'organization.typenode.units.sales'</setting>
+					<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+					<virtual-sockets />
+				</widget>
+				<setting key="explorerTreeConfigCtx" type="String">organizationbackoffice-explorer-tree</setting>
+				<setting key="allowFilteringEntries" type="Boolean">true</setting>
+				<virtual-sockets />
+			</widget>
+			<widget id="organizationCollapsibleContainer" widgetDefinitionId="com.hybris.cockpitng.collapsiblecontainer" slotId="centerSlot" template="false">
+				<widget id="organizationAdvancedSearch" widgetDefinitionId="com.hybris.cockpitng.advancedsearch" slotId="center" template="false">
+					<widget id="organizationAdvancedSearchEngine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine" slotId="cockpitWidgetChildrenInvisible" template="false">
+						<setting key="defaultPageSize" type="Integer">10</setting>
+						<!-- here -->
+						<virtual-sockets />
+					</widget>
+					<widget id="organizationList" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser" slotId="nestedWidget" template="false">
+						<setting key="listSubtitle" type="String">emptylist</setting>
+						<setting key="socketDataType_$T" type="String">java.lang.Object</setting>
+						<setting key="pageSize" type="Integer">10</setting>
+						<setting key="maxCharsInCell" type="Integer">70</setting>
+						<setting key="actionSlotComponentId" type="String">organizationListviewActions</setting>
+						<setting key="multiSelect" type="Boolean">false</setting>
+						<setting key="colConfigCtxCode" type="String">organizationlistview</setting>
+						<setting key="itemRenderer" type="String">listViewRenderer</setting>
+						<setting key="sortableListHeader" type="Boolean">true</setting>
+						<setting key="asyncLoading" type="Boolean">true</setting>
+						<virtual-sockets />
+					</widget>
+					<setting key="enableNestedWidgetView" type="Boolean">true</setting>
+					<setting key="advancedSearchConfigCtxCode" type="String">advanced-search</setting>
+					<setting key="addRowPosition" type="String">Header</setting>
+					<setting key="isNestedObjectCreationDisabled" type="Boolean">true</setting>
+					<setting key="forceSearchForCode" type="String">WorkflowAction,OrgUnit</setting>
+					<setting key="disableAttributesComparator" type="Boolean">false</setting>
+					<setting key="disableSimpleSearch" type="Boolean">false</setting>
+					<setting key="widgetStyleClass" type="String"></setting>
+					<setting key="disableSubtypesCheckbox" type="Boolean">false</setting>
+					<setting key="disableSearchModelCache" type="Boolean">false</setting>
+					<setting key="widgetStyleAttribute" type="String"></setting>
+					<setting key="disableSortOrder" type="Boolean">false</setting>
+					<setting key="sendResetWhenDisableAutoSearch" type="Boolean">true</setting>
+					<setting key="disableAutoSearch" type="Boolean">false</setting>
+					<setting key="disableAdvancedSearchToolbar" type="Boolean">false</setting>
+					<setting key="enableNestedWidgetView" type="Boolean">true</setting>
+					<setting key="addRowPosition" type="String">Bottom</setting>
+					<virtual-sockets />
+				</widget>
+				<widget id="organizationEditorArea" widgetDefinitionId="com.hybris.cockpitng.backoffice.defaultEditorArea" slotId="bottom" title="organizationEditorArea" template="false">
+					<widget id="organizationPermissionmanagementgroup" widgetDefinitionId="com.hybris.cockpitng.backoffice.permissionmanagementgroup" slotId="cockpitWidgetChildrenInvisible" title="Permission Management" template="true">
+						<instance-settings socketEventRoutingMode="LAST_USED">
+							<create onInit="false" reuseExisting="true">
+								<all-incoming-events />
+							</create>
+							<close />
+							<select onInit="false">
+								<all-incoming-events />
+							</select>
+						</instance-settings>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/eastWidth" type="String">25%</setting>
+						<setting key="/fieldPermissions/sortableListHeader" type="Boolean">true</setting>
+						<setting key="/permissionManager/type_id_accessor" type="String" />
+						<setting key="/permissionManager/principal_id_attribute" type="String">uid</setting>
+						<setting key="/centerSlotContent/centerCaption" type="String">Center Caption</setting>
+						<setting key="/leftSlotContent/thirdSectionDisabled" type="Boolean">true</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/eastBorder" type="String">none</setting>
+						<setting key="/permissionManager/type_typeCode" type="String">ComposedType</setting>
+						<setting key="/widgetFilterAttributes/enabledByDefault" type="Boolean">true</setting>
+						<setting key="/widgetFilterTypeOrPrincipal/enabledByDefault" type="Boolean">true</setting>
+						<setting key="/leftSlotContent/allowLockingCenterPanel" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/topPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/topPanelCollapsed" type="Boolean">false</setting>
+						<setting key="/fieldPermissions/asyncLoading" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/centerPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/typePermissions/asyncLoading" type="Boolean">false</setting>
+						<setting key="/centerSlotContent/centerPanelCollapsed" type="Boolean">false</setting>
+						<setting key="/fieldPermissions/pageSize" type="Integer">50</setting>
+						<setting key="/leftSlotContent/centerHeight" type="String">80px</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/southDisabled" type="Boolean">true</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/southHeight" type="String">50px</setting>
+						<setting key="/typePermissions/actionSlotComponentId" type="String">permissionManagementlistviewActions</setting>
+						<setting key="/centerSlotContent/bottomCaption" type="String">com.hybris.cockpitng.backoffice.permissionmanagementgroup.attributes</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/westCollapsible" type="Boolean">true</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/opaqueBG" type="String">true</setting>
+						<setting key="/leftSlotContent/bottomCaption" type="String">com.hybris.cockpitng.backoffice.permissionmanagementgroup.context</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/northBorder" type="String">none</setting>
+						<setting key="/leftSlotContent/allowLockingBottomPanel" type="Boolean">false</setting>
+						<setting key="/centerSlotContent/allowLockingBottomPanel" type="Boolean">false</setting>
+						<setting key="_width" type="String">80%</setting>
+						<setting key="/permissionManager/principal_typeCode" type="String">Principal</setting>
+						<setting key="/typePermissions/colConfigCtxCode" type="String">permissionManagementTypes</setting>
+						<setting key="/leftSlotContent/centerCaption" type="String">Center Caption</setting>
+						<setting key="/typePermissions/listSubtitle" type="String" />
+						<setting key="widgetStyleClass" type="String" />
+						<setting key="/permissionManager/principal_id_accessor" type="String" />
+						<setting key="/centerSlotContent/topCaption" type="String">com.hybris.cockpitng.backoffice.permissionmanagementgroup.filter.attributes</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/broadcastHorizontalResize" type="Boolean">true</setting>
+						<setting key="/permissionLegend/controller.groovy" type="String">package com.hybris.cockpitng.exampleGroovyWidget;
+
+							import com.hybris.cockpitng.annotations.SocketEvent;
+							import com.hybris.cockpitng.util.DefaultWidgetController;
+
+							/**
+							* Example groovy controller.
+							* You can use virtual sockets to communicate.
+							*/
+							public class GroovyController extends DefaultWidgetController
+							{
+							/**
+							* you can accept incoming sockets like this:
+							*/
+							@SocketEvent(socketId = "mysocket")
+							public void onMySocket(final Object data)
+							{
+							// using widget model to store data
+							getModel().setAttribute("mydata", data);
+							}
+
+							/**
+							* you can send data to outgoing sockets like this:
+							*/
+							public void sendOutput()
+							{
+							sendOutput("myoutput", getModel().getValue("mydata", Object.class));
+							}
+							}</setting>
+						<setting key="/leftSlotContent/bottomPanelCollapsed" type="Boolean">false</setting>
+						<setting key="/centerSlotContent/bottomPanelCollapsed" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/topHeight" type="String">33%</setting>
+						<setting key="/fieldPermissions/listSubtitle" type="String" />
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/centerBorder" type="String">none</setting>
+						<setting key="/centerSlotContent/thirdSectionDisabled" type="Boolean">true</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/northDisabled" type="Boolean">true</setting>
+						<setting key="/leftSlotContent/allowLockingTopPanel" type="Boolean">false</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/autoCloseWest" type="Boolean">false</setting>
+						<setting key="/centerSlotContent/centerHeight" type="String">80px</setting>
+						<setting key="/centerSlotContent/topHeight" type="String">33%</setting>
+						<setting key="/centerSlotContent/allowLockingTopPanel" type="Boolean">false</setting>
+						<setting key="/fieldPermissions/listTitle" type="String" />
+						<setting key="/typePermissions/itemRenderer" type="String">permissionManagementListViewRenderer</setting>
+						<setting key="/permissionManager/type_id_attribute" type="String">code</setting>
+						<setting key="/centerSlotContent/topPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/centerSlotContent/topPanelCollapsed" type="Boolean">false</setting>
+						<setting key="_height" type="String">80%</setting>
+						<setting key="/leftSlotContent/topCaption" type="String">com.hybris.cockpitng.backoffice.permissionmanagementgroup.filter.context</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/southCollapsible" type="Boolean">true</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/border" type="String">none</setting>
+						<setting key="/fieldPermissions/itemRenderer" type="String">listViewRenderer</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/westWidth" type="String">60%</setting>
+						<setting key="/fieldPermissions/actionSlotComponentId" type="String" />
+						<setting key="/centerSlotContent/allowLockingCenterPanel" type="Boolean">false</setting>
+						<setting key="/fieldPermissions/maxCharsInCell" type="Integer">70</setting>
+						<setting key="/typePermissions/pageSize" type="Integer">50</setting>
+						<setting key="widgetStyleAttribute" type="String" />
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/northHeight" type="String">50px</setting>
+						<setting key="/centerSlotContent/bottomPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/eastDisabled" type="Boolean">true</setting>
+						<setting key="/widgetFilterField/enabledByDefault" type="Boolean">true</setting>
+						<setting key="/fieldPermissions/colConfigCtxCode" type="String">permissionManagementFields</setting>
+						<setting key="/permissionLegend/view.zul" type="String">&lt;?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?&gt;
+							&lt;widget&gt;
+							&lt;div sclass="yw-permission-legend"&gt;
+							&lt;div sclass="yw-permission-legend-holder"&gt;
+							&lt;span sclass="yw-permission-legend-icon-inherited-id"&gt;&lt;/span&gt;
+							&lt;span sclass="yw-permission-legend-icon-inherited-ig"&gt;&lt;/span&gt;
+							${c:l('permission.inherited')}
+							&lt;/div&gt;
+							&lt;div sclass="yw-permission-legend-holder"&gt;
+							&lt;span sclass="yw-permission-legend-icon-d"&gt;&lt;/span&gt;
+							${c:l('permission.denied')}
+							&lt;/div&gt;
+							&lt;div sclass="yw-permission-legend-holder"&gt;
+							&lt;span sclass="yw-permission-legend-icon-g"&gt;&lt;/span&gt;
+							${c:l('permission.granted')}
+							&lt;/div&gt;
+							&lt;/div&gt;
+							&lt;/widget&gt;</setting>
+						<setting key="/centerSlotContent/centerPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/westBorder" type="String">none</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/eastCollapsible" type="Boolean">true</setting>
+						<setting key="/fieldPermissions/multiSelect" type="Boolean">false</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/southBorder" type="String">none</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/northCollapsible" type="Boolean">true</setting>
+						<setting key="/typePermissions/sortableListHeader" type="Boolean">true</setting>
+						<setting key="/typePermissions/maxCharsInCell" type="Integer">70</setting>
+						<setting key="/com.hybris.cockpitng.backoffice.permissionmanagementgroup/westDisabled" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/bottomPanelInitiallyLocked" type="Boolean">false</setting>
+						<setting key="/leftSlotContent/centerPanelCollapsed" type="Boolean">false</setting>
+						<setting key="/typePermissions/multiSelect" type="Boolean">false</setting>
+						<virtual-sockets />
+					</widget>
+					<widget id="organizationPreviousItemSelector" widgetDefinitionId="com.hybris.cockpitng.previousItemSelector" slotId="previousItemSelectorSlot" template="false">
+						<virtual-sockets />
+					</widget>
+					<widget id="organizationNextItemSelector" widgetDefinitionId="com.hybris.cockpitng.nextItemSelector" slotId="nextItemSelectorSlot" template="false">
+						<virtual-sockets />
+					</widget>
+					<setting key="viewModeBtnVisible" type="Boolean">false</setting>
+					<setting key="initViewMode" type="String">fluid</setting>
+					<setting key="fluidViewCode" type="String">fluid</setting>
+					<setting key="editorAreaConfigCtx" type="String">organizationEditorArea</setting>
+					<setting key="bottomToolbar" type="Boolean">false</setting>
+					<setting key="actionSlotComponentId" type="String">organizationEditorAreaActions</setting>
+					<setting key="showLinksInNotifications" type="Boolean">false</setting>
+					<virtual-sockets>
+						<output id="referenceSelected" type="com.hybris.cockpitng.data.TypeAwareSelectionContext" visibility="default"/>
+					</virtual-sockets>
+				</widget>
+				<widget id="organizationBackofficeSpaceManagement" widgetDefinitionId="com.hybris.backoffice.spaceManagement" slotId="cockpitWidgetChildrenInvisible" template="false">
+					<virtual-sockets />
+				</widget>
+				<setting key="allowLockingCenterPanel" type="Boolean">true</setting>
+				<setting key="bottomPanelCollapsed" type="Boolean">false</setting>
+				<setting key="topHeight" type="String">33%</setting>
+				<setting key="centerCaption" type="String">List</setting>
+				<setting key="bottomPanelInitiallyLocked" type="Boolean">false</setting>
+				<setting key="centerHeight" type="String">50%</setting>
+				<setting key="topPanelInitiallyLocked" type="Boolean">false</setting>
+				<setting key="thirdSectionDisabled" type="Boolean">false</setting>
+				<setting key="allowLockingBottomPanel" type="Boolean">true</setting>
+				<setting key="bottomCaption" type="String">Edit</setting>
+				<setting key="centerPanelCollapsed" type="Boolean">false</setting>
+				<setting key="topCaption" type="String">Search</setting>
+				<setting key="centerPanelInitiallyLocked" type="Boolean">false</setting>
+				<setting key="topPanelCollapsed" type="Boolean">true</setting>
+				<setting key="allowLockingTopPanel" type="Boolean">true</setting>
+				<setting key="thirdSectionDisabled" type="Boolean">true</setting>
+				<virtual-sockets />
+			</widget>
+    		<setting key="northHeight" type="String">50px</setting>
+			<setting key="northBorder" type="String">none</setting>
+			<setting key="broadcastHorizontalResize" type="Boolean">true</setting>
+			<setting key="eastDisabled" type="Boolean">true</setting>
+			<setting key="eastBorder" type="String">none</setting>
+			<setting key="westCollapsible" type="Boolean">true</setting>
+			<setting key="northCollapsible" type="Boolean">true</setting>
+			<setting key="border" type="String">none</setting>
+			<setting key="centerBorder" type="String">none</setting>
+			<setting key="westDisabled" type="Boolean">false</setting>
+			<setting key="opaqueBG" type="String">true</setting>
+			<setting key="southHeight" type="String">50px</setting>
+			<setting key="westBorder" type="String">none</setting>
+			<setting key="southBorder" type="String">none</setting>
+			<setting key="southDisabled" type="Boolean">true</setting>
+			<setting key="eastWidth" type="String">25%</setting>
+			<setting key="northDisabled" type="Boolean">true</setting>
+			<setting key="autoCloseWest" type="Boolean">true</setting>
+			<setting key="southCollapsible" type="Boolean">true</setting>
+			<setting key="westWidth" type="String">300px</setting>
+			<setting key="perspectiveImageUrl" type="String">/cng/images/organization_pers_active.png</setting>
+			<setting key="eastCollapsible" type="Boolean">true</setting>
+		</widget>
+	</widget-extension>
+	<widget-connection sourceWidgetId="organizationExplorerTree" outputId="nodeSelected" targetWidgetId="organizationExplorerTreeConditionEvaluator" inputId="input" />
+	<widget-connection sourceWidgetId="organizationExplorerTreeConditionEvaluator" outputId="true" targetWidgetId="organizationExplorerTreePropExtractor" inputId="genericInput" />
+	<widget-connection sourceWidgetId="organizationExplorerTreePropExtractor" outputId="genericOutput" targetWidgetId="organizationAdvancedSearch" inputId="type" />
+	<widget-connection sourceWidgetId="organizationExplorerTree" outputId="nodeSelected" targetWidgetId="organizationSalesUnitConditionEvaluator" inputId="input"/>
+	<widget-connection sourceWidgetId="organizationSalesUnitConditionEvaluator" outputId="true" targetWidgetId="isSalesUnit" inputId="nodeSelected"/>
+	<widget-connection sourceWidgetId="isSalesUnit" outputId="outContext" targetWidgetId="organizationAdvancedSearch" inputId="initContext"/>
+	<widget-connection sourceWidgetId="organizationAdvancedSearch" outputId="searchData" targetWidgetId="organizationAdvancedSearchEngine" inputId="searchData" />
+	<widget-connection sourceWidgetId="organizationAdvancedSearch" outputId="searchData" targetWidgetId="organizationBackofficeSpaceManagement" inputId="searchData" />
+	<widget-connection sourceWidgetId="organizationBackofficeSpaceManagement" outputId="collapseState" targetWidgetId="organizationCollapsibleContainer" inputId="collapseState" />
+	<widget-connection sourceWidgetId="organizationBackofficeSpaceManagement" outputId="collapseState" targetWidgetId="organizationCollapsibleContainer" inputId="collapseState" />
+	<widget-connection sourceWidgetId="organizationList" outputId="sortData" targetWidgetId="organizationAdvancedSearch" inputId="sortData" />
+	<widget-connection sourceWidgetId="organizationList" outputId="selectedItem" targetWidgetId="organizationBackofficeSpaceManagement" inputId="listSelectedObject" />
+	<widget-connection sourceWidgetId="organizationList" outputId="selectedItem" targetWidgetId="organizationSpaceManagement" inputId="listSelectedObject" />
+	<widget-connection sourceWidgetId="organizationList" outputId="selectedItem" targetWidgetId="organizationEditorArea" inputId="inputObject" />
+	<widget-connection sourceWidgetId="organizationList" outputId="previousItemSelectorContext" targetWidgetId="organizationPreviousItemSelector" inputId="previousItemSelectorContext" />
+	<widget-connection sourceWidgetId="organizationList" outputId="nextItemSelectorContext" targetWidgetId="organizationNextItemSelector" inputId="nextItemSelectorContext" />
+	<widget-connection sourceWidgetId="organizationPreviousItemSelector" outputId="previousItemSelectorInvocation" targetWidgetId="organizationList" inputId="previousItemSelectorInvocation" />
+	<widget-connection sourceWidgetId="organizationNextItemSelector" outputId="nextItemSelectorInvocation" targetWidgetId="organizationList" inputId="nextItemSelectorInvocation" />
+	<widget-connection sourceWidgetId="organizationAdvancedSearchEngine" outputId="pageable" targetWidgetId="organizationList" inputId="pageable" />
+	<widget-connection sourceWidgetId="organizationAdvancedSearch" outputId="searchData" targetWidgetId="organizationAdvancedSearchEngine" inputId="searchData" />
+	<widget-connection inputId="initContext" outputId="outContext" sourceWidgetId="organizationExplorerTree"  targetWidgetId="organizationAdvancedSearch" />
+	<widget-connection sourceWidgetId="STUB_de.hybris.platform.commerceservices.organization.backoffice.actions.salesunitcreateaction" outputId="createContext" targetWidgetId="createActionMultiplexer" inputId="element"/>
+
+</widgets>

@@ -1,0 +1,44 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# (Confidential Information). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE Script; code[unique=true]; active[unique=true] ; scriptType(code); content
+;exportDestinationsSpecificationToKymaScript; true; GROOVY; "import de.hybris.platform.apiregistryservices.services.ApiRegistrationService;
+import de.hybris.platform.apiregistryservices.enums.DestinationChannel;
+import de.hybris.platform.apiregistryservices.services.DestinationService;
+import de.hybris.platform.apiregistryservices.model.AbstractDestinationModel;
+import de.hybris.platform.apiregistryservices.model.ExposedDestinationModel;
+import de.hybris.platform.apiregistryservices.exceptions.ApiRegistrationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+def registrationService = spring.getBean 'apiRegistrationService'
+def destinationService = spring.getBean 'destinationService'
+
+Logger LOG = LoggerFactory.getLogger(""ImpExImportReader"");
+
+destinationService.getDestinationsByChannel(DestinationChannel.KYMA).stream()
+    .filter({adm -> (adm instanceof ExposedDestinationModel) && adm.isActive()})
+    .map({edm -> (ExposedDestinationModel)edm})
+    .forEach({dest ->
+        try {
+            registrationService.registerExposedDestination(dest);
+        }
+        catch (ApiRegistrationException e) {
+            LOG.error(""Cannot Register Destination : "" + dest.getId(), e);
+        }
+    });
+";
+
+INSERT_UPDATE ScriptingJob; code[unique=true];scriptURI
+;exportDestinationsSpecificationToKymaDynamicJob;model://exportDestinationsSpecificationToKymaScript
+
+INSERT_UPDATE CronJob; code[unique=true];job(code);singleExecutable;sessionLanguage(isocode)
+;exportDestinationsSpecificationToKymaCronJob;exportDestinationsSpecificationToKymaDynamicJob;false;en

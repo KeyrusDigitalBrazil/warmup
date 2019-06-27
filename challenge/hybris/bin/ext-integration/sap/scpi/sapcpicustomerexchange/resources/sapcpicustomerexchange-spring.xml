@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Deprecated -->
+    <alias name="defaultSapCpiCustomerService" alias="sapCpiCustomerService"/>
+    <bean id="defaultSapCpiCustomerService"
+          class="de.hybris.platform.sap.sapcpicustomerexchange.service.impl.DefaultSapCpiCustomerService">
+        <property name="sapCpiCustomerClient" ref="sapCpiCustomerClient"/>
+        <property name="sapCpiOAuthService" ref="sapCpiOAuthService"/>
+    </bean>
+
+    <!-- Outbound Customer Conversion Service -->
+    <alias name="sapCpiCustomerDefaultConversionService" alias="sapCpiCustomerConversionService"/>
+    <bean id="sapCpiCustomerDefaultConversionService"
+          class="de.hybris.platform.sap.sapcpicustomerexchange.service.impl.SapCpiCustomerDefaultConversionService">
+        <property name="globalConfigurationDAO" ref="sapCoreSAPGlobalConfigurationDAO"/>
+        <property name="modelService" ref="modelService"/>
+        <property name="customerNameStrategy" ref="customerNameStrategy"/>
+    </bean>
+
+    <!-- Send Outbound Customer Service -->
+    <alias name="sapCpiCustomerOutboundService" alias="customerExportService"/>
+    <bean id="sapCpiCustomerOutboundService"
+          class="de.hybris.platform.sap.sapcpicustomerexchange.service.impl.SapCpiCustomerOutboundService"
+          parent="defaultCustomerExportService">
+        <property name="sapCpiCustomerConversionService" ref="sapCpiCustomerConversionService"/>
+        <property name="sapCpiOutboundService" ref="sapCpiOutboundService"/>
+    </bean>
+
+    <!-- B2C Customer Persistence Hook -->
+    <bean id="sapCpiCustomerPersistenceHook"
+          class="de.hybris.platform.sap.sapcpicustomerexchange.inbound.events.SapCpiCustomerPersistenceHook">
+        <property name="customerImportService" ref="customerImportService"/>
+    </bean>
+
+</beans>

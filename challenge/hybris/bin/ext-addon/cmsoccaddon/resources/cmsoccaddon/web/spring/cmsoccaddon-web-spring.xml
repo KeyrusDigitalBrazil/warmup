@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/mvc
+           http://www.springframework.org/schema/mvc/spring-mvc.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/>
+	<context:component-scan base-package="de.hybris.platform.cmsoccaddon.controllers" />
+	
+    <alias alias="cmsDataMapper" name="defaultCMSDataMapper" />
+	<bean id="defaultCMSDataMapper"
+		  class="de.hybris.platform.cmsoccaddon.mapping.DefaultCMSDataMapper" parent="defaultDataMapper"/>
+
+	<alias name="cmsCustomJaxbContextFactory" alias="cmsCustomJaxbContextFactory"/>
+	<bean id="cmsCustomJaxbContextFactory" parent="customJaxbContextFactory">
+		<property name="metadataSourceFactory" ref="customMetadataSourceFactory" />
+		<property name="typeAdapters">
+			<list merge="true">
+				<value>de.hybris.platform.cmsoccaddon.jaxb.adapters.ComponentListWsDTOAdapter</value>
+				<value>de.hybris.platform.cmsoccaddon.jaxb.adapters.ComponentWsDTOAdapter</value>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="cmsCustomJsonHttpMessageConverter" alias="customJsonHttpMessageConverter"/>
+	<bean id="cmsCustomJsonHttpMessageConverter" class="de.hybris.platform.cmsoccaddon.jaxb.CmsJaxb2HttpMessageConverter"
+		  parent="defaultJsonHttpMessageConverter">
+		<property name="jaxbContextFactory" ref="cmsCustomJaxbContextFactory" />
+	</bean>
+	
+	<alias name="cmsCustomXmlHttpMessageConverter" alias="customXmlHttpMessageConverter"/>
+	<bean id="cmsCustomXmlHttpMessageConverter" class="de.hybris.platform.cmsoccaddon.jaxb.CmsJaxb2HttpMessageConverter"
+		  parent="defaultXmlHttpMessageConverter">
+		<property name="jaxbContextFactory" ref="cmsCustomJaxbContextFactory" />
+	</bean>
+	
+	<alias name="defaultComponentNodeSuffixesToRemove" alias="nodeSuffixesToRemove"/>
+	<util:list id="defaultComponentNodeSuffixesToRemove">
+		<value>AdaptedData</value>
+		<value>WsDTO</value>
+		<value>Data</value>
+	</util:list>
+	
+	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="false" />
+	</bean>
+
+	<!-- Cache manager for addon -->
+	<alias name="defaultCmsoccaddonCacheManager" alias="cmsoccaddonCacheManager"/>
+	<bean id="defaultCmsoccaddonCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="cmsoccaddonEhcache"/>
+	</bean>
+
+	<alias name="defaultCmsoccaddonEhcache" alias="cmsoccaddonEhcache"/>
+	<bean id="defaultCmsoccaddonEhcache" class="de.hybris.platform.webservicescommons.cache.TenantAwareEhCacheManagerFactoryBean">
+		<property name="cacheNamePrefix" value="cmsoccaddonCache_"/>
+		<property name="configLocation" value="/WEB-INF/cache/ehcache.xml"/>
+	</bean>
+
+	<bean depends-on="wsCacheManagerList" parent="listMergeDirective">
+		<property name="add" ref="cmsoccaddonCacheManager"/>
+	</bean>
+
+	<!-- field set level -->	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.ContentSlotWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="slotId,position" />
+				<entry key="DEFAULT" value="BASIC,name,slotShared" />
+				<entry key="FULL" value="DEFAULT,slotStatus" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.CMSPageWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="uid,title,template,typeCode" />
+				<entry key="DEFAULT" value="BASIC,name" />
+				<entry key="FULL" value="DEFAULT,defaultPage" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.ComponentWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="uid,typeCode,modifiedtime" />
+				<entry key="DEFAULT" value="BASIC,name,otherProperties" />
+				<entry key="FULL" value="DEFAULT" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.ComponentListWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="component" />
+				<entry key="DEFAULT" value="component(DEFAULT)" />
+				<entry key="FULL" value="component(FULL)" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.MediaWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code,url,altText" />
+				<entry key="DEFAULT" value="BASIC,mime" />
+				<entry key="FULL" value="DEFAULT,downloadUrl,description,catalogId" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+			value="de.hybris.platform.cmsoccaddon.data.NavigationNodeWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="uid,title,children,entries" />
+				<entry key="DEFAULT" value="BASIC" />
+				<entry key="FULL" value="DEFAULT,name,position" />
+			</map>
+		</property>
+	</bean>
+</beans>

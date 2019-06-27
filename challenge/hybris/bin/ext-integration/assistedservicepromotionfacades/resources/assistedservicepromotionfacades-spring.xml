@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	
+	<alias name="defaultAssistedServicePromotionFacade" alias="assistedServicePromotionFacade"/>
+	<bean id="defaultAssistedServicePromotionFacade" class="de.hybris.platform.assistedservicepromotionfacades.impl.DefaultAssistedServicePromotionFacade">
+		<property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+		
+	<bean id="defaultCustomer360CSAPromotionsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="CSAPromotionsFragment"/>
+		<property name="value" ref="CSAPromotionsModelProvider" />
+	</bean>
+	<bean id="defaultCustomer360CSAPromotionsCouponsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="CSACouponsFragment"/>
+		<property name="value" ref="CSACouponsModelProvider" />
+	</bean>
+	<bean id="defaultCustomer360CustomerPromotionsProviderMap" depends-on="customer360ModelProvidersMap" parent="mapMergeDirective">
+		<property name="key" value="customerPromotionsFragment"/>
+		<property name="value" ref="CustomerPromotionsModelProvider" />
+	</bean>
+	<alias name="defaultCustomer360CSAPromoDataPopulator" alias="CSAPromoDataPopulator"/>
+	<bean id="defaultCustomer360CSAPromoDataPopulator" class="de.hybris.platform.assistedservicepromotionfacades.populator.CSAPromoDataPopulator">
+	</bean>
+	
+	<alias name="defaultCustomer360CSAPromoDataConverter" alias="CSAPromoDataConverter"/>
+	<bean id="defaultCustomer360CSAPromoDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicepromotionfacades.customer360.CSAPromoData"/>
+		<property name="populators">
+			<list>
+				<ref bean="CSAPromoDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultCustomer360CSACouponDataPopulator" alias="CSACouponDataPopulator"/>
+	<bean id="defaultCustomer360CSACouponDataPopulator" class="de.hybris.platform.assistedservicepromotionfacades.populator.CSACouponDataPopulator">
+	</bean>
+	
+	<alias name="defaultCustomer360CSACouponDataConverter" alias="CSACouponDataConverter"/>
+	<bean id="defaultCustomer360CSACouponDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.assistedservicepromotionfacades.customer360.CSACouponData"/>
+		<property name="populators">
+			<list>
+				<ref bean="CSACouponDataPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCSAPromotionsModelProvider" alias="CSAPromotionsModelProvider"/>
+	<bean id="defaultCSAPromotionsModelProvider" class="de.hybris.platform.assistedservicepromotionfacades.data.provider.CSAPromotionsModelProvider">
+		<property name="assistedServicePromotionFacade" ref="assistedServicePromotionFacade" />
+		<property name="csaPromoDataConverter" ref="CSAPromoDataConverter" />
+		<property name="cartFacade" ref="cartFacade"/>
+		
+	</bean>
+	
+	<alias name="defaultCustomerPromotionsModelProvider" alias="CustomerPromotionsModelProvider"/>
+	<bean id="defaultCustomerPromotionsModelProvider" class="de.hybris.platform.assistedservicepromotionfacades.data.provider.CustomerPromotionsModelProvider">
+		<property name="assistedServicePromotionFacade" ref="assistedServicePromotionFacade" />
+		<property name="csaPromoDataConverter" ref="CSAPromoDataConverter" />
+		
+	</bean>
+	
+	<alias name="defaultCustomer360CSAPromotionsCouponsModelProvider" alias="CSACouponsModelProvider"/>
+	<bean id="defaultCustomer360CSAPromotionsCouponsModelProvider" class="de.hybris.platform.assistedservicepromotionfacades.data.provider.CSACouponsModelProvider">
+		<property name="csaCouponDataConverter" ref="CSACouponDataConverter" />
+		<property name="assistedServicePromotionFacade" ref="assistedServicePromotionFacade" />
+		<property name="cartFacade" ref="cartFacade"/>
+	</bean>	
+</beans>

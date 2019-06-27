@@ -1,0 +1,13 @@
+# This rule will *only* remove medias of type 'IntegrationApiMedia' (not subtypes!)
+INSERT_UPDATE FlexibleSearchRetentionRule ; code[unique=true]              ; actionReference          ; retentionTimeSeconds ; searchQuery
+                                          ; integrationApiMediaCleanupRule ; basicRemoveCleanupAction ; 604800               ; SELECT {api.pk}, {api.itemtype} FROM {IntegrationApiMedia as api JOIN ComposedType as ct ON {api.itemtype} = {ct.pk}} WHERE internalcode = 'IntegrationApiMedia' AND {api.creationtime} <= ?CALC_RETIREMENT_TIME
+
+INSERT_UPDATE RetentionJob  ; code[unique=true]             ; retentionRule(code)             ; batchSize
+                            ; integrationApiMediaCleanupJob ; integrationApiMediaCleanupRule  ; 100
+
+INSERT_UPDATE CronJob   ; code[unique=true]                  ; job(code)                     ; sessionLanguage(isoCode)[default=en]
+                        ; integrationApiMediaCleanupCronJob  ; integrationApiMediaCleanupJob ;
+
+# CronJob Triggers set to run every day at midnight
+INSERT_UPDATE Trigger ; cronJob(code)[unique=true]            ; cronExpression
+                      ; integrationApiMediaCleanupCronJob     ; 0 0 0 * * ?

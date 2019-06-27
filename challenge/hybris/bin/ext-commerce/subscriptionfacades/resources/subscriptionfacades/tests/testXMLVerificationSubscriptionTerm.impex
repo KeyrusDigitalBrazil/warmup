@@ -1,0 +1,50 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+#create test subscription terms
+INSERT SubscriptionTerm;id[unique=true];name[lang=$lang];termOfServiceFrequency(code);termOfServiceNumber(code);termOfServiceRenewal(code);billingPlan(id[default=MonthlyPlan]);cancellable[default=true]
+;T1;T1;monthly;10;auto_renewing;;
+;T2;T2;monthly;11;auto_renewing;;
+;T3;T3;monthly;12;auto_renewing;;
+;T4;T4;monthly;11;non_renewing;;
+;T5;T5;monthly;12;non_renewing;;
+;T6;T6;monthly;11;renews_once;;
+;T7;T7;monthly;12;renews_once;;
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"P1";;
+;"P2";;
+;"P3";;
+;"P4";;
+;"P5";;
+;"P6";;
+;"P7";;
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;P1;P1;testCategory0;;T1
+;P2;P2;testCategory0;;T2
+;P3;P3;testCategory0;;T3
+;P4;P4;testCategory0;;T4
+;P5;P5;testCategory0;;T5
+;P6;P6;testCategory0;;T6
+;P7;P7;testCategory0;;T7
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;PP1;;;USD;P1
+;PP2;;;USD;P2
+;PP3;;;USD;P3
+;PP4;;;USD;P4
+;PP5;;;USD;P5
+;PP6;;;USD;P6
+;PP7;;;USD;P7
+
+
+

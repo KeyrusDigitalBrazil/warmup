@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="testAcceleratorCheckoutService"
+	      class="de.hybris.platform.acceleratorservices.order.impl.DefaultAcceleratorCheckoutService">
+		<property name="pickupPointOfServiceConsolidationStrategy" ref="pickupPointOfServiceConsolidationStrategy"/>
+		<property name="cartService" ref="cartService"/>
+		<property name="commerceCartService" ref="testCommerceCartService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="commerceStockService" ref="testCommerceStockService"/>
+		<property name="baseStoreService" ref="baseStoreService"/>
+	</bean>
+	
+	<bean id="testCommerceCartService"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceCartService">
+		<property name="modelService" ref="modelService"/>
+		<property name="baseSiteService" ref="baseSiteService"/>
+		<property name="commerceCartDao" ref="commerceCartDao"/>
+		<property name="cartValidationStrategy" ref="cartValidationStrategy"/>
+		<property name="commerceCartCalculationStrategy" ref="commerceCartCalculationStrategy"/>
+		<property name="commerceCartEstimateTaxesStrategy" ref="commerceCartEstimateTaxesStrategy"/>
+		<property name="commerceCartHashCalculationStrategy" ref="commerceCartHashCalculationStrategy"/>
+		<property name="sessionService" ref="sessionService"/>
+		<property name="staleCartRemovalStrategy" ref="staleCartRemovalStrategy"/>
+		<property name="commerceAddToCartStrategy" ref="commerceAddToCartStrategy"/>
+		<property name="commerceUpdateCartEntryStrategy" ref="testCommerceUpdateCartEntryStrategy"/>
+		<property name="commerceCartRestorationStrategy" ref="commerceCartRestorationStrategy"/>
+		<property name="commerceCartSplitStrategy" ref="commerceCartSplitStrategy"/>
+		<property name="commerceRemoveEntriesStrategy" ref="commerceRemoveEntriesStrategy"/>
+		<property name="commerceCartMergingStrategy" ref="commerceCartMergingStrategy"/>
+		<property name="commerceCartMetadataUpdateStrategy" ref="commerceCartMetadataUpdateStrategy"/>
+        <property name="productConfigurationStrategy" ref="productConfigurationStrategy"/>
+		<property name="removeEntryGroupStrategy" ref="removeEntryGroupStrategy"/>
+    </bean>
+	
+	<bean id="testCommerceStockService"
+			class="de.hybris.platform.commerceservices.stock.impl.DefaultCommerceStockService">
+		<property name="commerceStockLevelCalculationStrategy" ref="defaultCommerceStockLevelCalculationStrategy"/>
+		<property name="stockService" ref="stockService"/>
+		<property name="warehouseSelectionStrategy" ref="warehouseSelectionStrategy"/>
+		<property name="storePickupDao" ref="storePickupDao"/>
+		<property name="stockLevelStatusStrategy" ref="stockLevelStatusStrategy"/>
+		<property name="stockLevelProductStrategy" ref="stockLevelProductID"/>
+	</bean>
+	
+	<bean id="testCommerceUpdateCartEntryStrategy"
+			class="de.hybris.platform.commerceservices.order.impl.DefaultCommerceUpdateCartEntryStrategy"
+			parent="abstractCommerceCartStrategy">
+		<property name="commerceUpdateCartEntryHooks" ref="commerceUpdateCartEntryMethodHooks"/>
+		<property name="configurationService" ref="configurationService"/>
+        <property name="entryMergeStrategy" ref="entryMergeStrategy"/>
+        <property name="commerceStockService" ref="testCommerceStockService"/>
+	</bean>
+</beans>

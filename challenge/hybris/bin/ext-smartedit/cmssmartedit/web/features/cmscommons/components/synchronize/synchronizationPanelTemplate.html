@@ -1,0 +1,72 @@
+<div class="se-sync-panel">
+
+    <div class="se-sync-panel__sync-status"
+        data-ng-if="sync.headerTemplateUrl"
+        data-ng-include="sync.headerTemplateUrl">
+    </div>
+
+    <div class="se-sync-panel__sync-info"
+        data-ng-show="sync.showItemList">
+        <div data-ng-repeat="dependency in sync.getRows()"
+            data-ng-class="{active: $index==0, 'se-sync-panel--item__external': dependency.isExternal}"
+            class="se-sync-panel__sync-info__row">
+
+            <div class="checkbox se-sync-panel__sync-info__checkbox se-nowrap-ellipsis">
+                <input type="checkbox"
+                    data-ng-if="!dependency.isExternal"
+                    data-ng-model="dependency.selected"
+                    data-ng-disabled="sync.isDisabled(dependency)"
+                    data-ng-change="sync.selectionChange($index)"
+                    id="sync-info__checkbox_{{$index}}">
+                <label data-ng-if="$index===0"
+                    for="sync-info__checkbox_{{$index}}"
+                    class="se-sync-panel__sync-info__checkbox-label se-nowrap-ellipsis"
+                    title="{{::dependency.selectAll | translate}}">
+                    {{::dependency.selectAll | translate}}</label>
+
+                <label data-ng-if="$index!==0 && !dependency.isExternal"
+                    for="sync-info__checkbox_{{$index}}"
+                    class="se-sync-panel__sync-info__checkbox-label se-nowrap-ellipsis"
+                    title="{{::dependency.name | translate}}">
+                    {{::dependency.name | translate}}</label>
+
+                <label data-ng-if="$index!==0 && dependency.isExternal"
+                    data-y-popover
+                    data-trigger="'hover'"
+                    data-template="sync.getTemplateInfoForExternalComponent()"
+                    for="sync-info__checkbox_{{$index}}"
+                    class="se-sync-panel__sync-info__checkbox-label se-nowrap-ellipsis">
+                    {{::dependency.name | translate}}
+                </label>
+            </div>
+
+            <span data-ng-if="sync.buildInfoTemplate(dependency)"
+                data-y-popover
+                data-trigger="'hover'"
+                data-title="sync.getInfoTitle(dependency)"
+                data-template="sync.buildInfoTemplate(dependency)"
+                data-ng-class="{'pull-right se-sync-panel__sync-info__right-icon': true, 'se-sync-panel--icon-globe': dependency.isExternal} ">
+                <span data-status="{{dependency.status}}"
+                    data-ng-if="!dependency.isExternal"
+                    data-ng-class="{'hyicon hyicon__se-sync-panel__sync-info':true, 'hyicon-done hyicon__se-sync-panel__sync-done':sync.isInSync(dependency), 'hyicon-sync hyicon__se-sync-panel__sync-not':!sync.isInSync(dependency)}"></span>
+                <span data-ng-if="dependency.isExternal"
+                    class="hyicon hyicon-globe"></span>
+            </span>
+
+            <span data-ng-if="!sync.buildInfoTemplate(dependency)"
+                class="pull-right se-sync-panel__sync-info__right-icon">
+                <span data-status="{{dependency.status}}"
+                    data-ng-class="{'hyicon hyicon__se-sync-panel__sync-info':true, 'hyicon-done hyicon__se-sync-panel__sync-done':sync.isInSync(dependency), 'hyicon-sync hyicon__se-sync-panel__sync-not':!sync.isInSync(dependency)}"></span>
+            </span>
+        </div>
+    </div>
+
+    <div class="se-sync-panel__footer"
+        data-ng-if="sync.showSyncButton">
+        <button class="btn btn-lg btn-primary se-sync-panel__footer__btn"
+            data-ng-disabled="sync.isSyncButtonDisabled()"
+            data-ng-click="sync.syncItems()"
+            data-translate="se.cms.actionitem.page.sync"></button>
+    </div>
+
+</div>

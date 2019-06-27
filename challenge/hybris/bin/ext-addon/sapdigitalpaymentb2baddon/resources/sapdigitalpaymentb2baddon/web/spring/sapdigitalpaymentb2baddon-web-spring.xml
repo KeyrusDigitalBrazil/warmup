@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:annotation-config/> 
+    
+    
+    
+	<!-- B2B multistep checkout changes start -->
+	
+	<alias name="defaultB2bDeliveryMethodCheckoutStep" alias="b2bDeliveryMethodCheckoutStep" />
+	<bean id="defaultB2bDeliveryMethodCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="b2bCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="deliveryMethodCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="current" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="deliveryMethod"/>
+	</bean>
+	
+	<alias name="defaultB2bPickupLocationCheckoutStep" alias="b2bPickupLocationCheckoutStep" />
+	<bean id="defaultB2bPickupLocationCheckoutStep" parent="checkoutStep">
+		<property name="checkoutGroup" ref="b2bCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultPickupCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="current" value-ref="REDIRECT_TO_PICKUP_LOCATION"/>
+				<entry key="next" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="deliveryMethod"/>
+	</bean>
+	
+	
+	<alias name="defaultB2bPaymentMethodCheckoutStep" alias="b2bPaymentMethodCheckoutStep" />
+	<bean id="defaultB2bPaymentMethodCheckoutStep" class="de.hybris.platform.b2bacceleratoraddon.checkout.steps.B2BPaymentMethodCheckoutStep" parent="checkoutStep">
+		<property name="checkoutGroup" ref="b2bCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultSapDigitalPaymentBillingMethodCheckoutValidator"/>
+		<property name="checkoutFacade" ref="b2bCheckoutFacade" />
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="current" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_SUMMARY"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="paymentMethod"/>
+	</bean>
+	
+	<alias name="defaultB2bSummaryCheckoutStep" alias="b2bSummaryCheckoutStep" />
+	<bean id="defaultB2bSummaryCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="b2bCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultSummaryCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="current" value-ref="REDIRECT_TO_SUMMARY"/>
+				<entry key="next" value="redirect:/checkout/orderConfirmation/%s"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="confirmOrder"/>
+	</bean>
+	
+	<!-- Checkout Steps -->
+	
+	<!-- Default checkout group -->
+
+	<alias name="defaultB2bMultiStepCheckoutGroup" alias="b2bCheckoutGroup" />
+	<bean id="defaultB2bMultiStepCheckoutGroup"  class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.CheckoutGroup">
+		<property name="groupId"  value="defaultGroup"/>
+		<property name="checkoutStepMap">
+			<map merge="true">
+				<entry key="multi" value-ref="multiStepCheckout"/>
+				<entry key="payment-type" value-ref="paymentTypeCheckoutStep"/>
+				<entry key="delivery-address" value-ref="deliveryAddressCheckoutStep"/>
+				<entry key="delivery-method" value-ref="b2bDeliveryMethodCheckoutStep"/>
+				<entry key="pickup-location" value-ref="b2bPickupLocationCheckoutStep"/>
+				<entry key="payment-method" value-ref="paymentMethodCheckoutStep"/>
+				<entry key="payment-billing-method" value-ref="b2bPaymentMethodCheckoutStep"/>
+				<entry key="summary" value-ref="b2bSummaryCheckoutStep"/>
+			</map>
+		</property>
+		<property name="validationResultsMap">
+			<map merge="true">
+				<entry key="FAILED" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_PAYMENT_TYPE" value-ref="REDIRECT_TO_PAYMENT_TYPE"/>
+				<entry key="REDIRECT_TO_DELIVERY_ADDRESS" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="REDIRECT_TO_PICKUP_LOCATION" value-ref="REDIRECT_TO_PICKUP_LOCATION"/>
+				<entry key="REDIRECT_TO_CART" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_PAYMENT_METHOD" value-ref="REDIRECT_TO_PAYMENT_METHOD"/>
+				<entry key="REDIRECT_TO_PAYMENT_BILLING_METHOD" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="REDIRECT_TO_DELIVERY_METHOD" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="REDIRECT_TO_SUMMARY" value-ref="REDIRECT_TO_SUMMARY"/>
+				<entry key="REDIRECT_TO_DUMMY_STEP" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="checkoutProgressBar">
+			<map merge="true">
+				<entry key="1" value-ref="paymentTypeCheckoutStep"/>
+				<entry key="2" value-ref="deliveryAddressCheckoutStep"/>
+				<entry key="3" value-ref="b2bDeliveryMethodCheckoutStep"/>
+				<entry key="4" value-ref="b2bPaymentMethodCheckoutStep"/>
+				<entry key="5" value-ref="b2bSummaryCheckoutStep"/>
+			</map>
+		</property>
+	</bean>
+	
+
+	<!---Default checkout group-->
+	
+	<!-- B2B multistep checkout changes end-->
+
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultSapdigitalpaymentb2baddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="sapdigitalpaymentb2baddon"/>
+	</bean>
+
+	<bean id="defaultSapdigitalpaymentb2baddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultSapdigitalpaymentb2baddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getSapdigitalpaymentb2baddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultSapdigitalpaymentb2baddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="Sapdigitalpaymentb2baddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getSapdigitalpaymentb2baddonBeforeViewHandler"/>
+	</bean>
+
+</beans>

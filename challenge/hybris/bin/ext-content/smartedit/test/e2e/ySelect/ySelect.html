@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base href="../../../../../" />
+
+    <!--3rd prty libs-->
+    <script src="../../../web/webroot/static-resources/dist/smartedit/js/thirdparties.js"></script>
+    <script src="../../../web/webroot/static-resources/thirdparties/ckeditor/ckeditor.js"></script>
+
+    <!-- 3rd party css -->
+    <link rel="stylesheet"
+        href="../../../web/webroot/static-resources/dist/smartedit/css/outer-styling.css">
+
+    <script src="../../../jsTarget/templates.js"></script>
+    <script src="../../../web/webroot/static-resources/smarteditloader/js/smarteditloader.js"></script>
+    <script src="../../../web/webroot/static-resources/smarteditcontainer/js/smarteditcontainer.js"></script>
+
+    <script src="/test/e2e/ySelect/ySelectApp.js"></script>
+    <script src="/test/e2e/ySelect/backendMocks.js"></script>
+
+
+</head>
+
+<body data-ng-app="ySelectApp"
+    data-ng-controller="defaultController as ctrl">
+
+    <!--
+        First language example
+    -->
+    <h2>First language example.</h2>
+    <div>Selected value:
+        <span id="model-{{ ctrl.example1.id }}">{{ctrl.example1.model}}</span> Force Reset: {{ctrl.example1.forceReset}}</div>
+
+    <input type="button"
+        value="Change source"
+        data-ng-click="ctrl.changeSource( ctrl.example1.id )"
+        id="source-{{ ctrl.example1.id }}" /> Force Reset:
+    <input type="checkbox"
+        id="force-reset-{{ ctrl.example1.id }}"
+        data-ng-model="ctrl.example1.forceReset" />
+
+    <button id="error-{{ ctrl.example1.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.example1.id, 'error')">Show Error</button>
+    <button id="warning-{{ ctrl.example1.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.example1.id, 'warning')">Show Warning</button>
+    <button id="reset-{{ ctrl.example1.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.example1.id, 'reset')">Reset Validation</button>
+
+    <y-select id="{{ ctrl.example1.id }}"
+        ng-model="ctrl.example1.model"
+        reset="ctrl.example1.reset"
+        keep-model-on-reset="!ctrl.example1.forceReset"
+        fetch-strategy="ctrl.example1.fetchStrategy"
+        data-get-api="ctrl.example1.setSelectorApi($api)">
+    </y-select>
+
+    <!--
+        First products example
+    -->
+    <h2>First products example.</h2>
+    <div>Selected value:
+        <span id="model-{{ ctrl.exampleMulti1.id }}">{{ctrl.exampleMulti1.model}}</span> Force Reset: {{ctrl.exampleMulti1.forceReset}}</div>
+    <input type="button"
+        value="Change source"
+        data-ng-click="ctrl.changeSource( 'exampleMulti1' )"
+        id="source-{{ ctrl.exampleMulti1.id }}" /> Force Reset:
+    <input type="checkbox"
+        id="force-reset-{{ ctrl.exampleMulti1.id }}"
+        data-ng-model="ctrl.exampleMulti1.forceReset" />
+
+    <y-select id="{{ctrl.exampleMulti1.id}}"
+        ng-model="ctrl.exampleMulti1.model"
+        controls="true"
+        multi-select="true"
+        reset="ctrl.exampleMulti1.reset"
+        keep-model-on-reset="!ctrl.exampleMulti1.forceReset"
+        fetch-strategy="ctrl.exampleMulti1.fetchStrategy"
+        results-header-template="ctrl.example1.template"></y-select>
+
+    <!--
+        Second products example
+    -->
+    <h2>Second products example.</h2>
+    <div>Selected value:
+        <span id="model-{{ ctrl.exampleMulti2.id }}">{{ctrl.exampleMulti2.model}}</span> Force Reset: {{ctrl.exampleMulti2.forceReset}}</div>
+
+    <button id="error-{{ ctrl.exampleMulti2.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.exampleMulti2.id, 'error')">Show Error</button>
+    <button id="warning-{{ ctrl.exampleMulti2.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.exampleMulti2.id, 'warning')">Show Warning</button>
+    <button id="reset-{{ ctrl.exampleMulti2.id }}"
+        data-ng-click="ctrl.changeValidationState(ctrl.exampleMulti2.id, 'reset')">Reset Validation</button>
+
+    <y-select id="{{ctrl.exampleMulti2.id}}"
+        ng-model="ctrl.exampleMulti2.model"
+        controls="true"
+        multi-select="true"
+        keep-model-on-reset="!ctrl.exampleMulti2.forceReset"
+        reset="ctrl.exampleMulti2.reset"
+        item-template="ctrl.exampleMulti2.template"
+        fetch-strategy="ctrl.exampleMulti2.fetchStrategy"
+        settings="ctrl.exampleMulti2.settings"
+        data-get-api="ctrl.exampleMulti2.setSelectorApi($api)"></y-select>
+
+</body>
+
+</html>

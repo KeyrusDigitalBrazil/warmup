@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="sapproductconfigrulesbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton" init-method="init" lazy-init="false">
+  		<property name="location" value="/sapproductconfigrulesbackoffice-backoffice-labels/"/>
+  		<property name="name" value="labels"/>
+  	</bean>
+  	
+  	<bean id="productconfigConditionsEditorSectionRenderer" class="de.hybris.platform.sap.productconfig.rules.backoffice.editors.conditionseditor.ProductconfigConditionsEditorSectionRenderer"
+		parent="conditionsEditorSectionRenderer">
+		<property name="editorViewModelClass" value="de.hybris.platform.sap.productconfig.rules.backoffice.editors.conditionseditor.ProductconfigConditionsEditorViewModel"/>
+	</bean>
+
+	<bean id="productconfigActionsEditorSectionRenderer" class="de.hybris.platform.sap.productconfig.rules.backoffice.editors.actionseditor.ProductconfigActionsEditorSectionRenderer"
+		parent="actionsEditorSectionRenderer">
+		<property name="editorViewModelClass" value="de.hybris.platform.sap.productconfig.rules.backoffice.editors.actionseditor.ProductconfigActionsEditorViewModel"/>
+		<property name="productCodeExtractor" ref="sapProductConfigProductCodeExtractor" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultProductCodeExtractor" alias="sapProductConfigProductCodeExtractor" />
+	<bean id="sapProductConfigDefaultProductCodeExtractor" class="de.hybris.platform.sap.productconfig.rules.backoffice.editors.actionseditor.ProductconfigProductCodeExtractorImpl">
+		<property name="ruleConditionsRegistry" ref="ruleConditionsRegistry" />
+		<property name="ruleConditionsService" ref="ruleConditionsService" />
+	</bean>
+	
+	<alias name="sapProductConfigDefaultRulesModulesAdvancedSearchInitializer" alias="sapProductConfigRulesModulesAdvancedSearchInitializer"/>
+	<bean id="sapProductConfigDefaultRulesModulesAdvancedSearchInitializer" class="de.hybris.platform.ruleenginebackoffice.handlers.RulesModulesForTypeAdvancedSearchInitializer">
+		<property name="ruleType" value="PRODUCTCONFIG"/>
+	</bean>
+
+</beans>

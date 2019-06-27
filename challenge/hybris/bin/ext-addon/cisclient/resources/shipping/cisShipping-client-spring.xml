@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+	<!-- Add any custom extension beans that are deployment agnostic -->
+	<bean id="shippingClient" class="com.hybris.charon.HttpClientFactoryBean">
+		<property name="type" value="com.hybris.cis.client.shipping.ShippingClient"/>
+		<property name="clientId" value="shipping"/>
+		<property name="url" value="#{configurationService.configuration.getProperty('cis.shipping.url')}"/>
+	</bean>
+
+	<bean id="cisClientShippingService" class="com.hybris.cis.service.impl.DefaultCisClientShippingService">
+		<property name="shippingClient" ref="shippingClient"/>
+	</bean>
+
+	<bean id="shippingClientMock" class="com.hybris.cis.client.mock.ShippingClientMock"/>
+
+</beans>

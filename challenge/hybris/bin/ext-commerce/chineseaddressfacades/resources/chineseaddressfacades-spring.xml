@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+    <alias name="defaultCityConverter" alias="cityConverter"/>
+	<bean id="defaultCityConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.addressfacades.data.CityData"/>
+		<property name="populators">
+			<list>
+				<ref bean="cityPopulator"/>
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultDistrictConverter" alias="districtConverter"/>
+	<bean id="defaultDistrictConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.addressfacades.data.DistrictData"/>
+		<property name="populators">
+			<list>
+				<ref bean="districtPopulator"/>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ************ Chinese Address Populators ************ -->
+	<bean id="cityPopulator" class="de.hybris.platform.addressfacades.populators.CityPopulator" />
+	<bean id="districtPopulator" class="de.hybris.platform.addressfacades.populators.DistrictPopulator" />
+
+	<bean id="chineseAddressFacade" class="de.hybris.platform.addressfacades.address.impl.ChineseAddressFacade" scope="tenant">
+		<property name="chineseAddressService" ref="chineseAddressService" />
+		<property name="cityConverter" ref="cityConverter" />
+		<property name="districtConverter" ref="districtConverter" />
+		<property name="postcodeValidateStrategy" ref="postcodeValidateStrategy"/>
+	</bean>
+
+	<!-- ************ Chinese Address Populators ************ -->
+	<bean id="chineseAddressPopulator" class="de.hybris.platform.addressfacades.populators.ChineseAddressPopulator">
+		<property name="i18NService" ref="i18NService"/>
+		<property name="nameWithTitleFormatStrategy" ref="nameWithTitleFormatStrategy" />
+	</bean>
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="addressConverter" />
+		<property name="add" ref="chineseAddressPopulator" />
+	</bean>
+
+	<!-- ************ Chinese Address Reverse Populators ************ -->
+	<alias alias="addressReversePopulator" name="chineseAddressReversePopulator" />
+	<bean id="chineseAddressReversePopulator" class="de.hybris.platform.addressfacades.populators.ChineseAddressReversePopulator"
+		scope="tenant" parent="defaultAddressReversePopulator">
+		<property name="chineseAddressService" ref="chineseAddressService" />
+	</bean>
+	
+	<alias alias="userFacade" name="chineseUserFacade" />
+	<bean id="chineseUserFacade" class="de.hybris.platform.addressfacades.address.impl.ChineseUserFacade" parent="defaultUserFacade" />
+</beans>

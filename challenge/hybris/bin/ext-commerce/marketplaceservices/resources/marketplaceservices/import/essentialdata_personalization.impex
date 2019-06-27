@@ -1,0 +1,28 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];restrictedType(code);principal(uid);active;generate;query
+;vendoradmin_vendoruser_restricted;;VendorUser;vendoradministratorgroup;true;true;{vendor} = ?session.user.vendor
+;vendoradmin_productcarousel_restricted;;ProductCarouselComponent;vendoradministratorgroup;true;true;{pk} in (?session.productCarouselComponents)
+;vendorcontentmanager_productcarousel_restricted;;ProductCarouselComponent;vendorcontentmanagergroup;true;true;{pk} in (?session.productCarouselComponents)
+;vendorcontentmanager_product_restricted;;Product;vendorcontentmanagergroup;true;true;{catalogVersion} in  ( ?session.catalogversions )  or {catalogVersion} is null
+;vendoradmin_product_restricted;;Product;vendoradministratorgroup;true;true;{catalogVersion} in  ( ?session.catalogversions )  or {catalogVersion} is null
+;vendoradmin_usergroup_restricted;;UserGroup;vendoradministratorgroup;true;true;{uid} in ('vendoradministratorgroup','vendorproductmanagergroup','vendorcontentmanagergroup','vendorwarehousestaffgroup') or {uid} in ({{select {b.uid} from {vendor as a join usergroup as b on {a.pk} = {b.vendor}} where {b.vendor}=?session.user.vendor}})
+;vendoradmin_consignment_restricted;;Consignment;vendoradministratorgroup;true;true;{warehouse} in ({{select {pk} from {warehouse} where {vendor} = ?session.user.vendor}})
+;vendoradmin_category_restricted;;Category;vendoradministratorgroup;true;true;{pk} in (?session.vendorCategories)
+;vendoradmin_media_restricted;;Media;vendoradministratorgroup;true;true;{catalogVersion} in  ( ?session.catalogversions ) or {catalogVersion} is null
+;vendoradmin_mediacontainer_restricted;;MediaContainer;vendoradministratorgroup;true;true;{catalogVersion} in  ( ?session.catalogversions )  or {catalogVersion} is null
+;vendorwarehousestaff_consignment_restricted;;Consignment;vendorwarehousestaffgroup;true;true;{warehouse} in ({{select {pk} from {warehouse} where {vendor} = ?session.user.vendor}})
+;vendorproductmanager_media_restricted;;Media;vendorproductmanagergroup;true;true;{catalogVersion} in  ( ?session.catalogversions ) or {catalogVersion} is null
+;vendorproductmanager_mediacontainer_restricted;;MediaContainer;vendorproductmanagergroup;true;true;{catalogVersion} in  ( ?session.catalogversions )  or {catalogVersion} is null
+;vendorproductmanager_product_restricted;;Category;vendorproductmanagergroup;true;true;{pk} in (?session.vendorCategories)
+;vendorproductmanager_stocklevel_restricted;;Product;vendorproductmanagergroup;true;true;{catalogversion} in ({{select {pk} from {catalogversion} where {catalog} = ?session.user.vendor.catalog}})

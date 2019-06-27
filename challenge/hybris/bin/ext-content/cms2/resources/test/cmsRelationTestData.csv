@@ -1,0 +1,98 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=sampleContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+INSERT_UPDATE Language;isocode[unique=true];active;;;;;;
+;de;true;;;;;;
+;en;true;;;;;;
+
+UPDATE Language;isocode[unique=true];name[lang=de];name[lang=en];;;;;
+;de;Deutsch;German;;;;;
+;en;Englisch;English;;;;;
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=de];name[lang=en];active;base;conversion;digits;symbol
+;EUR;Euro;Euro;true;true;1;2;€
+
+INSERT_UPDATE Catalog;id[unique=true];name[lang=de];name[lang=en]
+;$contentCatalog;Sample Catalog;Sample Catalog
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;defaultCurrency(isocode)
+;$contentCatalog;Staged;true;EUR;de,en
+
+# Create PageTemplates
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;restrictedPageTypes(code);active[default=true]
+;;ContentPage1Template;Content Page 1 Template;ContentPage;
+;;ContentPage2Template;Content Page 2 Template;ContentPage;
+
+# Create PageTemplates with no associated ContentPage
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;restrictedPageTypes(code);active[default=true]
+;;ContentPage3Template;Content Page 3 Template;ContentPage;
+;;ContentPage4Template;Content Page 4 Template;ContentPage;
+
+# Create ContentSlotNames
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true]
+;TopSection;ContentPage1Template;
+;MiddleSection;ContentPage1Template;
+;BottomSection;ContentPage1Template;
+
+;TopSection;ContentPage2Template;
+;MiddleSection;ContentPage2Template;
+;BottomSection;ContentPage2Template;
+
+;TopSection;ContentPage3Template;
+;MiddleSection;ContentPage3Template;
+;BottomSection;ContentPage3Template;
+
+;TopSection;ContentPage4Template;
+;MiddleSection;ContentPage4Template;
+;BottomSection;ContentPage4Template;
+
+# Create Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active
+;;TopContentSlot;Top Content;true
+;;MiddleContentSlot;Middle Content;true
+;;BottomContentSlot;Bottom Content;true
+;;PunchedOutContentSlot;Punched Out Top Content;true
+
+# Bind Content Slots to Page Templates
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;TopSection-ContentPage1;TopSection;ContentPage1Template;TopContentSlot;true
+;;MiddleSection-ContentPage1;MiddleSection;ContentPage1Template;MiddleContentSlot;true
+;;BottomSection-ContentPage1;BottomSection;ContentPage1Template;BottomContentSlot;true
+
+;;TopSection-ContentPage2;TopSection;ContentPage2Template;TopContentSlot;true
+;;MiddleSection-ContentPage2;MiddleSection;ContentPage2Template;MiddleContentSlot;true
+;;BottomSection-ContentPage2;BottomSection;ContentPage2Template;BottomContentSlot;true
+
+# Bind Content Slots to Page Templates Relations with no associated ContentPage
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;TopSection-ContentPage3;TopSection;ContentPage3Template;TopContentSlot;true
+;;MiddleSection-ContentPage3;MiddleSection;ContentPage3Template;MiddleContentSlot;true
+;;BottomSection-ContentPage3;BottomSection;ContentPage3Template;BottomContentSlot;true
+
+;;TopSection-ContentPage4;TopSection;ContentPage4Template;TopContentSlot;true
+;;MiddleSection-ContentPage4;MiddleSection;ContentPage4Template;MiddleContentSlot;true
+;;BottomSection-ContentPage4;BottomSection;ContentPage4Template;BottomContentSlot;true
+
+# Create Content Pages
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];homepage[default='false']
+;;faq;FAQ Page;ContentPage1Template;/faq
+;;help;Help Page;ContentPage1Template;/help
+;;aboutUs;About Us Page;ContentPage1Template;/aboutus
+;;terms;Terms Page;ContentPage2Template;/terms
+
+# Bind Content Slots to Pages
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;TopSection-FaqPage;TopSection;faq;PunchedOutContentSlot;
+;;TopSection-HelpPage;TopSection;help;PunchedOutContentSlot;
+;;TopSection-AboutUsPage;TopSection;aboutUs;PunchedOutContentSlot;

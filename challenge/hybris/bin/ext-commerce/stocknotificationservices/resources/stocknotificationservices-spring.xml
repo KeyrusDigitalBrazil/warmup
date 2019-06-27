@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<alias name="defaultStockNotificationThreadFactory" alias="stockNotificationThreadFactory" />
+	<bean id="defaultStockNotificationThreadFactory" class="de.hybris.platform.stocknotificationservices.thread.factory.StockNotificationThreadFactory" />
+
+	<bean id="abstractStockLevelStatusJob" class="de.hybris.platform.stocknotificationservices.cronjob.AbstractStockLevelStatusJob"
+		abstract="true" parent="abstractJobPerformable">
+		<property name="stockService" ref="stockService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="warehouseSelectionStrategy" ref="warehouseSelectionStrategy" />
+		<property name="backInStockProductInterestDao" ref="backInStockProductInterestDao"></property>
+		<property name="taskExecutor">
+			<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+				<property name="corePoolSize" value="${stocknotificationservices.notification.pool.coreSize}" />
+				<property name="maxPoolSize" value="${stocknotificationservices.notification.pool.maxSize}" />
+				<property name="queueCapacity" value="${stocknotificationservices.notification.pool.queueCapacity}" />
+				<property name="threadFactory" ref="stockNotificationThreadFactory" />
+			</bean>
+		</property>
+		<property name="notificationService" ref="notificationService" />
+		<property name="siteMessageService" ref="siteMessageService"/>
+		<property name="commerceCommonI18NService" ref="commerceCommonI18NService"/>
+	</bean>
+
+	<alias name="defaultStockLevelStatusJob" alias="stockLevelStatusJob" />
+	<bean id="defaultStockLevelStatusJob" class="de.hybris.platform.stocknotificationservices.cronjob.StockLevelStatusJob"
+		parent="abstractStockLevelStatusJob">
+	</bean>
+
+	<alias name="defaultBackInStockProductInterestDao" alias="backInStockProductInterestDao" />
+	<bean id="defaultBackInStockProductInterestDao" class="de.hybris.platform.stocknotificationservices.dao.impl.DefaultBackInStockProductInterestDao">
+	</bean>
+
+	<alias name="defaultStockNotificationEmailProcessor" alias="stockNotificationEmailProcessor" />
+	<bean id="defaultStockNotificationEmailProcessor" class="de.hybris.platform.stocknotificationservices.email.processor.impl.DefaultStockNotificationEmailProcessor">
+		<property name="modelService" ref="modelService" />
+		<property name="businessProcessService" ref="businessProcessService" />
+	</bean>
+
+	<alias name="defaultStockNotificationSmsProcessor" alias="stockNotificationSmsProcessor" />
+	<bean id="defaultStockNotificationSmsProcessor" class="de.hybris.platform.stocknotificationservices.sms.processor.impl.DefaultStockNotificationSmsProcessor">
+		<property name="sendSmsMessageStrategy" ref="sendSmsMessageStrategy" />
+		<property name="notificationService" ref="notificationService" />
+	</bean>
+
+	<bean id="stockNotificationEmailRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="BACK_IN_STOCK"></property>
+		<property name="notificationChannel" value="EMAIL"></property>
+		<property name="processor" ref="stockNotificationEmailProcessor"></property>
+	</bean>
+
+	<bean id="stockNotificationSmsRegistrar" class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"></property>
+		<property name="notificationType" value="BACK_IN_STOCK"></property>
+		<property name="notificationChannel" value="SMS"></property>
+		<property name="processor" ref="stockNotificationSmsProcessor"></property>
+	</bean>
+
+	<bean id="generateBackInStockNotificationEmail" parent="abstractGenerateEmailAction">
+		<property name="frontendTemplateName" value="ProductBackInStockNotificationEmailTemplate" />
+	</bean>
+
+	<bean id="productBackInStockNotificationEmailProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/stocknotificationservices/processes/productBackInStockNotificationEmailProcess.xml" />
+	</bean>
+
+	<alias name="defaultProductInterestProcessContextStrategy" alias="productInterestProcessContextStrategy" />
+	<bean id="defaultProductInterestProcessContextStrategy" class="de.hybris.platform.stocknotificationservices.process.strategies.impl.ProductInterestProcessContextStrategy"
+		parent="abstractProcessContextStrategy">
+	</bean>
+
+	<bean depends-on="processContextResolutionStrategyMap" parent="mapMergeDirective">
+		<property name="key">
+			<value type="java.lang.Class">de.hybris.platform.customerinterestsservices.model.ProductInterestsProcessModel</value>
+		</property>
+		<property name="value" ref="productInterestProcessContextStrategy" />
+	</bean>
+	
+	<bean id="stockNotificationSiteMessageProcessor" class="de.hybris.platform.stocknotificationservices.sitemsg.processor.impl.StockNotificationSiteMessageProcessor">
+		<property name="sendSiteMessageStrategies" ref="sendSiteMessageStrategies"/>
+	</bean>
+	
+	<bean class="de.hybris.platform.notificationservices.mapping.ProcessorMappingRegistrar">
+		<property name="registry" ref="processorRegistry"/>
+		<property name="notificationType" value="BACK_IN_STOCK"/>
+		<property name="notificationChannel" value="SITE_MESSAGE"/>
+		<property name="processor" ref="stockNotificationSiteMessageProcessor"/>
+	</bean>
+
+</beans>

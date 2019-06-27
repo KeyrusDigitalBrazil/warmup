@@ -1,0 +1,78 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=marketplaceContentCatalog
+$catalogVersion=Staged
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=$catalogVersion])[default=$contentCatalog:$catalogVersion]
+$addonExtensionName=verticalnavigationaddon
+
+INSERT_UPDATE PageTemplate;$contentCV[unique=true];uid[unique=true];name;frontendTemplateName;restrictedPageTypes(code);active[default=true]
+;;VerticalNavigationLandingPageTemplate;Vertical Navigation Landing Page Template;addon:/$addonExtensionName/pages/layout/verticalNavigationLandingLayoutPage;CategoryPage,ContentPage
+
+INSERT_UPDATE ContentSlotForTemplate;$contentCV[unique=true];uid[unique=true];position[unique=true];pageTemplate(uid,$contentCV)[unique=true][default='VerticalNavigationLandingPageTemplate'];contentSlot(uid,$contentCV)[unique=true];allowOverwrite
+;;SiteLogo-VerticalNavigationLandingPage;SiteLogo;;SiteLogoSlot;true
+;;HomepageLink-VerticalNavigationLandingPage;HomepageNavLink;;HomepageNavLinkSlot;true
+;;NavigationBar-VerticalNavigationLandingPage;NavigationBar;;NavigationBarSlot;true
+;;MiniCart-VerticalNavigationLandingPage;MiniCart;;MiniCartSlot;true
+;;Footer-VerticalNavigationLandingPage;Footer;;FooterSlot;true
+;;HeaderLinks-VerticalNavigationLandingPage;HeaderLinks;;HeaderLinksSlot;true
+;;SearchBox-VerticalNavigationLandingPage;SearchBox;;SearchBoxSlot;true
+;;TopHeaderSlot-VerticalNavigationLandingPage;TopHeaderSlot;;TopHeaderSlot;true
+;;BottomHeaderSlot-VerticalNavigationLandingPage;BottomHeaderSlot;;BottomHeaderSlot;true
+;;PlaceholderContentSlot-VerticalNavigationLandingPage;PlaceholderContentSlot;;PlaceholderContentSlot;true
+
+INSERT_UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);label;defaultPage[default='true'];approvalStatus(code)[default='approved'];homepage[default='true']
+;;homepage;Homepage;VerticalNavigationLandingPageTemplate;homepage
+
+###  Home page splash Slot1B  #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageSplashBannerComponent;Marketplace Homepage Splash Banner Component;/OpenCatalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;MarketplaceHompageSplashBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageDiscountBannerComponent;Marketplace Homepage Discount Banner Component;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/c/585;MarketplaceHompageDiscountBannerComponent
+
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1A-Homepage;Section1A;;Section1ASlot-Homepage
+;;Section1B-Homepage;Section1B;;Section1BSlot-Homepage
+;;Section1C-Homepage;Section1C;;Section1CSlot-Homepage
+
+INSERT_UPDATE VerticalNavigationListComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(uid,$contentCV);wrapAfter
+;;VerticalNavigationListComponent;Vertical Navigation List Component;;VerticalNavigationListComponent;MarketplaceCategoryNavNode;5
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1ASlot-Homepage;true;VerticalNavigationListComponent
+;;Section1BSlot-Homepage;true;MarketplaceHompageSplashBannerComponent
+;;Section1CSlot-Homepage;true;MarketplaceHompageDiscountBannerComponent
+
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='VerticalNavigationLandingPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SiteLogo;;;logo
+;HeaderLinks;;;headerlinks
+;SearchBox;;;searchbox
+;MiniCart;;;minicart
+;NavigationBar;;;navigation
+;Section1;;;wide
+;Section1A;;;narrow
+;Section1B;;;narrow
+;Section1C;;;wide
+;Section2A;;;narrow
+;Section2B;;;narrow
+;Section2C;;;wide
+;Section3;;;wide
+;Section4;;;narrow
+;Section5;;;wide
+;Footer;;;footer
+;TopHeaderSlot;;;wide
+;BottomHeaderSlot;;;wide
+;PlaceholderContentSlot;;;
+
+INSERT_UPDATE ComponentTypeGroups2ComponentType; source(code)[unique=true]; target(code)[unique=true]   
+;narrow; VerticalNavigationListComponent
+

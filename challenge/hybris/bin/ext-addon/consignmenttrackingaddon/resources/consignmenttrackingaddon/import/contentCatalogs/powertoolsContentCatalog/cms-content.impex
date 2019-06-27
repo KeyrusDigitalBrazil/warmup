@@ -1,0 +1,25 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$jarResourceCms=jar:de.hybris.platform.consignmenttrackingaddon.constants.ConsignmenttrackingaddonConstants&/consignmenttrackingaddon/import/cockpit/cmscockpit
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];page
+;;AccountOrderDetailsItemsComponent;/WEB-INF/views/addons/consignmenttrackingaddon/responsive/pages/account/accountOrderDetailItems.jsp
+
+INSERT_UPDATE ConsignmentTrackingAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ConsignmentTrackingAction;/consignment/\\${consignment.code}/tracking;Consignment Tracking Action;ActionRestriction;ConsignmentTrackingAction
+
+INSERT_UPDATE ApplicableCmsActionsTypeForCmsComponent;target(code)[unique=true];source(code)[unique=true]
+;JspIncludeComponent;ConsignmentTrackingAction
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];actions(uid,$contentCV)
+;;AccountOrderDetailsItemsComponent;ConsignmentTrackingAction

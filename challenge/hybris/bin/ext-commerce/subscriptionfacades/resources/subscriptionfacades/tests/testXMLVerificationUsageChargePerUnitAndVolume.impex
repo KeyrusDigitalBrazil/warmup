@@ -1,0 +1,46 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"P1";;
+;"P2";;
+;"P3";;
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;P1;P1;testCategory0;;monthly
+;P2;P2;testCategory0;;monthly
+;P3;P3;testCategory0;;monthly
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;PP1;;;USD;P1
+;PP2;;;USD;P2
+;PP3;;;USD;P3
+
+INSERT PerUnitUsageCharge;id[unique=true];name[lang=$lang];subscriptionPricePlanUsage(name[lang=$lang, unique=true]);usageUnit(id);usageChargeType(code);$catalogversion
+;PUC1;PUC1;PP1;video;each_respective_tier
+;PUC2;PUC2;PP2;video;each_respective_tier
+;PUC3;PUC3;PP3;video;each_respective_tier
+
+INSERT VolumeUsageCharge;id[unique=true];name[lang=$lang];usageUnit(id);subscriptionPricePlanUsage(name[lang=$lang, unique=true]);$catalogversion
+;VC1;VC1;minute;PP1
+;VC2;VC2;minute;PP2
+;VC3;VC3;minute;PP3
+
+INSERT OverageUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;$catalogversion
+;OC1;PUC1;15
+;OC2;VC1;25
+;OC3;PUC2;15
+;OC4;VC3;15
+
+INSERT TierUsageChargeEntry;id[unique=true];usageCharge(id, $catalogversionResolver);price;tierStart;tierEnd;$catalogversion
+;TC2;VC2;12;1;2
+;TC3;PUC3;12;1;2
+

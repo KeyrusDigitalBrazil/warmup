@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<widget xmlns="http://www.zkoss.org/2005/zul" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.hybris.com/schema/cockpitng/zul/zul.xsd"
+        sclass="oms-widget-reallocationconsignment-configuration" height="100%" width="100%"
+        id="reallocationconsignmentview">
+
+	<separator width="100%" sclass="oms-widget-reallocationconsignment-configuration--separator"/>
+
+    <hlayout sclass="oms-widget-reallocationconsignment-header">
+        <hbox sclass="oms-widget-reallocationconsignment-body">
+            <vbox>
+                <label value="${labels.warehousingbackoffice.reallocationconsignment.consignmentcode}" width="100%"/>
+                <textbox sclass="oms-widget-reallocationconsignment-input-text-box" readonly="true" id="consignmentCode"
+                         width="140px"/>
+            </vbox>
+        </hbox>
+        <hbox sclass="oms-widget-reallocationconsignment-body">
+            <vbox>
+                <label value="${labels.warehousingbackoffice.reallocationconsignment.customer}" width="100%"/>
+                <textbox sclass="oms-widget-reallocationconsignment-input-text-box" readonly="true" id="customerName"
+                         width="240px"/>
+            </vbox>
+        </hbox>
+    </hlayout>
+
+	<separator width="100%" sclass="oms-widget-reallocationconsignment-configuration--separator"/>
+	
+    <hlayout width="100%" sclass="oms-widget-reallocationconsignment-list">
+        <div sclass="oms-widget-reallocationconsignment-list-container">
+            <grid id="consignmentEntries" mold="paging"
+                  pageSize="5" width="100%" height="100%">
+                <columns>
+                	<column width="30px" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <checkbox id="globalDeclineEntriesSelection" class="oms-widget-reallocationconsignment-list-container__checkbox"/>
+                    </column>
+                    <column width="12%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.reallocationconsignment.productcode}" width="100%"/>
+                    </column>
+                    <column width="18%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.reallocationconsignment.productname}" width="100%"/>
+                    </column>
+                    <column width="11%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.reallocationconsignment.qtypending}" width="100%" style="text-align: center;"/>
+                    </column>
+                    <column width="11%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <label value="${labels.warehousingbackoffice.reallocationconsignment.qtytoreallocate}" width="100%"/>
+                    </column>
+                    <column width="18%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                        <combobox id="globalDeclineReasons" placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.reason}" readonly="true"/>
+                    </column>
+                    <column width="18%" sclass="oms-widget-reallocationconsignment-listbox-header">
+                       <combobox id="globalPossibleLocations" placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.location}" readonly="true">
+                       		<template name="model">
+                        		<comboitem label="${each.code}"/>
+                    		</template>
+                		</combobox>
+                    </column>
+                    <column width="20%" sclass="oms-widget-reallocationconsignment-listbox-header oms-widget-reallocationconsignment-listbox-header__comment">
+                        <textbox class="oms-widget-reallocationconsignment-listbox-header__comment" id="globalDeclineComment" maxlength="255" placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.comment}" width="97%"/>
+                    </column>
+                </columns>
+                <rows>
+                    <template name="model">
+                        <row>
+                            <checkbox class="oms-widget-reallocationconsignment-list-container__checkbox"/>
+                            <label value="${each.consignmentEntry.orderEntry.product.code}" width="100%"/>
+                            <label value="${each.consignmentEntry.orderEntry.product.name}" width="100%"/>
+                            <label value="${each.consignmentEntry.quantityPending}" width="100%" style="text-align: center;"/>
+                            <intbox value="${each.quantityToReallocate}" width="50%" style="margin-left:15px;text-align:center;"
+                                    constraint="no empty,no negative: Quantity Must be Greater Than Zero"/>
+                            <combobox xmlns:w="client" w:onSelect="CockpitNG.sendEvent(this.uuid,'onCustomChange',this._value)"
+                                model="${each.declineReasonsModel}" placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.reason}"
+                                readonly="true" style="margin-left:4px;width:95%;">
+                                <template name="model">
+                                    <comboitem label="${each}"/>
+                                </template>
+                            </combobox>
+                            <combobox model="${each.possibleLocationsModel}"  placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.location}" readonly="true" style="margin-left:4px;width:95%;">
+                                <template name="model">
+                                    <comboitem label="${each.code}"/>
+                                </template>
+                            </combobox>
+                            <textbox value="${each.declineConsignmentEntryComment}" maxlength="255" placeholder="${labels.warehousingbackoffice.reallocationconsignment.popup.placeholder.comment}" width="93%" style="margin-left:4px;"/>
+                        </row>
+                    </template>
+                </rows>
+            </grid>
+        </div>
+    </hlayout>
+
+    <div sclass="oms-widget-reallocationconsignment-configuration-footer oms-widget-footer">
+                <button id="undoreallocation"
+                        label="${labels.warehousingbackoffice.reallocationconsignment.button.undo}"
+                        sclass="oms-widget-reallocationconsignment-configuration-button oms-widget-reallocationconsignment-configuration-revert-button"/>
+                <button id="confirmreallocation"
+                        label="${labels.warehousingbackoffice.reallocationconsignment.button.confirm}"
+                        sclass="y-btn-primary oms-widget-reallocationconsignment-configuration-button oms-widget-reallocationconsignment-configuration-save-button"/>
+    </div>
+
+</widget>

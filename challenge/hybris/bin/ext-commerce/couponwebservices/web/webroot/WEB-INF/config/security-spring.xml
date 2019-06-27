@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!-- ~ [y] hybris Platform ~ ~ Copyright (c) 2000-2016 SAP SE or an SAP affiliate company. ~ All rights reserved. ~ ~ This software is the confidential and proprietary 
+	information of hybris ~ ("Confidential Information"). You shall not disclose such Confidential ~ Information and shall use it only 
+	in accordance with the terms of the ~ license agreement you entered into with SAP. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security" xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/security/oauth2 
+     	http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
+
+	<!-- Security OAuth2 -->
+	
+		<import resource="classpath*:oauth2-resource-spring.xml"/>
+		
+		<!-- Swagger config -->
+		<security:http pattern="/#{configurationService.configuration.getProperty('springfox.documentation.swagger.v2.path')}" security="none"/>
+		<security:http pattern="/**/*swagger*/**" security="none"/>
+		<security:http pattern="/v2/api-docs" security="none"/>
+		
+		<http pattern="/**" create-session="never"
+		   entry-point-ref="oauthAuthenticationEntryPoint"
+		   access-decision-manager-ref="accessDecisionManager"
+		   xmlns="http://www.springframework.org/schema/security" use-expressions="false">
+		   <anonymous enabled="false"/>
+		   
+		   <headers disabled="true"/>
+		   <csrf disabled="true"/>
+		   
+		   <intercept-url pattern="/**" access="IS_AUTHENTICATED_FULLY"/>
+		   <port-mappings>
+				<port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}" https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}" />
+				<port-mapping http="#{configurationService.configuration.getProperty('embeddedserver.http.port')}" https="#{configurationService.configuration.getProperty('embeddedserver.ssl.port')}" />
+			</port-mappings>
+		   <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER"/>
+		   <custom-filter ref="hybrisUserFilter" after="LAST" />
+		   <access-denied-handler ref="oauthAccessDeniedHandler"/>
+		   
+	      <headers defaults-disabled="true">
+			<content-type-options />
+			<hsts include-subdomains="true" max-age-seconds="16070400" />
+			<xss-protection />
+		  </headers>
+			
+		</http>
+
+		<bean id="hybrisUserFilter" class="de.hybris.platform.webservicescommons.oauth2.HybrisOauth2UserFilter" />
+  				
+		<bean id="oauthAuthenticationEntryPoint" class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+			<property name="realmName" value="hybris" />
+			<property name="exceptionRenderer" ref="oAuth2ExceptionRenderer" />
+		</bean>
+
+		<bean id="oauthAccessDeniedHandler" class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+			<property name="exceptionRenderer" ref="oAuth2ExceptionRenderer" />
+		</bean>
+
+		<bean id="oAuth2ExceptionRenderer" class="de.hybris.platform.webservicescommons.oauth2.OAuth2ExceptionRenderer">
+			<property name="messageConverters" ref="jaxbMessageConverters" />
+			<property name="exceptionConverter" ref="exceptionConverter" />
+		</bean>
+</beans>

@@ -1,0 +1,161 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$lang = en
+$contentCatalog = apparel-ukContentCatalog
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]), CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$defaultPassword = 12341234
+$siteUid = apparel-uk
+
+# Create Customer Group
+INSERT_UPDATE UserGroup; UID[unique = true]        ; groups(uid)[mode = append]
+                       ; apparel-uk-cxmanagergroup ; cxmanagergroup
+                       ; apparel-uk-cxusergroup    ; cxusergroup
+
+INSERT_UPDATE Employee; UID[unique = true]   ; password[default = $defaultPassword]; backOfficeLoginDisabled; groups(uid)[mode = append]; name                                   ; description
+                      ; cxmanager-apparel-uk ;                                     ;                        ; apparel-uk-cxmanagergroup ; Personalization Manager For Apparel UK ; Personalization Manager For Apparel UK
+                      ; cxuser-apparel-uk    ;                                     ;                        ; apparel-uk-cxusergroup    ; Personalization User For Apparel UK    ; Personalization Read Only User For Apparel UK
+
+INSERT_UPDATE Employee; UID[unique = true]; groups(uid)[mode = append];
+                      ; cxmanager         ; apparel-uk-cxmanagergroup ;
+                      ; cxuser            ; apparel-uk-cxusergroup
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique = true]; version[unique = true]; readPrincipals(uid)[mode = append]               ; writePrincipals(uid)[mode = append]
+                            ; apparel-ukContentCatalog  ; Staged                ; apparel-uk-cxusergroup                           ; apparel-uk-cxmanagergroup
+                            ; apparel-ukContentCatalog  ; Online                ; apparel-uk-cxusergroup,apparel-uk-cxmanagergroup ; cxmanager
+
+INSERT_UPDATE CxSegment; code[unique = true] ; description                            ;
+                       ; CATEGORY Burton     ;                                        ;
+                       ; CATEGORY 250600     ; Users who browse Shorts products often ;
+                       ; CATEGORY skigear    ;                                        ;
+                       ; CATEGORY sandals    ;                                        ;
+                       ; BeachwearLover      ;                                        ;
+                       ; FlannelShirtsFan    ;                                        ;
+                       ; FlipFlopsEnthusiast ;                                        ;
+                       ; ShadesConnoisseur   ;                                        ;
+                       ; BeltsOldHand        ;                                        ;
+                       ; HatsFan             ;                                        ;
+
+INSERT_UPDATE Customer; uid[unique = true]        ; groups(uid)   ; password[default = $defaultPassword]; name             ; &userref;
+                      ; menshortslover@hybris.com ; customergroup ;                                     ; Men Shorts Lover ;         ; menshortslover@hybris.com ;
+                      ; shortslover@hybris.com    ; customergroup ;                                     ; Shorts Lover     ;         ; shortslover@hybris.com    ;
+                      ; burtonlover@hybris.com    ; customergroup ;                                     ; Burton Lover     ;         ; burtonlover@hybris.com    ;
+
+INSERT_UPDATE CxUserToSegment; segment(code)[unique = true]; user(uid)[unique = true]  ; baseSite(uid)[unique = true, default = $siteUid]; affinity[default = 1];
+                             ; Men                         ; menshortslover@hybris.com ;                                                 ;
+                             ; CATEGORY 250600             ; menshortslover@hybris.com ;                                                 ;
+                             ; CATEGORY Burton             ; womenvipgold@hybris.com   ;                                                 ;
+                             ; CATEGORY 250600             ; shortslover@hybris.com    ;                                                 ;
+                             ; CATEGORY Burton             ; burtonlover@hybris.com    ;                                                 ;
+                             ; VIPGold                     ; vipgold@hybris.com        ;                                                 ;
+                             ; 20-29                       ; vipgold@hybris.com        ;                                                 ;
+                             ; VIPSilver                   ; vipsilver@hybris.com      ;                                                 ;
+                             ; VIPBronze                   ; vipbronze@hybris.com      ;                                                 ;
+                             ; Women                       ; women@hybris.com          ;                                                 ;
+                             ; Women                       ; womenvipgold@hybris.com   ;                                                 ;
+                             ; VIPGold                     ; womenvipgold@hybris.com   ;                                                 ;
+                             ; Women                       ; womenvipsilver@hybris.com ;                                                 ;
+                             ; VIPSilver                   ; womenvipsilver@hybris.com ;                                                 ;
+                             ; Men                         ; men@hybris.com            ;                                                 ;
+                             ; Men                         ; menvipbronze@hybris.com   ;                                                 ;
+                             ; VIPBronze                   ; menvipbronze@hybris.com   ;                                                 ;
+                             ; Men                         ; menvipgold@hybris.com     ;                                                 ;
+                             ; VIPGold                     ; menvipgold@hybris.com     ;                                                 ;
+                             ; 30-39                       ; menvipgold@hybris.com     ;                                                 ;
+                             ; Men                         ; menover30@hybris.com      ;                                                 ;
+                             ; 30-39                       ; menover30@hybris.com      ;                                                 ;
+                             ; 40-49                       ; menover30@hybris.com      ;                                                 ;
+                             ; 50-59                       ; menover30@hybris.com      ;                                                 ;
+                             ; 60-69                       ; menover30@hybris.com      ;                                                 ;
+                             ; 60-69                       ; menover30@hybris.com      ;                                                 ;
+                             ; 70-79                       ; menover30@hybris.com      ;                                                 ;
+                             ; 80-89                       ; menover30@hybris.com      ;                                                 ;
+                             ; 90-99                       ; menover30@hybris.com      ;                                                 ;
+
+INSERT_UPDATE CxCustomizationsGroup; code                        ; $contentCV[unique = true]
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxCustomizationsGroupExists(line, 1, impex, 1);"
+                                   ; apparelUKCustomizationGroup ; ;
+
+INSERT_UPDATE CxCustomization; code[unique = true]; name          ; $contentCV[unique = true]; group(code, $contentCV)[default = 'apparelUKCustomizationGroup']; status(code)[default = ENABLED]
+                             ; SummerSale         ; SummerSale    ;                          ;
+                             ; SpringSale         ; SpringSale    ;                          ;
+                             ; WinterSale         ; WinterSale    ;                          ;
+                             ; CategoryLover      ; CategoryLover ;                          ;
+                             ; VIP                ; VIP           ;                          ;
+
+INSERT_UPDATE CxCmsAction; componentId                          ; code[unique = true]                                 ; type(code); target                 ; &actionRef                                          ; $contentCV[unique = true]; containerId; componentCatalog[default = $contentCatalog];
+"#% beforeEach: de.hybris.platform.personalizationsampledataaddon.util.CxAddOnSampleDataUtils.verifyIfCxActionExists(line, 2, impex, 5);"
+#banner
+                         ; springSaleMenSplashBannerComponent   ; actionSpringSaleMenBanner                           ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleMenBanner                           ;                          ; Section1SlotHomepageCxContainer
+                         ; springSaleWomenSplashBannerComponent ; actionSpringSaleWomenBanner                         ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleWomenBanner                         ;                          ; Section1SlotHomepageCxContainer
+                         ; springSaleWomenSplashBannerComponent ; actionSpringSaleVipSilverWomenBanner                ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleVipSilverWomenBanner                ;                          ; Section1SlotHomepageCxContainer
+                         ; springSaleWomenSplashBannerComponent ; actionSpringSaleOver30AndShortsLoverAndNotVipGold   ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleOver30AndShortsLoverAndNotVipGold   ;                          ; Section1SlotHomepageCxContainer
+                         ; winterSaleMenSplashBannerComponent   ; actionWinterSaleBanner                              ; PLAIN     ; cxCmsActionPerformable ; actionWinterSaleBanner                              ;                          ; Section1SlotHomepageCxContainer
+                         ; loyalCustomersSplashBannerComponent  ; actionLoyalCustomers                                ; PLAIN     ; cxCmsActionPerformable ; actionLoyalCustomers                                ;                          ; Section1SlotHomepageCxContainer
+                         ; springShopSplashBannerComponent      ; actionSpringShop                                    ; PLAIN     ; cxCmsActionPerformable ; actionSpringShop                                    ;                          ; Section1SlotHomepageCxContainer
+                         ; summerCornerSplashBannerComponent    ; actionSummerCorner                                  ; PLAIN     ; cxCmsActionPerformable ; actionSummerCorner                                  ;                          ; Section1SlotHomepageCxContainer
+#content 2A
+                         ; burtonLoverContentComponent          ; actionSpringSaleBurtonLoverContent2A                ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleBurtonLoverContent2A                ;                          ; Section2ASlotHomepageCxContainer
+                         ; burtonLoverContentComponent          ; actionBurtonLoverContent2A                          ; PLAIN     ; cxCmsActionPerformable ; actionBurtonLoverContent2A                          ;                          ; Section2ASlotHomepageCxContainer
+                         ; shortsLoverContentComponent          ; actionShortsLoverContent2A                          ; PLAIN     ; cxCmsActionPerformable ; actionShortsLoverContent2A                          ;                          ; Section2ASlotHomepageCxContainer
+                         ; shortsLoverContentComponent          ; actionSpringSaleOver30AndShortsLoverAndNotVipGold2A ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleOver30AndShortsLoverAndNotVipGold2A ;                          ; Section2ASlotHomepageCxContainer
+#content 2B
+                         ; vipGoldContentComponent              ; actionVipGoldContent2B                              ; PLAIN     ; cxCmsActionPerformable ; actionVipGoldContent2B                              ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipGoldContentComponent              ; actionSpringSaleVipGoldContent2B                    ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleVipGoldContent2B                    ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipSilverContentComponent            ; actionWinterSaleContent2B                           ; PLAIN     ; cxCmsActionPerformable ; actionWinterSaleContent2B                           ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipSilverContentComponent            ; actionVipSilverContent2B                            ; PLAIN     ; cxCmsActionPerformable ; actionVipSilverContent2B                            ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipSilverContentComponent            ; actionSpringSaleVipSilverWomenContent2B             ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleVipSilverWomenContent2B             ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipBronzeContentComponent            ; actionVipBronzeContent2B                            ; PLAIN     ; cxCmsActionPerformable ; actionVipBronzeContent2B                            ;                          ; Section2BSlotHomepageCxContainer
+                         ; vipBronzeContentComponent            ; actionSpringSaleVipBronzeContent2B                  ; PLAIN     ; cxCmsActionPerformable ; actionSpringSaleVipBronzeContent2B                  ;                          ; Section2BSlotHomepageCxContainer
+
+INSERT_UPDATE CxVariation; code[unique = true]                         ; name                                        ; $contentCV[unique = true]; actions(&actionRef)[mode = append]                                                                    ; enabled[default = true]; customization(code, $contentCV)[unique = true]; status(code)[default = ENABLED]
+                         ; SpringSaleVipBronzeMen                      ; SpringSaleVipBronzeMen                      ;                          ; actionSpringSaleMenBanner,actionSpringSaleVipBronzeContent2B                                          ;                        ; SpringSale                                    ;
+                         ; SpringSaleVipGoldWomen                      ; SpringSaleVipGoldWomen                      ;                          ; actionSpringSaleWomenBanner,actionSpringSaleVipGoldContent2B,actionSpringSaleBurtonLoverContent2A     ;                        ; SpringSale                                    ;
+                         ; SpringSaleVipSilverWomen                    ; SpringSaleVipSilverWomen                    ;                          ; actionSpringSaleVipSilverWomenBanner,actionSpringSaleVipSilverWomenContent2B                          ;                        ; SpringSale                                    ;
+                         ; SpringSaleOver30AndShortsLoverAndNotVipGold ; SpringSaleOver30AndShortsLoverAndNotVipGold ;                          ; actionSpringSaleOver30AndShortsLoverAndNotVipGold,actionSpringSaleOver30AndShortsLoverAndNotVipGold2A ;                        ; SpringSale                                    ;
+                         ; VipGold                                     ; VipGold                                     ;                          ; actionVipGoldContent2B                                                                                ;                        ; VIP                                           ;
+                         ; VipSilver                                   ; VipSilver                                   ;                          ; actionVipSilverContent2B                                                                              ;                        ; VIP                                           ;
+                         ; VipBronze                                   ; VipBronze                                   ;                          ; actionVipBronzeContent2B                                                                              ;                        ; VIP                                           ;
+                         ; ShortsLover                                 ; ShortsLover                                 ;                          ; actionShortsLoverContent2A                                                                            ;                        ; CategoryLover                                 ;
+                         ; BurtonLover                                 ; BurtonLover                                 ;                          ; actionBurtonLoverContent2A                                                                            ;                        ; CategoryLover                                 ;
+                         ; WinterSaleDefault                           ; WinterSaleDefault                           ;                          ; actionWinterSaleBanner,actionWinterSaleContent2B                                                      ;                        ; WinterSale                                    ; DISABLED
+                         ; VIPDefault                                  ; VIPDefault                                  ;                          ; actionLoyalCustomers                                                                                  ;                        ; VIP                                           ; DISABLED
+                         ; SpringSaleDefault                           ; SpringSaleDefault                           ;                          ; actionSpringShop                                                                                      ;                        ; SpringSale                                    ; DISABLED
+                         ; SummerSaleDefault                           ; SummerSaleDefault                           ;                          ; actionSummerCorner                                                                                    ;                        ; SummerSale                                    ; DISABLED
+
+INSERT_UPDATE CxSegmentTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]; $contentCV[unique = true]; segments(code)                ; groupBy(code)[default = 'OR'];
+                              ; trigger1           ; SpringSaleVipBronzeMen                    ;                          ; Men,VIPBronze                 ; AND
+                              ; trigger2           ; SpringSaleVipGoldWomen                    ;                          ; Women,VIPGold,CATEGORY Burton ; AND
+                              ; trigger3           ; SpringSaleVipSilverWomen                  ;                          ; Women,VIPSilver               ; AND
+                              ; trigger4           ; VipGold                                   ;                          ; VIPGold                       ;
+                              ; trigger5           ; VipSilver                                 ;                          ; VIPSilver                     ;
+                              ; trigger6           ; VipBronze                                 ;                          ; VIPBronze                     ;
+                              ; trigger7           ; ShortsLover                               ;                          ; CATEGORY 250600               ;
+                              ; trigger8           ; BurtonLover                               ;                          ; CATEGORY Burton               ;
+
+INSERT_UPDATE CxExpressionTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]  ; $contentCV[unique = true]; expression;
+                                 ; expressionTrigger1 ; SpringSaleOver30AndShortsLoverAndNotVipGold ;                          ; "{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""30-39""},{""type"":""segmentExpression"",""code"":""CATEGORY 250600""},{""type"":""negationExpression"",""element"":{""type"":""groupExpression"",""elements"":[{""type"":""segmentExpression"",""code"":""VIPGold""}],""operator"":""AND""}}],""operator"":""AND""}"
+
+INSERT_UPDATE CxDefaultTrigger; code[unique = true]; variation(code, $contentCV)[unique = true]; $contentCV[unique = true];
+                              ; defaultTrigger1    ; VIPDefault                                ;
+                              ; defaultTrigger2    ; SpringSaleDefault                         ;
+                              ; defaultTrigger3    ; SummerSaleDefault                         ;
+                              ; defaultTrigger4    ; WinterSaleDefault                         ;
+
+UPDATE CxCustomization; code[unique = true]; name          ; $contentCV[unique = true]; variations(code, $contentCV)
+                      ; SpringSale         ; SpringSale    ;                          ; SpringSaleVipBronzeMen,SpringSaleVipGoldWomen,SpringSaleVipSilverWomen,SpringSaleOver30AndShortsLoverAndNotVipGold,SpringSaleDefault ;
+                      ; SummerSale         ; SummerSale    ;                          ; SummerSaleDefault                                                                                                                    ;
+                      ; WinterSale         ; WinterSale    ;                          ; WinterSaleDefault                                                                                                                    ;
+                      ; CategoryLover      ; CategoryLover ;                          ; ShortsLover,BurtonLover                                                                                                              ;
+                      ; VIP                ; VIP           ;                          ; VipGold,VipSilver,VipBronze,VIPDefault                                                                                               ;
+
+INSERT_UPDATE CxDefaultPersonalizationCalculationCronJob; code[unique = true]             ; job(code)                                    ; singleExecutable; sessionLanguage(isocode); baseSites(uid)
+                                             ; cxDefaultPersonalizationCalculationCronJobApparelUK ; cxDefaultPersonalizationCalculationJob ; false           ; en                      ; $siteUid ;

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+ All hybris buildcallbacks.xml macrodefinitions:
+
+ Build/Documentation
+
+	 before/after ant macro "clean"
+		 <macrodef name="sapcreditcheckbackoffice_before_clean"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_clean"/>
+
+	 before/after ant macro "build"
+		 <macrodef name="sapcreditcheckbackoffice_before_build"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_build"/>
+
+	 before/after ant macro "compile_core" - the core module of the extension
+		 <macrodef name="sapcreditcheckbackoffice_before_compile_core">
+		 <macrodef name="sapcreditcheckbackoffice_after_compile_core">
+
+	 before/after ant macro "compile_web" - the web module of the extension
+		 <macrodef name="sapcreditcheckbackoffice_before_compile_web" />
+		 <macrodef name="sapcreditcheckbackoffice_after_compile_web" />
+
+	 before/after ant macro "compile_hmc" - the hmc module of the extension
+		 <macrodef name="sapcreditcheckbackoffice_before_compile_hmc" />
+		 <macrodef name="sapcreditcheckbackoffice_after_compile_hmc" />
+
+ Preparing extension
+
+	 will be called in the beginning of the ant call and only once (also when using multiple
+	 ant targets e.g. ant build yunittest)
+		 <macrodef name="sapcreditcheckbackoffice_only_once_prepare"/>
+
+ Creating ear module/production
+
+	 before/after ant macro "ear"
+		 <macrodef name="sapcreditcheckbackoffice_before_ear"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_ear"/>
+
+	 before/after ant macro "production" - for hybris server only
+		 <macrodef name="sapcreditcheckbackoffice_before_production" />
+		 <macrodef name="sapcreditcheckbackoffice_after_production" />
+
+ JUnit Test
+
+	 before/after ant macro "yunitinit"
+		 <macrodef name="sapcreditcheckbackoffice_before_yunitinit" />
+		 <macrodef name="sapcreditcheckbackoffice_after_yunitinit" />
+
+	 before/after ant macro "yunit"
+		 <macrodef name="sapcreditcheckbackoffice_before_yunit" />
+		 <macrodef name="sapcreditcheckbackoffice_after_yunit" />
+
+ Distribution package
+
+ 	 before/after ant macro "dist" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapcreditcheckbackoffice_after_dist"/>
+		 <macrodef name="sapcreditcheckbackoffice_before_dist"/>
+
+	 before/after ant macro "dist_copy" - internal target; only for use when platform is available in source code
+		 <macrodef name="sapcreditcheckbackoffice_before_dist_copy"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_dist_copy"/>
+
+ 	 With these filters you can override the default extension filters defined in platform/resources/ant/dist/filtersets.xml
+ 	  	 <patternset id="extension.sapcreditcheckbackoffice.binary.filter">
+ 	  	  	 <patternset refid="extension.filter" />
+ 	  	  	 <exclude name="**/*-source.jar" />
+ 	  	 </patternset>
+ 	  	 <patternset id="extension.sapcreditcheckbackoffice.source.filter">
+ 	  	  	 <exclude name="**/bin/**" />
+ 	  	 </patternset>
+
+ Backoffice module
+
+ 	 before/after ant macro "backoffice" - internal target; only for use when extensin is a backoffice module
+		 <macrodef name="sapcreditcheckbackoffice_before_clean_backoffice"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_clean_backoffice"/>
+		 <macrodef name="sapcreditcheckbackoffice_before_compile_backoffice"/>
+		 <macrodef name="sapcreditcheckbackoffice_after_compile_backoffice"/>
+
+--><project name="sapcreditcheckbackoffice_buildcallbacks">
+	<property name="sapcreditcheckbackofficeWebFragmentSrc" value="${ext.sapcreditcheckbackoffice.path}/resources/web-fragment.xml"/>
+	<property name="sapcreditcheckbackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_sapcreditcheckbackoffice.jar"/>
+
+	
+
+	
+
+	<macrodef name="sapcreditcheckbackoffice_after_clean">
+		<sequential>
+			<sapcreditcheckbackoffice_remove_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapcreditcheckbackoffice_after_build">
+		<sequential>
+			<sapcreditcheckbackoffice_remove_web_fragment/>
+			<sapcreditcheckbackoffice_create_web_fragment/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapcreditcheckbackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${sapcreditcheckbackofficeWebFragmentDestJar}"/>
+				<then>
+					<delete file="${sapcreditcheckbackofficeWebFragmentDestJar}"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="sapcreditcheckbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${sapcreditcheckbackofficeWebFragmentSrc}"/>
+				<then>
+					<sequential>
+						<jar destfile="${sapcreditcheckbackofficeWebFragmentDestJar}">
+							<metainf file="${sapcreditcheckbackofficeWebFragmentSrc}"/>
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+</project>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+
+	<context:component-scan base-package="de.hybris.platform.marketplaceaddon" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties resource bundle as javascript variables -->
+	<bean id="defaultMarketplaceaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="marketplaceaddon" />
+	</bean>
+
+	<bean id="defaultMarketplaceaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee"
+		class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultMarketplaceaddonJavaScriptMessageResourceAccessor" />
+	</bean>
+
+	<bean id="getMarketplaceaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultMarketplaceaddonBeforeViewJsPropsHandlerAdaptee" />
+		</property>
+	</bean>
+	<bean id="MarketplaceaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getMarketplaceaddonBeforeViewHandler" />
+	</bean>
+
+	<alias alias="ProductCarouselComponentController" name="vendorProductCarouselComponentController" />
+	<bean id="vendorProductCarouselComponentController" class="de.hybris.platform.marketplaceaddon.controllers.cms.VendorProductCarouselComponentController" />
+
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="CMSProductListComponent" />
+		<property name="renderer" ref="marketplaceAddonCMSComponentRenderer" />
+	</bean>
+
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="SearchResultsListComponent" />
+		<property name="renderer" ref="marketplaceAddonCMSComponentRenderer" />
+	</bean>
+
+	<bean id="marketplaceAddonCMSComponentRenderer" class="de.hybris.platform.marketplaceaddon.renderer.impl.MarketplaceAddonCMSComponentRenderer"
+		parent="addOnJspIncludeCMSComponentRenderer">
+	</bean>
+	
+	<alias name="marketplaceSearchBreadcrumbBuilder" alias="searchBreadcrumbBuilder"/>
+	<bean id="marketplaceSearchBreadcrumbBuilder" class="de.hybris.platform.marketplaceaddon.breadcrumb.MarketplaceSearchBreadcrumbBuilder">
+		<property name="commerceCategoryService" ref="commerceCategoryService"/>
+		<property name="categoryModelUrlResolver" ref="categoryModelUrlResolver"/>
+		<property name="vendorUrlResolver" ref="vendorUrlResolver"/>
+		<property name="vendorCategoryUrlResolver" ref="vendorCategoryUrlResolver"/>
+		<property name="vendorService" ref="vendorService"/>
+	</bean>
+	
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="OrderReviewAction" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+	
+	<bean parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="VendorHomepageAction" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+</beans>

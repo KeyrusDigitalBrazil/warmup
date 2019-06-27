@@ -1,0 +1,57 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Workflow Handle Generated Audit Report.
+
+INSERT_UPDATE UserGroup; UID[unique = true]; locname[lang = en];
+          ; auditreportgroup ; Base audit report group ;
+
+$START_USERRIGHTS; ; ; ; ; ; ; ; ;
+Type      ; UID                  ; MemberOfGroups         ; Password ; Target         ; read ; change ; create ; remove ; change_perm
+UserGroup ; auditreportgroup ;                        ;          ;                ;      ;        ;        ;        ;
+          ;                      ;                        ;          ; WorkflowAction ; +    ; +      ; -      ; -
+$END_USERRIGHTS; ; ; ; ;
+
+INSERT_UPDATE WorkflowTemplate; code[unique = true]; name[lang = en]; owner(uid); description[lang = en]; activationscript; visibleForPrincipals(uid);;;
+; ProcessAuditReport ; Process Audit Report ; admin ; "This workflow is automatically started when a new Audit Report is generated. " ; ; auditreportgroup ; ; ;
+
+INSERT_UPDATE WorkflowActionTemplate; code[unique = true]; name[lang = en]; description[lang = en]; principalAssigned(uid); workflow(code)[unique = true]; sendEmail; emailAddress; rendererTemplate(code); actionType(code)
+; ProcessGeneratedAuditReportStart ; Process Audit Report ; ; auditreportgroup ; ProcessAuditReport ; false ; ; ; start
+; ProcessGeneratedAuditReportEnd   ; Audit Report Processed ; ; auditreportgroup ; ProcessAuditReport ; false ; ; ; end
+
+INSERT_UPDATE WorkflowDecisionTemplate; code[unique = true]; name[lang = en]; actionTemplate(code); description[allownull = true];;;;;;
+; AuditProcessingDone ; Done ; ProcessGeneratedAuditReportStart ; ; ; ; ; ; ;
+
+INSERT_UPDATE WorkflowActionTemplateLinkTemplateRelation; source(code)[unique = true]; target(code)[unique = true]; andConnectionTemplate; qualifier;;;;;;;
+; AuditProcessingDone ; ProcessGeneratedAuditReportEnd ; false ; WorkflowActionTemplateLinkTemplateRelation ; ; ; ; ; ; ;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;auditreportgroup;;;;;;;;
+
+# Access Rights for Workflow Users ;;;;;;;;;
+;;;;WorkflowAction;+;+;;;;
+;;;;AbstractComment;+;+;+;+;;
+;;;;Comment;+;+;+;+;;
+;;;;Reply;+;+;+;+;;
+;;;;WorkflowItemAttachment;+;+;;;;
+;;;;Domain;+;;;;;
+;;;;Component;+;;;;;
+;;;;CommentType;+;;;;;
+;;;;CommentUserSetting;+;+;+;+;;
+;;;;CommentMetadata;+;+;+;+;;
+;;;;WorkflowDecision;+;;;;;
+;;;;UserGroup;+;;;;;
+;;;;AuditReportTemplate;+;;;;;
+;;;;CronJob;+;;;;;
+;;;;Job;+;;;;;
+;;;;CronJobHistory;+;;;;;
+$END_USERRIGHTS;;;;;

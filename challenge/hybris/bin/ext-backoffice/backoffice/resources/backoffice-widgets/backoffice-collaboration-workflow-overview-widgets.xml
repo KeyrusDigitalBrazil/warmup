@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+    <widget-extension widgetId="collaborationViewSwitcher">
+
+        <widget id="collaborationCenter-workflowOverview-view" widgetDefinitionId="com.hybris.cockpitng.listlayout" title="collaboration.workflow.overview" slotId="views" template="false">
+
+            <widget id="workflowOverview-workflows-collectionbrowser" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+                    slotId="children" template="false" access="backofficeworkflowadmin">
+
+                <widget id="workflowOverview-workflows-collectionbrowser-toolbar-layout" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="toolbarCenter" template="false">
+
+                    <widget id="workflowOverview-workflows-search" widgetDefinitionId="com.hybris.backoffice.widgets.workflowsearch"
+                            slotId="headerSlot" template="false">
+                        <setting key="pageSize" type="Integer" value="5"/>
+                        <virtual-sockets/>
+                    </widget>
+
+                    <widget id="workflowOverview-workflows-search-statuses" widgetDefinitionId="com.hybris.cockpitng.valueChooser"
+                            slotId="centerSlot" template="false">
+                        <setting key="configCtx" type="String">workflow-status-filter</setting>
+                        <setting key="widgetStyleClass" type="String">yw-collaboration-center-overview-workflows-statuses</setting>
+                    </widget>
+
+                    <setting key="widgetStyleClass" type="String">yw-collaboration-center-browser-header-toolbar</setting>
+                    <setting key="westDisabled" type="Boolean">true</setting>
+                    <setting key="eastDisabled" type="Boolean">true</setting>
+                    <setting key="northDisabled" type="Boolean">false</setting>
+                    <setting key="northCollapsible" type="Boolean">false</setting>
+                    <setting key="northSplittable" type="Boolean">false</setting>
+                </widget>
+
+                <setting key="pagingPosition">bottom</setting>
+                <setting key="hyperlinks" type="Boolean">true</setting>
+                <setting key="collectionBrowserConfigCtx" type="String">workflowOverview-collectionbrowser</setting>
+                <setting key="listTitle" type="String">workflows.listTitle</setting>
+                <setting key="actionSlotComponentId" type="String">workflowOverview-collectionbrowser-workflows-actions</setting>
+                <setting key="colConfigCtxCode" type="String">workflowOverview-browser-listview</setting>
+                <setting key="widgetStyleClass" type="String">yw-collaboration-center-overview-workflows yw-collaboration-center-browser</setting>
+                <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowModel</setting>
+                <setting key="sortableListHeader" type="Boolean">false</setting>
+
+                <virtual-sockets>
+                    <output id="showFlow" type="de.hybris.platform.workflow.model.WorkflowModel" />
+                </virtual-sockets>
+
+				<widget id="workflowOverview-workflows-flow-presentation"
+                        widgetDefinitionId="com.hybris.cockpitng.visjs.networkchart"
+                        slotId="cockpitWidgetChildrenInvisible" title="Flow Overview" template="true">
+					<instance-settings socketEventRoutingMode="LAST_USED">
+						<create onInit="false" reuseExisting="false">
+							<all-incoming-events/>
+						</create>
+						<close/>
+						<select onInit="false">
+							<incoming-events>
+								<socket-event id="initData"/>
+							</incoming-events>
+						</select>
+					</instance-settings>
+                    <setting key="chartOptions" type="String">
+						{
+							"layout": {
+								"hierarchical": {
+									"sortMethod": "directed",
+									"nodeSpacing": 300,
+									"levelSeparation": 120
+								}
+							},
+							"nodes": {
+								"shape": "box",
+								"size": 20,
+								"font": {
+									"color": "#1a3263"
+								},
+								"borderWidth": 2,
+								"shadow": {
+									"enabled": false
+								},
+								"chosen": {
+									"node": false,
+									"label": false
+								}
+							},
+							"edges": {
+								"width": 2,
+								"shadow": {
+									"enabled": false
+								},
+								"color": {
+									"color": "#0486e0"
+								},
+								"smooth": {
+									"enabled": false
+								},
+								"arrows": {
+									"to": {
+										"enabled": true
+									}
+								},
+								"arrowStrikethrough": false,
+								"chosen": {
+									"edge": false,
+									"label": false
+								}
+							},
+							"groups": {
+								"decision": {
+									"margin": {
+										"top": 15,
+										"bottom": 15,
+										"left": 15,
+										"right": 15
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#0486E0"
+									}
+								},
+								"andConnection": {
+									"shape": "circle",
+									"margin": {
+										"top": 15,
+										"bottom": 15,
+										"left": 15,
+										"right": 15
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#000"
+									}
+								},
+								"action": {
+									"margin": {
+										"top": 40,
+										"bottom": 40,
+										"left": 40,
+										"right": 40
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#000"
+									}
+								},
+								"actionPending": {
+									"margin": {
+										"top": 40,
+										"bottom": 40,
+										"left": 40,
+										"right": 40
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#000"
+									}
+								},
+								"actionInProgress": {
+									"margin": {
+										"top": 40,
+										"bottom": 40,
+										"left": 40,
+										"right": 40
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#0486e0",
+										"border": "#0486e0"
+									},
+									"font": {
+										"color": "#fff"
+									}
+								},
+								"actionCompleted": {
+									"margin": {
+										"top": 40,
+										"bottom": 40,
+										"left": 40,
+										"right": 40
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#000"
+									},
+									"font": {
+										"color": "#5eb300"
+									}
+								},
+								"actionTerminated": {
+									"margin": {
+										"top": 40,
+										"bottom": 40,
+										"left": 40,
+										"right": 40
+									},
+									"borderWidth": 2,
+									"color": {
+										"background": "#fff",
+										"border": "#000"
+									},
+									"font": {
+										"color": "#ff3b30"
+									}
+								}
+							},
+							"physics": {
+								"enabled": false
+							}
+						}
+					</setting>
+                    <setting key="_width" type="String">80%</setting>
+                    <setting key="_height" type="String">80%</setting>
+					<setting key="networkPopulator" type="String">workflowModelPopulator</setting>
+					<virtual-sockets/>
+				</widget>
+            </widget>
+
+            <widget id="workflowOverview-tasks-collectionbrowser" widgetDefinitionId="com.hybris.cockpitng.collectionBrowser"
+                    slotId="children" template="false">
+
+                <widget id="collaborationCenter-task-search-init-filter" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+                        template="false" slotId="cockpitWidgetChildrenInvisible">
+                    <setting key="expression">#root.contains('collaborationCenter-workflowOverview-view')</setting>
+                    <setting key="socketDataType_$T" type="String">java.util.Collection</setting>
+                </widget>
+
+                <widget id="collaborationCenter-task-search-init-node" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+                        template="false" slotId="cockpitWidgetChildrenInvisible">
+                    <setting key="expression">new com.hybris.backoffice.navigation.impl.SimpleNode('hmc_backoffice-workflow-inbox')</setting>
+                    <setting key="socketDataType_$T" type="String">com.hybris.backoffice.navigation.NavigationNode</setting>
+                </widget>
+
+                <widget id="collaborationCenter-task-search-init" widgetDefinitionId="com.hybris.cockpitng.workflowactionadapter"
+                        slotId="cockpitWidgetChildrenInvisible" template="false">
+                    <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.enums.WorkflowActionStatus</setting>
+                </widget>
+
+                <widget id="workflowOverview-tasks-collectionbrowser-toolbar-layout" widgetDefinitionId="com.hybris.cockpitng.borderlayout" slotId="toolbarCenter" template="false">
+                    <widget id="workflowOverview-tasks-fulltext-search" widgetDefinitionId="com.hybris.cockpitng.fulltextsearch" slotId="headerSlot" template="false">
+                        <setting key="fulltextSearchConfigCtxCode" type="String">workflowOverview-tasks-fulltext-search</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <widget id="workflowOverview-tasks-status-chooser" widgetDefinitionId="com.hybris.cockpitng.valueChooser" slotId="centerSlot" template="false">
+                        <setting key="configCtx" type="String">task-status-filter</setting>
+                        <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.enums.WorkflowActionStatus</setting>
+                        <setting key="multiSelection" type="Boolean">false</setting>
+                        <setting key="forceSelection" type="Boolean">true</setting>
+                        <virtual-sockets/>
+                    </widget>
+                    <setting key="widgetStyleClass" type="String">yw-collaboration-center-browser-header-toolbar</setting>
+                    <setting key="westDisabled" type="Boolean">true</setting>
+                    <setting key="eastDisabled" type="Boolean">true</setting>
+                    <setting key="northDisabled" type="Boolean">false</setting>
+                    <setting key="northCollapsible" type="Boolean">false</setting>
+                    <setting key="northSplittable" type="Boolean">false</setting>
+                    <virtual-sockets/>
+                </widget>
+
+                <widget id="workflowOverview-tasks-advancedsearchengine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+                        slotId="cockpitWidgetChildrenInvisible" template="false">
+                    <setting key="defaultPageSize" type="Integer">5</setting>
+                    <virtual-sockets/>
+                </widget>
+
+                <setting key="pagingPosition">bottom</setting>
+                <setting key="hyperlinks" type="Boolean">true</setting>
+                <setting key="collectionBrowserConfigCtx" type="String">workflowOverview-collectionbrowser</setting>
+                <setting key="listTitle" type="String">tasks.listTitle</setting>
+                <setting key="actionSlotComponentId" type="String"></setting>
+                <setting key="colConfigCtxCode" type="String">workflowOverview-browser-listview</setting>
+                <setting key="widgetStyleClass" type="String">yw-collaboration-center-overview-tasks yw-collaboration-center-browser</setting>
+                <setting key="refreshAfterObjectCreation" type="Boolean">true</setting>
+                <setting key="socketDataType_$T" type="String">de.hybris.platform.workflow.model.WorkflowActionModel</setting>
+				<setting key="sendItemsOnSelect" type="Boolean">false</setting>
+            </widget>
+
+            <setting key="widgetStyleClass" type="String">yw-collaboration-center-overview</setting>
+            <virtual-sockets/>
+
+        </widget>
+
+        <setting key="selectWorkflowOverview_eval" type="String" value="'collaborationCenter-workflowOverview-view'"/>
+        <virtual-sockets>
+            <input id="selectWorkflowOverview" type="java.lang.Object"/>
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-extension widgetId="collaboration-center-title-toolbar">
+        <widget id="collaboration-center-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+                slotId="toolbarAfterSlot" template="false">
+            <setting key="widgetStyleClass" type="String">yw-collaboration-center-header-toolbar</setting>
+            <setting key="toolbarActions" type="String">collaboration-center-header-toolbar-actions</setting>
+            <virtual-sockets>
+                <output id="selectView" type="java.lang.String" visibility="default"/>
+            </virtual-sockets>
+        </widget>
+    </widget-extension>
+
+    <widget-extension widgetId="collaborationNavigationHistory">
+
+        <setting key="workflowOverviewSelected_output">selectWorkflowOverview</setting>
+        <virtual-sockets>
+            <input id="workflowOverviewSelected" type="java.lang.Object" visibility="external" />
+            <output id="selectWorkflowOverview" type="java.lang.Object" visibility="external" />
+        </virtual-sockets>
+    </widget-extension>
+
+    <widget-connection sourceWidgetId="collaboration-center-toolbar" outputId="selectView"
+                       targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+    <widget-connection sourceWidgetId="collaboration-center-toolbar" outputId="selectView"
+                       targetWidgetId="collaborationNavigationHistory" inputId="workflowOverviewSelected"/>
+
+    <widget-connection sourceWidgetId="collaborationNavigationHistory" outputId="selectWorkflowOverview"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectWorkflowOverview"/>
+
+    <widget-connection sourceWidgetId="collaboration" outputId="overviewSocket"
+                       targetWidgetId="collaborationViewSwitcher" inputId="selectWorkflowOverview"/>
+
+    <widget-connection sourceWidgetId="collaborationViewSwitcher" outputId="selectedViews"
+                       targetWidgetId="collaborationCenter-task-search-init-filter" inputId="input"/>
+
+    <widget-connection sourceWidgetId="collaborationCenter-task-search-init-filter" outputId="true"
+                       targetWidgetId="collaborationCenter-task-search-init-node" inputId="genericInput"/>
+    <widget-connection sourceWidgetId="collaborationCenter-task-search-init-filter" outputId="true"
+                       targetWidgetId="workflowOverview-workflows-search" inputId="refresh"/>
+
+    <widget-connection sourceWidgetId="collaborationCenter-task-search-init-node" outputId="genericOutput"
+                       targetWidgetId="collaborationCenter-task-search-init" inputId="nodeSelected"/>
+
+    <widget-connection sourceWidgetId="workflowOverview-tasks-status-chooser" outputId="selection"
+                       targetWidgetId="collaborationCenter-task-search-init" inputId="statuses"/>
+
+    <widget-connection sourceWidgetId="collaborationCenter-task-search-init" outputId="context"
+                       targetWidgetId="workflowOverview-tasks-fulltext-search" inputId="initContext"/>
+
+    <widget-connection sourceWidgetId="workflowOverview-tasks-fulltext-search" outputId="searchData"
+                       targetWidgetId="workflowOverview-tasks-advancedsearchengine" inputId="searchData"/>
+
+    <widget-connection sourceWidgetId="workflowOverview-tasks-fulltext-search" outputId="searchContextChanged"
+                       targetWidgetId="workflowOverview-tasks-advancedsearchengine" inputId="changeSearchContext"/>
+
+    <widget-connection sourceWidgetId="workflowOverview-tasks-advancedsearchengine" outputId="pageable"
+                       targetWidgetId="workflowOverview-tasks-collectionbrowser" inputId="pageable"/>
+
+    <widget-connection sourceWidgetId="workflowOverview-workflows-collectionbrowser" outputId="showFlow" targetWidgetId="workflowOverview-workflows-flow-presentation" inputId="initData"/>
+    <widget-connection sourceWidgetId="workflowOverview-workflows-search" outputId="result"
+                       targetWidgetId="workflowOverview-workflows-collectionbrowser" inputId="pageable"/>
+    <widget-connection sourceWidgetId="workflowOverview-workflows-search-statuses" outputId="selection"
+                       targetWidgetId="workflowOverview-workflows-search" inputId="statuses"/>
+
+</widgets>

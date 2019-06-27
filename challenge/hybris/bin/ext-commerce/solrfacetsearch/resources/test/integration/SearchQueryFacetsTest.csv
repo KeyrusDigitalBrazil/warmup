@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+INSERT_UPDATE Catalog;id[unique=true]
+;hwcatalog${testId}
+
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];languages(isocode);active
+;hwcatalog${testId};Online${testId};en;true
+;hwcatalog${testId};Staged${testId};en;false
+
+INSERT_UPDATE Product;code[unique=true];name;approvalStatus(code);catalogversion(catalog(id),version)[unique=true]
+;product1;product 1 name;approved;hwcatalog${testId}:Online${testId}
+;product2;product 2 name;approved;hwcatalog${testId}:Online${testId}
+;product1;product 1 name;check;hwcatalog${testId}:Staged${testId}
+;product2;product 2 name;unapproved;hwcatalog${testId}:Staged${testId}
+
+INSERT_UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true];name[unique=true];type(code);fieldValueProvider;valueProviderParameters[map-delimiter=|]
+;testIndexedType${testId};code;string;modelAttributesValueResolver;attribute->code
+;testIndexedType${testId};name;string;modelAttributesValueResolver;attribute->name
+;testIndexedType${testId};"name, 1766";string;modelAttributesValueResolver;attribute->name
+;testIndexedType${testId};approvalStatus;string;modelAttributesValueResolver;attribute->approvalStatus.code|evaluateExpression->true
+;testIndexedType${testId};"manufacturer name, 1766";string;modelAttributesValueResolver;attribute->manufacturerName
+
+INSERT_UPDATE SolrFacetSearchConfig;name[unique=true];catalogVersions(catalog(id),version)
+;testFacetSearchConfig${testId};hwcatalog${testId}:Online${testId},hwcatalog${testId}:Staged${testId}

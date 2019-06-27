@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="abstractPopulatorList" class="de.hybris.platform.converters.impl.DefaultPopulatorList" abstract="true" />
+	<bean id="abstractConfigurableConverter" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableConverter" abstract="true" >
+		<property name="defaultOptions" value="BASE" />
+	</bean>
+
+	<bean id="abstractSubtypeConverter" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableSubtypeConverter" abstract="true" parent="abstractConfigurableConverter" />
+	
+	
+	<!-- populators -->
+
+	<bean id="variationPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$BasePopulator"></bean>
+
+	<bean id="variationWithTriggerPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$VariationPopulator">
+		<property name="triggerConverter" ref="triggerConverter" />
+	</bean>
+
+	<bean id="segmentPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$BasePopulator"></bean>
+
+	<bean id="segmentWithTriggerPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$SegmentPopulator">
+		<property name="segmentTriggerConverter" ref="segmentTriggerConverter" />
+	</bean>
+
+	<bean id="classificationPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$BasePopulator"></bean>
+	<bean id="classificationWithTriggerPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$ClassificationPopulator">
+		<property name="classificationTriggerConverter" ref="classificationTriggerConverter" />
+	</bean>
+	<bean id="triggerPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$BasePopulator"></bean>
+	<bean id="triggerWithVariationPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerPopulator">
+		<property name="variationConverter" ref="variationConverter" />
+	</bean>
+	<bean id="segmentTriggerWithSegmentPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$SegmentTriggerPopulator">
+		<property name="segmentConverter" ref="segmentConverter" />
+		</bean>
+	<bean id="classificationTriggerWithClassificationPopulator"
+		class="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$ClassificationTriggerPopulator">
+		<property name="classificationConverter" ref="classificationConverter" />
+	</bean>
+		
+	<!-- populator lists -->
+
+	<bean id="variationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="variationPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="fullVariationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="variationPopulator" />
+				<ref bean="variationWithTriggerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="variationFromTriggerPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="variationPopulator" />
+			</list>
+		</property>
+	</bean>	
+		
+	<bean id="segmentPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="segmentPopulator" />
+				<ref bean="segmentWithTriggerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="segmentFromTriggerPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="segmentPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="classificationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="classificationPopulator" />
+				<ref bean="classificationWithTriggerPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="classificationFromTriggerPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="classificationPopulator" />
+			</list>
+		</property>
+	</bean>	
+		
+	<bean id="triggerPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="triggerFromVariationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	
+	
+	<bean id="segmentTriggerFromVariationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+				<ref bean="segmentTriggerWithSegmentPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="classificationTriggerFromVariationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+				<ref bean="classificationTriggerWithClassificationPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="segmentTriggerFromSegmentPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+				<ref bean="triggerWithVariationPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<bean id="classificationTriggerFromClassificationPopulators" parent="abstractPopulatorList">
+		<property name="populators">
+			<list>
+				<ref bean="triggerPopulator" />
+				<ref bean="triggerWithVariationPopulator" />
+			</list>
+		</property>
+	</bean>	
+	
+	<!-- converters -->
+	
+	<bean id="variationConverter" parent="abstractConfigurableConverter" >
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$VariationDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="variationPopulators" />
+			<entry key="FULL" value-ref="fullVariationPopulators" />
+			<entry key="FROM_TRIGGER" value-ref="variationFromTriggerPopulators" />
+		</map>
+		</property>
+	</bean>
+
+	<bean id="segmentConverter" parent="abstractConfigurableConverter" >
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$SegmentDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="segmentPopulators" />
+			<entry key="FROM_TRIGGER" value-ref="segmentFromTriggerPopulators" />
+		</map>
+		</property>
+	</bean>
+	
+	<bean id="classificationConverter" parent="abstractConfigurableConverter" >
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$ClassificationDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="classificationPopulators" />
+			<entry key="FROM_TRIGGER" value-ref="classificationFromTriggerPopulators" />
+		</map>
+		</property>
+	</bean>
+	
+	<!-- subtype converter -->
+	
+	
+	<bean id="baseTriggerConverter" parent="abstractSubtypeConverter" >
+		<constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerPopulators" />
+		<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerModel" />
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="triggerPopulators" />
+			<entry key="FROM_VARIATION" value-ref="triggerFromVariationPopulators" />
+		</map>
+		</property>
+	</bean>
+
+	<bean id="segmentTriggerConverter" parent="abstractSubtypeConverter" >
+		<constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerPopulators" />
+		<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$SegmentTriggerModel" />
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$SegmentTriggerDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="triggerPopulators" />
+			<entry key="FROM_VARIATION" value-ref="segmentTriggerFromVariationPopulators" />			
+			<entry key="FROM_SEGMENT" value-ref="segmentTriggerFromSegmentPopulators" />			
+		</map>
+		</property>
+	</bean>
+	
+	<bean id="classificationTriggerConverter" parent="abstractSubtypeConverter" >
+		<constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerPopulators" />
+		<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$ClassificationTriggerModel" />
+		<property name="targetClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$ClassificationTriggerDto" />
+		<property name="populators">
+		<map>
+			<entry key="BASE" value-ref="triggerPopulators" />
+			<entry key="FROM_VARIATION" value-ref="classificationTriggerFromVariationPopulators" />
+			<entry key="FROM_CLASSIFICATION" value-ref="classificationTriggerFromClassificationPopulators" />		
+		</map>
+		</property>
+	</bean>
+	
+	<bean id="triggerConverter" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableSubtypeAwareConverter">
+		<property name="defaultOptions" value="BASE" />
+		<property name="markerClass" value="de.hybris.platform.personalizationfacades.converters.ConfigurableConvertersTest$TriggerPopulators" />
+	</bean>
+	
+</beans>

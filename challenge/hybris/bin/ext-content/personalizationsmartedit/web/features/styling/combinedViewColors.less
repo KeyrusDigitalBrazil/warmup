@@ -1,0 +1,42 @@
+@combinedViewColorsNumber: @colorsNumber;
+@combinedViewColorsIndex: @index;
+@combinedViewColorsIncrement: @increment;
+
+.personalizationsmarteditComponentSelected {
+    border: 5px;
+    border-style: solid;
+    border-color: @blue;
+}
+
+.personalizationsmarteditComponentSelectedList {
+    color: @text-color-white;
+    width: @combinedview__letter--width;
+    height: @combinedview__letter--height; //to make sure it stays within a small component border
+    padding-top: 10px;
+    font-size: 20px;
+    text-align: center;
+    display: inline-block;
+}
+
+.define(@var) {
+    @personalizationCombinedViewColor: 'personalizationComponentColor@{var}';
+}
+.generate-border-colors (@combinedViewColorsIndex) when (@combinedViewColorsIndex <= @combinedViewColorsNumber) {
+    .personalizationsmarteditComponentSelected@{combinedViewColorsIndex} {
+        &:extend(.personalizationsmarteditComponentSelected);
+        .define(@combinedViewColorsIndex);
+        border-color: @@personalizationCombinedViewColor;
+    }
+    .generate-border-colors(@combinedViewColorsIndex + @combinedViewColorsIncrement);
+}
+.generate-border-colors(@combinedViewColorsIndex);
+
+.generate-background-colors (@combinedViewColorsIndex) when (@combinedViewColorsIndex <= @combinedViewColorsNumber) {
+    .personalizationsmarteditComponentSelectedList@{combinedViewColorsIndex} {
+        &:extend(.personalizationsmarteditComponentSelectedList);
+        .define(@combinedViewColorsIndex);
+        background: @@personalizationCombinedViewColor;
+    }
+    .generate-background-colors(@combinedViewColorsIndex + @combinedViewColorsIncrement);
+}
+.generate-background-colors(@combinedViewColorsIndex);

@@ -1,0 +1,269 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=marketplaceContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+$picture=media(code, $contentCV);
+
+# Vendor1 Product catalog
+$vendor1ProductCatalog=vendor1ProductCatalog
+$vendor1ProductCV=catalogversion(catalog(id[default=$vendor1ProductCatalog]),version[default='Online'])[unique=true,default=$vendor1ProductCatalog:Online]
+
+# Vendor2 Product catalog
+$vendor2ProductCatalog=vendor2ProductCatalog
+$vendor2ProductCV=catalogversion(catalog(id[default=$vendor2ProductCatalog]),version[default='Online'])[unique=true,default=$vendor2ProductCatalog:Online]
+
+# Vendor3 Product catalog
+$vendor3ProductCatalog=vendor3ProductCatalog
+$vendor3ProductCV=catalogversion(catalog(id[default=$vendor3ProductCatalog]),version[default='Online'])[unique=true,default=$vendor3ProductCatalog:Online]
+
+# Vendor4 Product catalog
+$vendor4ProductCatalog=vendor4ProductCatalog
+$vendor4ProductCV=catalogversion(catalog(id[default=$vendor4ProductCatalog]),version[default='Online'])[unique=true,default=$vendor4ProductCatalog:Online]
+
+# Vendor5 Product catalog
+$vendor5ProductCatalog=vendor5ProductCatalog
+$vendor5ProductCV=catalogversion(catalog(id[default=$vendor5ProductCatalog]),version[default='Online'])[unique=true,default=$vendor5ProductCatalog:Online]
+
+# Vendor6 Product catalog
+$vendor6ProductCatalog=vendor6ProductCatalog
+$vendor6ProductCV=catalogversion(catalog(id[default=$vendor6ProductCatalog]),version[default='Online'])[unique=true,default=$vendor6ProductCatalog:Online]
+
+# Vendorsed7 Product catalog
+$vendor7ProductCatalog=vendor7ProductCatalog
+$vendor7ProductCV=catalogversion(catalog(id[default=$vendor7ProductCatalog]),version[default='Online'])[unique=true,default=$vendor7ProductCatalog:Online]
+$vendor7Media=media(code, $vendor7ProductCV);
+
+# Vendorsed8 Product catalog
+$vendor8ProductCatalog=vendor8ProductCatalog
+$vendor8ProductCV=catalogversion(catalog(id[default=$vendor8ProductCatalog]),version[default='Online'])[unique=true,default=$vendor8ProductCatalog:Online]
+$vendor8Media=media(code, $vendor8ProductCV);
+
+######## Start: Marketplace site home page hot vendor product carousels ########
+
+# Vendor7 Product Carousel Component in Homepage
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor7ProductCV);scroll(code);popup;&componentRef;$vendor7Media;url
+;;MarketplaceHomepageVendor7ProductCarouselComponent;Marketplace Homepage Vendor7 Product Carousel;vendor7_4135570,vendor7_429430,vendor7_442466,vendor7_23355,vendor7_454831,vendor7_458542,vendor7_2934303,vendor7_2938457,vendor7_107701,vendor7_110561,vendor7_1231346,vendor7_2278102,vendor7_1291399,vendor7_1297878,vendor7_2934297,vendor7_2934302;allVisible;false;MarketplaceHomepageVendor7ProductCarouselComponent;PhotoGears_300x300_Logo.png;v/vendor7
+
+# Vendor8 Product Carousel Component in Homepage
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor8ProductCV);scroll(code);popup;&componentRef;$vendor8Media;url
+;;MarketplaceHomepageVendor8ProductCarouselComponent;Marketplace Homepage Vendor8 Product Carousel;vendor8_1322031,vendor8_1322041,vendor8_1641905,vendor8_2336001,vendor8_2336002,vendor8_2336004,vendor8_4205431,vendor8_4205436,vendor8_443175,vendor8_1981412,vendor8_1981413,vendor8_1981414,vendor8_1981415,vendor8_4528140,vendor8_553637,vendor8_560583;allVisible;false;MarketplaceHomepageVendor8ProductCarouselComponent;DigitalLife_300x300_Logo.png;v/vendor8
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section3Slot-Homepage;MarketplaceHomepageVendor7ProductCarouselComponent,MarketplaceHomepageVendor8ProductCarouselComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section3-Homepage;Section3;;Section3Slot-Homepage
+
+######## End: Marketplace site home page hot vendor product carousels ########
+
+
+######## Start: Vendor Landing Pages ###########
+
+INSERT_UPDATE VendorPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved']
+;;default_landing_page;Default Landing Page;VendorLandingPageTemplate;true;
+;;vendor1_landing_page;Vendor1 Landing Page;VendorLandingPageTemplate;false;
+;;vendor2_landing_page;Vendor2 Landing Page;VendorLandingPageTemplate;false;
+;;vendor3_landing_page;Vendor3 Landing Page;VendorLandingPageTemplate;false;
+;;vendor4_landing_page;Vendor4 Landing Page;VendorLandingPageTemplate;false;
+;;vendor5_landing_page;Vendor5 Landing Page;VendorLandingPageTemplate;false;
+;;vendor6_landing_page;Vendor6 Landing Page;VendorLandingPageTemplate;false;
+;;vendor7_landing_page;Vendor7 Landing Page;VendorLandingPageTemplate;false;
+;;vendor8_landing_page;Vendor8 Landing Page;VendorLandingPageTemplate;false;
+
+# Vendor Page Restriction
+INSERT_UPDATE CMSVendorRestriction;$contentCV[unique=true];uid[unique=true];name;pages(uid, $contentCV);vendor(code)
+;;Vendor1-LandingPageRestriction;Restriction for Vendor1;vendor1_landing_page;vendor1
+;;Vendor2-LandingPageRestriction;Restriction for Vendor2;vendor2_landing_page;vendor2
+;;Vendor3-LandingPageRestriction;Restriction for Vendor3;vendor3_landing_page;vendor3
+;;Vendor4-LandingPageRestriction;Restriction for Vendor4;vendor4_landing_page;vendor4
+;;Vendor5-LandingPageRestriction;Restriction for Vendor5;vendor5_landing_page;vendor5
+;;Vendor6-LandingPageRestriction;Restriction for Vendor6;vendor6_landing_page;vendor6
+;;vendor7-LandingPageRestriction;Restriction for vendor7;vendor7_landing_page;vendor7
+;;vendor8-LandingPageRestriction;Restriction for vendor8;vendor8_landing_page;vendor8
+
+#Insert Vendor Categories Component
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;DefaultVendorCategoriesComponent;Default Categories Component;/WEB-INF/views/addons/marketplaceaddon/responsive/pages/store/storeVendorCategoriesPage.jsp;;DefaultVendorCategoriesComponent
+
+#Insert Vendor Logo Component
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;DefaultVendorLogoComponent;Default Logo Component;/WEB-INF/views/addons/marketplaceaddon/responsive/pages/store/storeVendorLogoPage.jsp;;DefaultVendorLogoComponent
+;;ActiveVendorsIndexComponent;Active Vendors Index Component;/WEB-INF/views/addons/marketplaceaddon/responsive/pages/store/vendorIndexPage.jsp;;ActiveVendorsIndexComponent
+
+# Landing page banner components
+INSERT_UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;$picture
+;;ResponsiveImageBannerBargainSale_EN;Responsive Image Banner Bargain Sale EN;ResponsiveImageBannerBargainSale_EN;B2C_BargainSaleHeroImage_960x330.jpg
+;;ResponsiveImageBannerNewProducts_EN;Responsive Image Banner New Products EN;ResponsiveImageBannerNewProducts_EN;B2C_NewProductsHeroImage_960x330.jpg
+;;ResponsiveImageBannerVendor1NewProducts_EN;Responsive Image Banner Vendor1 New Products EN;ResponsiveImageBannerVendor1NewProducts_EN;Vendor1_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor1BargainSaleHero_EN;Responsive Image Banner Vendor1 New Products EN;ResponsiveImageBannerVendor1BargainSaleHero_EN;Vendor1_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor2NewProducts_EN;Responsive Image Banner Vendor2 New Products EN;ResponsiveImageBannerVendor2NewProducts_EN;Vendor2_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor2BargainSaleHero_EN;Responsive Image Banner Vendor2 New Products EN;ResponsiveImageBannerVendor2BargainSaleHero_EN;Vendor2_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor3NewProducts_EN;Responsive Image Banner Vendor3 New Products EN;ResponsiveImageBannerVendor3NewProducts_EN;Vendor3_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor3BargainSaleHero_EN;Responsive Image Banner Vendor3 New Products EN;ResponsiveImageBannerVendor3BargainSaleHero_EN;Vendor3_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor4NewProducts_EN;Responsive Image Banner Vendor4 New Products EN;ResponsiveImageBannerVendor4NewProducts_EN;Vendor4_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor4BargainSaleHero_EN;Responsive Image Banner Vendor4 New Products EN;ResponsiveImageBannerVendor4BargainSaleHero_EN;Vendor4_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor5NewProducts_EN;Responsive Image Banner Vendor5 New Products EN;ResponsiveImageBannerVendor5NewProducts_EN;Vendor5_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor5BargainSaleHero_EN;Responsive Image Banner Vendor5 New Products EN;ResponsiveImageBannerVendor5BargainSaleHero_EN;Vendor5_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor6NewProducts_EN;Responsive Image Banner Vendor6 New Products EN;ResponsiveImageBannerVendor6NewProducts_EN;Vendor6_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor6BargainSaleHero_EN;Responsive Image Banner Vendor6 New Products EN;ResponsiveImageBannerVendor6BargainSaleHero_EN;Vendor6_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor7NewProducts_EN;Responsive Image Banner Vendor7 New Products EN;ResponsiveImageBannerVendor7NewProducts_EN;Vendor7_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor7BargainSaleHero_EN;Responsive Image Banner Vendor7 New Products EN;ResponsiveImageBannerVendor7BargainSaleHero_EN;Vendor7_BargainSaleHero_960x330.jpg
+;;ResponsiveImageBannerVendor8NewProducts_EN;Responsive Image Banner Vendor8 New Products EN;ResponsiveImageBannerVendor8NewProducts_EN;Vendor8_NewProducts_960x330.jpg
+;;ResponsiveImageBannerVendor8BargainSaleHero_EN;Responsive Image Banner Vendor8 New Products EN;ResponsiveImageBannerVendor8BargainSaleHero_EN;Vendor8_BargainSaleHero_960x330.jpg
+
+# Landing page banner components
+INSERT_UPDATE RotatingImagesComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;banners(&componentRef)[mode=append]
+;;Vendor1LandingPageRatatingImagesComponent;Vendor1 Landing Page Rotating Images;Vendor1LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor1NewProducts_EN,ResponsiveImageBannerVendor1BargainSaleHero_EN
+;;Vendor2LandingPageRatatingImagesComponent;Vendor2 Landing Page Rotating Images;Vendor2LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor2NewProducts_EN,ResponsiveImageBannerVendor2BargainSaleHero_EN
+;;Vendor3LandingPageRatatingImagesComponent;Vendor3 Landing Page Rotating Images;Vendor3LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor3NewProducts_EN,ResponsiveImageBannerVendor3BargainSaleHero_EN
+;;Vendor4LandingPageRatatingImagesComponent;Vendor4 Landing Page Rotating Images;Vendor4LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor4NewProducts_EN,ResponsiveImageBannerVendor4BargainSaleHero_EN
+;;Vendor5LandingPageRatatingImagesComponent;Vendor5 Landing Page Rotating Images;Vendor5LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor5NewProducts_EN,ResponsiveImageBannerVendor5BargainSaleHero_EN
+;;Vendor6LandingPageRatatingImagesComponent;Vendor6 Landing Page Rotating Images;Vendor6LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor6NewProducts_EN,ResponsiveImageBannerVendor6BargainSaleHero_EN
+;;Vendor7LandingPageRatatingImagesComponent;Vendor7 Landing Page Rotating Images;Vendor7LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor7NewProducts_EN,ResponsiveImageBannerVendor7BargainSaleHero_EN
+;;Vendor8LandingPageRatatingImagesComponent;Vendor8 Landing Page Rotating Images;Vendor8LandingPageRatatingImagesComponent;ResponsiveImageBannerVendor8NewProducts_EN,ResponsiveImageBannerVendor8BargainSaleHero_EN
+
+# Vendor1 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor1ProductCV);scroll(code);popup;&componentRef
+;;vendor1_Vendor1LandingPageProductCarouselComponent;Vendor1LandingPageProductCarouselComponent;Vendor1 Landing Page Product Carousel;vendor1_31095020,vendor1_33164820,vendor1_32756998,vendor1_30856843,vendor1_32756557,vendor1_33228002,vendor1_30390161,vendor1_30375367,vendor1_30576533,vendor1_26289661,vendor1_29718340;allVisible;false;vendor1_Vendor1LandingPageProductCarouselComponent
+;;vendor1_NewVendor1LandingPageProductCarouselComponent;NewVendor1LandingPageProductCarouselComponent;What's New Vendor1 Landing Page Product Carousel;vendor1_30690963,vendor1_29891068,vendor1_32014480,vendor1_32007771,vendor1_32826888,vendor1_30812305,vendor1_32300899,vendor1_32299214,vendor1_32007778,vendor1_30812097,vendor1_30810569;allVisible;false;vendor1_NewVendor1LandingPageProductCarouselComponent
+
+# Vendor2 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor2ProductCV);scroll(code);popup;&componentRef
+;;vendor2_Vendor2LandingPageProductCarouselComponent;Vendor2LandingPageProductCarouselComponent;Vendor2 Landing Page Product Carousel;vendor2_26416725,vendor2_22327706,vendor2_32351385,vendor2_33381732,vendor2_29954561,vendor2_29954562,vendor2_33689257,vendor2_33438149;allVisible;false;vendor2_Vendor2LandingPageProductCarouselComponent
+;;vendor2_NewVendor2LandingPageProductCarouselComponent;NewVendor2LandingPageProductCarouselComponent;What's New Vendor2 Landing Page Product Carousel;vendor2_33438147,vendor2_24495842,vendor2_24495844,vendor2_25873091,vendor2_29634940,vendor2_27033003,vendor2_33125637,vendor2_33125638;allVisible;false;vendor2_NewVendor2LandingPageProductCarouselComponent
+
+# Vendor3 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor3ProductCV);scroll(code);popup;&componentRef
+;;vendor3_Vendor3LandingPageProductCarouselComponent;Vendor3LandingPageProductCarouselComponent;Vendor3 Landing Page Product Carousel;vendor3_27235695,vendor3_29537253,vendor3_19528839,vendor3_18063038,vendor3_24556149,vendor3_27214088,vendor3_11747455,vendor3_27104363;allVisible;false;vendor3_Vendor3LandingPageProductCarouselComponent
+;;vendor3_NewVendor3LandingPageProductCarouselComponent;NewVendor3LandingPageProductCarouselComponent;What's New Vendor3 Landing Page Product Carousel;vendor3_31119770,vendor3_31119771,vendor3_17617211,vendor3_31080879,vendor3_31081082,vendor3_31084078,vendor3_31254523,vendor3_31084108;allVisible;false;vendor3_NewVendor3LandingPageProductCarouselComponent
+
+# Vendor4 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor4ProductCV);scroll(code);popup;&componentRef
+;;vendor4_Vendor4LandingPageProductCarouselComponent;Vendor4LandingPageProductCarouselComponent;Vendor4 Landing Page Product Carousel;vendor4_28479725,vendor4_32047374,vendor4_14844785,vendor4_22641907,vendor4_21742564,vendor4_10791863,vendor4_27275785,vendor4_10791863;allVisible;false;vendor4_Vendor4LandingPageProductCarouselComponent
+;;vendor4_NewVendor4LandingPageProductCarouselComponent;NewVendor4LandingPageProductCarouselComponent;What's New Vendor4 Landing Page Product Carousel;vendor4_27275785,vendor4_32047426,vendor4_30521525,vendor4_22641907,vendor4_29282721,vendor4_27213440,vendor4_24411634,vendor4_21319807;allVisible;false;vendor4_NewVendor4LandingPageProductCarouselComponent
+
+# Vendor5 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor5ProductCV);scroll(code);popup;&componentRef
+;;vendor5_Vendor5LandingPageProductCarouselComponent;Vendor5LandingPageProductCarouselComponent;Vendor5 Landing Page Product Carousel;vendor5_300046028,vendor5_300046029,vendor5_300046030,vendor5_300046031,vendor5_300046032,vendor5_300046033,vendor5_300046035,vendor5_300067366,vendor5_300067367,vendor5_300067368;allVisible;false;vendor5_Vendor5LandingPageProductCarouselComponent
+;;vendor5_NewVendor5LandingPageProductCarouselComponent;NewVendor5LandingPageProductCarouselComponent;What's New Vendor5 Landing Page Product Carousel;vendor5_300067369,vendor5_300067371,vendor5_300067372,vendor5_300052678,vendor5_300076093,vendor5_300076094,vendor5_300399602,vendor5_300399603,vendor5_300399600,vendor5_300399601,vendor5_300399590;allVisible;false;vendor5_NewVendor5LandingPageProductCarouselComponent
+
+# Vendor6 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor6ProductCV);scroll(code);popup;&componentRef
+;;vendor6_Vendor6LandingPageProductCarouselComponent;Vendor6LandingPageProductCarouselComponent;Vendor6 Landing Page Product Carousel;vendor6_300610919,vendor6_300613861,vendor6_300614881,vendor6_300610925,vendor6_300611156,vendor6_300613800,vendor6_300389772,vendor6_300613859,vendor6_300617559,vendor6_300385272,vendor6_300619188;allVisible;false;vendor6_Vendor6LandingPageProductCarouselComponent
+;;vendor6_NewVendor6LandingPageProductCarouselComponent;NewVendor6LandingPageProductCarouselComponent;What's New Vendor6 Landing Page Product Carousel;vendor6_300786274,vendor6_300786276,vendor6_300786275,vendor6_300786277,vendor6_300610920,vendor6_300610921,vendor6_300610922,vendor6_300610925,vendor6_300610926,vendor6_300610923;allVisible;false;vendor6_NewVendor6LandingPageProductCarouselComponent
+
+# Vendor7 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor7ProductCV);scroll(code);popup;&componentRef
+;;vendor7_Vendor7LandingPageProductCarouselComponent;Vendor7LandingPageProductCarouselComponent;Vendor7 Landing Page Product Carousel;vendor7_107701,vendor7_110561,vendor7_1231346,vendor7_2278102,vendor7_1291399,vendor7_1297878,vendor7_2934297,vendor7_2934302;allVisible;false;vendor7_Vendor7LandingPageProductCarouselComponent
+;;vendor7_NewVendor7LandingPageProductCarouselComponent;NewVendor7LandingPageProductCarouselComponent;What's New Vendor7 Landing Page Product Carousel;vendor7_4135570,vendor7_429430,vendor7_442466,vendor7_23355,vendor7_454831,vendor7_458542,vendor7_2934303,vendor7_2938457;allVisible;false;vendor7_NewVendor7LandingPageProductCarouselComponent
+
+# Vendor8 landing page carousel components
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];vendorCarouselCode;name;products(code,$vendor8ProductCV);scroll(code);popup;&componentRef
+;;vendor8_Vendor8LandingPageProductCarouselComponent;Vendor8LandingPageProductCarouselComponent;Vendor8 Landing Page Product Carousel;vendor8_1322031,vendor8_1322041,vendor8_1641905,vendor8_726510,vendor8_2336001,vendor8_1981415,vendor8_4528140,vendor8_553637,vendor8_560583;allVisible;false;vendor8_Vendor8LandingPageProductCarouselComponent
+;;vendor8_NewVendor8LandingPageProductCarouselComponent;NewVendor8LandingPageProductCarouselComponent;What's New Vendor8 Landing Page Product Carousel;vendor8_4812254,vendor8_572461,vendor8_726510,vendor8_784343,vendor8_1934795,vendor8_4852405,vendor8_4868199,vendor8_4869234,vendor8_4872010,vendor8_4873607,vendor8_695824,vendor8_897853;allVisible;false;vendor8_NewVendor8LandingPageProductCarouselComponent
+
+
+# Create side content and body content slot for vendor landing page
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;BodyContentSlot-vendor1-Section2A;Content Slot for Vendor1 Banner;true;Vendor1LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor1-Section3;Content Slot for Vendor1 Carousel;true;vendor1_Vendor1LandingPageProductCarouselComponent,vendor1_NewVendor1LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor2-Section2A;Content Slot for Vendor2 Banner;true;Vendor2LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor2-Section3;Content Slot for Vendor2 Carousel;true;vendor2_Vendor2LandingPageProductCarouselComponent,vendor2_NewVendor2LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor3-Section2A;Content Slot for Vendor3 Banner;true;Vendor3LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor3-Section3;Content Slot for Vendor3 Carousel;true;vendor3_Vendor3LandingPageProductCarouselComponent,vendor3_NewVendor3LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor4-Section2A;Content Slot for Vendor4 Banner;true;Vendor4LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor4-Section3;Content Slot for Vendor4 Carousel;true;vendor4_Vendor4LandingPageProductCarouselComponent,vendor4_NewVendor4LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor5-Section2A;Content Slot for Vendor5 Banner;true;Vendor5LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor5-Section3;Content Slot for Vendor5 Carousel;true;vendor5_Vendor5LandingPageProductCarouselComponent,vendor5_NewVendor5LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor6-Section2A;Content Slot for Vendor6 Banner;true;Vendor6LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor6-Section3;Content Slot for Vendor6 Carousel;true;vendor6_Vendor6LandingPageProductCarouselComponent,vendor6_NewVendor6LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor7-Section2A;Content Slot for Vendor7 Banner;true;Vendor7LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor7-Section3;Content Slot for Vendor7 Carousel;true;vendor7_Vendor7LandingPageProductCarouselComponent,vendor7_NewVendor7LandingPageProductCarouselComponent
+;;BodyContentSlot-vendor8-Section2A;Content Slot for Vendor8 Banner;true;Vendor8LandingPageRatatingImagesComponent
+;;BodyContentSlot-vendor8-Section3;Content Slot for Vendor8 Carousel;true;vendor8_Vendor8LandingPageProductCarouselComponent,vendor8_NewVendor8LandingPageProductCarouselComponent
+
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;VendorLeftBodySlot;Default Left Side Content Slot;true;DefaultVendorLogoComponent,DefaultVendorCategoriesComponent
+
+
+#### VendorIndexPage
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;VendorGridSlot;Vendor Grid Slot;true;ActiveVendorsIndexComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor1_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor1-banner-Marketplace;Section2A;;BodyContentSlot-vendor1-Section2A;;;
+;;BodyContent-vendor1-carousel;Section3;;BodyContentSlot-vendor1-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor2_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor2-banner-Marketplace;Section2A;;BodyContentSlot-vendor2-Section2A;;;
+;;BodyContent-vendor2-carousel;Section3;;BodyContentSlot-vendor2-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor3_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor3-banner-Marketplace;Section2A;;BodyContentSlot-vendor3-Section2A;;;
+;;BodyContent-vendor3-carousel;Section3;;BodyContentSlot-vendor3-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor4_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor4-banner-Marketplace;Section2A;;BodyContentSlot-vendor4-Section2A;;;
+;;BodyContent-vendor4-carousel;Section3;;BodyContentSlot-vendor4-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor5_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor5-banner-Marketplace;Section2A;;BodyContentSlot-vendor5-Section2A;;;
+;;BodyContent-vendor5-carousel;Section3;;BodyContentSlot-vendor5-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor6_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor6-banner-Marketplace;Section2A;;BodyContentSlot-vendor6-Section2A;;;
+;;BodyContent-vendor6-carousel;Section3;;BodyContentSlot-vendor6-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor7_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor7-banner-Marketplace;Section2A;;BodyContentSlot-vendor7-Section2A;;;
+;;BodyContent-vendor7-carousel;Section3;;BodyContentSlot-vendor7-Section3;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='vendor8_landing_page'];contentSlot(uid,$contentCV)[unique=true];;;
+;;BodyContent-vendor8-banner-Marketplace;Section2A;;BodyContentSlot-vendor8-Section2A;;;
+;;BodyContent-vendor8-carousel;Section3;;BodyContentSlot-vendor8-Section3;;;
+
+###### Vendor Landing Page End ######
+
+
+# Homepage Tabbed Product Carousel #
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor1ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor1TabbedCarouselComponent;Marketplace Homepage Vendor1 Product Carousel;vendor1_32007778,vendor1_30375367,vendor1_33164820,vendor1_30690963,vendor1_32756557,vendor1_32756998,vendor1_33228002,vendor1_30576533,vendor1_32014480,vendor1_32299214,vendor1_29891068,vendor1_32007771;allVisible;false;MarketplaceHomepageVendor1TabbedCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor2ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor2TabbedCarouselComponent;Marketplace Homepage Vendor2 Product Carousel;vendor2_29954561,vendor2_29954562,vendor2_33381732,vendor2_26416725,vendor2_33689257,vendor2_33125638,vendor2_33125637,vendor2_29634940,vendor2_32351385,vendor2_22327706;allVisible;false;MarketplaceHomepageVendor2TabbedCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor3ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor3TabbedCarouselComponent;Marketplace Homepage Vendor3 Product Carousel;vendor3_18063038,vendor3_31119771,vendor3_31119770,vendor3_27235695,vendor3_17617211,vendor3_31080879,vendor3_19528839,vendor3_11747455,vendor3_29537253;allVisible;false;MarketplaceHomepageVendor3TabbedCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor5ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor5TabbedCarouselComponent;Marketplace Homepage Vendor5 Product Carousel;vendor5_300046031,vendor5_300046035,vendor5_300067368,vendor5_300067371,vendor5_300399588,vendor5_300399602,vendor5_300615225,vendor5_300717315,vendor5_74818_sky_blue,vendor5_74825_gunship;allVisible;false;MarketplaceHomepageVendor5TabbedCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor6ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor6TabbedCarouselComponent;Marketplace Homepage Vendor6 Product Carousel;vendor6_300786276,vendor6_300611156,vendor6_300613800,vendor6_300617559,vendor6_300614882,vendor6_300389774,vendor6_300389779,vendor6_300619188,vendor6_300202725,vendor6_300610921;allVisible;false;MarketplaceHomepageVendor6TabbedCarouselComponent
+
+INSERT_UPDATE ProductCarouselComponent;$contentCV[unique=true];uid[unique=true];name;products(code,$vendor7ProductCV);scroll(code);popup;&componentRef
+;;MarketplaceHomepageVendor7TabbedCarouselComponent;Marketplace Homepage Vendor7 Product Carousel;vendor7_816324,vendor7_1997551,vendor7_779841,vendor7_458542,vendor7_2231913,vendor7_289540,vendor7_1934406,vendor7_1291399,vendor7_1432722,vendor7_1297878,vendor7_2934302;allVisible;false;MarketplaceHomepageVendor7TabbedCarouselComponent
+
+
+# CMS Tab Paragraph Container Component
+INSERT_UPDATE CMSTabParagraphContainer;$contentCV[unique=true];uid[unique=true];name;visible;simpleCMSComponents(uid, $contentCV);&componentRef
+;;MarketplaceHomepageElectronicsTabContainer;Marketplace Homepage Electronics House Tab container;true;MarketplaceHomepageVendor7TabbedCarouselComponent,MarketplaceHomepageVendor1TabbedCarouselComponent,MarketplaceHomepageVendor2TabbedCarouselComponent,MarketplaceHomepageVendor3TabbedCarouselComponent;MarketplaceHomepageElectronicsTabContainer
+;;MarketplaceHomepageFashionTabContainer;Marketplace Homepage Fashion House Tab container;true;MarketplaceHomepageVendor5TabbedCarouselComponent,MarketplaceHomepageVendor6TabbedCarouselComponent;MarketplaceHomepageFashionTabContainer
+
+# CMS Paragraph Component (Tab Container Title)
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;ElectronicsTabContainerTitleComponent;Electronics House Tab Container Title;ElectronicsTabContainerTitleComponent
+;;FashionTabContainerTitleComponent;Fashion House Tab Container Title;FashionTabContainerTitleComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)[mode=append]
+;;Section3Slot-Homepage;Section3 Slot for Homepage;true;ElectronicsTabContainerTitleComponent,MarketplaceHomepageElectronicsTabContainer,FashionTabContainerTitleComponent,MarketplaceHomepageFashionTabContainer

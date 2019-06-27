@@ -1,0 +1,42 @@
+<div class="slot-sync-button-template"
+    data-ng-if="ctrl.ready">
+    <div class="btn-group se-slot-ctx-menu__btn-group"
+        data-uib-dropdown
+        data-dropdown-append-to="'#smarteditoverlay'"
+        data-auto-close="outsideClick"
+        data-is-open="ctrl.isPopupOpened">
+
+        <span data-y-popover
+            class="se-slot-ctx-menu__popover"
+            data-trigger="'hover'"
+            data-template="ctrl.newPageIsNotSynchronizedTemplate"
+            data-ng-if="ctrl.newPageIsNotSynchronized"
+            data-placement="'bottom'">
+        </span>
+
+        <button type="button"
+            data-uib-dropdown-toggle
+            class="btn btn-primary se-slot-ctx-menu__btn se-slot-ctx-menu__divider"
+            data-ng-class="{'ySESyncOpen': ctrl.isPopupOpened, 'se-slot-ctx-menu__btn--disabled': ctrl.newPageIsNotSynchronized }"
+            id="slot-sync-button-{{::ctrl.slotId}}">
+            <span class="hyicon hyicon-sync se-slot-ctx-menu__btn__sync"></span>
+            <span data-ng-if="!ctrl.isSlotInSync"
+                class="hyicon hyicon-caution se-slot-ctx-menu__btn__caution"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right btn-block se-toolbar-menu-content se-toolbar-menu-content__page-sync slot-sync-button-template__menu"
+            data-uib-dropdown-menu
+            role="menu">
+            <li role="menuitem">
+                <div class="se-toolbar-menu-content--wrapper">
+                    <div class="slot-sync__header"
+                        data-translate="se.cms.synchronization.slot.header">
+                    </div>
+                    <div class="se-toolbar-menu-content--body">
+                        <slot-synchronization-panel data-ng-if="ctrl.isPopupOpened"
+                            data-slot-id="ctrl.slotId"></slot-synchronization-panel>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

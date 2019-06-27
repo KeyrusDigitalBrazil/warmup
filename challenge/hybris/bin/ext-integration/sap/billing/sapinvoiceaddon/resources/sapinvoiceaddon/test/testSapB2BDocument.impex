@@ -1,0 +1,30 @@
+
+REMOVE SapB2BDocument[ batchmode=true];itemtype (code)[unique=true]
+;SapB2BDocument
+
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;EUR;Euro;true;true;1;2;E
+;USD;US Dollar;true;false;1,38;2;$
+
+INSERT_UPDATE B2BUnit;description;uid[unique=true];name;locName[lang=en];groups(uid);
+;Hierarchical;Test Rustic;Test Rustic;Test Rustic;;
+;Unit A;Test Rustic Retail;Test Rustic Retail;Test Rustic Retail;Test Rustic;
+;Unit B;Custom Retail;Custom Retail;Custom Retail;Test Rustic Retail;
+
+
+## Document insert
+INSERT_UPDATE B2BDocumentType;code[unique=true];name[lang=en];includeInOpenBalance;displayInAllList
+;Purchase Order;Purchase Order;true;true
+
+INSERT_UPDATE SapB2BDocument;invoiceNumber[unique=true];documentNumber[unique=true];Unit(uid);amount;currency(isocode);date[dateformat=yyyy-MM-dd];documentType(code)[unique=true];dueDate[dateformat=yyyy-MM-dd hh:mm:ss];openAmount;status(code,itemtype(code))
+;PUR-002;PUR-002;Custom Retail;75.31;USD;2013-08-09;Purchase Order;2013-08-16 12:00:00;75.54;open:DocumentStatus;
+
+
+
+## Add restriction to only result documents link with b2bunit's user
+
+INSERT_UPDATE SearchRestriction;code[unique=true];name[lang=en];query;principal(UID);restrictedType(code);active;generate
+;b2busergroup_restriction;Restrict B2BDocument visibility;{item:Unit} IN (?session.branch);b2bcustomergroup;B2BDocument;true;true
+
+

@@ -1,0 +1,26 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Old payment subscription result Cleanup CronJobs
+INSERT_UPDATE OldPaymentSubscriptionResultRemovalCronJob;code[unique=true];job(code);age;sessionLanguage(isoCode)[default=en]
+"#% beforeEach: 
+String code = line.get(new Integer(1));
+de.hybris.platform.servicelayer.cronjob.CronJobService service = de.hybris.platform.core.Registry.getApplicationContext().getBean(""cronJobService"");
+try 
+{
+	service.getCronJob(code);
+    line.clear();
+} 
+catch (Exception ex) {}
+";
+;oldPaymentSubscriptionResultRemovalCronJob;oldPaymentSubscriptionResultRemovalJob;86400;
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+;oldPaymentSubscriptionResultRemovalCronJob;0;0;3;-1;-1;-1;false;true;-1

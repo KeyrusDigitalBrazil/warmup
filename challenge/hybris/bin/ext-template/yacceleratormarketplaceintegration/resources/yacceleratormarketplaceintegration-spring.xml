@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:file="http://www.springframework.org/schema/integration/file" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/integration
+		   http://www.springframework.org/schema/integration/spring-integration.xsd
+		   http://www.springframework.org/schema/integration/file
+		   http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		   http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+		
+    <context:annotation-config/> 
+
+	<!-- ***************************** import related definition ******************************* -->
+	<bean id="marketplaceBaseDirectory" class="java.lang.String">
+		<constructor-arg value="#{baseDirectory}/${tenantId}/marketplace" />
+	</bean>
+		
+	<!-- 1) Scan for files -->
+	<bean id="marketplaceScanner" class="de.hybris.platform.marketplaceservices.dataimport.batch.util.MarketplaceVendorDirectoryScanner">
+		<property name="fileNamePatten" value="^marketplace_(.*)-(\d+)\.csv" />
+	</bean>
+
+	<file:inbound-channel-adapter id="batchFilesMarketplace" directory="#{marketplaceBaseDirectory}"
+		comparator="marketplaceFileOrderComparator" scanner="marketplaceScanner">
+		<int:poller fixed-rate="1000" />
+	</file:inbound-channel-adapter>
+
+	<!-- 2) move the file to processing and setup header -->
+	<file:outbound-gateway request-channel="batchFilesMarketplace" reply-channel="batchFilesMarketplaceProc"
+		directory-expression="payload.getParentFile().getAbsolutePath() + T(java.io.File).separator + 'processing'" delete-source-files="true" />
+	<int:service-activator input-channel="batchFilesMarketplaceProc" output-channel="marketplaceBatchFilesHeaderInit"
+		ref="marketplaceHeaderSetupTask" method="execute" />
+	<bean id="marketplaceHeaderSetupTask" class="de.hybris.platform.marketplaceservices.dataimport.batch.task.MarketplaceHeaderSetupTask">
+		<property name="catalog" value="" />
+		<property name="net" value="false" />
+		<property name="storeBaseDirectory" ref="marketplaceBaseDirectory" />
+	</bean>
+
+	<bean id="batchVendorCatalogParser" class="de.hybris.platform.marketplaceservices.dataimport.batch.util.VendorProductCatalogParser">
+		<property name="vendorDao" ref="vendorDao" />
+	</bean>
+
+	<int:service-activator input-channel="marketplaceBatchFilesHeaderInit" output-channel="marketplaceBatchFilesHeader"
+		ref="marketplaceHeaderInitTask" method="execute" />
+	<bean id="marketplaceHeaderInitTask" class="de.hybris.platform.marketplaceservices.dataimport.batch.task.MarketplaceHeaderInitTask" parent="headerInitTask">
+		<property name="vendorCatalogParser" ref="batchVendorCatalogParser" />
+		<property name="configurationService" ref="configurationService" />
+	</bean>
+
+	<!-- 3) transform csv to impex file -->
+	<int:service-activator input-channel="marketplaceBatchFilesHeader" output-channel="marketplaceBatchFilesTran"
+		ref="marketplaceBatchTransformerTask" method="execute" />
+	<bean id="marketplaceBatchTransformerTask" class="de.hybris.platform.marketplaceservices.dataimport.batch.task.MarketplaceImpexTransformerTask"
+		init-method="initConvertersMap">
+		<property name="fieldSeparator" value="," />
+		<property name="encoding" value="UTF-8" />
+		<property name="linesToSkip" value="0" />
+		<property name="cleanupHelper" ref="cleanupHelper" />
+	</bean>
+
+	<!-- 4) run impex import -->
+	<int:service-activator input-channel="marketplaceBatchFilesTran" output-channel="batchFilesImp"
+		ref="marketplaceBatchRunnerTask" method="execute" />
+	<bean id="marketplaceBatchRunnerTask" class="de.hybris.platform.marketplaceservices.dataimport.batch.task.AbstractMarketplaceImpexRunnerTask">
+		<property name="sessionService" ref="sessionService" />
+		<property name="importService" ref="importService" />
+		<lookup-method name="getImportConfig" bean="importConfig" />
+	</bean>
+
+	<!-- Transformer converters mappings -->
+	<bean id="marketplaceBatchProductConverterMapping" 
+	      class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+	      p:mapping="marketplace_base_product" 
+	      p:converter-ref="marketplaceBatchProductConverter"/>
+	<bean id="marketplaceBatchApparelProductConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_apparel_base_product" 
+		  p:converter-ref="marketplaceBatchApparelProductConverter"/>
+	<bean id="marketplaceBatchApparelStyleVariantProductConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_apparel_variant_product" 
+		  p:converter-ref="marketplaceBatchApparelStyleVariantProductConverter"/>
+	<bean id="marketplaceBatchApparelSizeVariantProductConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_apparel_variant_product" 
+		  p:converter-ref="marketplaceBatchApparelSizeVariantProductConverter"/>
+	<bean id="marketplaceBatchPriceConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_price" 
+		  p:converter-ref="marketplaceBatchPriceConverter"/>
+	<bean id="marketplaceBatchTaxConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_tax" 
+		  p:converter-ref="marketplaceBatchTaxConverter"/>
+	<bean id="marketplaceBatchExternalTaxConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_external_tax" 
+		  p:converter-ref="marketplaceBatchExternalTaxConverter"/>
+	<bean id="marketplaceBatchStockConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_stock" 
+		  p:converter-ref="marketplaceBatchStockConverter"/>
+	<bean id="marketplaceBatchStockIncrementalConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_inc_stock" 
+		  p:converter-ref="marketplaceBatchStockIncrementalConverter"/>
+	<bean id="marketplaceBatchProductApprovalConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_product_approval" 
+		  p:converter-ref="marketplaceBatchProductApprovalConverter"/>
+	<bean id="marketplaceBatchMediaConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_media" 
+		  p:converter-ref="marketplaceBatchMediaConverter"/>
+	<bean id="marketplaceBatchMediaContainerConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_media" 
+		  p:converter-ref="marketplaceBatchMediaContainerConverter"/>
+	<bean id="marketplaceBatchMediaProductConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_media" 
+		  p:converter-ref="marketplaceBatchMediaProductConverter"/>
+	<bean id="marketplaceBatchClassificationConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_classification" 
+		  p:converter-ref="marketplaceBatchClassificationConverter"/>
+	<bean id="marketplaceBatchProductStatusConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_product_status" 
+		  p:converter-ref="marketplaceBatchProductStatusConverter"/>
+	<bean id="marketplaceBatchConsignmentConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_orders" 
+		  p:converter-ref="marketplaceBatchConsignmentConverter"/>
+	<bean id="marketplaceBatchProdcutCarouselComponentConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_product_carousel" 
+		  p:converter-ref="marketplaceBatchProdcutCarouselComponentConverter"/>	  
+	<bean id="marketplaceBatchCMSMediaConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_cmsmedia" 
+		  p:converter-ref="marketplaceBatchCMSMediaConverter"/>
+	<bean id="marketplaceBatchCMSMediaContainerConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_cmsmedia" 
+		  p:converter-ref="marketplaceBatchCMSMediaContainerConverter"/>
+	<bean id="marketplaceBatchMediaBannerConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_cmsmedia" 
+		  p:converter-ref="marketplaceBatchMediaBannerConverter"/>
+	<bean id="marketplaceBatchBannersConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_banners" 
+		  p:converter-ref="marketplaceBatchBannersConverter"/>
+	<bean id="marketplaceBatchRotatingImagesConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_rotating_images" 
+		  p:converter-ref="marketplaceBatchRotatingImagesConverter"/>
+	<bean id="marketplaceBatchProductCarouselSynchronizationConverterMapping" 
+		  class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.mapping.impl.DefaultConverterMapping" 
+		  p:mapping="marketplace_synchronize_product_carousel" 
+		  p:converter-ref="marketplaceBatchSynchronizationProductCarouselConverter"/>
+		  	  
+	<!-- product import -->
+	<bean id="marketplaceImpexProductHeader" class="java.lang.String">
+		<constructor-arg>
+			<value># ImpEx for importing data into $CATALOG$
+				$catalogVersion=catalogversion(catalog(id[default=$CATALOG$]),version[default='Online'])[unique=true]
+				$approved=approvalstatus(code)[default='check']
+				$taxGroup=Europe1PriceFactory_PTG(code)[default=$TAXGROUP$]
+				$supercategories=supercategories(code,catalogversion(catalog(id[default='globalMarketplaceProductCatalog']),version[default='Online']))
+				$lang=$LANGUAGE$
+				$vendor=$VENDOR$
+				$baseProduct=baseProduct(code, $catalogVersion)
+			</value>
+		</constructor-arg>
+	</bean>
+
+	<!-- impex converters -->
+	<bean id="marketplaceBatchProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+        <property name="header">
+            <value>#{marketplaceImpexProductHeader}
+                # Insert Products
+                INSERT_UPDATE Product;vendorSku;code[unique=true];name[lang=$lang];description[lang=$lang];ean;manufacturerName;manufacturerAID;unit(code)[default=pieces];$approved;$supercategories[vendor=$vendor][globalCatalogId='globalMarketplaceProductCatalog'][globalCatalogVersion='Online'][translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceCategoryTranslator];$taxGroup;sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator];$catalogVersion
+            </value>
+        </property>
+        <property name="impexRow">
+            <value>;{+0};$vendor_{+0};{1};{2};{3};{4};{5};{6};check;{7};{8};{S}</value>
+        </property>
+        <property name="type" value="Product" />
+    </bean>
+    
+	<bean id="marketplaceBatchPriceConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value># ImpEx for Importing Prices into $CATALOG$
+				#{marketplaceImpexProductHeader}
+				$catalog=$CATALOG$
+				#% impex.setLocale(Locale.ENGLISH); 
+				INSERT_UPDATE PriceRow;product(code,catalogversion(catalog(id),version))[unique=true];price[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.PriceTranslator];currency(isocode)[unique=true];net[default=$NET$];unit(code)[default=pieces];unitFactor[default=1];minqtd[default=1];catalogversion(catalog(id),version);sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0}:$catalog:Online;{+1};{+2};{3};;;;$catalog:Online;{S}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchTaxConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert tax
+				UPDATE Product;code[unique=true];Europe1PriceFactory_PTG(code)[default=eu-vat-full];sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.GreaterSequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{1};{S}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchExternalTaxConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert external tax
+				INSERT_UPDATE ProductTaxCode;productCode[unique=true];taxCode;taxArea[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1};{+2}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchStockConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert stock
+				UPDATE Product;code[unique=true];@stock[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceStockTranslator,adapter=stockImportAdapter];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchStockIncrementalConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert stock
+				UPDATE Product;code[unique=true];@stock[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceStockTranslator,adapter=stockIncrementalImportAdapter];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchProductApprovalConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert stock
+				UPDATE Product;code[unique=true];@dummy[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceProductApprovalTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+0}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchMediaConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Import media from filesystem
+				$importFolder=file:$BASE_SOURCE_DIR$/images
+				INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];mime[default='image/jpeg'];$catalogVersion;folder(qualifier)[default=images];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;1200Wx1200H;/1200Wx1200H/$vendor_{+1};;;;{+1};$importFolder/1200Wx1200H/{+1}
+;515Wx515H;/515Wx515H/$vendor_{+1};;;;{+1};$importFolder/515Wx515H/{+1}
+;300Wx300H;/300Wx300H/$vendor_{+1};;;;{+1};$importFolder/300Wx300H/{+1}
+;96Wx96H;/96Wx96H/$vendor_{+1};;;;{+1};$importFolder/96Wx96H/{+1}
+;65Wx65H;/65Wx65H/$vendor_{+1};;;;{+1};$importFolder/65Wx65H/{+1}
+;30Wx30H;/30Wx30H/$vendor_{+1};;;;{+1};$importFolder/30Wx30H/{+1}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchMediaContainerConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Import media container
+				INSERT_UPDATE MediaContainer;qualifier[unique=true];medias(code, $catalogVersion);$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{1};/1200Wx1200H/$vendor_{1},/515Wx515H/$vendor_{1},/300Wx300H/$vendor_{1},/96Wx96H/$vendor_{1},/65Wx65H/$vendor_{1},/30Wx30H/$vendor_{1}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchMediaProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				$thumbnail=thumbnail(code, $catalogVersion)
+				$thumbnails=thumbnails(code, $catalogVersion)
+				$picture=picture(code, $catalogVersion)
+				$detail=detail(code, $catalogVersion)
+				$normal=normal(code, $catalogVersion)
+				$others=others(code, $catalogVersion)
+				$galleryImages=galleryImages(qualifier, $catalogVersion)
+				# Import product media
+				UPDATE Product;code[unique=true];$picture;$thumbnail;$detail;$others;$normal;$thumbnails;$galleryImages;sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.GreaterSequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};/300Wx300H/$vendor_{1};/96Wx96H/$vendor_{1};/1200Wx1200H/$vendor_{1};/515Wx515H/$vendor_{1},/96Wx96H/$vendor_{1},/30Wx30H/$vendor_{1};/300Wx300H/$vendor_{1};/96Wx96H/$vendor_{1};$vendor_{1};{S}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchClassificationConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert Classification
+				$clAttrModifiers=system='MarketplaceClassification',version='1.0',translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceClassificationAttributeTranslator,lang=$lang
+				$feature=@dummy[$clAttrModifiers];
+				UPDATE Product;code[unique=true];$feature;sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.GreaterSequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1};{S}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchProductStatusConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				UPDATE Product;code[unique=true];onlineDate[dateformat=yyyy-MM-dd HH:mm:ss];offlineDate[dateformat=yyyy-MM-dd HH:mm:ss];sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.GreaterSequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{1};{2};{S}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchConsignmentConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				UPDATE Consignment;code[unique=true][vendor=$vendor][translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceConsignmentCodeTranslator];trackingID;carrierDetails(code)
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{1};{2}</value>
+		</property>
+	</bean>
+
+	<bean id="marketplaceBatchProdcutCarouselComponentConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert ProductCarouselComponent
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+		        $vendorCatalog=$CATALOG$
+		        $position=Section3		
+				INSERT_UPDATE ProductCarouselComponent;vendorCarouselCode;name;title[lang=$lang];products[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceProductsTranslator][vendor=$vendor][vendorCatalog=$vendorCatalog][version=Online];slots[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceSlotsTranslator][vendor=$vendor][contentCatalog=$contentCatalog][version=Staged];uid[unique=true];$contentCV[unique=true];popup[default=false]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};{1};{2};{+3};$position;$vendor_{+0}</value>
+		</property>
+	</bean>	
+	
+	<!-- Converters -->
+	<bean id="marketplaceBatchCMSMediaConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Import media from filesystem
+				$importFolder=file:$BASE_SOURCE_DIR$/cmsimages
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+				INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];mime[default='image/jpeg'];$contentCV;folder(qualifier)[default=images];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;widescreen;/1140Wx440H/$vendor_{+1};;;;{+1};$importFolder/1140Wx440H/{+1}
+;desktop;/960Wx330H/$vendor_{+1};;;;{+1};$importFolder/960Wx330H/{+1}
+;tablet;/770Wx350H/$vendor_{+1};;;;{+1};$importFolder/770Wx350H/{+1}
+;mobile;/480Wx320H/$vendor_{+1};;;;{+1};$importFolder/480Wx320H/{+1}</value>
+		</property>
+	</bean>
+	<bean id="marketplaceBatchCMSMediaContainerConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Import media container
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+				$medias=medias(code, $contentCV)
+				INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{1};/1140Wx440H/$vendor_{1},/960Wx330H/$vendor_{1},/770Wx350H/$vendor_{1},/480Wx320H/$vendor_{1}</value>
+		</property>
+	</bean>
+	
+	<bean id="marketplaceBatchMediaBannerConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Update media of BannerComponent
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+		        $picture=media(code, $contentCV)		
+				INSERT_UPDATE BannerComponent;uid[unique=true];$picture;$contentCV[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};/960Wx330H/$vendor_{1}</value>
+		</property>
+	</bean>	
+	
+	<bean id="marketplaceBatchBannersConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert BannerComponent
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+				INSERT_UPDATE BannerComponent;uid[unique=true];name;$contentCV[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1}</value>
+		</property>
+	</bean>	
+	
+	<bean id="marketplaceBatchRotatingImagesConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				# Insert RotatingImagesComponent
+				$position=Section2A
+				$contentCatalog=marketplaceContentCatalog
+                $contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+				$banners=banners(uid)[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceBannerComponentTranslator][vendor=$vendor][contentCatalog=$contentCatalog][version=Staged]
+				$slots=slots(uid)[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceSlotsTranslator][vendor=$vendor][contentCatalog=$contentCatalog][version=Staged]
+				INSERT_UPDATE RotatingImagesComponent;uid[unique=true];name;$banners;$slots;$contentCV[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;$vendor_{+0};{+1};{+2};$position</value>
+		</property>
+	</bean>	
+	
+	<bean id="marketplaceBatchApparelProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+        <property name="header">
+            <value>#{marketplaceImpexProductHeader}
+                INSERT_UPDATE ApparelProduct;vendorSku;code[unique=true];varianttype(code);name[lang=$lang];description[lang=$lang];ean;manufacturerName;manufacturerAID;unit(code)[default=pieces];$approved;$supercategories[vendor=$vendor][globalCatalogId='globalMarketplaceProductCatalog'][globalCatalogVersion='Online'][translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceCategoryTranslator];$taxGroup;genders(code);sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator];$catalogVersion
+            </value>
+        </property>
+        <property name="impexRow">
+            <value>;{+0};$vendor_{+0};{+1};{2};{3};{4};{5};{6};{7};check;{8};{9};{10};{S}</value>
+        </property>
+        <property name="type" value="ApparelProduct"/>
+    </bean>
+    
+	<bean id="marketplaceBatchApparelStyleVariantProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				INSERT_UPDATE ApparelStyleVariantProduct;vendorSku;code[unique=true];$baseProduct;varianttype(code);style[lang=$lang];size[lang=$lang];$approved;sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator];$catalogVersion				
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};$vendor_{+0};$vendor_{+1};{2};{3};{4};check;{S}</value>
+		</property>
+		<property name="rowFilter">
+			<bean class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexRowFilter">
+				<property name="expression" value="row[2] == 'ApparelStyleVariantProduct' || (!row[2] &amp;&amp; !row[4])"/>
+			</bean>
+		</property>		
+	</bean>
+
+	<bean id="marketplaceBatchApparelSizeVariantProductConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				INSERT_UPDATE ApparelSizeVariantProduct;vendorSku;code[unique=true];$baseProduct;variantType(code);style[lang=$lang];size[lang=$lang];$approved;sequenceId[translator=de.hybris.platform.acceleratorservices.dataimport.batch.converter.SequenceIdTranslator];$catalogVersion
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{+0};$vendor_{+0};$vendor_{+1};{2};{3};{4};check;{S}</value>
+		</property>
+		<property name="rowFilter">
+			<bean class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexRowFilter">
+				<property name="expression" value="row[2] == 'ApparelSizeVariantProduct' || row[4]"/>
+			</bean>
+		</property>		
+	</bean>
+	
+	<bean id="marketplaceBatchSynchronizationProductCarouselConverter" class="de.hybris.platform.acceleratorservices.dataimport.batch.converter.impl.DefaultImpexConverter">
+		<property name="header">
+			<value>#{marketplaceImpexProductHeader}
+				$contentCatalog=marketplaceContentCatalog
+				$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+				UPDATE ProductCarouselComponent;vendorCarouselCode;uid[unique=true];@dummy[translator=de.hybris.platform.marketplaceservices.dataimport.batch.translator.MarketplaceProductCarouselsSynchronizationTranslator];$contentCV[unique=true]
+			</value>
+		</property>
+		<property name="impexRow">
+			<value>;{0};$vendor_{+0};{0}</value>
+		</property>
+	</bean>
+	
+	<!-- file order comparator -->
+	<bean id="marketplaceFileOrderComparator" class="de.hybris.platform.acceleratorservices.dataimport.batch.FileOrderComparator">
+		<property name="prefixPriority">
+			<map>
+				<!-- default priority is 0 -->
+				<entry key="marketplace_base_product" value="2" />
+				<entry key="marketplace_apparel_base_product" value="2" />
+			</map>
+		</property>
+	</bean>
+</beans>

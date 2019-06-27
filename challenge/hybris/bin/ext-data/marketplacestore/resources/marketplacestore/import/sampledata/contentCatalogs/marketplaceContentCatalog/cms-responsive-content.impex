@@ -1,0 +1,1471 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$contentCatalog=marketplaceContentCatalog
+$contentCatalogName=Marketplace Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+$productCatalog=globalMarketplaceProductCatalog
+$productCatalogName=Marketplace Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$picture=media(code,$contentCV);
+$image=image(code,$contentCV);
+$media=media(code,$contentCV);
+$medias=medias(code, $contentCV);
+$mediaContainer=media(qualifier, $contentCV);
+$page=page(uid,$contentCV);
+$contentPage=contentPage(uid, $contentCV);
+$product=product(code, $productCV)
+$category=category(code, $productCV)
+$siteResource=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/contentCatalogs/$contentCatalog
+$productResource=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/productCatalogs/$productCatalog
+$jarResourceCms=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/cockpits/cmscockpit
+
+# Canon Product catalog
+$vendor8ProductCatalog=vendor8ProductCatalog
+$vendor8ProductCV=catalogversion(catalog(id[default=$vendor8ProductCatalog]),version[default='Online'])[unique=true,default=$vendor8ProductCatalog:Online]
+
+# CMS Site Settings
+UPDATE CMSSite;uid[unique=true];defaultPreviewCategory(code, $productCV);defaultPreviewProduct(code, $vendor8ProductCV)
+;marketplace;575;vendor8_2053367
+
+# Site Logo
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText;folder(qualifier)[default='images']
+;;/images/theme/logo-marketplace.png;logo-marketplace.png;$siteResource/images/theme/logo-marketplace.png;image/png;hybris Marketplace;
+
+# Site Logo Component
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;SiteLogoComponent;Site Logo Component;SiteLogoComponent;"/"
+
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;HomepageNavLink;Home Page Nav Link;/;HomepageNavLink;HomepageNavLink;;;;
+;;StoreFinderLink;Store Finder Link;/store-finder;StoreFinderLink;StoreFinderLink;;;;
+;;LoginLink;Login Link;/login;LoginLink;LoginLink;;;;
+;;AllBrandsCategoryLink;All Brands Link;/Brands/c/brands;AllBrandsCategoryLink;AllBrandsCategoryLink;;brands;;
+;;SonyBrandCategoryLink;Sony Link;/Brands/Sony/c/brand_5;SonyBrandCategoryLink;SonyBrandCategoryLink;;brand_5;;
+;;CanonBrandCategoryLink;Canon Link;/Brands/Canon/c/brand_10;CanonBrandCategoryLink;CanonBrandCategoryLink;;brand_10;;
+;;KodakBrandCategoryLink;Kodak Link;/Brands/Kodak/c/brand_88;KodakBrandCategoryLink;KodakBrandCategoryLink;;brand_88;;
+;;SamsungBrandCategoryLink;Samsung Link;/Brands/Samsung/c/brand_26;SamsungBrandCategoryLink;SamsungBrandCategoryLink;;brand_26;;
+;;ToshibaBrandCategoryLink;Toshiba Link;/Brands/Toshiba/c/brand_2;ToshibaBrandCategoryLink;ToshibaBrandCategoryLink;;brand_2;;
+;;FujifilmBrandCategoryLink;Fujifilm Link;/Brands/Fujifilm/c/brand_75;FujifilmBrandCategoryLink;FujifilmBrandCategoryLink;;brand_75;;
+;;KingstonBrandCategoryLink;Kingston Link;/Brands/Kingston/c/brand_18;KingstonBrandCategoryLink;KingstonBrandCategoryLink;;brand_18;;
+;;IciduBrandCategoryLink;Icidu Link;/Brands/ICIDU/c/brand_2171;IciduBrandCategoryLink;IciduBrandCategoryLink;;brand_2171;;
+;;TDKBrandCategoryLink;TDK Link;/Brands/TDK/c/brand_251;TDKBrandCategoryLink;TDKBrandCategoryLink;;brand_251;;
+;;SweexBrandCategoryLink;Sweex Link;/Brands/Sweex/c/brand_702;SweexBrandCategoryLink;SweexBrandCategoryLink;;brand_702;;
+;;DigitalCompactsCategoryLink;Digital Compacts Link;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/c/576;DigitalCompactsCategoryLink;DigitalCompactsCategoryLink;;576;;
+;;DigitalSLRCategoryLink;Digital SLR Link;/Open-Catalogue/Cameras/Digital-Cameras/Digital-SLR/c/578;DigitalSLRCategoryLink;DigitalSLRCategoryLink;;578;;
+;;CamerasCategoryLink;Cameras Category Link;/Open-Catalogue/Cameras/c/571;CamerasCategoryLink;CamerasCategoryLink;;571;;
+;;ComponentsCategoryLink;Components Category Link;/Open-Catalogue/Components/c/106;ComponentsCategoryLink;ComponentsCategoryLink;;106;;
+;;DigitalCamerasCategoryLink;Digital Cameras Category Link;/Open-Catalogue/Cameras/Digital-Cameras/c/575;DigitalCamerasCategoryLink;DigitalCamerasCategoryLink;;575;;
+;;FilmCamerasCategoryLink;Film Cameras Category Link;/Open-Catalogue/Cameras/Film-Cameras/c/574;FilmCamerasCategoryLink;FilmCamerasCategoryLink;;574;;
+;;CameraAccessoriesCategoryLink;Camera Accessories Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/c/585;CameraAccessoriesCategoryLink;CameraAccessoriesCategoryLink;;585;;
+;;PowerSuppliesCategoryLink;Power Supplies Category Link;/Open-Catalogue/Components/Power-Supplies/c/816;PowerSuppliesCategoryLink;PowerSuppliesCategoryLink;;816;;
+;;FlashMemoryCategoryLink;Flash Memory Category Link;/Open-Catalogue/Data-storage/Flash-Memory/c/902;FlashMemoryCategoryLink;FlashMemoryCategoryLink;;902;;
+;;HandheldCamcordersCategoryLink;Handheld Camcorders Category Link;/Open-Catalogue/Cameras/Hand-held-Camcorders/c/584;HandheldCamcordersCategoryLink;HandheldCamcordersCategoryLink;;584;;
+;;SpecialOffersLink;Special Offers Link;"/Open-Catalogue/c/1?q=%3AtopRated%3AallPromotions%3ABOGOFMarketplace%3AallPromotions%3A10DiscountCanonEOS450D%3AallPromotions%3AMultiBuyMarketplace%3AallPromotions%3APerfectPartnerMarketplace%3AallPromotions%3AProductBundleMarketplace";SpecialOffersLink;SpecialOffersLink;;1;;
+;;CamerasFlashesCategoryLink;Cameras Flashes Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Camera-Flashes/c/586;CamerasFlashesCategoryLink;CamerasFlashesCategoryLink;;586;;
+;;TripodsCategoryLink;Tripods Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Tripods/c/587;TripodsCategoryLink;TripodsCategoryLink;;587;;
+;;CameraLensesCategoryLink;Camera Lenses Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Camera-Lenses/c/588;CameraLensesCategoryLink;CameraLensesCategoryLink;;588;;
+;;ColourFilmsCategoryLink;ColourFilms Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Colour-Films/c/597;ColourFilmsCategoryLink;ColourFilmsCategoryLink;;597;;
+;;BlackAndWhiteFilmsCategoryLink;Black And WhiteFilms Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Black-26-White-Films/c/598;BlackAndWhiteFilmsCategoryLink;BlackAndWhiteFilmsCategoryLink;;598;;
+;;BlankVideotapesCategoryLink;BlankVideotapes Category Link;/Open-Catalogue/Cameras/Camera-Accessories-26-Supplies/Blank-Video-Tapes/c/604;BlankVideotapesCategoryLink;BlankVideotapesCategoryLink;;604;;
+;;AboutAcceleratorLink;About Accelerator Link;"http://www.hybris.com/multichannel-accelerator";AboutAcceleratorLink;AboutAcceleratorLink;newWindow;;;
+;;DocumentationLink;Documentation Link;"https://help.hybris.com";DocumentationLink;DocumentationLink;newWindow;;;
+;;AboutHybrisLink;About Hybris Link;"http://www.hybris.com";AboutHybrisLink;AboutHybrisLink;newWindow;;;
+;;ContactUsLink;Contact Us Link;"http://www.hybris.com/contact";ContactUsLink;ContactUsLink;newWindow;;;
+;;FacebookLink;Facebook Link;"http://www.facebook.com/hybrissoftware";FacebookLink;FacebookLink;newWindow;;;
+;;TwitterLink;Twitter Link;"http://twitter.com/#!/hybris_software";TwitterLink;TwitterLink;newWindow;;;
+;;AgileCommerceBlogLink;Agile Commerce Blog Link;"http://www.agile-commerce.com/";AgileCommerceBlogLink;AgileCommerceBlogLink;newWindow;;;
+;;LinkedInLink;Linked In Link;"http://www.linkedin.com/company/97435";LinkedInLink;LinkedInLink;newWindow;;;
+;;FAQLink;FAQ Link;/faq;FAQLink;FAQLin;;;;
+;;TermsAndConditionsLink;Terms and Conditions Link;/termsAndConditions;TermsAndConditionsLink;TermsAndConditionsLink;;;;
+;;OurVendorsLink;Our Vendors Link;/vendors;OurVendorsLink;OurVendorsLink;;;;
+
+;;ComputersCategoryLink;Computers Category Link;/Open-Catalogue/Computers/c/301;ComputersCategoryLink;ComputersCategoryLink;;301;;
+;;TabletsCategoryLink;Tablets Category Link;/Open-Catalogue/Computers/Tablets/c/897;TabletsCategoryLink;TabletsCategoryLink;;897;;
+;;LabtopsCategoryLink;Labtops Category Link;/Open-Catalogue/Computers/Labtops/c/151;LabtopsCategoryLink;LabtopsCategoryLink;;151;;
+;;PCsWorkstationsCategoryLink;PCsWorkstations Category Link;/Open-Catalogue/Computers/PCsWrkstationsCategoryLink/c/153;PCsWorkstationsCategoryLink;PCsWorkstationsCategoryLink;;153;;
+
+;;SmartWearablesCategoryLink;Smart Wearables CategoryLink;/Open-Catalogue/SmartWearables/c/302;SmartWearablesCategoryLink;SmartWearablesCategoryLink;;302;;
+;;SmartWatchesCategoryLink;Smart Watches CategoryLink;/Open-Catalogue/SmartWearables/SmartWatches/c/2647;SmartWatchesCategoryLink;SmartWatchesCategoryLink;;2647;;
+;;ActivityTrackersCategoryLink;Activity Trackers CategoryLink;/Open-Catalogue/SmartWearables/ActivityTrackers/c/2871;ActivityTrackersCategoryLink;ActivityTrackersCategoryLink;;2871;;
+
+;;HomeAppliancesCategoryLink;Home Appliances Category Link;/Open-Catalogue/HomeAppliances/c/303;HomeAppliancesCategoryLink;HomeAppliancesCategoryLink;;303;;
+;;FridgeFreezersCategoryLink;Fridge-Freezers Category Link;/Open-Catalogue/HomeAppliances/FridgeFreezers/c/1873;FridgeFreezersCategoryLink;FridgeFreezersCategoryLink;;1873;;
+;;WashingMachinesCategoryLink;Washing Machines Category Link;/Open-Catalogue/HomeAppliances/WashingMachines/c/1331;WashingMachinesCategoryLink;WashingMachinesCategoryLink;;1331;;
+;;CoffeeMakersCategoryLink;Coffee Makers Category Link;/Open-Catalogue/HomeAppliances/CoffeeMakers/c/1320;CoffeeMakersCategoryLink;CoffeeMakersCategoryLink;;1320;;
+
+;;HealthcarePersonalCareCategoryLink;Healthcare & Personal Care CategoryLink;/Open-Catalogue/HealthcarePersonalCare/c/304;HealthcarePersonalCareCategoryLink;HealthcarePersonalCareCategoryLink;;304;;
+;;ElectricToothbrushesCategoryLink;Electric Toothbrushes CategoryLink;/Open-Catalogue/HealthcarePersonalCare/ElectricToothbrushes/c/1334;ElectricToothbrushesCategoryLink;ElectricToothbrushesCategoryLink;;1334;;
+;;MenShaversCategoryLink;Men's Shavers Category Link;/Open-Catalogue/HealthcarePersonalCare/MenShavers/c/1337;MenShaversCategoryLink;MenShaversCategoryLink;;1337;;
+;;HairConditionersCategoryLink;Hair Conditioners Category Link;/Open-Catalogue/HealthcarePersonalCare/HairConditioners/c/2863;HairConditionersCategoryLink;HairConditionersCategoryLink;;2863;;
+;;HairShampoosCategoryLink;Hair Shampoos Category Link;/Open-Catalogue/HealthcarePersonalCare/HairShampoos/c/2862;HairShampoosCategoryLink;HairShampoosCategoryLink;;2862;;
+
+# Lightbox Banner for Mini Cart
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;LightboxHomeDeliveryBannerComponent;Lightbox Home Delivery Banner Component;LightboxHomeDeliveryBannerComponent;
+
+# CMS Mini Cart Component
+INSERT_UPDATE MiniCartComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;totalDisplay(code);shownProductCount;lightboxBannerComponent(&componentRef)
+;;MiniCart;Mini Cart;MiniCart;SUBTOTAL;3;LightboxHomeDeliveryBannerComponent
+
+# CMS tabs components
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ProductDetailsTabComponent;Product Details Tab;/WEB-INF/views/responsive/pages/product/productDetailsTab.jsp;;ProductDetailsTabComponent
+;;ProductSpecsTabComponent;Product Specification Tab;/WEB-INF/views/responsive/pages/product/productSpecsTab.jsp;;ProductSpecsTabComponent
+;;ProductReviewsTabComponent;Product Reviews Tab;/WEB-INF/views/responsive/pages/product/productReviewsTab.jsp;;ProductReviewsTabComponent
+
+INSERT_UPDATE CMSTabParagraphComponent;$contentCV[unique=true];uid[unique=true];name;visible;&componentRef
+;;deliveryTab;Delivery tab;true;deliveryTab
+
+INSERT_UPDATE CMSTabParagraphContainer;$contentCV[unique=true];uid[unique=true];name;visible;simpleCMSComponents(uid, $contentCV);&componentRef
+;;TabPanelContainer;Tab container;true;ProductDetailsTabComponent,ProductSpecsTabComponent,ProductReviewsTabComponent,deliveryTab;TabPanelContainer
+
+
+# CMS VariantSelector Components
+INSERT_UPDATE ProductVariantSelectorComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;VariantSelector;Product Variant Selector;VariantSelector
+
+# CMS ProductAddToCart Components
+INSERT_UPDATE ProductAddToCartComponent;$contentCV[unique=true];uid[unique=true];name;actions(&actionRef);&componentRef
+;;AddToCart;Product Add To Cart;AddToCartAction,PickUpInStoreAction,ShareOnSocialNetworkAction;AddToCart
+
+# CMS AddToCart Action
+INSERT_UPDATE AddToCartAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;AddToCartAction;/cart/add;Product Add To Cart Action;ActionRestriction;AddToCartAction
+
+INSERT_UPDATE ListAddToCartAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ListAddToCartAction;/cart/add;Product Add To Cart Action;ActionRestriction;ListAddToCartAction
+
+INSERT_UPDATE ListPickUpInStoreAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ListPickUpInStoreAction;/store-pickup/{productCode}/pointOfServices;Pickup in Store Action;ActionRestriction;ListPickUpInStoreAction
+
+# CMS PickUpInStoreAction Action
+INSERT_UPDATE PickUpInStoreAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;PickUpInStoreAction;/store-pickup/{productCode}/pointOfServices;Pickup in Store Action;ActionRestriction;PickUpInStoreAction
+
+# CMS ShareOnSocialNetwork Action
+INSERT_UPDATE ShareOnSocialNetworkAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ShareOnSocialNetworkAction;/;Share On Social Network Action;ActionRestriction;ShareOnSocialNetworkAction
+
+# CMS Action Restrictions
+INSERT_UPDATE CMSActionRestriction;$contentCV[unique=true];uid[unique=true];name;
+;;ActionRestriction;A CMSAction restriction;
+
+# CMS ProductReferences Components
+INSERT_UPDATE ProductReferencesComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;&componentRef
+;;accessories;Accessories;ACCESSORIES;5;accessories
+;;CrossSelling;Cross Selling;CROSSELLING;5;CrossSelling
+;;Others;Others;OTHERS;5;Others
+;;Similar;Similar;SIMILAR;5;Similar
+
+# CMS PurchasedCategorySuggestion Components
+INSERT_UPDATE PurchasedCategorySuggestionComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;filterPurchased;category(code, $productCV);&componentRef
+;;PurchasedCategorySuggestions;Purchased Category Suggestions;OTHERS;10;true;578;PurchasedCategorySuggestions
+
+# CMS CartSuggestion Components
+INSERT_UPDATE CartSuggestionComponent;$contentCV[unique=true];uid[unique=true];name;productReferenceTypes(code);maximumNumberProducts;filterPurchased;&componentRef
+;;CartSuggestions;Cart Suggestions;ACCESSORIES,SIMILAR;20;true;CartSuggestions
+
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+# CMS Language and Currency Component
+INSERT_UPDATE LanguageCurrencyComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;LangCurrencyComponent;Language and Currency Component;LangCurrencyComponent
+
+INSERT_UPDATE ProductRefinementComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;RefinementFacetComponent;Product Refinement Facet Component;RefinementFacetComponent
+
+INSERT_UPDATE CMSProductListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;ProductListComponent;Product List Component;ListPickUpInStoreAction,ListAddToCartAction;ProductListComponent
+
+INSERT_UPDATE ProductGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;ProductGridComponent;Product Grid Component;ListPickUpInStoreAction,ListAddToCartAction;ProductGridComponent
+
+INSERT_UPDATE SearchResultsListComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsList;Search Result List Component;ListPickUpInStoreAction,ListAddToCartAction;SearchResultsList
+
+INSERT_UPDATE SearchResultsGridComponent;$contentCV[unique=true];uid[unique=true];name;actions(uid,$contentCV);&componentRef
+;;SearchResultsGrid;Search Result Grid Component;ListPickUpInStoreAction,ListAddToCartAction;SearchResultsGrid
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SiteLogoSlot;SiteLogoComponent
+;;HomepageNavLinkSlot;HomepageNavLink
+;;MiniCartSlot;MiniCart
+;;TabsSlot;TabPanelContainer
+;;FooterSlot;
+;;HeaderLinksSlot;
+;;SearchBoxSlot;SearchBox,LangCurrencyComponent
+;;VariantSelectorSlot;VariantSelector
+;;AddToCartSlot;AddToCart
+;;UpSellingSlot;Similar
+;;CrossSellingSlot;accessories
+;;ProductLeftRefinements;RefinementFacetComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;CamerasPagePreview;text/png;CamerasPage.png;$jarResourceCms/preview-images/marketplace/CamerasPage.png
+;;DigitalCamerasPagePreview;text/png;DigitalCamerasPage.png;$jarResourceCms/preview-images/marketplace/DigitalCamerasPage.png
+;;CameraAccessoriesPagePreview;text/png;CameraAccessoriesPage.png;$jarResourceCms/preview-images/marketplace/CameraAccessoriesPage.png
+
+# Category Pages
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV)
+;;Cameras;Cameras;ProductListPageTemplate;false;;CamerasPagePreview
+;;DigitalCameras;Digital Cameras;ProductListPageTemplate;false;;DigitalCamerasPagePreview
+
+# Category Page Restrictions
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;Cameras-LandingPageRestriction;Restriction for Cameras page;571;Cameras
+;;DigitalCameras-LandingPageRestriction;Restriction for Digital Cameras page;575;DigitalCameras
+
+# CMS Navigation Nodes #
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;children(uid,$contentCV)[mode=append]
+;root;;root;;
+
+# CMS Navigation Nodes
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;SiteRootNode;;SiteRootNode;root;;SiteRootNode
+;MarketplaceNavNode;;Marketplace Site;SiteRootNode;HomepageNavLink;MarketplaceNavNode
+;BrandsNavNode;;Brand Links;MarketplaceNavNode;AllBrandsCategoryLink;BrandsNavNode
+;DigitalCameraTypesNavNode;;Digital Camera Type Links;DigitalCamerasNavNode;DigitalCompactsCategoryLink,DigitalSLRCategoryLink;DigitalCameraTypesNavNode
+;CamerasNavNode;;Cameras Category;MarketplaceNavNode;DigitalCamerasCategoryLink,FilmCamerasCategoryLink;CamerasNavNode
+;DigitalCamerasNavNode;;Digital Cameras Category;CamerasNavNode;DigitalCamerasCategoryLink;DigitalCamerasNavNode
+;FilmCamerasNavNode;;Film Cameras Category;CamerasNavNode;FilmCamerasCategoryLink;FilmCamerasNavNode
+;WebcamsNavNode;;Webcams Category;CamerasNavNode;;WebcamsNavNode
+;CameraAccessoriesNavNode;;Camera Accessories Category;CamerasNavNode;CameraAccessoriesCategoryLink;CameraAccessoriesNavNode
+;HandheldCamcordersNavNode;;Hand-held Camcorders Category;CamerasNavNode;HandheldCamcordersCategoryLink;HandheldCamcordersNavNode
+;PowerSuppliesNavNode;;Power Supplies Category;MarketplaceNavNode;PowerSuppliesCategoryLink;PowerSuppliesNavNode
+;FlashMemoryNavNode;;Flash Memory Category;CamerasNavNode;FlashMemoryCategoryLink;FlashMemoryNavNode
+;AccessoriesNavNode;;Accessories Links;CameraAccessoriesNavNode;CamerasFlashesCategoryLink,TripodsCategoryLink,CameraLensesCategoryLink;AccessoriesNavNode
+;SuppliesNavNode;;Supplies Links;CameraAccessoriesNavNode;ColourFilmsCategoryLink,BlackAndWhiteFilmsCategoryLink,BlankVideotapesCategoryLink;SuppliesNavNode
+;AcceleratorNavNode;;Accelerator Pages;MarketplaceNavNode;AboutAcceleratorLink,OurVendorsLink,FAQLink;AcceleratorNavNode
+;HybrisNavNode;;Hybris Pages;MarketplaceNavNode;AboutHybrisLink,ContactUsLink;HybrisNavNode
+;FollowUsNavNode;;Follow Us Pages;MarketplaceNavNode;AgileCommerceBlogLink,LinkedInLink,FacebookLink,TwitterLink;FollowUsNavNode
+
+# Preview Image for use in the CMS Cockpit for special ContentPages
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;accountPagePreview;text/png;AccountPage.png;$jarResourceCms/preview-images/marketplace/AccountPage.png
+;;addEditAddressPagePreview;text/png;AddEditAddressPage.png;$jarResourceCms/preview-images/marketplace/AddEditAddressPage.png
+;;addressBookPagePreview;text/png;AddressBook.png;$jarResourceCms/preview-images/marketplace/AddressBookPage.png
+;;cartPagePreview;text/png;CartPage.png;$jarResourceCms/preview-images/marketplace/CartPage.png
+;;checkoutLoginPagePreview;text/png;CheckoutLoginPage.png;$jarResourceCms/preview-images/marketplace/CheckoutLoginPage.png
+;;multiStepCheckoutSummaryPagePreview;text/png;MultiStepCheckoutSummaryPage.png;$jarResourceCms/preview-images/marketplace/MultiStepCheckoutSummaryPage.png
+;;frequentlyAskedQuestionsPage;text/png;FrequentlyAskedQuestionsPage.png;$jarResourceCms/preview-images/marketplace/FrequentlyAskedQuestionsPage.png;;;
+;;termsAndConditionsPage;text/png;TermsAndConditionsPage.png;$jarResourceCms/preview-images/marketplace/TermsAndConditionsPage.png;;;
+;;homepagePreview;text/png;Homepage.png;$jarResourceCms/preview-images/marketplace/Homepage.png
+;;loginPagePreview;text/png;LoginPage.png;$jarResourceCms/preview-images/marketplace/LoginPage.png
+;;notFoundPagePreview;text/png;NotFoundPage.png;$jarResourceCms/preview-images/marketplace/NotFoundPage.png
+;;orderConfirmationPagePreview;text/png;OrderConfirmationPage.png;$jarResourceCms/preview-images/marketplace/OrderConfirmationPage.png
+;;orderDetailsPagePreview;text/png;OrderDetailsPage.png;$jarResourceCms/preview-images/marketplace/OrderDetailsPage.png
+;;orderHistoryPagePreview;text/png;OrderHistoryPage.png;$jarResourceCms/preview-images/marketplace/OrderHistoryPage.png
+;;paymentDetailsPagePreview;text/png;PaymentDetailsPage.png;$jarResourceCms/preview-images/marketplace/PaymentDetailsPage.png
+;;productDetailsPagePreview;text/png;ProductDetailsPage.png;$jarResourceCms/preview-images/marketplace/ProductDetailsPage.png
+;;productListPagePreview;text/png;ProductListPage.png;$jarResourceCms/preview-images/marketplace/ProductListPage.png
+;;profilePagePreview;text/png;ProfilePage.png;$jarResourceCms/preview-images/marketplace/ProfilePage.png
+;;searchResultsEmptyPagePreview;text/png;SearchResultsEmptyPage.png;$jarResourceCms/preview-images/marketplace/SearchResultsEmptyPage.png
+;;searchResultsPagePreview;text/png;SearchResultsPage.png;$jarResourceCms/preview-images/marketplace/SearchResultsPage.png
+;;storefinderPagePreview;text/png;StoreFinderPage.png;$jarResourceCms/preview-images/marketplace/StoreFinderPage.png
+;;updateForgottenPasswordPagePreview;text/png;UpdateForgottenPasswordPage.png;$jarResourceCms/preview-images/marketplace/UpdateForgottenPasswordPage.png
+;;productGridPagePreview;text/png;ProductGridPage.png;$jarResourceCms/preview-images/marketplace/ProductGridPage.png
+;;defaultCategoryPagePreview;text/png;DefaultCategoryPage.png;$jarResourceCms/preview-images/marketplace/DefaultCategoryPage.png
+;;orderExpiredPagePreview;text/png;OrderExpiredPage.png;$jarResourceCms/preview-images/marketplace/OrderExpiredPage.png;;;
+
+# Site-wide Homepage
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);linkComponents(&linkRef)
+;;homepage;homepagePreview;HomepageNavLink
+
+# Functional Content Pages
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;multiStepCheckoutSummaryPage;multiStepCheckoutSummaryPagePreview
+;;orderConfirmationPage;orderConfirmationPagePreview
+;;cartPage;cartPagePreview
+;;search;searchResultsPagePreview
+;;address-book;addressBookPagePreview
+;;add-edit-address;addEditAddressPagePreview
+;;payment-details;paymentDetailsPagePreview
+;;order;orderDetailsPagePreview
+;;orders;orderHistoryPagePreview
+;;storefinderPage;storefinderPagePreview
+;;checkout-login;checkoutLoginPagePreview
+;;login;loginPagePreview
+;;notFound;notFoundPagePreview
+;;searchEmpty;searchResultsEmptyPagePreview
+;;updatePassword;updateForgottenPasswordPagePreview
+;;orderExpired;orderExpiredPagePreview
+
+# Simple Content Pages
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);linkComponents(&linkRef)
+;;faq;frequentlyAskedQuestionsPage;FAQLink
+
+# Order Expired Page
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;orderExpired;orderExpiredPagePreview
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV);linkComponents(&linkRef)
+;;termsAndConditions;termsAndConditionsPage;TermsAndConditionsLink
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];linkComponents(&linkRef);;;;;
+;;storefinderPage;StoreFinderLink
+;;login;LoginLink
+
+# Product Details Page
+UPDATE ProductPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;productDetails;productDetailsPagePreview
+
+# Category Pages
+UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;productList;productListPagePreview
+;;productGrid;productGridPagePreview
+;;category;defaultCategoryPagePreview
+
+###### Marketplace Homepage ######
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText;&imageRef;folder(qualifier)[default='images']
+;;1934793_1719.jpg;$productResource/images/96Wx96H/1934793_1719.jpg;;"Canon PowerShot A480";1934793_1719.jpg
+;;1992695-Sony-DSC-S930P-11441.jpg;$productResource/images/96Wx96H/1992695-Sony-DSC-S930P-11441.jpg;;"Sony Cybershot DSC-S930";1992695-Sony-DSC-S930P-11441.jpg
+;;1320808-1767.jpg;$productResource/images/96Wx96H/1320808-1767.jpg;;"Kodak EASYSHARE V1253";1320808-1767.jpg
+;;1978440-Sony-DSC-H20-114081.jpg;$productResource/images/96Wx96H/1978440-Sony-DSC-H20-114081.jpg;;"Sony DSC-H20";1978440-Sony-DSC-H20-114081.jpg
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;BrandsGaloreBanner;Brands Galore Banner;BrandsGaloreBanner;/Brands/c/brands
+;;CamcordersBanner;Camcorders Banner;CamcordersBanner;/Open-Catalogue/Cameras/Hand-held-Camcorders/c/584
+;;LensesBanner;Lenses Banner;LensesBanner;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/Camera-Lenses/c/588
+;;NextDayDeliveryBanner;Next Day Delivery Banner;NextDayDeliveryBanner
+
+INSERT_UPDATE BannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;CanonPowershotBannerComponent;Canon Powershot A480 Thumbnail Detail;CanonPowershotBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/PowerShot-A480/p/1934793
+;;SonyCybershotBannerComponent;Sony Cybershot DSC-S930 Thumbnail Detail;SonyCybershotBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/DSC-S930/p/1992695
+;;KodakEasyshareBannerComponent;Kodak Easyshare V1253 Thumbnail Detail;KodakEasyshareBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/EASYSHARE-V1253%2C-Black/p/1320808
+;;SonyDSCBannerComponent;Sony DSC-H20 Thumbnail Detail;SonyDSCBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/DSC-H20/p/1978440
+;;DigitalCompactCamerasBannerComponent;Digital Compact Cameras Small Detail;DigitalCompactCamerasBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/c/576
+;;DigitalSLRCamerasBannerComponent;Digital SLR Cameras Small Detail;DigitalSLRCamerasBannerComponent;/Open-Catalogue/Cameras/Digital-Cameras/Digital-SLR/c/578
+;;MemoryBannerComponent;Camera and Camcorder Memory Small Detail;MemoryBannerComponent;/Open-Catalogue/Data-storage/Flash-Memory/c/902
+;;AccessoriesBannerComponent;Camera Accessories and Supplies Small Detail;AccessoriesBannerComponent;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/c/585
+;;CarouselCyberBanner;Carousel Cyber Banner;CarouselCyberBanner;/Open-Catalogue/Cameras/Digital-Cameras/Digital-Compacts/Cyber-shot-W55/p/676442
+;;CarouselCamcorderBanner;Carousel Camcorder Banner;CarouselCamcorderBanner;Open-Catalogue/Cameras/Hand-held-Camcorders/LEGRIA-HF-S100/p/1986316
+;;CarouselFunBanner;Carousel Fun Banner;CarouselFunBanner;/Open-Catalogue/Cameras/Film-cameras/FUN-Flash-Single-Use-Camera%2C-27%2B12-pic/p/779841
+
+INSERT_UPDATE RotatingImagesComponent;$contentCV[unique=true];uid[unique=true];name;banners(&componentRef);&componentRef
+;;MarketplaceHomepageCarouselComponent;Marketplace Homepage Carousel;CarouselCyberBanner,CarouselCamcorderBanner,CarouselFunBanner;MarketplaceHomepageCarouselComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;Section1 Slot for Homepage;true;BrandsGaloreBanner
+;;Section2ASlot-Homepage;Section2A Slot for Homepage;true;CanonPowershotBannerComponent,SonyCybershotBannerComponent,KodakEasyshareBannerComponent,SonyDSCBannerComponent
+;;Section2BSlot-Homepage;Section2B Slot for Homepage;true;CamcordersBanner,LensesBanner
+;;Section2CSlot-Homepage;Section2C Slot for Homepage;true;MarketplaceHomepageCarouselComponent
+;;Section4Slot-Homepage;Section4 Slot for Homepage;true;DigitalCompactCamerasBannerComponent,DigitalSLRCamerasBannerComponent,MemoryBannerComponent,AccessoriesBannerComponent
+;;Section5Slot-Homepage;Section5 Slot for Homepage;true;NextDayDeliveryBanner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='homepage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-Homepage;Section1;;Section1Slot-Homepage
+;;Section2A-Homepage;Section2A;;Section2ASlot-Homepage
+;;Section2B-Homepage;Section2B;;Section2BSlot-Homepage
+;;Section2C-Homepage;Section2C;;Section2CSlot-Homepage
+;;Section4-Homepage;Section4;;Section4Slot-Homepage
+;;Section5-Homepage;Section5;;Section5Slot-Homepage
+
+###### Marketplace Camera Accessories and Supplies Category Landing Page ######
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV)
+;;CamerasAccessoriesAndSuppliesCategoryPage;Cameras Accessories & Supplies Category Page;CategoryPageTemplate;false;;CameraAccessoriesPagePreview
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;CamerasAccessoriesAndSupplies-LandingPageRestriction;Restriction for Cameras Accessories And Supplies;585;CamerasAccessoriesAndSuppliesCategoryPage
+
+INSERT_UPDATE CategoryFeatureComponent;$contentCV[unique=true];uid[unique=true];name;category(code, $productCV);&componentRef
+;;CameraFlashesFeatureComponent;CameraFlashesFeatureComponent;586;CameraFlashesFeatureComponent
+;;TripodFeatureComponent;TripodFeatureComponent;587;TripodFeatureComponent
+;;CameraLensesFeatureComponent;CameraLensesFeatureComponent;588;CameraLensesFeatureComponent
+;;ColourFilmsFeatureComponent;ColourFilmsFeatureComponent;597;ColourFilmsFeatureComponent
+;;BlackAndWhiteFilmsFeatureComponent;BlackAndWhiteFilmsFeatureComponent;598;BlackAndWhiteFilmsFeatureComponent
+;;BlankVideoTapesFeatureComponent;BlankVideoTapesFeatureComponent;604;BlankVideoTapesFeatureComponent
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;BuyOnlineBanner;Buy Online Banner;BuyOnlineBanner
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section2Slot-CameraAccessories;Section2 Slot for Camera Accessories Page;true;BuyOnlineBanner
+;;Section3Slot-CameraAccessories;Section3 Slot for Camera Accessories Page;true;CameraFlashesFeatureComponent,TripodFeatureComponent,CameraLensesFeatureComponent,ColourFilmsFeatureComponent,BlackAndWhiteFilmsFeatureComponent,BlankVideoTapesFeatureComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='CamerasAccessoriesAndSuppliesCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section2-CameraAccessories;Section2;;Section2Slot-CameraAccessories
+;;Section3-CameraAccessories;Section3;;Section3Slot-CameraAccessories
+
+###### Marketplace Search Results Page ######
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;PerfectPictureBanner;Perfect Picture Banner;PerfectPictureBanner;
+;;SLRLensesBanner;SLR Lenses Banner;SLRLensesBanner;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;Section2Slot-search;Section2 Slot for search;true;PerfectPictureBanner
+;;Section4Slot-search;Section4 Slot for search;true;SLRLensesBanner
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='search'];contentSlot(uid,$contentCV)[unique=true]
+;;Section2-search;Section2;;Section2Slot-search
+;;Section4-search;Section4;;Section4Slot-search
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;NoSearchResultsParagraphComponent;No Search Results Paragraph Component;NoSearchResultsParagraphComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;TopContent-searchEmpty;Top Slot for searchEmpty;true;
+;;SideContent-searchEmpty;Side Slot for searchEmpty;true;SLRLensesBanner
+;;MiddleContent-searchEmpty;Middle Slot for searchEmpty;true;NoSearchResultsParagraphComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='searchEmpty'];contentSlot(uid,$contentCV)[unique=true]
+;;Top-searchEmpty;TopContent;;TopContent-searchEmpty
+;;Side-searchEmpty;SideContent;;SideContent-searchEmpty
+;;Middle-searchEmpty;MiddleContent;;MiddleContent-searchEmpty
+
+###### Marketplace Cart Page ######
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;urlLink
+;;NextDayDeliveryBanner120;Next Day Delivery Banner (120);NextDayDeliveryBanner120;#
+;;HelpBanner;Help Banner;HelpBanner;#
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;EmptyCartParagraphComponent;Empty Cart Paragraph Component;EmptyCartParagraphComponent
+;;HelpParagraphComponent;Help Paragraph Component;HelpParagraphComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;TopContent-cartPage;Top Slot for Cart Page;true;NextDayDeliveryBanner120,CartComponent
+;;EmptyCartMiddleContent-cartPage;Empty Cart Middle Slot for Cart Page;true;EmptyCartParagraphComponent
+;;CenterLeftContentSlot-cartPage;Center Left Content Slot for Cart Page;true;PromotionsComponent,PotentialPromotionsComponent
+;;CenterRightContentSlot-cartPage;Center Right Content Slot for Cart Page;true;CartTotalsComponent
+;;BottomContentSlot-cartPage;Bottom Content Slot for Cart Page;true;CheckoutComponent,CartSuggestions
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='cartPage'];contentSlot(uid,$contentCV)[unique=true]
+;;TopContentSlotForCartPage;TopContent;;TopContent-cartPage
+;;EmptyCartMiddleForCartPage;EmptyCartMiddleContent;;EmptyCartMiddleContent-cartPage
+;;CenterLeftContentSlotForCartPage;CenterLeftContentSlot;;CenterLeftContentSlot-cartPage
+;;CenterRightContentSlotForCartPage;CenterRightContentSlot;;CenterRightContentSlot-cartPage
+;;BottomContentSlotForCartPage;BottomContentSlot;;BottomContentSlot-cartPage
+
+###### Marketplace Checkout Login Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;BottomContent-checkoutLogin;Bottom Slot for Checkout Login Page;true;HelpParagraphComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='checkout-login'];contentSlot(uid,$contentCV)[unique=true]
+;;Bottom-checkoutLogin;BottomContent;;BottomContent-checkoutLogin
+
+###### Marketplace Checkout Summary / Proceed to Checkout Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;SideContent-multiStepCheckoutSummaryPage;Side Slot for multiStepCheckoutSummaryPage;true;HelpParagraphComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true];contentSlot(uid,$contentCV)[unique=true]
+;;Side-multiStepCheckoutSummaryPage;SideContent;multiStepCheckoutSummaryPage;SideContent-multiStepCheckoutSummaryPage
+
+###### Marketplace Store Finder Page ######
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef)
+;;SideContent-StoreFinderPage;Side Slot for Store Finder Page;true;SLRLensesBanner
+;;MiddleContent-StoreFinderPage;Middle Slot for Store Finder Page;true;StoreFinderComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='storefinderPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Side-StoreFinderPage;SideContent;;SideContent-StoreFinderPage
+;;Middle-StoreFinderPage;MiddleContent;;MiddleContent-StoreFinderPage
+
+###### Marketplace FAQ Page ######
+
+# CMSParagraphComponent
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;faqMenuParagraph;FAQ Paragraph;FAQMenuParagraph;;;;
+;;faqTextParagraph;FAQ Paragraph;FAQTextParagraph;;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-FAQ;Section2A Slot for FAQ Page;true;FAQMenuParagraph;;;
+;;Section2BSlot-FAQ;Section2B Slot for FAQ Page;true;FAQTextParagraph;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='faq'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-FAQ;Section2A;;Section2ASlot-FAQ;;;
+;;Section2B-FAQ;Section2B;;Section2BSlot-FAQ;;;
+
+###### Marketplace Order Expired Page ######
+
+# CMSParagraphComponent
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;orderExpiredMenuParagraph;Order Expired Paragraph;OrderExpiredMenuParagraph;;;;
+;;orderExpiredTextParagraph;Order Expired Paragraph;OrderExpiredTextParagraph;;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-OrderExpired;Section2A Slot for Order Expired Page;true;OrderExpiredMenuParagraph;;;
+;;Section2BSlot-OrderExpired;Section2B Slot for Order Expired Page;true;OrderExpiredTextParagraph;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orderExpired'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-OrderExpired;Section2A;;Section2ASlot-OrderExpired;;;
+;;Section2B-OrderExpired;Section2B;;Section2BSlot-OrderExpired;;;
+
+###### Marketplace Terms and Conditions Page
+
+# CMSParagraphComponent
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;;;;
+;;termsAndConditionsMenuParagraph;Terms and Conditions Paragraph;TermsAndConditionsMenuParagraph;;;;
+;;termsAndConditionsTextParagraph;Terms and Conditions Paragraph;TermsAndConditionsTextParagraph;;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;Section2ASlot-TermsAndConditions;Section2A Slot for Terms and Conditions Page;true;TermsAndConditionsMenuParagraph;;;
+;;Section2BSlot-TermsAndConditions;Section2B Slot for Terms and Conditions Page;true;TermsAndConditionsTextParagraph;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='termsAndConditions'];contentSlot(uid,$contentCV)[unique=true];;;
+;;Section2A-TermsAndConditions;Section2A;;Section2ASlot-TermsAndConditions;;;
+;;Section2B-TermsAndConditions;Section2B;;Section2BSlot-TermsAndConditions;;;
+
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountPaymentDetailsComponent;Account Payment Details Component;accountPaymentInfoPage.jsp;;AccountPaymentDetailsComponent
+;;AccountOrderDetailsHeadlineComponent;Account Order Details Headline Component;accountOrderDetailHeadline.jsp;;AccountOrderDetailsHeadlineComponent
+;;AccountOrderDetailsTotalsComponent;Account Order Details Order Totals Component;accountOrderDetailOrderTotals.jsp;;AccountOrderDetailsTotalsComponent
+;;AccountOrderDetailsShippingComponent;Account Order Details Shipping Info Component;accountOrderDetailShippingInfo.jsp;;AccountOrderDetailsShippingComponent
+;;AccountOrderDetailsItemsComponent;Account Order Details Items Info Component;accountOrderDetailItems.jsp;;AccountOrderDetailsItemsComponent
+;;AccountOrderHistoryComponent;Account History Component;accountOrderHistoryPage.jsp;ViewOrderAction;AccountOrderHistoryComponent
+;;AccountProfileComponent;Account Profile Component;accountProfilePage.jsp;;AccountProfileComponent
+;;AccountAddressBookComponent;Account Address Book Component;accountAddressBookPage.jsp;;AccountAddressBookComponent
+;;AccountAddEditAddressComponent;Account Add Edit Address Component;accountEditAddressPage.jsp;;AccountAddEditAddressComponent
+;;UpdatePasswordComponent;Update Password Component;accountChangePasswordPage.jsp;;UpdatePasswordComponent
+;;UpdateProfileComponent;Update Profile Component;accountProfileEditPage.jsp;;UpdateProfileComponent
+;;UpdateEmailComponent;Update Email Component;accountProfileEmailEditPage.jsp;;UpdateEmailComponent
+;;ConsentManagementComponent;Consent Management Component;accountConsentManagementPage.jsp;;ConsentManagementComponent
+;;StoreFinderComponent;Store Finder Component;storeFinderContent.jsp;ViewStoreAction;StoreFinderComponent
+;;CartComponent;Cart Display Component;cartDisplay.jsp;;CartComponent
+;;CartTotalsComponent;Cart Totals Display Component;cartTotalsDisplay.jsp;;CartTotalsComponent
+;;PromotionsComponent;Promotions Component;cartPromotionsDisplay.jsp;;PromotionsComponent
+;;PotentialPromotionsComponent;Potential Promotions Component;potentialPromotionsDisplay.jsp;;PotentialPromotionsComponent
+;;CheckoutComponent;Checkout Display Component;checkoutDisplay.jsp;;CheckoutComponent
+;;NewCustomerLoginComponent;New Customer Login Component;accountNewCustomerLogin.jsp;;NewCustomerLoginComponent
+;;ReturningCustomerLoginComponent;Returning Customer Login Component;accountReturningCustomerLogin.jsp;;ReturningCustomerLoginComponent
+;;NewCustomerCheckoutLoginComponent;New Customer Checkout Login Component;checkoutNewCustomerLogin.jsp;;NewCustomerCheckoutLoginComponent
+;;ReturningCustomerCheckoutLoginComponent;Returning Customer Checkout Login Component;checkouReturningCustomerLogin.jsp;;ReturningCustomerCheckoutLoginComponent
+;;GuestCheckoutLoginComponent;Guest Checkout Login Component;checkoutGuestLogin.jsp;;GuestCheckoutLoginComponent
+;;CloseAccountComponent;Close Account Component;accountCloseAccountPage.jsp;;CloseAccountComponent
+;;AnonymousConsentManagementComponent;Anonymous Consent Management Component;/WEB-INF/views/responsive/pages/consent/consentmanagement.jsp;;AnonymousConsentManagementComponent
+;;CookieNotificationComponent;Cookie Notification Component;/WEB-INF/views/responsive/pages/consent/cookienotification.jsp;;CookieNotificationComponent
+
+INSERT_UPDATE BreadcrumbComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;breadcrumbComponent;Breadcrumb CMS Component;breadcrumbComponent
+
+# CMS View Order Action
+INSERT_UPDATE ViewOrderAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ViewOrderAction;/my-account/order/{orderCode};View Order Action;ActionRestriction;ViewOrderAction
+
+# CMS View Store Action
+INSERT_UPDATE ViewStoreAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ViewStoreAction;;View Store Action;ActionRestriction;ViewStoreAction
+
+###### Account Profile
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;BodyContent-profile;Body Content Slot for My Account Profile;true;AccountProfileComponent;;;
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)[mode=append]
+;;TopHeaderSlot;true;CookieNotificationComponent,AnonymousConsentManagementComponent
+
+###### Close Account Page
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-close-account;Side Content Slot for Close Account Page;true;;;;
+;;BodyContentSlot-close-account;Body Content Slot for Close Account Page;true;CloseAccountComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='close-account'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-close-account;SideContent;;SideContentSlot-close-account;;;
+;;BodyContent-close-account;BodyContent;;BodyContentSlot-close-account;;;
+
+###### Account Address Book
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-address-book;Side Content Slot for Account Address Book;true;;;;
+;;BodyContent-address-book;Body Content Slot for Account Address Book;true;AccountAddressBookComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='address-book'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-address-book;SideContent;;SideContent-address-book;;;
+;;BodyContent-address-book;BodyContent;;BodyContent-address-book;;;
+
+###### Account Add Edit Address
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-add-edit-address;Side Content Slot for Add Edit Address;true;;;;
+;;BodyContent-add-edit-address;Body Content Slot for Add Edit Address;true;AccountAddEditAddressComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='add-edit-address'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-add-edit-address;SideContent;;SideContent-add-edit-address;;;
+;;BodyContent-add-edit-address;BodyContent;;BodyContent-add-edit-address;;;
+
+######  Account payment detail page
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-payment-details;Side Content Slot for My Account payment-details;true;;;;
+;;BodyContent-payment-details;Body Content Slot for My Account payment-details;true;AccountPaymentDetailsComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='payment-details'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-payment-details;SideContent;;SideContent-payment-details;;;
+;;BodyContent-payment-details;BodyContent;;BodyContent-payment-details;;;
+
+
+###### Account Order History
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-orders;Side Content Slot for My Account Order History;true;;;;
+;;BodyContent-orders;Body Content Slot for My Account Order History;true;AccountOrderHistoryComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orders'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orders;SideContent;;SideContent-orders;;;
+;;BodyContent-orders;BodyContent;;BodyContent-orders;;;
+
+
+###### Account Order Details
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-orderdetail;Side Content Slot for My Account Order Details;true;;;;
+;;BodyContent-orderdetail;Body Content Slot for My Account Order Details;true;AccountOrderDetailsHeadlineComponent,AccountOrderDetailsTotalsComponent,AccountOrderDetailsShippingComponent,AccountOrderDetailsItemsComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='order'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orderdetail;SideContent;;SideContent-orderdetail;;;
+;;BodyContent-orderdetail;BodyContent;;BodyContent-orderdetail;;;
+
+###### Account Update Password
+# ContentSlot
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-updatePassword;Side Content Slot for Update Password;true;;;;
+;;BodyContent-updatePassword;Body Content Slot for Update Password;true;UpdatePasswordComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='updatePassword'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-updatePassword;SideContent;;SideContent-updatePassword;;;
+;;BodyContent-updatePassword;BodyContent;;BodyContent-updatePassword;;;
+
+###### Account Update Profile
+# ContentSlot
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-update-profile;Side Content Slot for Update Profile;true;;;;
+;;BodyContent-update-profile;Body Content Slot for Update Profile;true;UpdateProfileComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='update-profile'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-update-profile;SideContent;;SideContent-update-profile;;;
+;;BodyContent-update-profile;BodyContent;;BodyContent-update-profile;;;
+
+###### Account Update Email
+# ContentSlot
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-update-email;Side Content Slot for Update Email;true;;;;
+;;BodyContent-update-email;Body Content Slot for Update Email;true;UpdateEmailComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='update-email'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-update-email;SideContent;;SideContent-update-email;;;
+;;BodyContent-update-email;BodyContent;;BodyContent-update-email;;;
+
+###### Account Consent Management
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContentSlot-consents;Side Content Slot for Consent Management;true;;;;
+;;BodyContentSlot-consents;Body Content Slot for Consent Management;true;ConsentManagementComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='consents'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-consents;SideContent;;SideContentSlot-consents;;;
+;;BodyContent-consents;BodyContent;;BodyContentSlot-consents;;;
+
+
+#### ProductListPage
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;ProductListSlot;Product List Slot for Product List;true;ProductListComponent;;;
+
+#### ProductGridPage
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;ProductGridSlot;Product Grid Slot for Product List;true;ProductGridComponent;;;
+
+#### SearchResultListPage
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SearchResultsListSlot;Search Result List Slot for Search List;true;SearchResultsList;;;
+
+#### SearchResultGridPage
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SearchResultsGridSlot;Search Result Grid Slot for Search List;true;SearchResultsGrid;;;
+
+### Customer Login
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;LeftContentSlot-login;Left Content Slot for Customer Login;true;ReturningCustomerLoginComponent;;;
+;;RightContentSlot-login;Right Content Slot for Customer Login;true;NewCustomerLoginComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='login'];contentSlot(uid,$contentCV)[unique=true];;;
+;;LeftContentSlot-login;LeftContentSlot;;LeftContentSlot-login;;;
+;;RightContentSlot-login;RightContentSlot;;RightContentSlot-login;;;
+
+### Checkout Login
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;LeftContentSlot-checkout-login;Left Content Slot for Checkout Login;true;ReturningCustomerCheckoutLoginComponent;;;
+;;CenterContentSlot-checkout-login;Center Content Slot for Checkout Login;true;NewCustomerCheckoutLoginComponent;;;
+;;RightContentSlot-checkout-login;Right Content Slot for Checkout Login;true;GuestCheckoutLoginComponent;;;
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='checkout-login'];contentSlot(uid,$contentCV)[unique=true];;;
+;;LeftContentSlot-checkout-login;LeftContentSlot;;LeftContentSlot-checkout-login;;;
+;;CenterContentSlot-checkout-login;CenterContentSlot;;CenterContentSlot-checkout-login;;;
+;;RightContentSlot-checkout-login;RightContentSlot;;RightContentSlot-checkout-login;;;
+
+$contentCatalog=marketplaceContentCatalog
+$contentCatalogName=Marketplace Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+$productCatalog=globalMarketplaceProductCatalog
+$productCatalogName=Marketplace Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$siteResource=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/contentCatalogs/$contentCatalog
+$medias=medias(code, $contentCV);
+$mediaContainer=media(qualifier, $contentCV);
+$jarResourceCms=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/cockpits/cmscockpit
+
+##  Remove the language currency component from the search and place a tag in the footer
+# CMS SearchBox Components
+INSERT_UPDATE SearchBoxComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;SearchBox;Search Box;SearchBox
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;SearchBoxSlot;SearchBox
+
+INSERT_UPDATE FooterComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;showLanguageCurrency
+;;FooterComponent;4;true
+
+#################    HOME PAGE START     #################
+
+###  Home page splash Slot 1  #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageSplashBannerComponent;Marketplace Homepage Splash Banner Component;/Open-Catalogue/Categories/c/categories;MarketplaceHompageSplashBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageDiscountBannerComponent;Marketplace Homepage Discount Banner Component;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/c/585;MarketplaceHompageDiscountBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-Homepage;true;MarketplaceHompageSplashBannerComponent,MarketplaceHompageDiscountBannerComponent
+
+###  Home page slot 2A  ####
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageLightFamBannerComponent;Marketplace Homepage Light Family Banner Component;/Open-Catalogue/Home-Appliances/c/303;MarketplaceHompageLightFamBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageLightFamTextBannerComponent;Marketplace Homepage Light Family Text Banner Component;/Open-Catalogue/Computers/c/301;MarketplaceHompageLightFamTextBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2ASlot-Homepage;true;MarketplaceHompageLightFamBannerComponent,MarketplaceHompageLightFamTextBannerComponent
+
+#### Home section 2B #######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageCamcordersBannerComponent;Marketplace Homepage Camcorders Banner Component;/Open-Catalogue/Smart-Wearables/c/302;MarketplaceHompageCamcordersBannerComponent
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageCamcordersChildBannerComponent;Marketplace Homepage Light Family Banner Component Child;/Open-Catalogue/Healthcare-%26-Personal-Care/c/304;MarketplaceHompageCamcordersChildBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2BSlot-Homepage;true;MarketplaceHompageCamcordersBannerComponent,MarketplaceHompageCamcordersChildBannerComponent
+
+## Home section 2C
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;Section2CSlot-Homepage;
+
+
+#### Section 4
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageSmDiscountBannerComponent;Marketplace Homepage Small Discount Banner Component;/Open-Catalogue/Smart-Wearables/Smart-Watches/WI500Q/p/vendor2_26416725;MarketplaceHompageSmDiscountBannerComponent
+;;MarketplaceHompageShopBannerComponent;Marketplace Homepage Shop Banner Component;/Open-Catalogue/Home-Appliances/Coffee-Makers/RI8425-22/p/vendor3_29537253;MarketplaceHompageShopBannerComponent
+;;MarketplaceHompageShipmentBannerComponent;Marketplace Homepage Shipment Banner Component;/Open-Catalogue/Healthcare-%26-Personal-Care/Men%27s-Shavers/wet-and-dry-electric-shaver/p/vendor4_10791863;MarketplaceHompageShipmentBannerComponent
+;;MarketplaceHompageServiceBannerComponent;Marketplace Homepage Service Banner Component;/Open-Catalogue/Categories/Accessories-women/Bags-women/Wind-Jammer-Tote-Beach-Bag-Women/p/vendor6_300613861;MarketplaceHompageServiceBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section4Slot-Homepage;true;MarketplaceHompageSmDiscountBannerComponent,MarketplaceHompageShopBannerComponent,MarketplaceHompageShipmentBannerComponent,MarketplaceHompageServiceBannerComponent
+
+### Section 5
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceHompageFreeDelBannerComponent;Marketplace Homepage Free Delivery Banner Component;/faq;MarketplaceHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section5Slot-Homepage;true;MarketplaceHompageFreeDelBannerComponent
+
+#################    HOME PAGE END       #################
+
+#################    MY ACCOUNT START    #################
+
+#### Remove everything related to my account home page and profile overview page for responsive
+
+REMOVE ContentSlot;$contentCV[unique=true];uid[unique=true]
+;;SideContent-Account
+;;SideContent-profile
+
+REMOVE ContentPage;$contentCV[unique=true];uid[unique=true]
+;;account
+;;profile
+
+##### Add AccountOrderDetailsActionsComponent
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountOrderDetailsHeadlineComponent;Account Order Details Headline Component;accountOrderDetailHeadline.jsp;;AccountOrderDetailsHeadlineComponent
+;;AccountOrderDetailsTotalsComponent;Account Order Details Order Totals Component;accountOrderDetailOrderTotals.jsp;;AccountOrderDetailsTotalsComponent
+;;AccountOrderDetailsShippingComponent;Account Order Details Shipping Info Component;accountOrderDetailShippingInfo.jsp;;AccountOrderDetailsShippingComponent
+;;AccountOrderDetailsItemsComponent;Account Order Details Items Info Component;accountOrderDetailItems.jsp;;AccountOrderDetailsItemsComponent
+;;AccountOrderDetailsActionsComponent;Account Order Details Actions Component;accountOrderDetailActions.jsp;;AccountOrderDetailsActionsComponent
+;;AccountOrderDetailsOverviewComponent;Account Order Details Overview Info Component;accountOrderDetailOverview.jsp;;AccountOrderDetailsOverviewComponent
+
+###### Empty account page SideContent and BodyContent slots
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef);
+;;SideContent-payment-details;;
+;;SideContent-address-book;;
+;;SideContent-add-edit-address;;
+;;SideContent-orders;;
+;;SideContent-orderdetail;;
+;;SideContent-updatePassword;;
+;;SideContent-update-profile;;
+;;SideContent-update-email;;
+;;SideContentSlot-consents;;
+;;BodyContent-orderdetail;AccountOrderDetailsHeadlineComponent,AccountOrderDetailsOverviewComponent,AccountOrderDetailsItemsComponent,AccountOrderDetailsShippingComponent,AccountOrderDetailsTotalsComponent,AccountOrderDetailsActionsComponent;
+
+#################    MY ACCOUNT END    #################
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(uid, $contentCV)
+;;TopContent-cartPage;Top Slot for Cart Page;true;CartComponent
+
+# Site Logo
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/svg+xml'];altText;folder(qualifier)[default='images']
+;;/images/theme/logo_marketplace_responsive.svg;logo_marketplace_responsive.svg;$siteResource/images/theme/logo_marketplace_responsive.svg;image/svg+xml;Marketplace Accelerator;
+
+###  Responsive Error page #######
+
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];realfilename;altText;mime[default='image/svg+xml'];$contentCV[unique=true];folder(qualifier)[default=images]
+;mobile;Elec_480x170_ErrorPage_480W.svg;$siteResource/images/banners/site/Elec_1400x401_ErrorPage_EN_1400W.svg;Elec_1400x401_ErrorPage_EN_1400W.svg;"Page not found";
+;tablet;Elec_770x221_ErrorPage_770W.svg;$siteResource/images/banners/site/Elec_1400x401_ErrorPage_EN_1400W.svg;Elec_1400x401_ErrorPage_EN_1400W.svg;"Page not found";
+;desktop;Elec_960x275_ErrorPage_960W.svg;$siteResource/images/banners/site/Elec_1400x401_ErrorPage_EN_1400W.svg;Elec_1400x401_ErrorPage_EN_1400W.svg;"Page not found";
+;widescreen;Elec_1400x401_ErrorPage_1400W.svg;$siteResource/images/banners/site/Elec_1400x401_ErrorPage_EN_1400W.svg;Elec_1400x401_ErrorPage_EN_1400W.svg;"Page not found";
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$contentCV[unique=true]
+;marketplace-errorpage-pagenotfound;Elec_480x170_ErrorPage_480W.svg,Elec_770x221_ErrorPage_770W.svg,Elec_960x275_ErrorPage_960W.svg,Elec_1400x401_ErrorPage_1400W.svg
+
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef;$mediaContainer
+;;MarketplaceErrorpageBannerComponent;Marketplace Error Page Banner Component;MarketplaceErrorpageBannerComponent;marketplace-errorpage-pagenotfound
+
+# Create ContentSlots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;MiddleContent-Errorpage;Middle Content Slot for Error Page;true;MarketplaceErrorpageBannerComponent;;;
+
+# Create Content Slots for Page
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='notFound'];contentSlot(uid,$contentCV)[unique=true]
+;;MiddleContent-Errorpage;MiddleContent;;MiddleContent-Errorpage
+
+# Remove view store action from store finder component
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];actions(uid,$contentCV);
+;;StoreFinderComponent;;
+###### Update the Camera and Accessories Category Page #####
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV)
+;;CamerasAccessoriesAndSuppliesCategoryPage;Cameras Accessories & Supplies Category Page;ProductListPageTemplate;false;;CameraAccessoriesPagePreview
+
+
+##### End Update the Camera and Accessories Category Page #####
+
+###### Marketplace SLR Category Landing Page ######
+
+INSERT_UPDATE CategoryPage;$contentCV[unique=true];uid[unique=true];name;masterTemplate(uid,$contentCV);defaultPage;approvalStatus(code)[default='approved'];previewImage(code, $contentCV)
+;;SLRCamerasCategoryPage;SLR Cameras Category Page;CategoryPageTemplate;false;;;
+
+INSERT_UPDATE CMSCategoryRestriction;$contentCV[unique=true];uid[unique=true];name;categories(code, $productCV);pages(uid, $contentCV)
+;;SLRCameras-LandingPageRestriction;Restriction for SLR Cameras;578;SLRCamerasCategoryPage
+
+INSERT_UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;BuyOnlineBanner;Buy Online Banner;BuyOnlineBanner
+
+##### Section 1 ######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceSLRSplashBannerComponent;Marketplace SLR Camera Splash Banner Component;Open-Catalogue/Cameras/Digital-Cameras/c/575;MarketplaceSLRSplashBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section1Slot-SLRCameras;true;MarketplaceSLRSplashBannerComponent
+
+##### Section 2 ######
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceCanon500DBannerComponent;Marketplace Canon 500D Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/EOS-500D-%2B-18-200mm-IS/p/2054947;MarketplaceCanon500DBannerComponent
+;;MarketplaceCanon450DBannerComponent;Marketplace Canon 450D Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/EOS450D-%2B-18-55-IS-Kit/p/1382080;MarketplaceCanon450DBannerComponent
+;;MarketplaceSonyA100HBannerComponent;Marketplace Sony A100H Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/DSLR-A100H/p/816780;MarketplaceSonyA100HBannerComponent
+;;MarketplaceSonyA330BannerComponent;Marketplace Sony A330 Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/DSLR-A330-%2BDT-18---55-mm/p/2934302;MarketplaceSonyA330BannerComponent
+;;MarketplaceSonyA200BannerComponent;Marketplace Sony A200 Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/Alpha-200/p/1391319;MarketplaceSonyA200BannerComponent
+;;MarketplaceSonyAlpha350BannerComponent;Marketplace Sony Alpha 350 Banner Component;Open-Catalogue/Cameras/DigitalCameras/Digital-SLR/Alpha-350/p/1446509;MarketplaceSonyAlpha350BannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section2Slot-SLRCameras;true;MarketplaceSonyA100HBannerComponent,MarketplaceCanon500DBannerComponent,MarketplaceCanon450DBannerComponent,MarketplaceSonyA330BannerComponent,MarketplaceSonyA200BannerComponent,MarketplaceSonyAlpha350BannerComponent
+
+##### Section 3 #####
+INSERT_UPDATE SimpleResponsiveBannerComponent;$contentCV[unique=true];uid[unique=true];name;urlLink;&componentRef
+;;MarketplaceSaveBigDLSRBannerComponent;Marketplace Save Big DSLR Banner Component;/Open-Catalogue/Cameras/Camera-Accessories-%26-Supplies/c/585;MarketplaceSaveBigDLSRBannerComponent
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];active;cmsComponents(&componentRef)
+;;Section3Slot-SLRCameras;true;MarketplaceSaveBigDLSRBannerComponent,MarketplaceHompageFreeDelBannerComponent
+
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='SLRCamerasCategoryPage'];contentSlot(uid,$contentCV)[unique=true]
+;;Section1-SLRCameras;Section1;;Section1Slot-SLRCameras
+;;Section2-SLRCameras;Section2;;Section2Slot-SLRCameras
+;;Section3-SLRCameras;Section3;;Section3Slot-SLRCameras
+
+###### End Marketplace SLR Category Landing Page ######
+
+# Remove new customer component from the center slot of the checkout login page
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;CenterContentSlot-checkout-login;Center Content Slot for Checkout Login;true;;;;
+
+# create cms link components for my account pages
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;target(code)[default='sameWindow']
+;;PersonalDetailsLink;PersonalDetailsLink;/my-account/update-profile;PersonalDetailsLink;
+;;UpdateEmailLink;UpdateEmailLink;/my-account/update-email;UpdateEmailLink;
+;;UpdatePasswordLink;UpdatePasswordLink;/my-account/update-password;UpdatePasswordLink;
+;;AddressBookLink;AddressBookLink;/my-account/address-book;AddressBookLink;
+;;PaymentDetailsLink;PaymentDetailsLink;/my-account/payment-details;PaymentDetailsLink;
+;;OrderHistoryLink;OrderHistoryLink;/my-account/orders;OrderHistoryLink;
+;;SavedCartsLink;SavedCartsLink;/my-account/saved-carts;SavedCartsLink;
+;;ConsentManagementLink;ConsentManagementLink;/my-account/consents;ConsentManagementLink;
+;;CloseAccountLink;CloseAccountLink;/my-account/close-account;CloseAccountLink;
+
+# create navigation root node for my account & child nodes for the root node 
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;MyAccountNavNode;;My Account Nav;SiteRootNode;;MyAccountNavNode
+# children for my account
+;PersonalDetailsNavNode;;PersonalDetailsNavNode;MyAccountNavNode;;PersonalDetailsNavNode
+;UpdateEmailNavNode;;UpdateEmailNavNode;MyAccountNavNode;;UpdateEmailNavNode
+;PaymentDetailsNavNode;;PaymentDetailsNavNode;MyAccountNavNode;;PaymentDetailsNavNode
+;ChangePasswordNavNode;;ChangePasswordNavNode;MyAccountNavNode;;ChangePasswordNavNode
+;OrderHistoryNavNode;;OrderHistoryNavNode;MyAccountNavNode;;OrderHistoryNavNode
+;AddressBookNavNode;;AddressBookNavNode;MyAccountNavNode;;AddressBookNavNode
+;SavedCartsNavNode;;SavedCartsNavNode;MyAccountNavNode;;SavedCartsNavNode
+;ConsentManagementNavNode;;Consent Management;MyAccountNavNode;;ConsentManagementNavNode
+;CloseAccountNavNode;;Close Account;MyAccountNavNode;;CloseAccountNavNode
+
+# create cms navigation entry for nvaigation child nodes
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;PersonalDetailsNavNodeEntry;;PersonalDetailsNavNodeEntry;PersonalDetailsNavNode;PersonalDetailsLink;
+;UpdateEmailNavNodeEntry;;UpdateEmailNavNodeEntry;UpdateEmailNavNode;UpdateEmailLink;
+;ChangePasswordNavNodeEntry;;ChangePasswordNavNodeEntry;ChangePasswordNavNode;UpdatePasswordLink;
+;AddressBookNavNodeEntry;;AddressBookNavNodeEntry;AddressBookNavNode;AddressBookLink;
+;PaymentDetailsNavNodeEntry;;PaymentDetailsNavNodeEntry;PaymentDetailsNavNode;PaymentDetailsLink;
+;OrderHistoryNavNodeEntry;;OrderHistoryNavNodeEntry;OrderHistoryNavNode;OrderHistoryLink;
+;SavedCartsNavNodeEntry;;SavedCartsNavNodeEntry;SavedCartsNavNode;SavedCartsLink;
+;ConsentManagementNavNodeEntry;;ConsentManagementNavNodeEntry;ConsentManagementNavNode;ConsentManagementLink;
+;CloseAccountNavNodeEntry;;CloseAccountNavNodeEntry;CloseAccountNavNode;CloseAccountLink;
+
+# create navigation component for my account
+INSERT_UPDATE NavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef)
+;;MyAccountComponent;My Account;accNavComponent;MyAccountComponent;MyAccountNavNode
+
+### Quick Order ###
+
+# create cms link components for quick order pages
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;styleAttributes;&linkRef;target(code)[default='sameWindow']
+;;QuickOrderLink;Quick Order Link;/quickOrder;;QuickOrderLink;;
+
+# create cms navigation entry for quick order
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;QuickOrderNavNodeEntry;;QuickOrderNavNodeEntry;QuickOrderNavNode;QuickOrderLink;
+
+# create navigation root node for order & child nodes for the root node
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;OrderNavNode;;Order Nav;SiteRootNode;;OrderNavNode
+# children for Order Nav Node
+;QuickOrderNavNode;;QuickOrderNavNode;OrderNavNode;;QuickOrderNavNode
+
+# create navigation component for Quick Order
+INSERT_UPDATE NavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef)
+;;OrderComponent;Order Component;nav-order-tools;OrderComponent;OrderNavNode
+
+# Content Slots
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
+;;MiniCartSlot;OrderComponent,MiniCart
+
+# create a user restriction
+INSERT_UPDATE CMSUserRestriction;$contentCV[unique=true];&userRestriction;name;uid[unique=true];users(uid)
+;;anonymousUserRestriction;Anonymous User Restriction;anonymousUserRestriction;anonymous
+
+# create a inverse restriction
+INSERT_UPDATE CMSInverseRestriction;$contentCV[unique=true];name;originalRestriction(&userRestriction)[allownull=true];uid[unique=true];components(&componentRef)
+;;Logged in User;anonymousUserRestriction;loggedInUser;MyAccountComponent
+
+# add my account navigation component to a content slot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;HeaderLinksSlot;MyAccountComponent
+
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)
+;;CrossSellingSlot;
+
+# CMS ListOrderForm Action
+INSERT_UPDATE ListOrderFormAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;ListOrderFormAction;/orderForm;Order Form Action;ActionRestriction;ListOrderFormAction
+
+UPDATE CMSProductListComponent;$contentCV[unique=true];uid[unique=true];actions(&actionRef)[mode=append]
+;;ProductListComponent;ListOrderFormAction
+
+UPDATE ProductGridComponent;$contentCV[unique=true];uid[unique=true];actions(&actionRef)[mode=append]
+;;ProductGridComponent;ListOrderFormAction
+
+UPDATE SearchResultsListComponent;$contentCV[unique=true];uid[unique=true];actions(&actionRef)[mode=append]
+;;SearchResultsList;ListOrderFormAction
+
+UPDATE SearchResultsGridComponent;$contentCV[unique=true];uid[unique=true];actions(&actionRef)[mode=append]
+;;SearchResultsGrid;ListOrderFormAction
+
+# Removing Search empty page content
+UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];&componentRef
+;;NoSearchResultsParagraphComponent;NoSearchResultsParagraphComponent
+
+UPDATE SimpleBannerComponent;$contentCV[unique=true];uid[unique=true];&componentRef
+;;SLRLensesBanner;SLRLensesBanner
+
+UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(&componentRef)[mode=remove]
+;;SideContent-searchEmpty;SLRLensesBanner
+;;MiddleContent-searchEmpty;NoSearchResultsParagraphComponent
+
+######## Order Confirmation Page Start #######
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;OrderConfirmationThankMessageComponent;Order Confirmation Thank You Message Component;checkoutConfirmationThankMessage.jsp;;OrderConfirmationThankMessageComponent
+;;OrderConfirmationOverviewComponent;Order Confirmation Overview Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailOverview.jsp;;OrderConfirmationOverviewComponent
+;;OrderConfirmationTotalsComponent;Order Confirmation Totals Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailOrderTotals.jsp;;OrderConfirmationTotalsComponent
+;;OrderConfirmationShippingComponent;Order Confirmation Shipping Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailShippingInfo.jsp;;OrderConfirmationShippingComponent
+;;OrderConfirmationItemsComponent;Order Confirmation Items Info Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailItems.jsp;;OrderConfirmationItemsComponent
+;;OrderConfirmationContinueButtonComponent;Order Confirmation Continue Button Component;checkoutConfirmationContinueButton.jsp;;OrderConfirmationContinueButtonComponent
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orderConfirmationPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-orderConfirmation;SideContent;;SideContent-orderConfirmation;;;
+;;BodyContent-orderConfirmation;BodyContent;;BodyContent-orderConfirmation;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-orderConfirmation;Side Content Slot for Order Confirmation;true;;;;
+;;BodyContent-orderConfirmation;Body Content Slot for Order Confirmation;true;OrderConfirmationThankMessageComponent,OrderConfirmationOverviewComponent,OrderConfirmationItemsComponent,OrderConfirmationShippingComponent,OrderConfirmationTotalsComponent,OrderConfirmationContinueButtonComponent;;;
+
+######## Order Confirmation Page End #######
+
+###### Import CSV as Saved Cart Page Start ######
+
+# create cms link components for import csv file
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;styleAttributes;&linkRef;target(code)[default='sameWindow']
+;;ImportSavedCartLink;Import Saved Cart Link;/import/csv/saved-cart;;ImportSavedCartLink;;
+
+# create cms navigation entry for import csv file
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(&linkRef);
+;ImportSavedCartNavNodeEntry;;ImportSavedCartNavNodeEntry;ImportSavedCartNavNode;ImportSavedCartLink;
+
+# create navigation root node for import csv file
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);links(&linkRef);&nodeRef
+;ImportSavedCartNavNode;;ImportSavedCartNavNode;OrderNavNode;;ImportSavedCartNavNode
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='importCSVSavedCartPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-importCSVSavedCartPage;SideContent;;SideContent-importCSVSavedCartPage;;;
+;;BodyContent-importCSVSavedCartPage;BodyContent;;BodyContent-importCSVSavedCartPage;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-importCSVSavedCartPage;Side Content Slot for Import CSV as Saved Cart Page;true;;;;
+;;BodyContent-importCSVSavedCartPage;Body Content Slot for Import CSV as Saved Cart Page;true;ImportCSVSavedCartComponent;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;ImportCSVSavedCartComponent;Import CSV as Saved Cart Component;csv/importCSVSavedCartPage.jsp;;ImportCSVSavedCartComponent
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;importCSVSavedCartPagePreview;text/png;OrderHistoryPage.png;$jarResourceCms/preview-images/marketplace/OrderHistoryPage.png
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;importCSVSavedCartPage;importCSVSavedCartPagePreview
+###### Import CSV as Saved Cart Page End ######
+
+###### Saved Cart Details Page Start ######
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='savedCartDetailsPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-savedCartDetailsPage;SideContent;;SideContent-savedCartDetailsPage;;;
+;;BodyContent-savedCartDetailsPage;BodyContent;;BodyContent-savedCartDetailsPage;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-savedCartDetailsPage;Side Content Slot for Saved Cart Details Page;true;;;;
+;;BodyContent-savedCartDetailsPage;Body Content Slot for Saved Cart Details Page;true;AccountSavedCartDetailsHeadlineComponent,AccountSavedCartDetailsOverviewComponent,AccountSavedCartDetailsItemsComponent,AccountSavedCartDetailsActionComponent;;;
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountSavedCartDetailsHeadlineComponent;Account Saved Cart Details Headline Component;accountSavedCartDetailsHeadline.jsp;;AccountSavedCartDetailsHeadlineComponent
+;;AccountSavedCartDetailsOverviewComponent;Account Saved Cart Details Overview Component;accountSavedCartDetailsOverview.jsp;;AccountSavedCartDetailsOverviewComponent
+;;AccountSavedCartDetailsItemsComponent;Account Saved Cart Details Items Component;accountSavedCartDetailsItems.jsp;;AccountSavedCartDetailsItemsComponent
+;;AccountSavedCartDetailsActionComponent;Account Order Details Action Component;accountSavedCartDetailsAction.jsp;;AccountSavedCartDetailsActionComponent
+
+# Preview image
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;savedCartDetailsPagePreview;text/png;SavedCartDetailsPage.png;$jarResourceCms/preview-images/marketplace/SavedCartDetailsPage.png
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;savedCartDetailsPage;savedCartDetailsPagePreview
+
+###### Saved Cart Details Page End ######
+
+######## Account Saved Carts Page Start #######
+
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];mime;realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator][forceWrite=true];folder(qualifier)[default='images']
+;;savedCartsPagePreview;text/png;SavedCartsPage.png;$jarResourceCms/preview-images/marketplace/SavedCartsPage.png
+
+UPDATE ContentPage;$contentCV[unique=true];uid[unique=true];previewImage(code, $contentCV)
+;;saved-carts;savedCartsPagePreview
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;SavedCartsComponent;Saved Carts Component;accountSavedCartsPage.jsp;;SavedCartsComponent
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SideContent-saved-carts;Side Content Slot for Saved Carts;true;;;;
+;;BodyContent-saved-carts;Body Content Slot for Saved Carts;true;SavedCartsComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='saved-carts'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SideContent-saved-carts;SideContent;;SideContent-saved-carts;;;
+;;BodyContent-saved-carts;BodyContent;;BodyContent-saved-carts;;;
+
+######## Account Saved Carts Page End #######
+
+###### Quick Order Page Start ######
+
+INSERT_UPDATE CMSParagraphComponent;$contentCV[unique=true];uid[unique=true];name;&componentRef
+;;QuickOrderInfoParagraphComponent;Quick Order Info Paragraph Component;QuickOrderInfoParagraphComponent
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='quickOrderPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;TopContent-quickOrderPage;TopContent;;TopContent-quickOrderPage;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;TopContent-quickOrderPage;Top Content Slot for Quick Order Page;true;QuickOrderInfoParagraphComponent;;;
+
+###### Quick Order Page End ######
+	
+INSERT_UPDATE CategoryNavigationComponent;$contentCV[unique=true];uid[unique=true];name;styleClass;&componentRef;navigationNode(&nodeRef);wrapAfter
+;;MarketplaceCategoryNavComponent;Category Navigation Component;;MarketplaceCategoryNavComponent;MarketplaceCategoryNavNode;7
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
+;;NavigationBarSlot;MarketplaceCategoryNavComponent,breadcrumbComponent
+
+
+## level 1. SiteRoot ##
+## level 2. children of SiteRoot ## 
+## level 3. children of Category Nav ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+;BrandsNavNode;;Brand Links;BrandsNavNode;BrandLinksNavNode
+;CamerasNavNode;;Cameras Category;CamerasNavNode;DigitalCameraNavNode,FilmCameraNavNode,WebcamNavNode,CameraAccessorieNavNode,HandheldCamcorderNavNode,FlashMemoryNavNode
+;ComputersNavNode;;Computers Category;ComputersNavNode;TabletsNavNode,LabtopsNavNode,PCsWorkstationsNavNode
+;SmartWearablesNavNode;;Computers Category;SmartWearablesNavNode;SmartWatchesNavNode,ActivityTrackersNavNode
+;HomeAppliancesNavNode;;Computers Category;HomeAppliancesNavNode;FridgeFreezersNode,WashingMachinesNavNode,CoffeeMakersNavNode
+;HealthcarePersonalCareNavNode;;Computers Category;HealthcarePersonalCareNavNode;ElectricToothbrushesNavNode,MenShaversNavNode,HairConditionersNavNode,HairShampoosNavNode
+
+## entries of the above navigation nodes ##
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;CamerasNavNodeEntry;;Cameras Navigation Node Entry;CamerasNavNode;CamerasCategoryLink;
+;ComputersNavNodeEntry;;Computers Navigation Node Entry;ComputersNavNode;ComputersCategoryLink;
+;SmartWearablesNavNodeEntry;;Smart Wearables Navigation Node Entry;SmartWearablesNavNode;SmartWearablesCategoryLink;
+;HomeAppliancesNavNodeEntry;;Home Appliances Navigation Node Entry;HomeAppliancesNavNode;HomeAppliancesCategoryLink;
+;HealthcarePersonalCareNavNodeEntry;;Healthcare & Personal Care Navigation Node Entry;HealthcarePersonalCareNavNode;HealthcarePersonalCareCategoryLink;
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;WebcamsCategoryLink;Webcams Category Link;/Open-Catalogue/Cameras/Webcams/c/577;WebcamsCategoryLink;WebcamsCategoryLink;;577;;
+
+
+## level 4. children of NavNode (the following order of children is the display order on the site) ## 
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+## children of CamerasNavNode 
+;DigitalCameraNavNode;;Digital Camera Links;DigitalCameraNavNode
+;FilmCameraNavNode;;Film Camera Links;FilmCameraNavNode
+;WebcamNavNode;;Webcams Links;WebcamNavNode
+;CameraAccessorieNavNode;;Camera Accessorie Links;CameraAccessorieNavNode
+;HandheldCamcorderNavNode;;Handheld Camcorder Links;HandheldCamcorderNavNode
+;FlashMemoryNavNode;;Flash Memory Links;FlashMemoryNavNode
+## children of ComputersNavNode 
+;TabletsNavNode;;Tablets Link;TabletsNavNode
+;LabtopsNavNode;;Labtops Link;LabtopsNavNode
+;PCsWorkstationsNavNode;;PCsWorkstationsNavNode Link;PCsWorkstationsNavNode
+## children of SmartWearablesNavNode
+;SmartWatchesNavNode;;Smart Watches Link;SmartWatchesNavNode
+;ActivityTrackersNavNode;;Activity Trackers Link;ActivityTrackersNavNode
+## children of HomeAppliancesNavNode
+;FridgeFreezersNode;;Fridge Freezers Link;FridgeFreezersNode
+;WashingMachinesNavNode;;Washing Machines Link;WashingMachinesNavNode
+;CoffeeMakersNavNode;;Coffee Makers Link;CoffeeMakersNavNode
+## children of HealthcarePersonalCareNavNode
+;ElectricToothbrushesNavNode;;ElectricToothbrushes NavNode Link;ElectricToothbrushesNavNode
+;MenShaversNavNode;;Men's Shavers NavNode Link;MenShaversNavNode
+;HairConditionersNavNode;;Hair Conditioners NavNode Link;HairConditionersNavNode
+;HairShampoosNavNode;;Hair Shampoos NavNode Link;HairShampoosNavNode
+
+## entries of the above navigation nodes ##
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+##Cameras
+;DigitalCameraNavNodeEntry;;Digital Cameras Navigation Node Entry;DigitalCameraNavNode;DigitalCamerasCategoryLink;
+;FilmCameraNavNodeEntry;;Film Cameras Navigation Node Entry;FilmCameraNavNode;FilmCamerasCategoryLink;
+;WebcamNavNodeEntry;;Webcams Navigation Node Entry;WebcamNavNode;WebcamsCategoryLink;
+;CameraAccessorieNavNodeEntry;;Camera Accessories Navigation Node Entry;CameraAccessorieNavNode;CameraAccessoriesCategoryLink;
+;HandheldCamcorderNavNodeEntry;;Handheld Camcorders Navigation Node Entry;HandheldCamcorderNavNode;HandheldCamcordersCategoryLink;
+;FlashMemoryNavNodeEntry;;Flash Memory Navigation Node Entry;FlashMemoryNavNode;FlashMemoryCategoryLink;
+##Computers
+;TabletsNavNodeEntry;;Tablets Navigation Node Entry;TabletsNavNode;TabletsCategoryLink;
+;LabtopsNavNodeEntry;;Labtops Navigation Node Entry;LabtopsNavNode;LabtopsCategoryLink;
+;PCsWorkstationsNavNodeEntry;;PCsWorkstations Navigation Node Entry;PCsWorkstationsNavNode;PCsWorkstationsCategoryLink;
+##Smart Wearables
+;SmartWatchesNavNodeEntry;;Smart Watches Navigation Node Entry;SmartWatchesNavNode;SmartWatchesCategoryLink;
+;ActivityTrackersNavNodeEntry;;Activity Trackers Navigation Node Entry;ActivityTrackersNavNode;ActivityTrackersCategoryLink;
+#Home Appliances
+;FridgeFreezersNodeEntry;;Fridge Freezers Navigation Node Entry;FridgeFreezersNode;FridgeFreezersCategoryLink;
+;WashingMachinesNavNodeEntry;;Washing Machines Navigation Node Entry;WashingMachinesNavNode;WashingMachinesCategoryLink;
+;CoffeeMakersNavNodeEntry;;Coffee Makers Navigation Node Entry;CoffeeMakersNavNode;CoffeeMakersCategoryLink;
+##Healthcare & Personal Care
+;ElectricToothbrushesNavNodeEntry;;ElectricToothbrushes NavNode Navigation Node Entry;ElectricToothbrushesNavNode;ElectricToothbrushesCategoryLink;
+;MenShaversNavNodeEntry;;Men's Shavers NavNode Navigation Node Entry;MenShaversNavNode;MenShaversCategoryLink;
+;HairConditionersNavNodeEntry;;Hair Conditioners NavNode Navigation Node Entry;HairConditionersNavNode;HairConditionersCategoryLink;
+;HairShampoosNavNodeEntry;;Hair Shampoos NavNode Navigation Node Entry;HairShampoosNavNode;HairShampoosCategoryLink;
+
+###### Navigation Component Refactor End ######
+
+
+###### Footer Component Refactor Start ######
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid,$contentCV)
+;;FooterSlot;FooterNavigationComponent
+
+INSERT_UPDATE FooterNavigationComponent;$contentCV[unique=true];uid[unique=true];wrapAfter;&componentRef;showLanguageCurrency;navigationNode(&nodeRef)
+;;FooterNavigationComponent;4;FooterNavigationComponent;true;FooterNavNode;
+
+# the order of children is the same as the display order on the site
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);&nodeRef;children(uid,$contentCV)
+;FooterNavNode;;Footer Pages;MarketplaceNavNode;FooterNavNode;AcceleratorNavNode,HybrisNavNode,FollowUsNavNode
+
+# children of FooterNavNode #
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef)
+;AcceleratorNavNode;;Accelerator Pages;AcceleratorNavNode;AboutAcceleratorNavNode,OurVendorsNavNode,FAQNavNode
+;HybrisNavNode;;Hybris Pages;HybrisNavNode;AboutHybrisNavNode,ContactUsNavNode
+;FollowUsNavNode;;Follow Us Pages;FollowUsNavNode;AgileCommerceBlogNavNode,LinkedInNavNode,FacebookNavNode,TwitterNavNode
+
+# children of above navigation nodes #
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+;AboutAcceleratorNavNode;;About Accelerator Page;AboutAcceleratorNavNode
+;FAQNavNode;;FAQ Page;FAQNavNode
+;AboutHybrisNavNode;;About Hybris Page;AboutHybrisNavNode
+;ContactUsNavNode;;Contact Us Page;ContactUsNavNode
+;AgileCommerceBlogNavNode;;Agile Commerce Blog Page;AgileCommerceBlogNavNode
+;LinkedInNavNode;;LinkedIn Page;LinkedInNavNode
+;FacebookNavNode;;Facebook Page;FacebookNavNode
+;TwitterNavNode;;Twitter Page;TwitterNavNode
+;OurVendorsNavNode;;Our Vendors Page;OurVendorsNavNode
+
+# entries of the above navigation nodes ##
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;AboutAcceleratorNavNodeEntry;;About Accelerator Navigation Node Entry;AboutAcceleratorNavNode;AboutAcceleratorLink;
+;FAQNavNodeEntry;;FAQ Navigation Node Entry;FAQNavNode;FAQLink;
+;AboutHybrisNavNodeEntry;;About Hybris Navigation Node Entry;AboutHybrisNavNode;AboutHybrisLink;
+;ContactUsNavNodeEntry;;Contact Us Navigation Node Entry;ContactUsNavNode;ContactUsLink;
+;AgileCommerceBlogNavNodeEntry;;Agile Commerce Blog Navigation Node Entry;AgileCommerceBlogNavNode;AgileCommerceBlogLink;
+;LinkedInNavNodeEntry;;LinkedIn Navigation Node Entry;LinkedInNavNode;LinkedInLink;
+;FacebookNavNodeEntry;;Facebook Navigation Node Entry;FacebookNavNode;FacebookLink;
+;TwitterNavNodeEntry;;Twitter Navigation Node Entry;TwitterNavNode;TwitterLink;
+;OurVendorsNavNodeEntry;;Our Vendors Navigation Node Entry;OurVendorsNavNode;OurVendorsLink;
+###### Footer Component Refactor End ######
+
+###### create brands navigation start ######
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+;BrandLinksNavNode;;Brand Links;BrandLinksNavNode;NixonBrandNavNode,Special BlendBrandNavNode,Alien WorkshopBrandNavNode,VolcomBrandNavNode,HurleyBrandNavNode,QuiksilverBrandNavNode,ElementBrandNavNode,DakineBrandNavNode,BenchBrandNavNode,FoxBrandNavNode,RoxyBrandNavNode,brand_1BrandNavNode,brand_2BrandNavNode,brand_5BrandNavNode,brand_10BrandNavNode,brand_18BrandNavNode,brand_26BrandNavNode,brand_75BrandNavNode,brand_88BrandNavNode,brand_103BrandNavNode,brand_128BrandNavNode,brand_251BrandNavNode,brand_702BrandNavNode,brand_2171BrandNavNode,brand_25BrandNavNode,brand_9644BrandNavNode,brand_161BrandNavNode,brand_173BrandNavNode,brand_925-644BrandNavNode,brand_473BrandNavNode,brand_875BrandNavNode,brand_921BrandNavNode,brand_878BrandNavNode,brand_728BrandNavNode
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;AllBrandsCategoryLink;All Brands Link;/Brands/c/brands;AllBrandsCategoryLink;AllBrandsCategoryLink;;brands;;
+
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;BrandsNavNodeEntry;;Brands Navigation Node Entry;BrandsNavNode;AllBrandsCategoryLink;
+
+##all brand
+$contentCatalog=marketplaceContentCatalog
+$contentCatalogName=Marketplace Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default='Staged'])[default=$contentCatalog:Staged]
+$productCatalog=globalMarketplaceProductCatalog
+$productCatalogName=Marketplace Product Catalog
+$productCV=catalogVersion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$product=product(code, $productCV)
+$category=category(code, $productCV)
+
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;NixonBrandCategoryLink;Nixon Link;/Brands/Nixon/c/Nixon;NixonBrandCategoryLink;NixonBrandCategoryLink;;Nixon;;
+;;Special BlendBrandCategoryLink;Special Blend Link;/Brands/Special Blend/c/Special Blend;Special BlendBrandCategoryLink;Special BlendBrandCategoryLink;;Special Blend;;
+;;Alien WorkshopBrandCategoryLink;Alien Workshop Link;/Brands/Alien Workshop/c/Alien Workshop;Alien WorkshopBrandCategoryLink;Alien WorkshopBrandCategoryLink;;Alien Workshop;;
+;;VolcomBrandCategoryLink;Volcom Link;/Brands/Volcom/c/Volcom;VolcomBrandCategoryLink;VolcomBrandCategoryLink;;Volcom;;
+;;HurleyBrandCategoryLink;Hurley Link;/Brands/Hurley/c/Hurley;HurleyBrandCategoryLink;HurleyBrandCategoryLink;;Hurley;;
+;;QuiksilverBrandCategoryLink;Quiksilver Link;/Brands/Quiksilver/c/Quiksilver;QuiksilverBrandCategoryLink;QuiksilverBrandCategoryLink;;Quiksilver;;
+;;ElementBrandCategoryLink;Element Link;/Brands/Element/c/Element;ElementBrandCategoryLink;ElementBrandCategoryLink;;Element;;
+;;DakineBrandCategoryLink;Dakine Link;/Brands/Dakine/c/Dakine;DakineBrandCategoryLink;DakineBrandCategoryLink;;Dakine;;
+;;BenchBrandCategoryLink;Bench Link;/Brands/Bench/c/Bench;BenchBrandCategoryLink;BenchBrandCategoryLink;;Bench;;
+;;FoxBrandCategoryLink;Fox Link;/Brands/Fox/c/Fox;FoxBrandCategoryLink;FoxBrandCategoryLink;;Fox;;
+;;RoxyBrandCategoryLink;Roxy Link;/Brands/Roxy/c/Roxy;RoxyBrandCategoryLink;RoxyBrandCategoryLink;;Roxy;;
+;;brand_1BrandCategoryLink;HP Link;/Brands/brand_1/c/brand_1;brand_1BrandCategoryLink;brand_1BrandCategoryLink;;brand_1;;
+;;brand_2BrandCategoryLink;Toshiba Link;/Brands/brand_2/c/brand_2;brand_2BrandCategoryLink;brand_2BrandCategoryLink;;brand_2;;
+;;brand_5BrandCategoryLink;Sony Link;/Brands/brand_5/c/brand_5;brand_5BrandCategoryLink;brand_5BrandCategoryLink;;brand_5;;
+;;brand_10BrandCategoryLink;Canon Link;/Brands/brand_10/c/brand_10;brand_10BrandCategoryLink;brand_10BrandCategoryLink;;brand_10;;
+;;brand_18BrandCategoryLink;Kingston Link;/Brands/brand_18/c/brand_18;brand_18BrandCategoryLink;brand_18BrandCategoryLink;;brand_18;;
+;;brand_26BrandCategoryLink;Samsung Link;/Brands/brand_26/c/brand_26;brand_26BrandCategoryLink;brand_26BrandCategoryLink;;brand_26;;
+;;brand_75BrandCategoryLink;Fujifilm Link;/Brands/brand_75/c/brand_75;brand_75BrandCategoryLink;brand_75BrandCategoryLink;;brand_75;;
+;;brand_88BrandCategoryLink;Kodak Link;/Brands/brand_88/c/brand_88;brand_88BrandCategoryLink;brand_88BrandCategoryLink;;brand_88;;
+;;brand_103BrandCategoryLink;NEC Link;/Brands/brand_103/c/brand_103;brand_103BrandCategoryLink;brand_103BrandCategoryLink;;brand_103;;
+;;brand_128BrandCategoryLink;Targus Link;/Brands/brand_128/c/brand_128;brand_128BrandCategoryLink;brand_128BrandCategoryLink;;brand_128;;
+;;brand_251BrandCategoryLink;TDK Link;/Brands/brand_251/c/brand_251;brand_251BrandCategoryLink;brand_251BrandCategoryLink;;brand_251;;
+;;brand_702BrandCategoryLink;Sweex Link;/Brands/brand_702/c/brand_702;brand_702BrandCategoryLink;brand_702BrandCategoryLink;;brand_702;;
+;;brand_2171BrandCategoryLink;ICIDU Link;/Brands/brand_2171/c/brand_2171;brand_2171BrandCategoryLink;brand_2171BrandCategoryLink;;brand_2171;;
+;;brand_25BrandCategoryLink;Philips Link;/Brands/brand_25/c/brand_25;brand_25BrandCategoryLink;brand_25BrandCategoryLink;;brand_25;;
+;;brand_9644BrandCategoryLink;Saeco Link;/Brands/brand_9644/c/brand_9644;brand_9644BrandCategoryLink;brand_9644BrandCategoryLink;;brand_9644;;
+;;brand_161BrandCategoryLink;ASUS Link;/Brands/brand_161/c/brand_161;brand_161BrandCategoryLink;brand_161BrandCategoryLink;;brand_161;;
+;;brand_173BrandCategoryLink;TomTom Link;/Brands/brand_173/c/brand_173;brand_173BrandCategoryLink;brand_173BrandCategoryLink;;brand_173;;
+;;brand_925-644BrandCategoryLink;Krups Link;/Brands/brand_925-644/c/brand_925-644;brand_925-644BrandCategoryLink;brand_925-644BrandCategoryLink;;brand_925-644;;
+;;brand_473BrandCategoryLink;Braun Link;/Brands/brand_473/c/brand_473;brand_473BrandCategoryLink;brand_473BrandCategoryLink;;brand_473;;
+;;brand_875BrandCategoryLink;Electrolux Link;/Brands/brand_875/c/brand_875;brand_875BrandCategoryLink;brand_875BrandCategoryLink;;brand_875;;
+;;brand_921BrandCategoryLink;Gaggia Link;/Brands/brand_921/c/brand_921;brand_921BrandCategoryLink;brand_921BrandCategoryLink;;brand_921;;
+;;brand_878BrandCategoryLink;Indesit Link;/Brands/brand_878/c/brand_878;brand_878BrandCategoryLink;brand_878BrandCategoryLink;;brand_878;;
+;;brand_728BrandCategoryLink;Lenovo Link;/Brands/brand_728/c/brand_728;brand_728BrandCategoryLink;brand_728BrandCategoryLink;;brand_728;;
+
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef
+;NixonBrandNavNode;;Nixon Brand Link;NixonBrandNavNode
+;Special BlendBrandNavNode;;Special Blend Brand Link;Special BlendBrandNavNode
+;Alien WorkshopBrandNavNode;;Alien Workshop Brand Link;Alien WorkshopBrandNavNode
+;VolcomBrandNavNode;;Volcom Brand Link;VolcomBrandNavNode
+;HurleyBrandNavNode;;Hurley Brand Link;HurleyBrandNavNode
+;QuiksilverBrandNavNode;;Quiksilver Brand Link;QuiksilverBrandNavNode
+;ElementBrandNavNode;;Element Brand Link;ElementBrandNavNode
+;DakineBrandNavNode;;Dakine Brand Link;DakineBrandNavNode
+;BenchBrandNavNode;;Bench Brand Link;BenchBrandNavNode
+;FoxBrandNavNode;;Fox Brand Link;FoxBrandNavNode
+;RoxyBrandNavNode;;Roxy Brand Link;RoxyBrandNavNode
+;brand_1BrandNavNode;;HP Brand Link;brand_1BrandNavNode
+;brand_2BrandNavNode;;Toshiba Brand Link;brand_2BrandNavNode
+;brand_5BrandNavNode;;Sony Brand Link;brand_5BrandNavNode
+;brand_10BrandNavNode;;Canon Brand Link;brand_10BrandNavNode
+;brand_18BrandNavNode;;Kingston Brand Link;brand_18BrandNavNode
+;brand_26BrandNavNode;;Samsung Brand Link;brand_26BrandNavNode
+;brand_75BrandNavNode;;Fujifilm Brand Link;brand_75BrandNavNode
+;brand_88BrandNavNode;;Kodak Brand Link;brand_88BrandNavNode
+;brand_103BrandNavNode;;NEC Brand Link;brand_103BrandNavNode
+;brand_128BrandNavNode;;Targus Brand Link;brand_128BrandNavNode
+;brand_251BrandNavNode;;TDK Brand Link;brand_251BrandNavNode
+;brand_702BrandNavNode;;Sweex Brand Link;brand_702BrandNavNode
+;brand_2171BrandNavNode;;ICIDU Brand Link;brand_2171BrandNavNode
+;brand_25BrandNavNode;;Philips Brand Link;brand_25BrandNavNode
+;brand_9644BrandNavNode;;Saeco Brand Link;brand_9644BrandNavNode
+;brand_161BrandNavNode;;ASUS Brand Link;brand_161BrandNavNode
+;brand_173BrandNavNode;;TomTom Brand Link;brand_173BrandNavNode
+;brand_925-644BrandNavNode;;Krups Brand Link;brand_925-644BrandNavNode
+;brand_473BrandNavNode;;Braun Brand Link;brand_473BrandNavNode
+;brand_875BrandNavNode;;Electrolux Brand Link;brand_875BrandNavNode
+;brand_921BrandNavNode;;Gaggia Brand Link;brand_921BrandNavNode
+;brand_878BrandNavNode;;Indesit Brand Link;brand_878BrandNavNode
+;brand_728BrandNavNode;;Lenovo Brand Link;brand_728BrandNavNode
+
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;NixonBrandNavNodeEntry;;Nixon Brand Navigation Node Entry;NixonBrandNavNode;NixonBrandCategoryLink;
+;Special BlendBrandNavNodeEntry;;Special Blend Brand Navigation Node Entry;Special BlendBrandNavNode;Special BlendBrandCategoryLink;
+;Alien WorkshopBrandNavNodeEntry;;Alien Workshop Brand Navigation Node Entry;Alien WorkshopBrandNavNode;Alien WorkshopBrandCategoryLink;
+;VolcomBrandNavNodeEntry;;Volcom Brand Navigation Node Entry;VolcomBrandNavNode;VolcomBrandCategoryLink;
+;HurleyBrandNavNodeEntry;;Hurley Brand Navigation Node Entry;HurleyBrandNavNode;HurleyBrandCategoryLink;
+;QuiksilverBrandNavNodeEntry;;Quiksilver Brand Navigation Node Entry;QuiksilverBrandNavNode;QuiksilverBrandCategoryLink;
+;ElementBrandNavNodeEntry;;Element Brand Navigation Node Entry;ElementBrandNavNode;ElementBrandCategoryLink;
+;DakineBrandNavNodeEntry;;Dakine Brand Navigation Node Entry;DakineBrandNavNode;DakineBrandCategoryLink;
+;BenchBrandNavNodeEntry;;Bench Brand Navigation Node Entry;BenchBrandNavNode;BenchBrandCategoryLink;
+;FoxBrandNavNodeEntry;;Fox Brand Navigation Node Entry;FoxBrandNavNode;FoxBrandCategoryLink;
+;RoxyBrandNavNodeEntry;;Roxy Brand Navigation Node Entry;RoxyBrandNavNode;RoxyBrandCategoryLink;
+;brand_1BrandNavNodeEntry;;HP Brand Navigation Node Entry;brand_1BrandNavNode;brand_1BrandCategoryLink;
+;brand_2BrandNavNodeEntry;;Toshiba Brand Navigation Node Entry;brand_2BrandNavNode;brand_2BrandCategoryLink;
+;brand_5BrandNavNodeEntry;;Sony Brand Navigation Node Entry;brand_5BrandNavNode;brand_5BrandCategoryLink;
+;brand_10BrandNavNodeEntry;;Canon Brand Navigation Node Entry;brand_10BrandNavNode;brand_10BrandCategoryLink;
+;brand_18BrandNavNodeEntry;;Kingston Brand Navigation Node Entry;brand_18BrandNavNode;brand_18BrandCategoryLink;
+;brand_26BrandNavNodeEntry;;Samsung Brand Navigation Node Entry;brand_26BrandNavNode;brand_26BrandCategoryLink;
+;brand_75BrandNavNodeEntry;;Fujifilm Brand Navigation Node Entry;brand_75BrandNavNode;brand_75BrandCategoryLink;
+;brand_88BrandNavNodeEntry;;Kodak Brand Navigation Node Entry;brand_88BrandNavNode;brand_88BrandCategoryLink;
+;brand_103BrandNavNodeEntry;;NEC Brand Navigation Node Entry;brand_103BrandNavNode;brand_103BrandCategoryLink;
+;brand_128BrandNavNodeEntry;;Targus Brand Navigation Node Entry;brand_128BrandNavNode;brand_128BrandCategoryLink;
+;brand_251BrandNavNodeEntry;;TDK Brand Navigation Node Entry;brand_251BrandNavNode;brand_251BrandCategoryLink;
+;brand_702BrandNavNodeEntry;;Sweex Brand Navigation Node Entry;brand_702BrandNavNode;brand_702BrandCategoryLink;
+;brand_2171BrandNavNodeEntry;;ICIDU Brand Navigation Node Entry;brand_2171BrandNavNode;brand_2171BrandCategoryLink;
+;brand_25BrandNavNodeEntry;;Philips Brand Navigation Node Entry;brand_25BrandNavNode;brand_25BrandCategoryLink;
+;brand_9644BrandNavNodeEntry;;Saeco Brand Navigation Node Entry;brand_9644BrandNavNode;brand_9644BrandCategoryLink;
+;brand_161BrandNavNodeEntry;;ASUS Brand Navigation Node Entry;brand_161BrandNavNode;brand_161BrandCategoryLink;
+;brand_173BrandNavNodeEntry;;TomTom Brand Navigation Node Entry;brand_173BrandNavNode;brand_173BrandCategoryLink;
+;brand_925-644BrandNavNodeEntry;;Krups Brand Navigation Node Entry;brand_925-644BrandNavNode;brand_925-644BrandCategoryLink;
+;brand_473BrandNavNodeEntry;;Braun Brand Navigation Node Entry;brand_473BrandNavNode;brand_473BrandCategoryLink;
+;brand_875BrandNavNodeEntry;;Electrolux Brand Navigation Node Entry;brand_875BrandNavNode;brand_875BrandCategoryLink;
+;brand_921BrandNavNodeEntry;;Gaggia Brand Navigation Node Entry;brand_921BrandNavNode;brand_921BrandCategoryLink;
+;brand_878BrandNavNodeEntry;;Indesit Brand Navigation Node Entry;brand_878BrandNavNode;brand_878BrandCategoryLink;
+;brand_728BrandNavNodeEntry;;Lenovo Brand Navigation Node Entry;brand_728BrandNavNode;brand_728BrandCategoryLink;
+
+
+
+###### create brands navigation end ######
+
+###### create apparel navigation start ##########
+# CMS Link Components
+INSERT_UPDATE CMSLinkComponent;$contentCV[unique=true];uid[unique=true];name;url;&linkRef;&componentRef;target(code)[default='sameWindow'];$category;$product;
+;;MensFashionCategoryLink;Men's Fashion CategoryLink;/Open-Catalogue/Categories/c/200064;MensFashionCategoryLink;MensFashionCategoryLink;;;;
+;;LadiesFashionCategoryLink;Ladies' Fashion CategoryLink;/Open-Catalogue/Categories/c/200065;LadiesFashionCategoryLink;LadiesFashionCategoryLink;;;;
+;;TshirtsCategoryLink;T-shirts CategoryLink;/Open-Catalogue/Categories/c/200064/c/250100;TshirtsCategoryLink;TshirtsCategoryLink;;;;
+;;JacketsCategoryLink;Jackets CategoryLink;/Open-Catalogue/Categories/c/200064/c/190100;JacketsCategoryLink;JacketsCategoryLink;;;;
+;;WatchesCategoryLink;Watches CategoryLink;/Open-Catalogue/Categories/c/200064/c/340000;WatchesCategoryLink;WatchesCategoryLink;;;;
+;;SkirtsAndDressesCategoryLink;Skirts and Dresses CategoryLink;/Open-Catalogue/Categories/c/200065/c/260700;SkirtsAndDressesCategoryLink;SkirtsAndDressesCategoryLink;;;;
+;;BagsCategoryLink;Bags CategoryLink;/Open-Catalogue/Categories/c/200065/c/160400;BagsCategoryLink;BagsCategoryLink;;;;
+;;BeltsCategoryLink;Belts CategoryLink;/Open-Catalogue/Categories/c/200065/c/370900;BeltsCategoryLink;BeltsCategoryLink;;;;
+
+
+## level 1. SiteRoot ##
+## level 2. children of SiteRoot ## 
+# the following order of children is the display order on the site
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;parent(uid, $contentCV);&nodeRef;children(uid,$contentCV)
+;MarketplaceCategoryNavNode;;Categories;MarketplaceNavNode;MarketplaceCategoryNavNode;BrandsNavNode,CamerasNavNode,ComputersNavNode,SmartWearablesNavNode,HomeAppliancesNavNode,HealthcarePersonalCareNavNode,MensFashionNavNode,LadiesFashionNavNode
+
+## level 3. children of Category Nav ##
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+;MensFashionNavNode;;Mens' Fashion Category;MensFashionNavNode;WatchesNavNode,JacketsNavNode,TshirtsNavNode
+;LadiesFashionNavNode;;Ladies' Fashion Category;LadiesFashionNavNode;SkirtsAndDressesNavNode,BagsNavNode,BeltsNavNode
+
+## entries of the above navigation nodes ##
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;MensFashionNavNodeEntry;;Mens' Fashion Navigation Node Entry;MensFashionNavNode;MensFashionCategoryLink;
+;LadiesFashionNavNodeEntry;;Ladies' Fashion Navigation Node Entry;LadiesFashionNavNode;LadiesFashionCategoryLink;
+
+## level 4. children of NavNode (the following order of children is the display order on the site) ## 
+INSERT_UPDATE CMSNavigationNode;uid[unique=true];$contentCV[unique=true];name;&nodeRef;children(uid,$contentCV);links(&linkRef);
+## children of HealthcarePersonalCareNavNode
+;WatchesNavNode;;Watches NavNode Link;WatchesNavNode
+;JacketsNavNode;;Jackets NavNode Link;JacketsNavNode
+;TshirtsNavNode;;T-shirts NavNode Link;TshirtsNavNode
+;SkirtsAndDressesNavNode;;Skirts and Dresses NavNode Link;SkirtsAndDressesNavNode
+;BagsNavNode;;Bags NavNode Link;BagsNavNode
+;BeltsNavNode;;Belts NavNode Link;BeltsNavNode
+
+## entries of the above navigation nodes ##
+INSERT_UPDATE CMSNavigationEntry;uid[unique=true];$contentCV[unique=true];name;navigationNode(&nodeRef);item(CMSLinkComponent.uid,CMSLinkComponent.$contentCV);
+;WatchesNavNodeEntry;;Watches NavNode Navigation Node Entry;WatchesNavNode;WatchesCategoryLink;
+;JacketsNavNodeEntry;;Jackets NavNode Navigation Node Entry;JacketsNavNode;JacketsCategoryLink;
+;TshirtsNavNodeEntry;;T-shirts NavNode Navigation Node Entry;TshirtsNavNode;TshirtsCategoryLink;
+;SkirtsAndDressesNavNodeEntry;;Skirts and Dresses NavNode Navigation Node Entry;SkirtsAndDressesNavNode;SkirtsAndDressesCategoryLink;
+;BagsNavNodeEntry;;Bags NavNode Navigation Node Entry;BagsNavNode;BagsCategoryLink;
+;BeltsNavNodeEntry;;Belts NavNode Navigation Node Entry;BeltsNavNode;BeltsCategoryLink;
+###### create apparel navigation end ##########

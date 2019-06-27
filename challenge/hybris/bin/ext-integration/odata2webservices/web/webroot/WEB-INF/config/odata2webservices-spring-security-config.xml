@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ [y] hybris Platform
+  ~
+  ~ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+  ~ All rights reserved.
+  ~
+  ~ This software is the confidential and proprietary information of SAP
+  ~ ("Confidential Information"). You shall not disclose such Confidential
+  ~ Information and shall use it only in accordance with the terms of the
+  ~ license agreement you entered into with SAP.
+  -->
+<beans xmlns:security="http://www.springframework.org/schema/security"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns="http://www.springframework.org/schema/beans"
+	   xsi:schemaLocation="http://www.springframework.org/schema/security
+		   http://www.springframework.org/schema/security/spring-security.xsd
+		   http://www.springframework.org/schema/beans
+		   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<security:http access-decision-manager-ref="accessDecisionManager" use-expressions="false">
+		<security:session-management session-authentication-strategy-ref="fixation" />
+		<security:intercept-url pattern="/login.jsp" access="PERMIT_ALL" requires-channel="https"/>
+		<security:intercept-url pattern="/IntegrationService/**" method="GET" access="ROLE_INTEGRATIONADMINGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/IntegrationService" method="POST" access="DENY_ALL"
+								requires-channel="https" />
+		<security:intercept-url pattern="/IntegrationService/**" method="POST" access="ROLE_INTEGRATIONADMINGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/IntegrationService/**" access="DENY_ALL"
+								requires-channel="https" />
+		<security:intercept-url pattern="/InboundIntegrationMonitoring/**" method="GET" access="ROLE_INTEGRATIONADMINGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/InboundIntegrationMonitoring/**" access="DENY_ALL"
+								requires-channel="https" />
+		<security:intercept-url pattern="/OutboundIntegrationMonitoring/**" method="GET" access="ROLE_INTEGRATIONADMINGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/OutboundIntegrationMonitoring/**" access="DENY_ALL"
+								requires-channel="https" />
+		<security:intercept-url pattern="/**" method="POST" access="ROLE_INTEGRATIONADMINGROUP,ROLE_INTEGRATIONCREATEGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/*/$metadata" method="GET" access="ROLE_INTEGRATIONADMINGROUP,ROLE_INTEGRATIONCREATEGROUP,ROLE_INTEGRATIONVIEWGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/**" method="GET" access="ROLE_INTEGRATIONADMINGROUP,ROLE_INTEGRATIONVIEWGROUP"
+								requires-channel="https" />
+		<security:intercept-url pattern="/**" access="HYBRIS_NOT_INITIALIZED,ROLE_INTEGRATIONADMINGROUP"
+								requires-channel="https" />
+		<security:http-basic />
+
+		<security:remember-me services-ref="rememberMeServices" key="odata2webservices" />
+		<security:logout />
+		<security:csrf disabled="true" />
+		<security:headers>
+			<security:frame-options disabled="true" />
+		</security:headers>
+
+		<security:port-mappings>
+			<security:port-mapping http="#{configurationService.configuration.getProperty('tomcat.http.port')}"
+								   https="#{configurationService.configuration.getProperty('tomcat.ssl.port')}" />
+			<security:port-mapping http="#{configurationService.configuration.getInt('embeddedserver.http.port', 8001)}"
+								   https="#{configurationService.configuration.getInt('embeddedserver.ssl.port', 8002)}" />
+			<security:port-mapping http="80" https="443" />
+		</security:port-mappings>
+	</security:http>
+
+	<bean id="fixation" class="de.hybris.platform.servicelayer.security.spring.HybrisSessionFixationProtectionStrategy">
+		<property name="migrateSessionAttributes" value="false" />
+	</bean>
+
+	<bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+		<constructor-arg>
+			<list>
+				<bean id="permitAllVoter" class="de.hybris.platform.spring.security.voter.PermitAllVoter" />
+				<bean id="notInitializedVoter" class="de.hybris.platform.spring.security.voter.HybrisNotInitializedVoter" />
+				<bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter" />
+				<bean id="authenticatedVoter" class="org.springframework.security.access.vote.AuthenticatedVoter" />
+				<bean id="denyAllVoter" class="de.hybris.platform.odata2webservices.DenyAllVoter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="rememberMeServices" class="de.hybris.platform.spring.security.CoreRememberMeService">
+		<property name="key" value="adminweb" />
+		<property name="cookieName" value="LoginToken" />
+		<lookup-method name="lookupUserDetailsService" bean="coreUserDetailsService" />
+	</bean>
+
+	<security:authentication-manager>
+		<security:authentication-provider ref="coreAuthenticationProvider" />
+	</security:authentication-manager>
+
+	<bean id="coreAuthenticationProvider" class="de.hybris.platform.spring.security.CoreAuthenticationProvider">
+		<property name="userDetailsService" ref="coreUserDetailsService" />
+	</bean>
+
+	<bean id="coreUserDetailsService" class="de.hybris.platform.spring.security.CoreUserDetailsService" />
+
+</beans>

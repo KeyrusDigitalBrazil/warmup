@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<process xmlns="http://www.hybris.de/xsd/processdefinition" start="checkSAPOrder" name="sap-oms-order-process"
+	processClass="de.hybris.platform.orderprocessing.model.OrderProcessModel">
+
+	<action id="checkSAPOrder" bean="sapOmsCheckOrderAction">
+		<transition name="OK" to="checkSAPCustomerReplication" />
+		<transition name="NOK" to="error" />
+	</action>
+
+	<action id="checkSAPCustomerReplication" bean="sapOmsCheckCustomerReplicationAction">
+		<transition name="NOK" to="waitForERPCustomerReplication" />
+		<transition name="OK" to="geocodeShippingAddress" />
+	</action>
+	
+	<wait id="waitForERPCustomerReplication" then="geocodeShippingAddress" prependProcessCode="false">
+		<event>ERPCustomerReplicationEvent_${process.order.user.customerID}_${process.order.code}</event>
+	</wait>
+
+	<action id="geocodeShippingAddress" bean="sapOmsGeocodeShippingAddressAction">
+		<transition name="OK" to="sourceOrder"/>
+	</action>
+	
+	<action id="sourceOrder" bean="sapOmsSourceOrderAction">
+		<transition name="OK" to="sendOrderToErp"/>
+	</action>
+
+	<action id="sendOrderToErp" bean="sapOmsSendOrderAction">
+		<transition name="OK" to="waitForSendOrderToErpCompletion" />
+	</action>
+
+	<wait id="waitForSendOrderToErpCompletion" then="setOrderSendStatus" prependProcessCode="false">
+		<event>ERPOrderSendCompletionEvent_${process.order.code}</event>
+	</wait>
+
+	<action id="setOrderSendStatus" bean="sapOmsCheckOrderSendStatusAction">
+		<transition name="OK"  to="waitForERPConfirmation" />
+		<transition name="NOK" to="erpsendingerror" />
+	</action>
+
+	<wait id="waitForERPConfirmation" then="setConfirmationStatus" prependProcessCode="false">
+		<event>ERPOrderConfirmationEvent_${process.order.code}</event>
+	</wait>
+
+	<action id="setConfirmationStatus" bean="sapOmsSetConfirmationStatusAction">
+		<transition name="OK"   to="waitForOrderAction" />
+		<transition name="WAIT" to="waitForERPConfirmation" />
+	</action>
+
+    <wait id="waitForOrderAction" prependProcessCode="true" then="failed">
+        <case event="OrderActionEvent">
+            <choice id="consignmentProcessEnded" then="setCompletionStatus"/>
+            <choice id="consignmentProcessCancelled" then="cancelOrderAction"/>
+            <choice id="cancelOrder" then="cancelOrderAction"/>            
+        </case>
+        
+    </wait>
+    
+	<action id="setCompletionStatus" bean="sapOmsCheckCompletionStatusAction">
+		<transition name="OK" to="success" />
+		<transition name="WAIT" to="waitForOrderAction" />
+	</action>
+
+	<action id="cancelOrderAction" bean="sapOmsCancelOrderAction">
+		<transition name="OK" to="cancelled" />
+		<transition name="WAIT" to="waitForOrderAction" />
+	</action>
+
+	<end id="erpsendingerror" state="ERROR">Sending to ERP went wrong.</end>
+	<end id="error" state="ERROR">Order check failed.</end>
+	<end id="failed" state="FAILED">Order failed.</end>
+	<end id="cancelled" state="SUCCEEDED">Order cancelled.</end>
+	<end id="success" state="SUCCEEDED">Order placed. Consignment created.</end>
+
+</process>

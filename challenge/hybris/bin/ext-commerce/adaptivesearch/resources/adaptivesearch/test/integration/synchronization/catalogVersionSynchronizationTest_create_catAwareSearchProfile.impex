@@ -1,0 +1,88 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+
+### Category Aware Search Profile ###
+
+# search profile
+
+INSERT_UPDATE AsCategoryAwareSearchProfile;code[unique=true];name;indexType[default=$indexType];$catalogVersion[unique=true]
+;categoryAwareProfile;Category Aware Search Profile;;
+
+# global search configuration
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration;searchProfile(code,$catalogVersion)[unique=true];uid[unique=true];category(code,$catalogVersion);facetsMergeMode(code);boostItemsMergeMode(code);boostRulesMergeMode(code);sortsMergeMode(code);$catalogVersion[unique=true]
+;categoryAwareProfile;globalSearchConfiguration;;ADD_AFTER;ADD_AFTER;ADD;ADD_AFTER;
+
+INSERT_UPDATE AsPromotedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;globalSearchConfiguration;property3;MULTISELECT_AND;90;
+
+INSERT_UPDATE AsFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;globalSearchConfiguration;property2;MULTISELECT_OR;88;
+
+INSERT_UPDATE AsExcludedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;globalSearchConfiguration;property1;REFINE;10;
+
+INSERT_UPDATE AsPromotedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;globalSearchConfiguration;product1;
+
+INSERT_UPDATE AsExcludedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;globalSearchConfiguration;product3;
+
+INSERT_UPDATE AsBoostRule;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];indexProperty;operator(code);value;boost;boostType(code);$catalogVersion[unique=true]
+;globalSearchConfiguration;b4d51778-1e45-4d1d-8a6c-4c30f8456e96;property1;EQUAL;value;1.3;MULTIPLICATIVE;
+
+INSERT_UPDATE AsSort;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];code;name[lang=en];$catalogVersion[unique=true]
+;globalSearchConfiguration;sort1;sort1code;sort1name;
+;globalSearchConfiguration;sort2;sort2code;sort2name;
+
+INSERT_UPDATE AsSortExpression;sortConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];expression;order(code);$catalogVersion[unique=true]
+;sort1;sort1expression1;property1;ASCENDING;
+;sort2;sort2expression1;property2;ASCENDING;
+
+# category search configuration
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration;searchProfile(code,$catalogVersion)[unique=true];uid[unique=true];category(code,$catalogVersion);facetsMergeMode(code);boostItemsMergeMode(code);boostRulesMergeMode(code);sortsMergeMode(code);$catalogVersion[unique=true]
+;categoryAwareProfile;categorySearchConfiguration;cat10;ADD_BEFORE;ADD_BEFORE;ADD;ADD_BEFORE;
+
+INSERT_UPDATE AsPromotedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;categorySearchConfiguration;property1;REFINE;110;
+
+INSERT_UPDATE AsFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;categorySearchConfiguration;property3;MULTISELECT_AND;140;
+
+INSERT_UPDATE AsExcludedFacet;searchConfiguration(uid,$catalogVersion)[unique=true];indexProperty[unique=true];facetType(code);priority;$catalogVersion[unique=true]
+;categorySearchConfiguration;property2;MULTISELECT_OR;50;
+
+INSERT_UPDATE AsPromotedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;categorySearchConfiguration;product2;
+
+INSERT_UPDATE AsExcludedItem;searchConfiguration(uid,$catalogVersion)[unique=true];item(Product.code,Product.$catalogVersion)[unique=true];$catalogVersion[unique=true]
+;categorySearchConfiguration;product3;
+
+INSERT_UPDATE AsBoostRule;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];indexProperty;operator(code);value;boost;boostType(code);$catalogVersion[unique=true]
+;categorySearchConfiguration;0814871a-2972-4aee-8310-da4faec92c0a;property2;EQUAL;value;1.2;MULTIPLICATIVE;
+
+INSERT_UPDATE AsSort;searchConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];code;name[lang=en];$catalogVersion[unique=true]
+;categorySearchConfiguration;sort3;sort3code;sort3name;
+;categorySearchConfiguration;sort4;sort4code;sort4name;
+
+INSERT_UPDATE AsSortExpression;sortConfiguration(uid,$catalogVersion)[unique=true];uid[unique=true];expression;order(code);$catalogVersion[unique=true]
+;sort3;sort3expression1;property1;ASCENDING;
+;sort4;sort4expression1;property2;ASCENDING;
+
+### Search Profile Activation Set ###
+
+INSERT_UPDATE AsSearchProfileActivationSet;indexType[default=$indexType][unique=true];$catalogVersion[unique=true];searchProfiles(code,$catalogVersion)
+;;;categoryAwareProfile
+

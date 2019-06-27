@@ -1,0 +1,27 @@
+<table class="paged-list-table table table-striped table-hover techne-table">
+    <thead>
+        <tr>
+            <th data-ng-repeat="column in $ctrl.columns"
+                data-ng-click="$ctrl.sortColumn(column)"
+                data-ng-style="{ 'width': columnWidth + '%' }"
+                class="paged-list-header"
+                data-ng-class="'paged-list-header-'+column.property">
+                {{ column.i18n | translate }}
+                <span class="header-icon"
+                    ng-show="$ctrl.visibleSortingHeader === column.property"
+                    ng-class="{ 'down': $ctrl.headersSortingState[column.property] === true, 'up': $ctrl.headersSortingState[column.property] === false }"></span>
+            </th>
+        </tr>
+    </thead>
+    <tbody class="paged-list-table__body">
+        <tr data-ng-repeat=" item in $ctrl.items"
+            class="techne-table-xs-right techne-table-xs-left paged-list-item ">
+            <td ng-repeat="column in $ctrl.columns"
+                ng-class="'paged-list-item-'+column.property">
+                <div data-ng-if="column.renderer"
+                    compile-html="column.renderer(item, column)"></div>
+                <span data-ng-if="!column.renderer">{{ item[column.property] }}</span>
+            </td>
+        </tr>
+    </tbody>
+</table>

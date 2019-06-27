@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+				http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<alias name="defaultCmsVersionFacade" alias="cmsVersionFacade" />
+	<bean id="defaultCmsVersionFacade" class="de.hybris.platform.cmsfacades.version.impl.DefaultCMSVersionFacade">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="cmsVersionService" ref="cmsVersionService" />
+		<property name="cmsVersionSearchService" ref="cmsVersionSearchService" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+		<property name="modelService" ref="modelService" />
+		<property name="cmsVersionDataConverter" ref="cmsVersionDataConverter" />
+		<property name="getCMSVersionsForItemValidator" ref="cmsBaseCMSVersionValidator" />
+		<property name="createCMSVersionValidator" ref="cmsCreateCMSVersionCompositeValidator" />
+		<property name="updateCMSVersionValidator" ref="cmsUpdateCMSVersionCompositeValidator" />
+		<property name="rollbackCMSVersionValidator" ref="cmsRollbackCMSVersionCompositeValidator" />
+		<property name="deleteCMSVersionValidator" ref="cmsDeleteCMSVersionCompositeValidator" />
+		<property name="cmsVersionSearchDataFactory" ref="cmsVersionSearchDataFactory" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler" />
+		<property name="cmsItemConverter" ref="cmsItemConverter"/>
+		<property name="itemDataPopulatorProvider" ref="cmsItemDataPopulatorProvider"/>
+		<property name="cmsVersionItemCustomAttributesPopulator" ref="cmsVersionItemCustomAttributesPopulator" />
+		<property name="cmsVersionDataDataFactory" ref="cmsVersionDataDataFactory" />
+		<property name="versionLabelKeyGenerator" ref="versionLabelKeyGenerator" />
+		<property name="transactionManager" ref="txManager" />
+		<property name="permissionCRUDService" ref="cmsPermissionCachedCRUDService"/>
+	</bean>
+
+    <!-- Version Label generator -->
+    <bean id="versionLabelKeyGenerator" class="de.hybris.platform.servicelayer.keygenerator.impl.PersistentKeyGenerator" init-method="init">
+        <property name="key" value="${keygen.version.label.key}" />
+        <property name="digits" value="${keygen.version.label.digits}" />
+        <property name="start" value="${keygen.version.label.start}" />
+        <property name="type" value="${keygen.version.label.type}" />
+    </bean>
+
+	<!-- converters -->
+	<alias name="defaultCmsVersionDataConverter" alias="cmsVersionDataConverter" />
+	<bean id="defaultCmsVersionDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.CMSVersionData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsVersionDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- populators -->
+	<alias name="defaultCmsVersionDataPopulator" alias="cmsVersionDataPopulator" />
+	<bean id="defaultCmsVersionDataPopulator" class="de.hybris.platform.cmsfacades.version.populator.CMSVersionDataPopulator">
+		<property name="cmsAdminItemService" ref="cmsAdminItemService" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+	
+	<alias name="defaultCMSVersionItemCustomAttributesPopulator" alias="cmsVersionItemCustomAttributesPopulator" />
+	<bean id="defaultCMSVersionItemCustomAttributesPopulator" class="de.hybris.platform.cmsfacades.version.populator.CMSVersionItemCustomAttributesPopulator"/>
+
+	<!-- predicates -->
+	<alias name="defaultCMSVersionBelongsToCMSItemPredicate" alias="cmsVersionBelongsToCMSItemPredicate" />
+	<bean id="defaultCMSVersionBelongsToCMSItemPredicate" class="de.hybris.platform.cmsfacades.version.predicate.CMSVersionBelongsToCMSItemPredicate">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="cmsVersionService" ref="cmsVersionService" />
+	</bean>
+
+	<alias name="defaultLabelExistsInCMSVersionsPredicate" alias="cmsLabelExistsInCMSVersionsPredicate" />
+	<bean id="defaultLabelExistsInCMSVersionsPredicate" class="de.hybris.platform.cmsfacades.version.predicate.LabelExistsInCMSVersionsPredicate">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="cmsVersionService" ref="cmsVersionService" />
+	</bean>
+
+	<alias name="defaultVersionLabelChangedPredicate" alias="cmsVersionLabelChangedPredicate" />
+	<bean id="defaultVersionLabelChangedPredicate" class="de.hybris.platform.cmsfacades.version.predicate.VersionLabelChangedPredicate">
+		<property name="cmsVersionService" ref="cmsVersionService" />
+	</bean>
+
+	<alias name="defaultCMSVersionExistsPredicate" alias="cmsVersionExistsPredicate" />
+	<bean id="defaultCMSVersionExistsPredicate" class="de.hybris.platform.cmsfacades.version.predicate.CMSVersionExistsPredicate">
+		<property name="cmsVersionService" ref="cmsVersionService" />
+	</bean>
+	
+	<alias name="defaultVersionHasLabelPredicate" alias="cmsVersionHasLabelPredicate" />
+	<bean id="defaultVersionHasLabelPredicate" class="de.hybris.platform.cmsfacades.version.predicate.VersionHasLabelPredicate">
+		<property name="cmsVersionService" ref="cmsVersionService" />
+	</bean>
+ 
+	<!-- validators -->
+	<alias name="defaultBaseCMSVersionValidator" alias="cmsBaseCMSVersionValidator" />
+	<bean id="defaultBaseCMSVersionValidator" class="de.hybris.platform.cmsfacades.version.validator.BaseCMSVersionValidator">
+		<property name="itemModelExistsPredicate" ref="cmsItemModelExistsPredicate" />
+		<property name="cmsVersionBelongsToCMSItemPredicate" ref="cmsVersionBelongsToCMSItemPredicate" />
+		<property name="cmsVersionExistsPredicate" ref="cmsVersionExistsPredicate" />
+	</bean>
+	
+	<alias name="defaultCreateCMSVersionValidator" alias="cmsCreateCMSVersionValidator" />
+	<bean id="defaultCreateCMSVersionValidator" class="de.hybris.platform.cmsfacades.version.validator.CreateCMSVersionValidator">
+		<property name="labelExistsInCMSVersionsPredicate" ref="cmsLabelExistsInCMSVersionsPredicate" />
+	</bean>
+	
+	<alias name="defaultUpdateCMSVersionValidator" alias="cmsUpdateCMSVersionValidator" />
+	<bean id="defaultUpdateCMSVersionValidator" class="de.hybris.platform.cmsfacades.version.validator.UpdateCMSVersionValidator">
+		<property name="versionLabelChangedPredicate" ref="cmsVersionLabelChangedPredicate" />
+		<property name="labelExistsInCMSVersionsPredicate" ref="cmsLabelExistsInCMSVersionsPredicate" />
+	</bean>
+	
+	<alias name="defaultDeleteCMSVersionValidator" alias="cmsDeleteCMSVersionValidator" />
+	<bean id="defaultDeleteCMSVersionValidator" class="de.hybris.platform.cmsfacades.version.validator.DeleteCMSVersionValidator">
+		<property name="isLabeledVersionPredicate" ref="cmsVersionHasLabelPredicate" />
+	</bean>
+	
+	<alias name="defaultRollbackCMSVersionValidator" alias="cmsRollbackCMSVersionValidator" />
+	<bean id="defaultRollbackCMSVersionValidator" class="de.hybris.platform.cmsfacades.version.validator.RollbackCMSVersionValidator"/>
+
+	<!-- Composite validator -->
+	<alias name="defaultCreateCMSVersionCompositeValidator" alias="cmsCreateCMSVersionCompositeValidator" />
+	<bean id="defaultCreateCMSVersionCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="cmsBaseCMSVersionValidator" />
+				<ref bean="cmsCreateCMSVersionValidator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultUpdateCMSVersionCompositeValidator" alias="cmsUpdateCMSVersionCompositeValidator" />
+	<bean id="defaultUpdateCMSVersionCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="cmsBaseCMSVersionValidator" />
+				<ref bean="cmsUpdateCMSVersionValidator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultDeleteCMSVersionCompositeValidator" alias="cmsDeleteCMSVersionCompositeValidator" />
+	<bean id="defaultDeleteCMSVersionCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="cmsBaseCMSVersionValidator" />
+				<ref bean="cmsDeleteCMSVersionValidator" />
+			</list>
+		</property>
+	</bean>
+	
+	<alias name="defaultRollbackCMSVersionCompositeValidator" alias="cmsRollbackCMSVersionCompositeValidator" />
+	<bean id="defaultRollbackCMSVersionCompositeValidator" class="de.hybris.platform.cmsfacades.common.validator.CompositeValidator">
+		<property name="validators">
+			<list merge="true">
+				<ref bean="cmsBaseCMSVersionValidator" />
+				<ref bean="cmsRollbackCMSVersionValidator" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

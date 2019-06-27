@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$supportedPaymentModes=supportedPaymentModes(code)
+
+INSERT_UPDATE Currency;isocode[unique=true];name[lang=en];active;base;conversion;digits;symbol;;
+;CNY;CNY;true;true;1;2;￥
+
+
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=en];description[lang=en];active;paymentinfotype(code);
+;alipay;AliPay;Payment via alipay payment provider;true;AdvancePaymentInfo;
+
+
+
+INSERT_UPDATE StandardPaymentModeValue;paymentmode(code)[unique=true];currency(isoCode)[unique=true];value;;;;
+;alipay;CNY;0;;;;
+
+
+INSERT_UPDATE StandardPaymentMode;code[unique=true];name[lang=zh];description[lang=zh];
+;alipay;支付宝;Payment via alipay payment provider;
+
+
+# Zone Delivery Modes
+UPDATE ZoneDeliveryMode;code[unique=true];$supportedPaymentModes
+;premium-gross;alipay;
+;premium-net;alipay;
+;standard-gross;alipay;
+;standard-net;alipay;
+
+
+INSERT_UPDATE PickUpDeliveryMode ; code[unique=true]; active[default=true];$supportedPaymentModes
+;pickup;;alipay;
+
+
+# logo 
+$siteResource=jar:de.hybris.platform.chinesepspalipaysamplesaddon.constants.ChinesepspalipaysamplesaddonConstants&/chinesepspalipaysamplesaddon/import
+$catalog=Default
+$contentCV=catalogVersion(catalog(id[default=$catalog]),version[default='Staged'])[unique=true]
+INSERT_UPDATE Media;$contentCV[unique=true];code[unique=true];realfilename;@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator];mime[default='image/jpeg'];altText;folder(qualifier)[default='images']
+;;/images/theme/alipay.jpg;alipay.jpg;$siteResource/images/alipay.jpg;image/jpeg;Alipay;

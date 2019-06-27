@@ -1,0 +1,26 @@
+INSERT_UPDATE MediaFolder;qualifier[unique=true];path[unique=true]
+;kie-modules;kie-modules
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;productconfig-module;hybris-rules;productconfig;1.0.0;PRODUCTCONFIG;true;-1;
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;productconfig-base;productconfig-module;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)
+;productconfig-session;productconfig-base;STATELESS
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit
+;productconfig-context;productconfig-session;200;
+
+UPDATE DroolsKIEModule;name[unique=true];defaultKIEBase(name)
+;productconfig-module;productconfig-base
+
+UPDATE DroolsKIEBase;name[unique=true];defaultKIESession(name)
+;productconfig-base;productconfig-session
+
+INSERT_UPDATE RuleGroup;code[unique=true]
+;cpqRuleGroup
+
+INSERT_UPDATE BaseStore;uid[unique=true];
+;dummyStore

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+           
+    <context:annotation-config/> 
+    <context:component-scan  base-package="de.hybris.platform.sapdigitalpaymentaddon.controllers" scope-resolver="de.hybris.platform.spring.IgnoreTenantScopeMetadataResolver" />
+	
+	<!-- Checkout Steps -->
+	
+	<alias name="abstractCheckoutStep" alias="checkoutStep"/>
+	<bean id="abstractCheckoutStep" class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.CheckoutStep" abstract="true" />
+	
+	<alias name="defaultDeliveryMethodCheckoutStep" alias="deliveryMethodCheckoutStep" />
+	<bean id="defaultDeliveryMethodCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="defaultCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="deliveryMethodCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="current" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="deliveryMethod"/>
+	</bean>
+	
+
+	
+	<alias name="defaultSapDigitalPaymentBillingMethodCheckoutStep" alias="paymentBillingMethodCheckoutStep" />
+	<bean id="defaultSapDigitalPaymentBillingMethodCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="defaultCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultSapDigitalPaymentBillingMethodCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="current" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_SUMMARY"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="paymentBillingMethod"/>
+	</bean>
+	
+
+	<!-- Responsive Checkout Steps START -->
+	
+	<alias name="defaultResponsiveDeliveryMethodCheckoutStep" alias="responsiveDeliveryMethodCheckoutStep" />
+	<bean id="defaultResponsiveDeliveryMethodCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="responsiveCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultResponsiveDeliveryMethodCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="current" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="deliveryMethod"/>
+	</bean>
+	
+	
+	<alias name="defaultSapDigitalPaymentResponsivePaymentBillingMethodCheckoutStep" alias="responsivePaymentBillingMethodCheckoutStep" />
+	<bean id="defaultSapDigitalPaymentResponsivePaymentBillingMethodCheckoutStep"  parent="checkoutStep">
+		<property name="checkoutGroup" ref="responsiveCheckoutGroup"/>
+		<property name="checkoutStepValidator" ref="defaultSapDigitalResponsivePaymentBillingMethodCheckoutValidator"/>
+		<property name="transitions">
+			<map merge="true">
+				<entry key="previous" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="current" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="next" value-ref="REDIRECT_TO_SUMMARY"/>
+			</map>
+		</property>
+		<property name="progressBarId" value="paymentBillingMethod"/>
+	</bean>
+	
+	<!-- Responsive Checkout Steps END -->
+	
+	<!---Default checkout group-->
+
+	<alias name="defaultSapDigitalPaymentMultiStepCheckoutGroup" alias="defaultCheckoutGroup" />
+	<bean id="defaultSapDigitalPaymentMultiStepCheckoutGroup"  class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.CheckoutGroup">
+		<property name="groupId"  value="defaultGroup"/>
+		<property name="checkoutStepMap">
+			<map merge="true">
+				<entry key="multi" value-ref="multiStepCheckout"/>
+				<entry key="delivery-address" value-ref="deliveryAddressCheckoutStep"/>
+				<entry key="delivery-method" value-ref="deliveryMethodCheckoutStep"/>
+				<entry key="payment-method" value-ref="paymentMethodCheckoutStep"/>
+				<entry key="payment-billing-method" value-ref="paymentBillingMethodCheckoutStep"/>
+				<entry key="pickup-location" value-ref="pickupLocationCheckoutStep"/>
+				<entry key="summary" value-ref="summaryCheckoutStep"/>
+			</map>
+		</property>
+		<property name="validationResultsMap">
+			<map merge="true">
+				<entry key="FAILED" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_DELIVERY_ADDRESS" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="REDIRECT_TO_PICKUP_LOCATION" value-ref="REDIRECT_TO_PICKUP_LOCATION"/>
+				<entry key="REDIRECT_TO_CART" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_DELIVERY_METHOD" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="REDIRECT_TO_PAYMENT_BILLING_METHOD" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="REDIRECT_TO_PAYMENT_METHOD" value-ref="REDIRECT_TO_PAYMENT_METHOD"/>
+				<entry key="REDIRECT_TO_DUMMY_STEP" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="checkoutProgressBar">
+			<map merge="true">
+				<entry key="1" value-ref="deliveryAddressCheckoutStep"/>
+				<entry key="2" value-ref="deliveryMethodCheckoutStep"/>
+				<entry key="3" value-ref="paymentBillingMethodCheckoutStep"/>
+				<entry key="4" value-ref="summaryCheckoutStep"/>
+			</map>
+		</property>
+	</bean>
+
+	<!---Default checkout group-->
+
+	<!---Default Responsive checkout group START-->
+
+	<alias name="defaultSapDigitalPaymentResponsiveMultiStepCheckoutGroup" alias="responsiveCheckoutGroup" />
+	<bean id="defaultSapDigitalPaymentResponsiveMultiStepCheckoutGroup"  class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.CheckoutGroup">
+		<property name="groupId"  value="responsiveCheckoutGroup"/>
+		<property name="checkoutStepMap">
+			<map merge="true">
+				<entry key="multi" value-ref="responsiveMultiStepCheckout"/>
+				<entry key="delivery-address" value-ref="responsiveDeliveryAddressCheckoutStep"/>
+				<entry key="delivery-method" value-ref="responsiveDeliveryMethodCheckoutStep"/>
+				<entry key="payment-billing-method" value-ref="responsivePaymentBillingMethodCheckoutStep"/>
+				<entry key="payment-method" value-ref="responsivePaymentMethodCheckoutStep"/>
+				<entry key="summary" value-ref="responsiveSummaryCheckoutStep"/>
+			</map>
+		</property>
+		<property name="validationResultsMap">
+			<map merge="true">
+				<entry key="FAILED" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_DELIVERY_ADDRESS" value-ref="REDIRECT_TO_DELIVERY_ADDRESS"/>
+				<entry key="REDIRECT_TO_CART" value-ref="REDIRECT_TO_CART"/>
+				<entry key="REDIRECT_TO_PAYMENT_METHOD" value-ref="REDIRECT_TO_PAYMENT_METHOD"/>
+				<entry key="REDIRECT_TO_DELIVERY_METHOD" value-ref="REDIRECT_TO_DELIVERY_METHOD"/>
+				<entry key="REDIRECT_TO_PAYMENT_BILLING_METHOD" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+				<entry key="REDIRECT_TO_SUMMARY" value-ref="REDIRECT_TO_SUMMARY"/>
+				<entry key="REDIRECT_TO_DUMMY_STEP" value-ref="REDIRECT_TO_PAYMENT_BILLING_METHOD"/>
+			</map>
+		</property>
+		<property name="checkoutProgressBar">
+			<map merge="true">
+				<entry key="1" value-ref="responsiveDeliveryAddressCheckoutStep"/>
+				<entry key="2" value-ref="responsiveDeliveryMethodCheckoutStep"/>
+				<entry key="3" value-ref="responsivePaymentBillingMethodCheckoutStep"/>
+				<entry key="4" value-ref="responsiveSummaryCheckoutStep"/>
+			</map>
+		</property>
+	</bean>
+
+	<!---Default Responsive checkout group END-->
+
+	<!--Validation-->
+	
+	<bean id="abstractCheckoutStepValidator" class="de.hybris.platform.acceleratorstorefrontcommons.checkout.steps.validation.AbstractCheckoutStepValidator" abstract="true">
+		<property name="checkoutFlowFacade" ref="checkoutFlowFacade"/>
+		<property name="checkoutFacade" ref="checkoutFacade"/>
+	</bean>
+
+
+	<bean id="defaultSapDigitalPaymentBillingMethodCheckoutValidator" class="de.hybris.platform.sapdigitalpaymentaddon.controllers.pages.checkout.validation.DefaultSapDigiPayBillMethCheckoutStepValidator" parent="abstractCheckoutStepValidator" />
+
+	<bean id="defaultSapDigitalResponsivePaymentBillingMethodCheckoutValidator" class="de.hybris.platform.sapdigitalpaymentaddon.controllers.pages.checkout.validation.RespSapDigiPayBillMethCheckoutStepValidator" parent="abstractCheckoutStepValidator" />
+	
+	<alias name="defaultSapDigitalPaymentSummaryCheckoutValidator" alias="defaultSummaryCheckoutValidator" />
+	<bean id="defaultSapDigitalPaymentSummaryCheckoutValidator" class="de.hybris.platform.sapdigitalpaymentaddon.controllers.pages.checkout.validation.DefaultSapDigiPaySummaryCheckoutStepValidator" parent="abstractCheckoutStepValidator" />
+	
+	
+	<alias name="defaultSapDigitalPaymentRespSummaryCheckoutValidator" alias="defaultResponsiveSummaryCheckoutValidator" />
+	<bean id="defaultSapDigitalPaymentRespSummaryCheckoutValidator" class="de.hybris.platform.sapdigitalpaymentaddon.controllers.pages.checkout.validation.RespSapDigiPaySummaryCheckoutStepValidator" parent="abstractCheckoutStepValidator" />
+	
+	<!--Validation-->
+
+	<!--Checkout GroupMap-->
+	<util:map id="checkoutFlowGroupMap" >
+		<entry key="defaultCheckoutGroup" value-ref="defaultCheckoutGroup"/>
+		<entry key="responsiveCheckoutGroup" value-ref="responsiveCheckoutGroup"/>
+	</util:map>
+	<!--Checkout GroupMap-->
+
+
+	<!-- Redirects -->
+	<bean id="REDIRECT_TO_PAYMENT_BILLING_METHOD" class="java.lang.String">
+		<constructor-arg value="redirect:/checkout/multi/sap-digital-payment/billing-address/add"/>
+	</bean>
+    
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultSapdigitalpaymentaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="sapdigitalpaymentaddon"/>
+	</bean>
+
+	<bean id="defaultSapdigitalpaymentaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultSapdigitalpaymentaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getSapdigitalpaymentaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultSapdigitalpaymentaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="SapdigitalpaymentaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getSapdigitalpaymentaddonBeforeViewHandler"/>
+	</bean>
+
+</beans>

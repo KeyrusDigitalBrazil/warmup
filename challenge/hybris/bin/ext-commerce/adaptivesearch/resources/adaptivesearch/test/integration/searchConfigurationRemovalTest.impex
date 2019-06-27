@@ -1,0 +1,59 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$indexType=testIndex
+$catalogVersion=catalogVersion(catalog(id[default='hwcatalog']),version[default='Staged'])[unique=true,default='hwcatalog:Staged']
+
+INSERT_UPDATE Catalog ; id[unique=true] ; name              ; defaultCatalog
+                      ; hwcatalog       ; Computer hardware ; true          
+
+INSERT_UPDATE CatalogVersion ; catalog(id)[unique=true] ; version[unique=true] ; languages(isocode)
+                             ; hwcatalog                ; Staged               ; en                
+
+INSERT_UPDATE Category ; code[unique=true] ; $catalogVersion[unique=true]
+                       ; crCat10           ;                             
+                       ; crCat20           ;                             
+
+INSERT_UPDATE Product ; code[unique=true] ; $catalogVersion[unique=true]
+                      ; product1          ;                             
+                      ; product2          ;                             
+                      ; product3          ;                             
+
+
+### Category Aware Search Profile ###
+
+# search profile      
+
+INSERT_UPDATE AsCategoryAwareSearchProfile ; code[unique=true]    ; name                          ; indexType[default=$indexType] ; $catalogVersion[unique=true]
+                                           ; categoryAwareProfile ; Category Aware Search Profile ;                               ;                             
+
+# global search configuration              
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                     ; category(code,$catalogVersion) ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; categoryAwareProfile                             ; fd7d8009-df2f-4b78-9747-5b50efb244df ;                                ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; fd7d8009-df2f-4b78-9747-5b50efb244df                  ; product1                                                ;                             
+
+# cat10 search configuration 
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                     ; category(code,$catalogVersion) ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; categoryAwareProfile                             ; f5ca2ff6-c856-4608-bb69-b97d5de8ef42 ; crCat10                        ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; f5ca2ff6-c856-4608-bb69-b97d5de8ef42                  ; product2                                                ;                             
+
+# cat20 search configuration 
+
+INSERT_UPDATE AsCategoryAwareSearchConfiguration ; searchProfile(code,$catalogVersion)[unique=true] ; uid[unique=true]                     ; category(code,$catalogVersion) ; facetsMergeMode(code) ; boostItemsMergeMode(code) ; boostRulesMergeMode(code) ; sortsMergeMode(code) ; $catalogVersion[unique=true]
+                                                 ; categoryAwareProfile                             ; 3d97bdd0-d3a6-4280-a7c7-06f34b7a72ff ; crCat20                        ; ADD_AFTER             ; ADD_AFTER                 ; ADD                       ; ADD_AFTER            ;                             
+
+INSERT_UPDATE AsPromotedItem ; searchConfiguration(uid,$catalogVersion)[unique=true] ; item(Product.code,Product.$catalogVersion)[unique=true] ; $catalogVersion[unique=true]
+                             ; 3d97bdd0-d3a6-4280-a7c7-06f34b7a72ff                  ; product3                                                ;                             

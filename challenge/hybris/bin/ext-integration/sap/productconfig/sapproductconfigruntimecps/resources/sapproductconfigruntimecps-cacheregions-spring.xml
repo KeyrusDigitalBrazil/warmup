@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:c="http://www.springframework.org/schema/c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!-- Master Data Cache -->
+	<alias alias="sapProductConfigCPSMasterDataCacheRegion" name="sapProductConfigCPSDefaultMasterDataCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigCPSDefaultMasterDataCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigCPSDefaultMasterDataCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigmasterdatacacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigmasterdatacacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigmasterdatacacheregion.timeToLive}" />
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- Kb Determination Cache -->
+	<alias alias="sapProductConfigCPSKbDeterminationCacheRegion" name="sapProductConfigCPSDefaultKbDeterminationCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigCPSDefaultKbDeterminationCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigCPSDefaultKbDeterminationCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigkbdeterminationcacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigkbdeterminationcacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigkbdeterminationcacheregion.timeToLive}" />
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- CPS Cookie Cache -->
+	<alias alias="sapProductConfigCPSCookieCacheRegion" name="sapProductConfigCPSDefaultCookieCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigCPSDefaultCookieCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigCPSDefaultCookieCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigcookiecacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigcookiecacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigcookiecacheregion.timeToLive}" />
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- CPS Value Prices Cache -->
+	<alias alias="sapProductConfigCPSValuePricesCacheRegion" name="sapProductConfigCPSDefaultValuePricesCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigCPSDefaultValuePricesCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigCPSDefaultValuePricesCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigvaluepricescacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigvaluepricescacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigvaluepricescacheregion.timeToLive}" />
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+	
+	<!-- CPS Configuration Cache -->
+	<alias alias="sapProductConfigCPSConfigurationCacheRegion" name="sapProductConfigCPSDefaultConfigurationCacheRegion"/>
+	<bean class="de.hybris.platform.regioncache.region.impl.EHCacheRegion" id="sapProductConfigCPSDefaultConfigurationCacheRegion">
+    	<constructor-arg name="name" value="sapProductConfigCPSDefaultConfigurationCacheRegion"/>
+    	<constructor-arg name="maxEntries" value="${regioncache.sapproductconfigconfigurationcacheregion.size}" />
+		<constructor-arg name="evictionPolicy" value="${regioncache.sapproductconfigconfigurationcacheregion.evictionpolicy}" />
+		<constructor-arg name="statsEnabled" value="${regioncache.stats.enabled}" />
+		<constructor-arg name="exclusiveComputation" value="${regioncache.exclusivecomputation}" />
+		<constructor-arg name="ttlSeconds" value="${regioncache.sapproductconfigconfigurationcacheregion.timeToLive}" />
+		<property name="handledTypes">
+            <array>
+            </array>
+      </property>
+	</bean>
+		
+	 <!-- Add the cache region to the list displayed in the hac -->
+	 
+	 <bean id="sapProductConfigCPSMasterDataCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCPSMasterDataCacheRegion" />
+	 <bean id="sapProductConfigCPSKbDeterminationCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCPSKbDeterminationCacheRegion" />
+	 <bean id="sapProductConfigCPSCookieCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCPSCookieCacheRegion" />
+	 <bean id="sapProductConfigCPSValuePricesCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCPSValuePricesCacheRegion" />
+	 <bean id="sapProductConfigCPSConfigurationCacheRegionRegistrar" class="de.hybris.platform.regioncache.region.CacheRegionRegistrar" c:region-ref="sapProductConfigCPSConfigurationCacheRegion" />
+</beans>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+           
+    <context:component-scan base-package="de.hybris.platform.messagecentercsoccaddon"/>
+
+	<!-- Cache manager for addon -->
+
+	<alias name="defaultMessagecentercsoccaddonCacheManager" alias="messagecentercsoccaddonCacheManager"/>
+	<bean id="defaultMessagecentercsoccaddonCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="messagecentercsoccaddonEhcache"/>
+	</bean>
+
+	<alias name="defaultMessagecentercsoccaddonEhcache" alias="messagecentercsoccaddonEhcache"/>
+	<bean id="defaultMessagecentercsoccaddonEhcache" class="de.hybris.platform.webservicescommons.cache.TenantAwareEhCacheManagerFactoryBean">
+		<property name="cacheNamePrefix" value="messagecentercsoccaddonCache_"/>
+		<property name="configLocation" value="/WEB-INF/cache/addons/messagecentercsoccaddon/ehcache.xml"/>
+	</bean>
+
+	<bean depends-on="wsCacheManagerList" parent="listMergeDirective">
+		<property name="add" ref="messagecentercsoccaddonCacheManager"/>
+	</bean>
+	
+	
+	<bean id="messageCenterCSOauth2UserFilter" class="de.hybris.platform.messagecentercsoccaddon.filters.Oauth2UserFilter">
+		<property name="validGroups">
+			<list value-type="java.lang.String">
+				<value>ROLE_CUSTOMERSUPPORTAGENTGROUP</value>
+			</list>
+		</property>	
+	</bean>
+	
+	<bean depends-on="defaultCommerceWebServicesFilterChainListV2" parent="listMergeDirective">
+		<property name="add" ref="messageCenterCSOauth2UserFilter"/>
+	</bean>
+	
+	<alias alias="conversationMessageListValidator" name="defaultConversationMessageDTOValidator"/>
+	<bean id="defaultConversationMessageDTOValidator" class="de.hybris.platform.messagecentercsoccaddon.validation.ConversationMessageListValidator">
+		<property name="canBeEmpty" value="false"/>
+	</bean>
+</beans>

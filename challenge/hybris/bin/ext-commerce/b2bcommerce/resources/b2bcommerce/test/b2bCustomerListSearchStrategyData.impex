@@ -1,0 +1,53 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+$defaultPassword=12341234
+
+#B2B usergroups for b2b customer users
+INSERT_UPDATE Usergroup;uid[unique=true];groups(uid);locname[lang=en];
+;b2bgroup;customergroup;B2B Group;
+;b2bcustomergroup;b2bgroup;B2B Customer Group;
+
+# B2BUnit
+INSERT_UPDATE B2BUnit;description;uid[unique=true];name;locName[lang=en];groups(uid);
+;B2BUnit-A;B2BUnit-A;B2BUnit-A;B2BUnit-A;;
+;B2BUnit-B;B2BUnit-B;B2BUnit-B;B2BUnit-B;;
+;B2BUnit-C;B2BUnit-C;B2BUnit-C;B2BUnit-C;B2BUnit-B;
+
+# B2B customer users + B2BUnit membership
+INSERT_UPDATE B2BCustomer;description;uid[unique=true];originalUid;email;name;groups(uid);sessionCurrency(isocode)[default='USD'];
+;Customer K;customer.k@rustic-hw.com;customer.k@rustic-hw.com;customer.k@rustic-hw.com;Customer K;B2BUnit-A,b2bcustomergroup;
+;Customer L;customer.l@rustic-hw.com;customer.l@rustic-hw.com;customer.l@rustic-hw.com;Customer L;B2BUnit-A,b2bcustomergroup;
+;Customer M;customer.m@rustic-hw.com;customer.m@rustic-hw.com;customer.m@rustic-hw.com;Customer M;B2BUnit-A,b2bcustomergroup;
+;Customer N;customer.n@rustic-hw.com;customer.n@rustic-hw.com;customer.n@rustic-hw.com;Customer N;B2BUnit-A,b2bcustomergroup;
+;Customer O;customer.o@rustic-hw.com;customer.o@rustic-hw.com;customer.o@rustic-hw.com;Customer O;B2BUnit-A,b2bcustomergroup;
+;Customer P;customer.p@rustic-hw.com;customer.p@rustic-hw.com;customer.p@rustic-hw.com;Customer P;B2BUnit-A,b2bcustomergroup;
+;Customer Q;customer.q@rustic-hw.com;customer.q@rustic-hw.com;customer.q@rustic-hw.com;Customer Q;B2BUnit-A,b2bcustomergroup;
+;Customer R;customer.r@rustic-hw.com;customer.r@rustic-hw.com;customer.r@rustic-hw.com;Customer R;B2BUnit-A,b2bcustomergroup;
+;Customer S;customer.s@rustic-hw.com;customer.s@rustic-hw.com;customer.s@rustic-hw.com;Customer S;B2BUnit-A,b2bcustomergroup;
+;Customer T;customer.t@rustic-hw.com;customer.t@rustic-hw.com;customer.t@rustic-hw.com;Customer T;B2BUnit-B,b2bcustomergroup;
+;Customer U;customer.u@rustic-hw.com;customer.u@rustic-hw.com;customer.u@rustic-hw.com;Customer u;B2BUnit-C,b2bcustomergroup;
+
+# Sales Units
+INSERT_UPDATE OrgUnit;uid[unique=true];name;groups(uid);description;lineofbuisness(code);active;supplier
+;B2BCustomerListSearchStrategySalesUnit-Quebec;B2BCustomerListSearchStrategySalesUnit-Quebec sales region;;B2BCustomerListSearchStrategySalesUnit-Quebec sales region;trade;TRUE;TRUE
+;B2BCustomerListSearchStrategySalesUnit-B;B2BCustomerListSearchStrategySalesUnitB;B2BCustomerListSearchStrategySalesUnit-Quebec;B2BCustomerListSearchStrategySalesUnit-B;trade;TRUE;TRUE
+;B2BCustomerListSearchStrategySalesUnit-USA;B2BCustomerListSearchStrategySalesUnit-USA sales region;;B2BCustomerListSearchStrategySalesUnit-USA sales region;trade;TRUE;TRUE
+
+# Employees + membership of a Sales Unit
+INSERT_UPDATE Employee;name;groups(uid);password[default=$defaultPassword];uid[unique=true]
+;Darrin Hesser;B2BCustomerListSearchStrategySalesUnit-Quebec;;darrin.hesser@test.com
+;nosalesunit@test.com;;;nosalesunit@test.com
+;nob2bunit@test.com;B2BCustomerListSearchStrategySalesUnit-USA;;nob2bunit@test.com
+
+# B2BUnit membership of a Sales Unit
+INSERT_UPDATE B2BUnit;uid[unique=true];groups(uid)[mode=append]
+;B2BUnit-A;B2BCustomerListSearchStrategySalesUnit-Quebec
+;B2BUnit-B;B2BCustomerListSearchStrategySalesUnit-B

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:noNamespaceSchemaLocation="http://www.hybris.com/schema/cockpitng/widgets.xsd">
+
+	<requires resource="pcmbackoffice-widgets-general.xml"/>
+
+	<widget-extension widgetId="pcmbackoffice-contents">
+
+		<widget id="pcmbackoffice-dashboard-propextractor" widgetDefinitionId="com.hybris.cockpitng.widgets.common.propextractor"
+				slotId="cockpitWidgetChildrenInvisible" template="false">
+			<widget id="pcmbackoffice-dashboard-view-conditionevaluator" widgetDefinitionId="com.hybris.cockpitng.conditionevaluator"
+					slotId="cockpitWidgetChildrenInvisible" template="false">
+				<setting key="expression" type="String">#root.toString().equals('pcmbackoffice-dashboard-view')</setting>
+				<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+				<virtual-sockets/>
+			</widget>
+			<setting key="expression" type="String">#root.iterator().next()</setting>
+			<setting key="socketDataType_$T" type="String">java.lang.String</setting>
+			<virtual-sockets/>
+		</widget>
+
+		<widget id="pcmbackoffice-dashboard-view" widgetDefinitionId="com.hybris.cockpitng.dashboard" slotId="views" template="false">
+
+			<widget id="pcmbackoffice-dashboard-view-data-quality-chart" widgetDefinitionId="com.hybris.pcmbackoffice.charts.facetchart" slotId="dashboardWidgets" template="false">
+				<widget id="pcmbackoffice-dashboard-view-data-quality-advancedsearchengine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+						slotId="cockpitWidgetChildrenInvisible" template="false">
+					<virtual-sockets/>
+				</widget>
+				<setting key="facetsNames" type="String">pcmCoreAttributesCoverageGroup,pcmMarketingAttributesCoverageGroup</setting>
+				<setting key="chartDecorator" type="String">dataQualityChartComposer</setting>
+				<setting key="filterPanelRendererNames" type="String">catalogVersionFilterRenderer,categoryFilterRenderer</setting>
+				<setting key="chartTitleKey" type="String">solrchart.dataquality.chart_title</setting>
+				<virtual-sockets/>
+			</widget>
+
+			<widget id="pcmbackoffice-dashboard-view-product-stats-chart" widgetDefinitionId="com.hybris.pcmbackoffice.charts.facetchart" slotId="dashboardWidgets" template="false">
+				<widget id="pcmbackoffice-dashboard-view-product-stats-advancedsearchengine" widgetDefinitionId="com.hybris.cockpitng.widgets.common.advancedsearchengine"
+						slotId="cockpitWidgetChildrenInvisible" template="false">
+					<virtual-sockets/>
+				</widget>
+				<setting key="facetsNames" type="String">approvalStatus</setting>
+				<setting key="chartDecorator" type="String">productStatisticChartComposer</setting>
+				<setting key="filterPanelRendererNames" type="String">catalogVersionFilterRenderer,categoryFilterRenderer</setting>
+				<setting key="rightPanelRenderer" type="String">defaultProductLinksFacetChartRenderer</setting>
+				<setting key="chartTitleKey" type="String">solrchart.productstats.chart_title</setting>
+				<virtual-sockets>
+					<output id="goToAllProducts" type="java.lang.Object" />
+					<output id="addNewProduct" type="java.lang.String" />
+				</virtual-sockets>
+			</widget>
+
+			<widget id="pcmbackoffice-dashboard-view-collaboration-center-layout" widgetDefinitionId="com.hybris.cockpitng.borderlayout"
+					template="false" slotId="dashboardWidgets">
+
+				<widget id="pcmbackoffice-dashboard-view-collaboration-center-title-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+						slotId="headerSlot" template="false">
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-header yw-collaboration-center-styled</setting>
+					<setting key="toolbarActions" type="String">pcmbackoffice-dashboard-view-collaboration-center-title-actions</setting>
+				</widget>
+
+
+				<widget id="pcmbackoffice-dashboard-view-collaboration-center-tabs" widgetDefinitionId="com.hybris.cockpitng.defaulttabwidget" template="false" slotId="centerSlot">
+
+					<widget id="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" widgetDefinitionId="com.hybris.backoffice.widgets.workflows" template="false" slotId="children" title="label.collaborationCenter.tab.workflows.dashboard" access="backofficeworkflowadmin">
+						<setting key="isWorkflowRunningEnabled" type="Boolean" value="true" />
+						<setting key="workflowRenderer" type="String" value="dashboardRunningWorkflowsRenderer" />
+						<setting key="isWorkflowDropAreaEnabled" type="Boolean" value="false" />
+						<virtual-sockets>
+							<output id="showFlow" type="de.hybris.platform.workflow.model.WorkflowModel" />
+						</virtual-sockets>
+					</widget>
+
+					<widget id="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" widgetDefinitionId="com.hybris.backoffice.widgets.workflowactions" template="false" slotId="children" title="label.collaborationCenter.tab.tasks.dashboard">
+						<setting key="workflowActionsRenderer" type="String" value="dashboardWorkflowActionsRenderer" />
+					</widget>
+
+					<setting key="widgetStyleClass" type="String">yw-collaboration-center-tabs</setting>
+				</widget>
+
+				<setting key="northDisabled" type="Boolean" value="false"/>
+				<setting key="southDisabled" type="Boolean" value="true"/>
+				<setting key="northHeight" type="String" value="50px"/>
+				<setting key="eastDisabled" type="Boolean" value="true"/>
+				<setting key="westDisabled" type="Boolean" value="true"/>
+				<setting key="northCollapsible" type="Boolean" value="false"/>
+				<setting key="northSplittable" type="Boolean" value="false"/>
+				<setting key="widgetMold" type="String" value="light"/>
+				<setting key="widgetStyleClass" type="String">yw-collaboration-center-sidebar</setting>
+			</widget>
+
+			<setting key="widgetStyleClass" type="String"/>
+			<setting key="widgetStyleAttribute" type="String"/>
+			<setting key="actionSlotComponentId" type="String" value="pcmbackoffice-dashboard-actions"/>
+			<setting key="dashboardConfigContext" type="String">pcmbackoffice-dashboard-view</setting>
+			<virtual-sockets>
+				<output id="com.hybris.cockpitng.action.splitlayoutchooser.success" type="java.lang.Object"/>
+			</virtual-sockets>
+		</widget>
+
+		<setting key="defaultView" type="String">pcmbackoffice-dashboard-view</setting>
+		<setting key="initialView" type="String">pcmbackoffice-dashboard-view</setting>
+
+		<setting key="selectDashboard_eval" type="String">'pcmbackoffice-dashboard-view'</setting>
+		<virtual-sockets>
+			<input id="selectDashboard" type="java.lang.Object"/>
+		</virtual-sockets>
+
+	</widget-extension>
+
+	<widget-extension widgetId="pcmbackoffice-dashboard-view-collaboration-center-title-toolbar">
+		<widget id="pcmbackoffice-dashboard-view-collaboration-center-toolbar" widgetDefinitionId="com.hybris.backoffice.widgets.toolbar"
+				slotId="toolbarAfterSlot" template="false">
+			<setting key="widgetStyleClass" type="String">yw-collaboration-center-header-toolbar</setting>
+			<setting key="toolbarActions" type="String">pcmbackoffice-dashboard-view-collaboration-center-header-toolbar-actions</setting>
+			<virtual-sockets>
+				<output id="selectView" type="java.lang.String" visibility="default"/>
+			</virtual-sockets>
+		</widget>
+	</widget-extension>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-contents" outputId="selectedViews"
+					   targetWidgetId="pcmbackoffice-dashboard-propextractor" inputId="genericInput"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-propextractor" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-dashboard-view-conditionevaluator" inputId="input"/>
+
+	<!-- data quality chart configuration -->
+
+	<widget-connection sourceWidgetId="pcmbackoffice-search-init" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" inputId="initSearch"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-conditionevaluator" outputId="true"
+					   targetWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" inputId="initSearch"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" outputId="initialSearchData"
+					   targetWidgetId="pcmbackoffice-dashboard-view-data-quality-advancedsearchengine" inputId="searchData"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-data-quality-advancedsearchengine"  outputId="pageable"
+					   targetWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" inputId="fullTextSearchPageable"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" outputId="selectedFacets"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-data-quality-chart" outputId="selectedFacets"
+					   targetWidgetId="pcmbackoffice-contents" inputId="selectCollectionBrowser"/>
+
+	<!-- products stats chart configuration -->
+
+	<widget-connection sourceWidgetId="pcmbackoffice-search-init" outputId="genericOutput"
+					   targetWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" inputId="initSearch"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-conditionevaluator" outputId="true"
+					   targetWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" inputId="initSearch"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="initialSearchData"
+					   targetWidgetId="pcmbackoffice-dashboard-view-product-stats-advancedsearchengine" inputId="searchData"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-advancedsearchengine" outputId="pageable"
+					   targetWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" inputId="fullTextSearchPageable"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="selectedFacets"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="selectedFacets"
+					   targetWidgetId="pcmbackoffice-contents" inputId="selectCollectionBrowser"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="goToAllProducts"
+					   targetWidgetId="pcmbackoffice-contents" inputId="selectCollectionBrowser"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="goToAllProducts"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-catalogFilterTree" inputId="clear"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="goToAllProducts"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-catalogSelector" inputId="clear"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="goToAllProducts"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-fulltextsearch" inputId="clear"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="goToAllProducts"
+					   targetWidgetId="pcmbackoffice-collectionBrowser-advancedsearchengine" inputId="searchData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-product-stats-chart" outputId="addNewProduct"
+					   targetWidgetId="configurableFlow" inputId="contextType" />
+
+	<!-- collaboration center configuration -->
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-toolbar" outputId="selectView"
+					   targetWidgetId="perspectiveViewSwitcher" inputId="selectCollaborationCenter"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-toolbar" outputId="selectView"
+					   targetWidgetId="collaborationNavigationHistory" inputId="workflowOverviewSelected"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="showFlow"
+					   targetWidgetId="workflowOverview-workflows-flow-presentation" inputId="initData"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running"	outputId="workflowSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-workflows-running" outputId="workflowActionSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+
+	<widget-connection sourceWidgetId="pcmbackoffice-dashboard-view-collaboration-center-tab-tasks" outputId="workflowActionSelected"
+					   targetWidgetId="collaborationNavigationHistory" inputId="resetHistory"/>
+	<widget-connection sourceWidgetId="collaboration-center-tab-tasks" outputId="numberOfWorkflowActions"
+					   targetWidgetId="systembarActionsRight" inputId="numberOfWorkflowActions"/>
+
+</widgets>

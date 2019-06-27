@@ -1,0 +1,84 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Sample data for configurable product with product variants option 3:
+#
+# Base product has no configurations, configurations are defined for variants directly.
+# Configurations from 'Engraving' category are merged with variant-specific configurations.
+#
+# product "NV10"
+
+$productCatalog=electronicsProductCatalog
+$productCatalogName=Electronics Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$supercategories=supercategories(code, $catalogVersion)
+$baseProduct=baseProduct(code,$catalogVersion)
+$approved=approvalstatus(code)[default='approved']
+$taxGroup=Europe1PriceFactory_PTG(code)[default=jp-vat-full]
+$lang=en
+
+INSERT_UPDATE Product;code[unique=true];variantType(code);$catalogVersion
+;553637;ElectronicsColorVariantProduct
+
+INSERT_UPDATE ElectronicsColorVariantProduct;code[unique=true];$baseProduct;ean;unit(code);color;$supercategories;approvalstatus(code)[default='approved'];$catalogVersion
+;553637_red;553637;8801089775528;pieces;Red;
+;553637_green;553637;8801089775528;pieces;Green;
+;553637_blue;553637;8801089775528;pieces;Blue;
+
+INSERT_UPDATE ConfigurationCategory;code[unique=true];$supercategories;allowedPrincipals(uid)[default='customergroup'];$catalogVersion
+;553637_engraving;configurations
+;553637_engraving_largeFont;553637_engraving
+;553637_engraving_smallFont;553637_engraving
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;configuratorType(code)[default='TEXTFIELD'];configurationCategory(code, $catalogVersion);qualifier
+;553637_Engraved_Text;;;553637_engraving;553637_engravedText
+;553637_Font_Type;;;553637_engraving;553637_fontType
+;553637_Font_Size;;;553637_engraving;553637_fontSize
+;553637_LargeFont;;;553637_engraving_largeFont;553637_fontSize
+;553637_SmallFont;;;553637_engraving_smallFont;553637_fontSize
+
+INSERT_UPDATE TextFieldConfiguratorSetting;id[unique=true];$catalogVersion;textFieldLabel[lang=$lang];textFieldDefaultValue[lang=$lang]
+;553637_Engraved_Text;;Engraved Text;
+;553637_Font_Type;;Font Type;Webdings
+;553637_Font_Size;;Font Size;14
+;553637_LargeFont;;Font Size;24
+;553637_SmallFont;;Font Size;10
+
+INSERT_UPDATE Product;code[unique=true];$catalogVersion;$supercategories[mode='append']
+;553637_red;;553637_engraving_largeFont
+;553637_blue;;553637_engraving_smallFont
+
+UPDATE Product;code[unique=true];$approved;$catalogVersion;$taxGroup
+;553637_red
+;553637_green
+;553637_blue
+
+INSERT_UPDATE PriceRow;productId[unique=true];unit(code[unique=true,default=pieces]);currency(isocode)[unique=true];price;minqtd;unitFactor;net
+;553637_red;pieces;USD;264;1;1;false
+;553637_red;pieces;JPY;22550;1;1;false
+;553637_green;pieces;USD;264;1;1;false
+;553637_green;pieces;JPY;22550;1;1;false
+;553637_blue;pieces;USD;264;1;1;false
+;553637_blue;pieces;JPY;22550;1;1;false
+
+INSERT_UPDATE StockLevel;available;warehouse(code)[unique=true];inStockStatus(code);maxPreOrder;maxStockLevelHistoryCount;overSelling;preOrder;productCode[unique=true];reserved
+;31;warehouse_e;notSpecified;1;0;0;0;553637_red;0
+;31;warehouse_e;notSpecified;1;0;0;0;553637_green;0
+;31;warehouse_e;notSpecified;1;0;0;0;553637_blue;0
+
+INSERT_UPDATE ProductTaxCode;productCode[unique=true];taxCode;taxArea[unique=true]
+;553637_red;P0000000;US
+;553637_green;P0000000;US
+;553637_blue;P0000000;US
+
+UPDATE Product;code[unique=true];$catalogVersion;name[lang=$lang];summary[lang=$lang];description[lang=$lang]
+;553637_red;;NV10 Red;The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its extendable lens barrel, and a pop-up flash.;<b>10.1 mega-pixel 1/1.8""CCD high resolution</b><br/>The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its expendable lens barrel, and a pop-up flash. A 10.1 mega pixels, 1/1.8"" CCD, not normally used in slim cameras, is used to give better detail.<br/><br/><b>Smart Touch + Large 2.5"" LCD</b><br/>The new Smart Touch user interface makes it possible to quickly navigate and set menu items or view pictures. The unique makeup of the Smart Touch buttons with large 2.5 inch LCD on the back of the camera is expected to be great fun for users, giving them an experience unlike anything they have tried before.<br/><br/><b>The superior Schneider-KREUZNACH lens</b><br/>The superior Schneider-KREUZNACH lens produces crystal clear images. <br/>Bright lens that start at f2.8 delivers even resolution from the centre to the edges. For more natural-looking pictures, each lens surface is multi-coated to minimize the ""ghost"" or ""flare"" phenomenon.<br/><br/><b>Pop-Up Flash</b><br/>The most distinctive feature of the new NV Series is the built-in pop-up flash. The use of a pop-up mechanism made the overall design simple yet luxurious, and its location, right above the lens, hugely improved light diffusion angles and transmission rates. The lens location is also ideal for delivering the flashlight as intended, since it prevents accidental blocking of the flash by a hand.<br/><br/><b>Advanced Shake Reduction</b><br/>The ASR technology prevents the degradation of image clarity and colour common to flash photography. With ASR the effects of camera shake are reduced in lower light conditions. You can even take well exposed, sharper pictures in low light without using a flash at all. It guarantees brighter and more natural pictures.<br/><br/><b>ISO1000 Standards in Action</b><br/>NV series has an auto sensitivity feature that automatically adjusts sensitivity according to the ambient exposure conditions up to ISO 1000. The high sensitivity setting of ISO 1000 enables you to take clear indoor pictures in the dark without camera shake and the resulting image blurring.<br/><br/><b>Photo Gallery function</b><br/>This is an upgraded version of the photo album, which used to let you access the Menu only from Play Back. Now, this new UI lets you go directly to the album. Pictures are grouped and stored by date for easier access.<br/><br/><b>Multiple ways to Recharge</b><br/>Recharging can be done using a cradle or a 24 pin USB cable, as well as by using a detachable cable. Connect the camera to a PC using a 24 pin USB cable, use the adaptor cable to plug it into a power supply, or use any other convenient method to recharge your camera. <br/><br/><b>Advanced Movie Function</b><br/>The NV series supports MPEG-4 VGA (640x480, 30fps) and TVD (720x480, 20fps - NV3) size for an enhanced video shooting experience. You can even edit your movies on the camera itself, making these clever models brilliantly portable but powerful movie-makers.<br/><br/><b>Scene Mode</b><br/>11 Scene Modes and Text Recognition capability NV series have various scene modes to obtain the best picture result in a variety of settings.<br/>The scene modes provided are Night Scene, Portrait, Children, Landscape, Text Recognition, Sunset, Dawn, Backlight, Fireworks, Beach and Snow.
+;553637_green;;NV10 Green;The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its extendable lens barrel, and a pop-up flash.;<b>10.1 mega-pixel 1/1.8""CCD high resolution</b><br/>The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its expendable lens barrel, and a pop-up flash. A 10.1 mega pixels, 1/1.8"" CCD, not normally used in slim cameras, is used to give better detail.<br/><br/><b>Smart Touch + Large 2.5"" LCD</b><br/>The new Smart Touch user interface makes it possible to quickly navigate and set menu items or view pictures. The unique makeup of the Smart Touch buttons with large 2.5 inch LCD on the back of the camera is expected to be great fun for users, giving them an experience unlike anything they have tried before.<br/><br/><b>The superior Schneider-KREUZNACH lens</b><br/>The superior Schneider-KREUZNACH lens produces crystal clear images. <br/>Bright lens that start at f2.8 delivers even resolution from the centre to the edges. For more natural-looking pictures, each lens surface is multi-coated to minimize the ""ghost"" or ""flare"" phenomenon.<br/><br/><b>Pop-Up Flash</b><br/>The most distinctive feature of the new NV Series is the built-in pop-up flash. The use of a pop-up mechanism made the overall design simple yet luxurious, and its location, right above the lens, hugely improved light diffusion angles and transmission rates. The lens location is also ideal for delivering the flashlight as intended, since it prevents accidental blocking of the flash by a hand.<br/><br/><b>Advanced Shake Reduction</b><br/>The ASR technology prevents the degradation of image clarity and colour common to flash photography. With ASR the effects of camera shake are reduced in lower light conditions. You can even take well exposed, sharper pictures in low light without using a flash at all. It guarantees brighter and more natural pictures.<br/><br/><b>ISO1000 Standards in Action</b><br/>NV series has an auto sensitivity feature that automatically adjusts sensitivity according to the ambient exposure conditions up to ISO 1000. The high sensitivity setting of ISO 1000 enables you to take clear indoor pictures in the dark without camera shake and the resulting image blurring.<br/><br/><b>Photo Gallery function</b><br/>This is an upgraded version of the photo album, which used to let you access the Menu only from Play Back. Now, this new UI lets you go directly to the album. Pictures are grouped and stored by date for easier access.<br/><br/><b>Multiple ways to Recharge</b><br/>Recharging can be done using a cradle or a 24 pin USB cable, as well as by using a detachable cable. Connect the camera to a PC using a 24 pin USB cable, use the adaptor cable to plug it into a power supply, or use any other convenient method to recharge your camera. <br/><br/><b>Advanced Movie Function</b><br/>The NV series supports MPEG-4 VGA (640x480, 30fps) and TVD (720x480, 20fps - NV3) size for an enhanced video shooting experience. You can even edit your movies on the camera itself, making these clever models brilliantly portable but powerful movie-makers.<br/><br/><b>Scene Mode</b><br/>11 Scene Modes and Text Recognition capability NV series have various scene modes to obtain the best picture result in a variety of settings.<br/>The scene modes provided are Night Scene, Portrait, Children, Landscape, Text Recognition, Sunset, Dawn, Backlight, Fireworks, Beach and Snow.
+;553637_blue;;NV10 Blue;The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its extendable lens barrel, and a pop-up flash.;<b>10.1 mega-pixel 1/1.8""CCD high resolution</b><br/>The NV10 comes in an 18.5mm thin black aluminium body with Samsung's unique blue ring on its expendable lens barrel, and a pop-up flash. A 10.1 mega pixels, 1/1.8"" CCD, not normally used in slim cameras, is used to give better detail.<br/><br/><b>Smart Touch + Large 2.5"" LCD</b><br/>The new Smart Touch user interface makes it possible to quickly navigate and set menu items or view pictures. The unique makeup of the Smart Touch buttons with large 2.5 inch LCD on the back of the camera is expected to be great fun for users, giving them an experience unlike anything they have tried before.<br/><br/><b>The superior Schneider-KREUZNACH lens</b><br/>The superior Schneider-KREUZNACH lens produces crystal clear images. <br/>Bright lens that start at f2.8 delivers even resolution from the centre to the edges. For more natural-looking pictures, each lens surface is multi-coated to minimize the ""ghost"" or ""flare"" phenomenon.<br/><br/><b>Pop-Up Flash</b><br/>The most distinctive feature of the new NV Series is the built-in pop-up flash. The use of a pop-up mechanism made the overall design simple yet luxurious, and its location, right above the lens, hugely improved light diffusion angles and transmission rates. The lens location is also ideal for delivering the flashlight as intended, since it prevents accidental blocking of the flash by a hand.<br/><br/><b>Advanced Shake Reduction</b><br/>The ASR technology prevents the degradation of image clarity and colour common to flash photography. With ASR the effects of camera shake are reduced in lower light conditions. You can even take well exposed, sharper pictures in low light without using a flash at all. It guarantees brighter and more natural pictures.<br/><br/><b>ISO1000 Standards in Action</b><br/>NV series has an auto sensitivity feature that automatically adjusts sensitivity according to the ambient exposure conditions up to ISO 1000. The high sensitivity setting of ISO 1000 enables you to take clear indoor pictures in the dark without camera shake and the resulting image blurring.<br/><br/><b>Photo Gallery function</b><br/>This is an upgraded version of the photo album, which used to let you access the Menu only from Play Back. Now, this new UI lets you go directly to the album. Pictures are grouped and stored by date for easier access.<br/><br/><b>Multiple ways to Recharge</b><br/>Recharging can be done using a cradle or a 24 pin USB cable, as well as by using a detachable cable. Connect the camera to a PC using a 24 pin USB cable, use the adaptor cable to plug it into a power supply, or use any other convenient method to recharge your camera. <br/><br/><b>Advanced Movie Function</b><br/>The NV series supports MPEG-4 VGA (640x480, 30fps) and TVD (720x480, 20fps - NV3) size for an enhanced video shooting experience. You can even edit your movies on the camera itself, making these clever models brilliantly portable but powerful movie-makers.<br/><br/><b>Scene Mode</b><br/>11 Scene Modes and Text Recognition capability NV series have various scene modes to obtain the best picture result in a variety of settings.<br/>The scene modes provided are Night Scene, Portrait, Children, Landscape, Text Recognition, Sunset, Dawn, Backlight, Fireworks, Beach and Snow.

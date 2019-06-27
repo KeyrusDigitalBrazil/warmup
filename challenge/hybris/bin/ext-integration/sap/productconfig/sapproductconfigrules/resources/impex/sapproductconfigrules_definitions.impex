@@ -1,0 +1,68 @@
+### Conditions
+INSERT_UPDATE RuleConditionDefinitionCategory;id[unique=true];priority
+;productconfig;2000
+;productconfig_customer_category;1500
+
+INSERT_UPDATE RuleConditionDefinition;id[unique=true];priority;allowsChildren;translatorId;translatorParameters;categories(id)
+;y_configurable_product_in_cart;1100;false;sapProductConfigRuleConfigurableProductInCartConditionTranslator;;productconfig
+;y_configurable_product;1000;false;sapProductConfigRuleConfigurableProductConditionTranslator;;productconfig
+;y_configurable_product_customer;900;false;sapProductConfigRuleConfigurableProductCustomersConditionTranslator;;productconfig_customer_category
+;y_configurable_product_customer_group;800;false;sapProductConfigRuleConfigurableProductCustomerGroupsConditionTranslator;;productconfig_customer_category
+;y_configurable_product_customer_support_mode;700;false;ruleCustomerSupportConditionTranslator;;productconfig_customer_category
+
+INSERT_UPDATE RuleConditionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;type;value;required[default=true];validators;filters;defaultEditor
+;y_configurable_product_in_cart;product;1000;ItemType(Product);;false;
+;y_configurable_product_in_cart;cstic  ;900 ;java.lang.String ;;false;  ;product->product#code;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_in_cart;value_operator;850;Enum(de.hybris.platform.sap.productconfig.rules.definitions.ProductConfigRuleValueOperator);;false;
+;y_configurable_product_in_cart;cstic_value;800;java.lang.String;;false;;cstic->cstic##this   ;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticvalueeditor
+;y_configurable_product;product;1000;ItemType(Product);;false;
+;y_configurable_product        ;cstic;900;java.lang.String;;false;      ;product->product#code;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product;value_operator;850;Enum(de.hybris.platform.sap.productconfig.rules.definitions.ProductConfigRuleValueOperator);;false;
+;y_configurable_product        ;cstic_value;800;java.lang.String;;false;;cstic->cstic##this   ;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticvalueeditor
+;y_configurable_product_customer;customers_operator;1000;Enum(de.hybris.platform.sap.productconfig.rules.definitions.ProductConfigRuleContainedOperator);"""IS_CONTAINED_IN""";true
+;y_configurable_product_customer;customers;900;List(ItemType(Customer));;true;
+;y_configurable_product_customer_group;customer_groups_operator;1000;Enum(de.hybris.platform.sap.productconfig.rules.definitions.ProductConfigRuleContainedDeepOperator);"""IS_CONTAINED_IN_ANY""";true
+;y_configurable_product_customer_group;customer_groups;900;List(ItemType(UserGroup));;true;
+;y_configurable_product_customer_support_mode;value;1000;java.lang.Boolean;;true;
+
+
+INSERT_UPDATE RuleConditionDefinitionRuleTypeMapping;definition(id)[unique=true];ruleType(code)[default=ProductConfigSourceRule][unique=true]
+;y_configurable_product_in_cart;
+;y_configurable_product;
+;y_configurable_product_customer;
+;y_configurable_product_customer_group;
+;y_configurable_product_customer_support_mode;
+
+### Actions
+INSERT_UPDATE RuleActionDefinitionCategory;id[unique=true];priority
+;productconfig;2000
+
+INSERT_UPDATE RuleActionDefinition;id[unique=true];priority;translatorId;translatorParameters;categories(id)
+;y_configurable_product_set_cstic_value;1100;ruleExecutableActionTranslator;actionId->sapProductConfigSetCsticValueAction;productconfig
+;y_configurable_product_remove_assignable_value;1000;ruleExecutableActionTranslator;actionId->sapProductConfigRemoveAssignableValueAction;productconfig
+;y_configurable_product_hide_cstic;900;ruleExecutableActionTranslator;actionId->sapProductConfigHideCsticAction;productconfig
+;y_configurable_product_display_cstic_readonly;800;ruleExecutableActionTranslator;actionId->sapProductConfigDisplayCsticReadonlyAction;productconfig
+;y_configurable_product_display_message;700;ruleExecutableActionTranslator;actionId->sapProductConfigDisplayMessageAction;productconfig
+
+INSERT_UPDATE RuleActionDefinitionParameter;definition(id)[unique=true];id[unique=true];priority;type;value;required[default=true];validators;filters;defaultEditor
+;y_configurable_product_set_cstic_value;cstic;1100;java.lang.String;;;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_set_cstic_value;cstic_value;1000;java.lang.String;;false;;cstic->cstic##this;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticvalueeditor
+;y_configurable_product_remove_assignable_value;cstic;1100;java.lang.String;;;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_remove_assignable_value;cstic_value;1000;java.lang.String;;;;cstic->cstic##this;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticvalueeditor
+;y_configurable_product_hide_cstic;cstic;1100;java.lang.String;;;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_display_cstic_readonly;cstic;1100;java.lang.String;;;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_display_message;message;1200;Localized(java.lang.String);;false;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.productconfiglocalizededitor
+;y_configurable_product_display_message;message_severity;1100;Enum(de.hybris.platform.sap.productconfig.rules.definitions.ProductConfigRuleDisplayMessageSeverity);"""INFO""";false;;;
+;y_configurable_product_display_message;cstic;1000;java.lang.String;;false;;;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticeditor
+;y_configurable_product_display_message;cstic_value;900;java.lang.String;;false;;cstic->cstic##this;de.hybris.platform.sap.productconfig.rules.backoffice.editors.defaultproductconfigrulecsticvalueeditor
+
+
+INSERT_UPDATE RuleActionDefinitionRuleTypeMapping;definition(id)[unique=true];ruleType(code)[default=ProductConfigSourceRule][unique=true]
+;y_configurable_product_set_cstic_value;
+;y_configurable_product_remove_assignable_value;
+;y_configurable_product_hide_cstic
+;y_configurable_product_display_cstic_readonly
+;y_configurable_product_display_message
+
+INSERT_UPDATE RuleToEngineRuleTypeMapping;ruleType(code)[unique=true];engineRuleType(code)[default=PRODUCTCONFIG]
+;ProductConfigSourceRule;

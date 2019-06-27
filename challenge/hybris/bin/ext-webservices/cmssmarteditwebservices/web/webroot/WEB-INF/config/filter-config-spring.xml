@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+ <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+			  http://www.springframework.org/schema/context/spring-context.xsd">
+	
+  	<!-- Spring managed FilterChain for hybris Filter stack -->
+	<bean id="cmssmarteditwebservicesPlatformFilterChain" class="de.hybris.platform.servicelayer.web.PlatformFilterChain">
+		<constructor-arg>
+			<list>
+				<!-- Filter that catches and resolves exceptions thrown from other filters. Can be uncommented if you need such functionality -->
+				<!-- <ref bean="exceptionTranslationFilter" /> -->
+	
+				<ref bean="log4jFilter" />
+				<ref bean="tenantActivationFilter" />
+				<!-- This filter creates new jalo session and close it after request is handled. -->
+				<ref bean="restSessionFilter" />
+				<!-- If you want to track user session:
+					- uncomment filter below 
+					- comment or remove restSessionFilter above
+					- comment or remove SessionHindingRequestFilter in web.xml -->
+				<!-- ref bean="sessionFilter" /-->
+
+				<!-- Security -->
+				<ref bean="springSecurityFilterChain" />
+				
+				<!-- Media -->
+				<ref bean="cmssmarteditwebservicesMediaFilter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="restSessionFilter" class="de.hybris.platform.cmssmarteditwebservices.filter.RestSessionDataInjectionFilter">
+		<property name="sessionService" ref="sessionService" />
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+
+	<!-- Filter that catches and resolves exceptions thrown from other filters. Can be added to filter chain if you need such functionality -->
+	<alias alias="exceptionTranslationFilter" name="defaultExceptionTranslationFilter" />
+	<bean id="defaultExceptionTranslationFilter" class="de.hybris.platform.webservicescommons.filter.ExceptionTranslationFilter">
+		<property name="restHandlerExceptionResolver" ref="restHandlerExceptionResolver" />
+	</bean>
+	
+	<bean id="cmssmarteditwebservicesMediaFilter" class="de.hybris.platform.servicelayer.web.WebAppMediaFilter">
+		<property name="mediaPermissionService" ref="mediaPermissionService"/>
+		<property name="modelService" ref="modelService"/>
+		<property name="userService" ref="userService"/>
+		<property name="mediaService" ref="mediaService"/>
+	</bean>
+
+</beans>

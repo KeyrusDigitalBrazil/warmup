@@ -1,0 +1,272 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+# Grant access rights to log in to Backoffice
+INSERT_UPDATE Employee;UID[unique=true];backOfficeLoginDisabled;
+                      ;cmsmanager;false;
+                      ;cmseditor;false;
+                      ;cmspublisher;false;
+                      ;cmsreviewer;false;
+                      ;cmstranslator;false;
+                      ;cmstranslator-Annette;false;
+                      ;cmstranslator-Seb;false;
+
+# (Re-)Impexing groups as they might not be impexed by the time this file is executed and the user impex uploads might fail
+INSERT_UPDATE UserGroup;UID[unique=true];groups(uid)[mode=append]
+                       ;basecmsmanagergroup;employeegroup;
+                       ;cmsmanagergroup;basecmsmanagergroup
+                       ;cmsworkflowgroup;basecmsmanagergroup;
+                       ;cmseditorgroup;cmsworkflowgroup;
+
+# Import access rights for Backoffice
+
+# Access rights for all workflow users, e.g. publishers, reviewers and translators
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;basecmsmanagergroup;employeegroup;;;;;;;
+
+# general
+;;;;Item;+;;;;;
+;;;;UserGroup;+;;;;;
+;;;;Employee;+;-;;;;
+;;;;ItemSyncTimestamp;+;;;;;
+;;;;SyncItemJob;+;;;;;
+;;;;Type;+;;;;;
+
+# access rights for Products, Store, Site and Catalogs
+;;;;Product;+;+;;;;
+;;;;Category;+;+;;;;
+;;;;VariantType;+;;;;;
+;;;;BaseSite;+;+;-;-;-;
+;;;;BaseStore;+;-;-;-;-;
+;;;;Catalog;+;;;;;
+;;;;CatalogVersion;+;;;;;
+;;;;ContentCatalog;+;+;+;+;+;
+;;;;MediaContainer;+;+;-;-;-;
+;;;;MediaContext;+;+;-;-;-;
+;;;;MediaFormat;+;+;-;-;-;
+;;;;MediaFormatMapping;+;+;-;-;-;
+
+# cms2 items
+;;;;AbstractComponentContainer;+;+;-;-;-;
+;;;;AbstractComponentContainer.itemtype;+;-;-;-;-;
+;;;;AbstractCMSComponent;+;+;-;-;-;
+;;;;AbstractCMSComponent.itemtype;;-;-;-;-;
+;;;;AbstractCMSAction;+;+;-;-;-;
+;;;;AbstractCMSAction.itemtype;;-;-;-;-;
+;;;;CMSItem;+;+;-;-;-;
+;;;;CMSItem.itemtype;;-;-;-;-;
+;;;;CMSPageType;+;-;-;-;-;
+;;;;CMSRelation;+;+;-;-;-;
+;;;;CMSCatalogRestriction;;;+;+;+;
+;;;;CMSCategoryRestriction;;;+;+;+;
+;;;;CMSProductRestriction;;;+;+;+;
+;;;;CatalogPage;-;-;-;-;-;
+;;;;CategoryPage;+;+;-;-;-;
+;;;;ContentPage;+;+;-;-;-;
+;;;;ProductPage;+;+;-;-;-;
+;;;;ContentSlot;+;-;-;-;-;
+;;;;ContentSlotForPage;+;-;-;-;-;
+;;;;ContentSlotForTemplate;+;-;-;-;-;
+;;;;ContentSlotName;+;-;-;-;-;
+;;;;ComponentTypeGroup;+;-;-;-;-;
+;;;;ElementsForContainer;+;-;-;-;-;
+;;;;ElementsForSlot;+;-;-;-;-;
+;;;;CockpitUIScriptConfigMedia;-;-;-;-;-;
+;;;;PageRestrictions;+;+;-;-;-;
+;;;;CatalogsForCMSSite;+;+;-;-;-;
+;;;;AvailableSlotsForTemplate;+;+;-;-;-;
+;;;;RestrictionsForPages;+;+;-;-;-;
+;;;;CatalogsForRestriction;+;+;-;-;-;
+;;;;CategoriesForRestriction;+;+;-;-;-;
+;;;;ProductsForRestriction;+;+;-;-;-;
+;;;;UsersForRestriction;+;+;-;-;-;
+;;;;UserGroupsForRestriction;+;+;-;-;-;
+;;;;PreviewDataToCatalogVersion;+;+;-;-;-;
+;;;;PreviewData;+;+;-;-;-;
+;;;;CMSSite;+;+;-;-;-;
+;;;;CMSVersion;+;+;+;+;+;
+;;;;BusinessProcess;+;;;;;
+$END_USERRIGHTS;;;;;
+
+
+# Access rights for editors
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmseditorgroup;cmsworkflowgroup,basecmsmanagergroup,employeegroup;;;;;;;
+
+# general
+;;;;Item;+;+;;;;
+;;;;UserGroup;+;;;;;
+;;;;Employee;+;-;;;;
+;;;;ItemSyncTimestamp;+;;;;;
+;;;;SyncItemJob;+;;;;;
+;;;;Type;+;;;;;
+
+# access rights for Products, Store, Site and Catalogs
+;;;;Product;+;+;;;;
+;;;;Category;+;+;;;;
+;;;;VariantType;+;;;;;
+;;;;BaseSite;+;+;-;-;-;
+;;;;BaseStore;+;-;-;-;-;
+;;;;Catalog;+;;;;;
+;;;;CatalogVersion;+;;;;;
+;;;;ContentCatalog;+;+;+;+;+;
+;;;;MediaContainer;+;+;+;+;+;
+;;;;MediaContext;+;+;+;+;+;
+;;;;MediaFormat;+;+;+;+;+;
+;;;;MediaFormatMapping;+;+;+;+;+;
+
+# cms2 items
+;;;;AbstractComponentContainer;+;+;+;+;+;
+;;;;AbstractComponentContainer.itemtype;+;-;-;-;-;
+;;;;AbstractCMSComponent;+;+;+;+;+;
+;;;;AbstractCMSComponent.itemtype;;-;-;-;-;
+;;;;AbstractCMSAction;+;+;+;+;+;
+;;;;AbstractCMSAction.itemtype;;-;-;-;-;
+;;;;CMSItem;+;+;+;+;+;
+;;;;CMSItem.itemtype;;-;-;-;-;
+;;;;CMSPageType;+;+;+;+;+;
+;;;;CMSRelation;+;+;+;+;+;
+;;;;CMSCatalogRestriction;;;+;+;+;
+;;;;CMSCategoryRestriction;;;+;+;+;
+;;;;CMSProductRestriction;;;+;+;+;
+;;;;CatalogPage;-;-;-;-;-;
+;;;;CategoryPage;;;+;+;+;
+;;;;ContentPage;;;+;+;+;
+;;;;ProductPage;;;+;+;+;
+;;;;ContentSlot;+;+;+;+;+;
+;;;;ContentSlotForPage;+;+;+;+;+;
+;;;;ContentSlotForTemplate;+;+;+;+;+;
+;;;;ContentSlotName;+;+;+;+;+;
+;;;;ComponentTypeGroup;+;+;+;+;+;
+;;;;ElementsForContainer;+;+;+;+;+;
+;;;;ElementsForSlot;+;+;+;+;+;
+;;;;CockpitUIScriptConfigMedia;-;-;-;-;-;
+;;;;PageRestrictions;+;+;+;+;+;
+;;;;CatalogsForCMSSite;+;+;+;+;+;
+;;;;AvailableSlotsForTemplate;+;+;+;+;+;
+;;;;RestrictionsForPages;+;+;+;+;+;
+;;;;CatalogsForRestriction;+;+;+;+;+;
+;;;;CategoriesForRestriction;+;+;+;+;+;
+;;;;ProductsForRestriction;+;+;+;+;+;
+;;;;UsersForRestriction;+;+;+;+;+;
+;;;;UserGroupsForRestriction;+;+;+;+;+;
+;;;;PreviewDataToCatalogVersion;+;+;+;+;+;
+;;;;PreviewData;+;+;+;+;+;
+;;;;CMSSite;+;+;+;+;+;
+;;;;CMSVersion;+;+;+;+;+;
+;;;;BusinessProcess;+;;;;;
+$END_USERRIGHTS;;;;;
+
+
+# Access rights for managers
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;cmsmanagergroup;basecmsmanagergroup,employeegroup;;;;;;;
+
+# general
+;;;;Item;+;+;;;;
+;;;;UserGroup;+;+;;;;
+;;;;Employee;+;+;;;;
+;;;;ItemSyncTimestamp;+;;;;;
+;;;;SyncItemJob;+;;;;;
+;;;;Type;+;;;;;
+
+# access rights for Products, Store, Site and Catalogs
+;;;;Product;+;+;;;;
+;;;;Category;+;+;;;;
+;;;;VariantType;+;;;;;
+;;;;BaseSite;+;+;-;-;-;
+;;;;BaseStore;+;-;-;-;-;
+;;;;Catalog;+;;;;;
+;;;;CatalogVersion;+;+;;;;
+;;;;ContentCatalog;+;+;+;+;+;
+;;;;MediaContainer;+;+;+;+;+;
+;;;;MediaContext;+;+;+;+;+;
+;;;;MediaFormat;+;+;+;+;+;
+;;;;MediaFormatMapping;+;+;+;+;+;
+
+# cms2 items
+;;;;AbstractComponentContainer;+;+;+;+;+;
+;;;;AbstractComponentContainer.itemtype;+;-;-;-;-;
+;;;;AbstractCMSComponent;+;+;+;+;+;
+;;;;AbstractCMSComponent.itemtype;;-;-;-;-;
+;;;;AbstractCMSAction;+;+;+;+;+;
+;;;;AbstractCMSAction.itemtype;;-;-;-;-;
+;;;;CMSItem;+;+;+;+;+;
+;;;;CMSItem.itemtype;;-;-;-;-;
+;;;;CMSPageType;+;+;+;+;+;
+;;;;CMSRelation;+;+;+;+;+;
+;;;;CMSCatalogRestriction;;;+;+;+;
+;;;;CMSCategoryRestriction;;;+;+;+;
+;;;;CMSProductRestriction;;;+;+;+;
+;;;;CatalogPage;-;-;-;-;-;
+;;;;CategoryPage;;;+;+;+;
+;;;;ContentPage;;;+;+;+;
+;;;;ProductPage;;;+;+;+;
+;;;;ContentSlot;+;+;+;+;+;
+;;;;ContentSlotForPage;+;+;+;+;+;
+;;;;ContentSlotForTemplate;+;+;+;+;+;
+;;;;ContentSlotName;+;+;+;+;+;
+;;;;ComponentTypeGroup;+;+;+;+;+;
+;;;;ElementsForContainer;+;+;+;+;+;
+;;;;ElementsForSlot;+;+;+;+;+;
+;;;;CockpitUIScriptConfigMedia;-;-;-;-;-;
+;;;;PageRestrictions;+;+;+;+;+;
+;;;;CatalogsForCMSSite;+;+;+;+;+;
+;;;;AvailableSlotsForTemplate;+;+;+;+;+;
+;;;;RestrictionsForPages;+;+;+;+;+;
+;;;;CatalogsForRestriction;+;+;+;+;+;
+;;;;CategoriesForRestriction;+;+;+;+;+;
+;;;;ProductsForRestriction;+;+;+;+;+;
+;;;;UsersForRestriction;+;+;+;+;+;
+;;;;UserGroupsForRestriction;+;+;+;+;+;
+;;;;PreviewDataToCatalogVersion;+;+;+;+;+;
+;;;;PreviewData;+;+;+;+;+;
+;;;;CMSSite;+;+;+;+;+;
+;;;;CMSVersion;+;+;+;+;+;
+;;;;BusinessProcess;+;+;+;+;+;
+$END_USERRIGHTS;;;;;
+
+
+# Access rights for anonymous users
+# - These are needed for rendering (cmsoccaddon).
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+UserGroup;customergroup;;;;;;;;
+
+# general
+;;;;Item;+;;;;;
+;;;;Type;+;;;;;
+
+# access rights for Products, Store, Site and Catalogs
+;;;;Product;+;;;;;
+;;;;Category;+;;;;;
+;;;;VariantType;+;;;;;
+;;;;BaseSite;+;;;;;
+;;;;BaseStore;+;;;;;
+;;;;Catalog;+;;;;;
+;;;;CatalogVersion;+;;;;;
+;;;;ContentCatalog;+;;;;;
+;;;;MediaContainer;+;-;-;-;-;
+;;;;MediaContext;+;-;-;-;-;
+;;;;MediaFormat;+;-;-;-;-;
+;;;;MediaFormatMapping;+;-;-;-;-;
+
+# cms2 items
+;;;;CMSItem;+;-;-;-;-;
+
+$END_USERRIGHTS;;;;;

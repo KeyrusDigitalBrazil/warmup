@@ -1,0 +1,91 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# Import essential data for the Accelerator
+#
+# Includes:
+# * User Groups
+
+$languages=ja,en,de,zh
+
+# Update usergroups with the employeegroup, as the cmsmanager
+# doesn't have this usergroup in it's hierarchy
+INSERT_UPDATE PrincipalGroupRelation;source(uid)[unique=true];target(uid)[unique=true]
+;previewmanagergroup;employeegroup
+
+# local CMS Manager group
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid)[mode=append];readableLanguages(isocode)[mode=append];writeableLanguages(isocode)[mode=append];
+;base-electronics-cmsmanagergroup;basecmsmanagergroup;$languages;$languages
+;electronics-eu-cmsmanagergroup;base-electronics-cmsmanagergroup;$languages;$languages
+;electronics-uk-cmsmanagergroup;base-electronics-cmsmanagergroup;$languages;$languages
+;electronics-de-cmsmanagergroup;base-electronics-cmsmanagergroup;de;de
+;electronics-us-cmsmanagergroup;base-electronics-cmsmanagergroup;$languages;$languages
+;electronics-euzone-cmsmanagergroup;electronics-eu-cmsmanagergroup,electronics-uk-cmsmanagergroup,electronics-de-cmsmanagergroup;$languages;$languages
+;electronics-cmsmanagergroup;electronics-euzone-cmsmanagergroup,electronics-us-cmsmanagergroup;$languages;$languages
+;cmsmanagergroup;electronics-cmsmanagergroup;$languages;$languages
+
+# Search Restrictions
+INSERT_UPDATE SearchRestriction;code[unique=true];active[default=false];generate[default=false];principal(uid);restrictedType(code);query
+;Frontend_PageApprovalStatus;true;false;customergroup;AbstractPage;"{approvalStatus}=({{SELECT {PK} FROM {CmsApprovalStatus} WHERE {code} = 'approved'}})"
+
+
+
+#
+# Import Sample CMS Cockpit User
+#
+$defaultPassword=1234
+
+INSERT_UPDATE Employee;UID[unique=true];password[default=$defaultPassword];description;name;groups(uid)[mode=append];sessionLanguage(isocode);sessionCurrency(isocode)
+;cmsmanager-electronics;;Electronics CMS Manager;Electronics CMS Manager;electronics-cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager-electronics-euzone;;Electronics EU-Zone CMS Manager;Electronics EU-Zone CMS Manager;electronics-euzone-cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager;;CMS Manager;CMS Manager;cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager-electronics-eu;;Electronics EU CMS Manager;Electronics EU CMS Manager;electronics-eu-cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager-electronics-uk;;Electronics UK CMS Manager;Electronics UK CMS Manager;electronics-uk-cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager-electronics-de;;Electronics DE CMS Manager;Electronics DE CMS Manager;electronics-de-cmsmanagergroup,previewmanagergroup;en;USD;
+;cmsmanager-electronics-us;;Electronics US CMS Manager;Electronics US CMS Manager;electronics-us-cmsmanagergroup,previewmanagergroup;en;USD;
+
+#
+# Import permissions for SmartEdit users
+#
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics-euzone;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics-eu;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics-uk;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics-de;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;
+
+$START_USERRIGHTS;;;;;;;;;
+Type;UID;MemberOfGroups;Password;Target;read;change;create;remove;change_perm
+User;cmsmanager-electronics-us;;1234;;;;;;
+;;;;CatalogVersion;+;+;+;+;;
+$END_USERRIGHTS;;;;;

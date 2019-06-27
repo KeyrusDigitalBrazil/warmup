@@ -1,0 +1,45 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+INSERT_UPDATE Domain;code[unique=true];name;
+;ticketSystemDomain;Ticket System Domain;
+
+INSERT_UPDATE Component;code[unique=true];name;domain[unique=true](code)
+;ticketSystem;Ticket System;ticketSystemDomain
+
+INSERT_UPDATE CommentType;code[unique=true];name;domain[unique=true](code);metaType(code)
+;ticketCreationEvent;Ticket Created Event;ticketSystemDomain;CsCustomerEvent
+;ticketChangeEvent;Ticket Changed Event;ticketSystemDomain;CsTicketEvent;
+;customerNote;Customer Note;ticketSystemDomain;CsCustomerEvent
+;agentNote;Agent Note;ticketSystemDomain;CsCustomerEvent
+;ticketAssignedEvent;Ticket Assigned Event;ticketSystemDomain;CsTicketEvent;
+;ticketResolutionEvent;Ticket Resolved Event;ticketSystemDomain;CsTicketResolutionEvent
+;ticketUnResolutionEvent;Ticket UnResolved Event;ticketSystemDomain;CsCustomerEvent
+;customerEmail;Customer Email;ticketSystemDomain;CsCustomerEvent
+
+# Create the fraudAgentGroup which new fraud tickets will be automatically assigned to
+INSERT_UPDATE CsAgentGroup;uid[unique=true];locName[lang=en];name;emailDistributionList;
+;csagentmanagergroup;CS Agent Group Manager;CS Agent Group Manager;
+;fraudAgentGroup;Fraud Agent Group;
+
+INSERT_UPDATE UserGroup;uid[unique=true];groups(uid)[mode=append];locname[lang=en]
+;customerservicegroup;employeegroup;"Customer Service Group"
+;csagentgroup;customerservicegroup;"Customer Service Agent Group"
+
+# Session Events Cleanup CronJobs section
+INSERT_UPDATE ServicelayerJob;code[unique=true];springId[unique=true]
+;sessionEventsRemovalJob;sessionEventsRemovalJob
+
+INSERT_UPDATE SessionEventsRemovalCronJob;code[unique=true];job(code)[default=sessionEventsRemovalJob];sessionLanguage(isoCode)[default=en]
+;SessionEventsRemovalJob
+
+INSERT_UPDATE Trigger;cronJob(code)[unique=true];second;minute;hour;day;month;year;relative;active;maxAcceptableDelay
+;SessionEventsRemovalJob;0;0;1;-1;-1;-1;true;true;-1

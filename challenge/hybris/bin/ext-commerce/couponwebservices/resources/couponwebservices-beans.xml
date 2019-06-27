@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="beans.xsd">
+	
+
+	<!-- DTO -->
+	<bean abstract="true" class="de.hybris.platform.couponwebservices.dto.AbstractCouponWsDTO" extends="de.hybris.platform.couponwebservices.dto.CouponStatusWsDTO">
+		<description>Abstract coupon</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">abstractCoupon</hint>
+		</hints>
+		<property name="name" type="String"/>
+		<property name="startDate" type="String">
+			<description>Start date/time (UTC timezone) string representation in ISO-8601 format</description>
+		</property>
+		<property name="endDate" type="String">
+			<description>End date/time (UTC timezone) string representation in ISO-8601 format</description>
+		</property>	
+	</bean>
+	
+	<bean class="de.hybris.platform.couponwebservices.dto.CouponStatusWsDTO">
+		<description>Coupon status</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">couponStatus</hint>
+		</hints>
+		<property name="couponId" type="String" equals="true">
+			<description>The coupon Id is a mandatory property</description>
+		</property>
+		<property name="active" type="Boolean">
+			<description>Coupons status</description>
+		</property>	
+	</bean>
+	
+	<bean class="de.hybris.platform.couponwebservices.dto.SingleCodeCouponWsDTO" extends="de.hybris.platform.couponwebservices.dto.AbstractCouponWsDTO">
+		<description>Single code coupon</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">singleCodeCoupon</hint>
+		</hints>
+		<property name="maxRedemptionsPerCustomer" type="Integer"/>
+		<property name="maxTotalRedemptions" type="Integer"/>	
+	</bean>
+
+	<bean class="de.hybris.platform.couponwebservices.dto.MultiCodeCouponWsDTO" extends="de.hybris.platform.couponwebservices.dto.AbstractCouponWsDTO">
+		<description>Multi code coupon</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">multiCodeCoupon</hint>
+		</hints>
+		<property name="codeGenerationConfiguration" type="String">
+			<description>Mandatory field. Represents the name of the CodeGenerationConfiguration, available in the system</description>
+		</property>
+		<property name="couponCodeNumber" type="java.lang.Long">
+			<description>Mandatory field</description>
+		</property>
+		<property name="generatedCodes" type="java.util.List&lt;de.hybris.platform.couponwebservices.dto.CouponGeneratedCodeWsDTO>">
+		    <description>List of media codes containing the generated codes</description>
+		</property>
+	</bean>
+
+	<bean class="de.hybris.platform.couponwebservices.dto.CouponGeneratedCodeWsDTO" >
+		<description>Coupon generated code</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">couponGeneratedCode</hint>
+		</hints>
+		<property name="code" type="String"/>
+		<property name="link" type="String"/>
+	</bean>
+
+	<bean class="de.hybris.platform.couponwebservices.dto.ws.SingleCodeCouponsSearchPageWsDTO" extends="de.hybris.platform.webservicescommons.dto.SearchPageWsDTO&lt;de.hybris.platform.couponwebservices.dto.SingleCodeCouponWsDTO>">
+		<description>Single code coupons search page</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">singleCodeCouponsSearchPage</hint>
+		</hints>
+	</bean>
+
+	<bean class="de.hybris.platform.couponwebservices.dto.ws.MultiCodeCouponsSearchPageWsDTO" extends="de.hybris.platform.webservicescommons.dto.SearchPageWsDTO&lt;de.hybris.platform.couponwebservices.dto.MultiCodeCouponWsDTO>">
+		<description>Multi code coupons search page</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">multiCodeCouponsSearchPage</hint>
+		</hints>
+	</bean>
+
+	<bean class="de.hybris.platform.couponwebservices.dto.ws.CodeGenerationConfigurationsSearchPageWsDTO" extends="de.hybris.platform.webservicescommons.dto.SearchPageWsDTO&lt;de.hybris.platform.couponwebservices.dto.CodeGenerationConfigurationWsDTO>">
+		<description>Code generation configurations search page</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">codeGenerationConfigurationsSearchPage</hint>
+		</hints>
+	</bean>
+	
+	<bean class="de.hybris.platform.couponwebservices.dto.CouponRedemptionWsDTO">
+		<description>Coupon redemption</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">couponRedemption</hint>
+		</hints>
+	    <property name="couponId" type="String"/>
+	    <property name="customerId" type="String"/>
+		<property name="redemptionsPerCustomer" type="Integer"/>
+		<property name="totalRedemptions " type="Integer"/>
+		<property name="maxRedemptionsLimitPerCustomer" type="Integer"/>
+		<property name="maxTotalRedemptionsLimit " type="Integer"/>	
+	</bean>
+	
+	<bean class="de.hybris.platform.couponwebservices.dto.CodeGenerationConfigurationWsDTO">
+		<description>Code generation configuration</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">codeGenerationConfiguration</hint>
+		</hints>
+	    <property name="name" type="String"/>
+	    <property name="codeSeparator" type="String"/>
+		<property name="couponPartCount" type="Integer"/>
+		<property name="couponPartLength" type="Integer"/>
+	</bean>
+	
+	
+	<bean class="de.hybris.platform.couponwebservices.dto.CouponValidationResponseWsDTO">
+		<description>Coupon validation response</description>
+		<hints>
+			<hint name="wsRelated"/>
+			<hint name="alias">couponValidationResponse</hint>
+		</hints>
+	    <property name="couponId" type="String"/>
+	    <property name="generatedCouponCode" type="String"/>
+	    <property name="valid" type="Boolean"/>
+		<property name="message" type="String"/>
+	</bean>
+	
+</beans>

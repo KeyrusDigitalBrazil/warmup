@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<config>
+	<types>
+		<type>
+	 		<code>UserGroup</code>
+			<objectclasses>
+				<objectclass>organizationalUnit</objectclass>
+				<objectclass>group</objectclass>
+				<objectclass>hybrisOrganizationalUnit</objectclass>				
+		 	</objectclasses>
+			<attributes>
+		 		<attribute>
+		 			<ldap>ou</ldap>
+			 		<hybris>uid</hybris>
+			 		<impex>[unique=true]</impex>
+				</attribute>
+				<attribute>
+		 			<ldap>cn</ldap>
+		 			<hybris>cn</hybris>
+				</attribute>
+				<attribute>
+		 			<ldap>distinguishedName</ldap>
+		 			<hybris>dn</hybris>
+				</attribute>
+			</attributes>				
+		</type>
+		<type>
+	 		<code>Employee</code>
+			<objectclasses>
+				<objectclass>organizationalPerson</objectclass>
+				<objectclass>hybrisUser</objectclass>
+		 	</objectclasses>
+			<attributes>
+				<attribute>
+		 			<ldap>sAMAccountName</ldap>
+		 			<hybris>uid</hybris>
+			 		<impex>[unique=true]</impex>
+				</attribute>
+		 		<attribute>
+		 			<ldap>displayName</ldap>
+			 		<hybris>name</hybris>
+				</attribute>
+				<attribute>
+		 			<ldap>cn</ldap>
+		 			<hybris>cn</hybris>
+				</attribute>
+				<attribute>
+		 			<ldap>distinguishedName</ldap>
+		 			<hybris>dn</hybris>
+				</attribute>
+				<attribute>
+		 			<ldap>sAMAccountName</ldap>
+		 			<hybris>ldaplogin</hybris>
+				</attribute>
+				<attribute>
+					<!--
+		 			<ldap>dn</ldap>
+		 			<hybris>groups</hybris>
+					<impex>(dn)[translator=de.hybris.platform.ldap.impex.ExtractUserGroupTranslator, groupid=dn, mode=append]</impex>
+					-->
+					<ldap>memberOf</ldap>
+		 			<hybris>groups</hybris>
+					<impex>(dn)[translator=de.hybris.platform.ldap.impex.ActiveDirectoryGroupCollectionTranslator, mode=append, groupid=dn]</impex>
+				</attribute>
+			</attributes>
+			<defaultimpexheaderentry>
+				ldapaccount[virtual=true, default=true]
+			</defaultimpexheaderentry>
+		</type>
+	</types>
+	<mappings>
+		<mapping>
+			<attributes>
+		 		<attribute>ou</attribute>
+			</attributes>
+			<values>
+				<value>
+					<ldap>RD</ldap>
+					<hybris>Development</hybris>
+				</value>
+			</values>
+		</mapping>
+	</mappings>
+</config>

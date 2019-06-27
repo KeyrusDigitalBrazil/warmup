@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<import resource="cmsfacades-synchronization-collectors-spring.xml" />
+	<import resource="cmsfacades-synchronization-visitors-spring.xml" />
+	
+	
+	<!-- Converters and Populators -->
+	<alias name="defaultCmsSyncItemStatusDataConverter" alias="cmsSyncItemStatusDataConverter" />
+	<bean id="defaultCmsSyncItemStatusDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.SyncItemStatusData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsSyncItemStatusDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsItemTypeDataConverter" alias="cmsItemTypeDataConverter" />
+	<bean id="defaultCmsItemTypeDataConverter" parent="abstractPopulatingConverter">
+		<property name="targetClass" value="de.hybris.platform.cmsfacades.data.ItemTypeData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cmsItemTypeDataPopulator" />
+			</list>
+		</property>
+	</bean>
+
+	<alias name="defaultCmsItemTypeDataPopulator" alias="cmsItemTypeDataPopulator"/>
+	<bean name="defaultCmsItemTypeDataPopulator" class="de.hybris.platform.cmsfacades.synchronization.populator.ItemTypeDataPopulator">
+		<property name="prefix" value="type" />
+		<property name="suffix" value="name" />
+	</bean>
+
+	<alias name="defaultCmsSyncItemStatusDataPopulator" alias="cmsSyncItemStatusDataPopulator"/>
+	<bean name="defaultCmsSyncItemStatusDataPopulator" class="de.hybris.platform.cmsfacades.synchronization.populator.SyncItemStatusDataPopulator">
+		<property name="itemTypeConverter" ref="cmsItemTypeDataConverter" />
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+	</bean>
+	
+	<!-- service and facade -->
+
+	<alias name="defaultSyncConfig" alias="syncConfig" />
+	<bean id="defaultSyncConfig" class="de.hybris.platform.catalog.synchronization.SyncConfig">
+		<property name="createSavedValues" value="FALSE" />
+		<property name="logToDatabase" value="FALSE" />
+		<property name="logToFile" value="TRUE" />
+		<property name="logLevelDatabase" value="WARNING" />
+		<property name="logLevelFile" value="INFO" />
+		<property name="forceUpdate" value="FALSE" />
+		<property name="errorMode" value="IGNORE" />
+		<property name="synchronous" value="FALSE" />
+	</bean>
+	
+	<alias name="defaultCmsSyncItemStatusConfig" alias="cmsSyncItemStatusConfig" />
+	<bean id="defaultCmsSyncItemStatusConfig" class="de.hybris.platform.cmsfacades.data.SyncItemStatusConfig">
+		<property name="maxDepth" value="1" />
+	</bean>
+
+	<alias name="defaultItemSynchronizationService" alias="itemSynchronizationService" />
+	<bean id="defaultItemSynchronizationService" class="de.hybris.platform.cmsfacades.synchronization.service.impl.DefaultItemSynchronizationService">
+		<property name="searchRestrictionService" ref="searchRestrictionService" />
+		<property name="sessionService" ref="sessionService" />
+		<property name="modelService" ref="modelService" />
+		<property name="catalogTypeService" ref="catalogTypeService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+		<property name="relatedItemsCollector" ref="cmsRelatedItemsCollector" />
+		<property name="platformSynchronizationStatusService" ref="synchronizationStatusService" />
+		<property name="catalogSynchronizationService" ref="catalogSynchronizationService" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="sessionSearchRestrictionsDisabler" ref="cmsSessionSearchRestrictionsDisabler"/>
+	</bean>
+	
+	<alias name="defaultItemSynchronizationFacade" alias="itemSynchronizationFacade" />
+	<bean id="defaultItemSynchronizationFacade" class="de.hybris.platform.cmsfacades.synchronization.impl.DefaultItemSynchronizationFacade">
+		<property name="uniqueItemIdentifierService" ref="cmsUniqueItemIdentifierService" />
+		<property name="basicItemCollectorRegistry" ref="basicSynchronizationItemCollectorRegistry" />
+		<property name="sharedItemCollectorRegistry" ref="sharedSynchronizationItemCollectorRegistry" />
+		<property name="dependentItemCollectorRegistry" ref="dependentSynchronizationItemCollectorRegistry" />
+		<property name="itemSynchronizationService" ref="itemSynchronizationService" />
+		<property name="syncItemStatusConverter" ref="cmsSyncItemStatusDataConverter" />
+		<property name="syncItemStatusConfig" ref="cmsSyncItemStatusConfig" />
+		<property name="syncConfig" ref="syncConfig" />
+		<property name="catalogSynchronizationCompositeValidator" ref="cmsCatalogSynchronizationCompositeValidator" />
+		<property name="facadeValidationService" ref="facadeValidationService" />
+	</bean>
+	
+</beans>

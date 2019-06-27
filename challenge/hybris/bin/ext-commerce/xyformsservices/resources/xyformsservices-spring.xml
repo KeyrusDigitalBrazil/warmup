@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config />
+           
+	<alias alias="proxyEngine" name="mockProxyEngine"/>
+	<bean id="mockProxyEngine" class="de.hybris.platform.xyformsservices.proxy.impl.MockProxyEngine" />
+
+	<alias alias="proxyService" name="defaultProxyService"/>
+	<bean id="defaultProxyService" class="de.hybris.platform.xyformsservices.proxy.impl.DefaultProxyService" scope="singleton">
+		<property name="proxyEngine" ref="proxyEngine" />
+		<property name="orbeonAddress" value="#{configurationService.configuration.getProperty('xyformsservices.orbeon.url.address')}" />
+		<property name="extraHeaders">
+			<map>
+				<entry key="hybris-Username" value="-" />
+				<entry key="hybris-Group" value="-" />
+				<entry key="hybris-Roles" value="-" />
+				<entry key="Orbeon-Client" value="portlet" />
+				<entry key="#{configurationService.configuration.getProperty('xyformsservices.orbeon.hybris-proxy-header')}" value="#{configurationService.configuration.getProperty('xyformsservices.orbeon.hybris-proxy-value')}" />
+			</map>
+		</property>
+	</bean>
+    
+    <alias name="defaultYFormsHttpClient" alias="yFormsHttpClient"/>
+	<bean id="defaultYFormsHttpClient"  factory-bean="yFormsHttpClientsBuilder" factory-method="build" />
+	
+	<alias name="defaultYFormsHttpClientsBuilder" alias="yFormsHttpClientsBuilder"/>
+	<bean id="defaultYFormsHttpClientsBuilder" class="org.apache.http.impl.client.HttpClientBuilder" factory-method="create" >
+    	<property name="defaultRequestConfig" ref="yFormsRequestConfig" />
+    	<property name="connectionManager" ref="yFormsPoolingHttpClientConnectionManager" /> 
+	</bean>
+		
+	 <alias name="defaultInterceptedHttpClientBuilder" alias="interceptedHttpClientBuilder"/>
+	 <bean id="defaultInterceptedHttpClientBuilder" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    	<property name="targetObject" ref="yFormsHttpClientsBuilder" />
+    	<property name="targetMethod" value="addInterceptorFirst" />
+    	<property name="arguments">
+        <list>
+            <bean class="org.springframework.ws.transport.http.HttpComponentsMessageSender.RemoveSoapHeadersInterceptor"/>
+        </list>
+    	</property>
+	</bean>
+	
+	<alias name="defaultYFormsPoolingHttpClientConnectionManager" alias="yFormsPoolingHttpClientConnectionManager"/>
+	<bean  id="defaultYFormsPoolingHttpClientConnectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager" >
+        <property name="defaultMaxPerRoute" value="#{configurationService.configuration.getProperty('xyformsservices.proxy.httpclient.maxConnectionsPerHost')}"/>
+        <property name="maxTotal" value="#{configurationService.configuration.getProperty('xyformsservices.proxy.httpclient.maxTotalConnections')}"/>
+    </bean>
+     
+    <alias name="defaultYFormsRequestConfig" alias="yFormsRequestConfig"/>
+    <bean id="defaultYFormsRequestConfig" factory-bean="yFormsRequestConfigBuilder" factory-method="build" />
+    
+    <alias name="defaultYFormsRequestConfigBuilder" alias="yFormsRequestConfigBuilder"/>
+    <bean id="defaultYFormsRequestConfigBuilder" class="org.apache.http.client.config.RequestConfig"
+    	factory-method="custom">
+    	     <property name="cookieSpec">
+        		<util:constant static-field="org.apache.http.client.config.CookieSpecs.DEFAULT" />
+    	  </property> 
+    </bean>
+	
+    <util:list id="yFormsHeadersToList">
+       <value>Content-Type</value>
+       <value>Content-Length</value>
+       <value>Content-Language</value>
+       <value>Accept</value>
+    </util:list>
+
+    <util:list id="yFormsHeadersFromList">
+       <value>Content-Type</value>
+       <value>Content-Length</value>
+       <value>Last-Modified</value>
+       <value>Cache-Control</value>
+       <value>Location</value>
+    </util:list>
+
+   <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+      <property name="scopes">
+         <map>
+            <entry key="session">
+               <bean class="org.springframework.web.context.request.SessionScope" />
+            </entry>
+         </map>
+      </property>
+   </bean>
+   
+   <alias alias="getVersionNumberStrategy" name="defaultGetVersionNumberStrategy"/>
+   <bean id="defaultGetVersionNumberStrategy" class="de.hybris.platform.xyformsservices.strategy.DefaultGetVersionNumberStrategy" />
+
+	<bean id="yFormsServicesSystemSetup" class="de.hybris.platform.xyformsservices.setup.YFormsServicesSystemSetup" parent="abstractCoreSystemSetup" />
+	
+	<alias alias="yformDao" name="defaultYFormDao"/>
+	<bean id="defaultYFormDao" class="de.hybris.platform.xyformsservices.daos.impl.DefaultYFormDao" parent="abstractItemDao"/>
+
+	<alias alias="yformService" name="defaultYFormService"/>
+	<bean id="defaultYFormService" class="de.hybris.platform.xyformsservices.form.impl.DefaultYFormService">
+	   <property name="YFormDao" ref="yformDao" />
+      <property name="modelService" ref="modelService"/>
+      <property name="getVersionNumberStrategy" ref="getVersionNumberStrategy" />
+	</bean>
+	
+	<alias alias="yFormDefinitionHelper" name="defaultYFormDefinitionHelper"/>
+	<bean id="defaultYFormDefinitionHelper" class="de.hybris.platform.xyformsservices.helpers.impl.DefaultYFormDefinitionHelper">
+        <property name="YFormService" ref="yformService"/>
+	</bean>
+	
+	<alias alias="categoryAllYFormDefinitions" name="defaultCategoryAllYFormDefinitions"/>
+	<bean id="defaultCategoryAllYFormDefinitions" class="de.hybris.platform.xyformsservices.attribute.CategoryAllYFormDefinitions">
+		<property name="YFormDefinitionHelper" ref="yFormDefinitionHelper"/>
+	</bean>
+	
+	<alias alias="productAllYFormDefinitions" name="defaultProductAllYFormDefinitions"/>
+	<bean id="defaultProductAllYFormDefinitions" class="de.hybris.platform.xyformsservices.attribute.ProductAllYFormDefinitions">
+		<property name="YFormDefinitionHelper" ref="yFormDefinitionHelper"/>
+	</bean>
+
+	<alias alias="yFormDataPrepareInterceptor" name="defaultYFormDataPrepareInterceptor"/>
+	<bean id="defaultYFormDataPrepareInterceptor" class="de.hybris.platform.xyformsservices.interceptors.YFormDataPrepareInterceptor">
+		<property name="modelService" ref="modelService" />
+	</bean>
+
+	<alias alias="yFormDataPrepareInterceptorMapping" name="defaultYFormDataPrepareInterceptorMapping"/>
+	<bean id="defaultYFormDataPrepareInterceptorMapping"
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="yFormDataPrepareInterceptor" />
+		<property name="typeCode" value="YFormData" />
+	</bean>
+	
+	<alias alias="cookieManager" name="defaultCookieManager"/>
+	<bean id="defaultCookieManager" class="de.hybris.platform.xyformsservices.proxy.orbeonservices.impl.DefaultCookieManager" />
+
+	<alias alias="urlRewriter" name="defaultUrlRewriter"/>
+	<bean id="defaultUrlRewriter" class="de.hybris.platform.xyformsservices.proxy.orbeonservices.impl.DefaultUrlRewriter" scope="singleton" />
+
+    <alias alias="proxyEngine" name="defaultApache31ProxyEngine"/>
+    <bean id="defaultApache31ProxyEngine" class="de.hybris.platform.xyformsservices.proxy.orbeonservices.impl.DefaultApache31ProxyEngine">
+        <property name="httpClient" ref="yFormsHttpClient" />
+        <property name="urlRewriter" ref="urlRewriter" />
+        <property name="headersTo" ref="yFormsHeadersToList" />
+        <property name="headersFrom" ref="yFormsHeadersFromList"/>
+		<property name="configurationService" ref="configurationService" />
+    </bean>
+
+    <bean id="defaultSimpleProxyEngine" class="de.hybris.platform.xyformsservices.proxy.orbeonservices.impl.DefaultSimpleProxyEngine">
+        <property name="cookieManager" ref="cookieManager" />
+        <property name="urlRewriter" ref="urlRewriter" />
+        <property name="headersTo" ref="yFormsHeadersToList" />
+        <property name="headersFrom" ref="yFormsHeadersFromList"/>
+		<property name="configurationService" ref="configurationService" />
+    </bean>
+</beans>

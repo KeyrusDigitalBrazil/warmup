@@ -1,0 +1,25 @@
+
+$destination_target=kymaDefault
+
+INSERT_UPDATE DestinationTarget;id[unique=true];destinationChannel(code)[default=KYMA]
+                               ;$destination_target;
+
+INSERT_UPDATE Endpoint;id[unique=true];version;specUrl;specData;&eref;name
+;e1;v1;"url";;e1;n1
+
+INSERT_UPDATE OAuthClientDetails;clientId[unique=true];resourceIds;scope;authorizedGrantTypes;clientSecret;authorities
+                                ;kyma;hybris;basic;authorization_code,refresh_token,password,client_credentials;password;ROLE_TRUSTED_CLIENT
+                                ;kyma1;hybris;basic;authorization_code,refresh_token,password,client_credentials;password;ROLE_TRUSTED_CLIENT
+
+INSERT_UPDATE ExposedOAuthCredential;id[unique=true];oAuthClientDetails(clientId);password
+                                    ;kymaCred1;kyma;secret
+                                    ;kymaCred2;kyma;secret
+                                    ;kymaCred3;kyma1;secret
+
+
+INSERT_UPDATE ExposedDestination;id[unique=true];url;endpoint(&eref);additionalProperties;destinationTarget(id)[default=$destination_target];active;credential(id)
+;first_dest;"http://localhost:9002/test";e1;;;true;kymaCred2
+;second_dest;"http://localhost:9002/test";e1;;;false;kymaCred1
+;third_dest;"http://localhost:9002/test";e1;;;true;kymaCred1
+;fourth_dest;"http://localhost:9002/test";e1;;;true;kymaCred1
+;fifth_dest;"http://localhost:9002/test";e1;;;true;kymaCred2

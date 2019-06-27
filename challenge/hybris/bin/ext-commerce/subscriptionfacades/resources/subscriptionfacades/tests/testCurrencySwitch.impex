@@ -1,0 +1,32 @@
+$lang=en
+$catalog-id=testCatalog
+$catalog-version=Online
+
+$catalogversion=catalogversion(catalog(id),version)[unique=true,default=$catalog-id:$catalog-version]
+$catalogversionResolver=catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version])[default=$catalog-id:$catalog-version]
+$supercategories=supercategories(code,catalogversion(catalog(id[default=$catalog-id]),version[default=$catalog-version]))
+
+# create test products
+INSERT Product;code[unique=true];unit(code[unique=true,default=pieces]);$catalogversion
+;"P1";;
+
+# set subscription term "monthly" for all test products 
+UPDATE Product;code[unique=true];name[lang=$lang];$supercategories;$catalogversion;subscriptionTerm(id)
+;P1;P1;testCategory0;;monthly
+
+#   for all test products, add a subscription priceplan with currency "USD"    
+INSERT SubscriptionPricePlan;name[lang=$lang, unique=true];user(uid)[allowNull=true];ug(code,itemtype(code[default='UserPriceGroup']))[allowNull=true];currency(isocode);product(code, $catalogversionResolver);$catalogversion;unit(code)[default=pieces]
+;PP1_USD;;;USD;P1
+;PP1_EUR;;;EUR;P1
+
+#for test subscription price plans, add one time payments
+INSERT OneTimeChargeEntry;id[unique=true];subscriptionPricePlanOneTime(name[lang=$lang, unique=true]);price;$catalogversion;billingEvent(code)
+;PP1_USD_paynow;PP1_USD;5.75;;paynow
+;PP1_USD_onfirstbill;PP1_USD;10.00;;onfirstbill
+;PP1_EUR_paynow;PP1_EUR;20.50;;paynow
+;PP1_EUR_onfirstbill;PP1_EUR;21.00;;onfirstbill
+
+INSERT RecurringChargeEntry;id[unique=true];subscriptionPricePlanRecurring(name[lang=$lang, unique=true]);price;cycleStart;cycleEnd;$catalogversion
+;PP1_USD_Start_1_End_;PP1_USD;20.99;1;
+;PP1_EUR_Start_1_End_;PP1_EUR;31.99;1;
+

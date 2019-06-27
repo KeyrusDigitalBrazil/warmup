@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+			  http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- Orika : Converters -->
+	<bean class="de.hybris.platform.ordermanagementwebservices.mapping.converters.returns.ReturnActionConverter"/>
+	<bean class="de.hybris.platform.ordermanagementwebservices.mapping.converters.returns.RefundReasonConverter"/>
+	<bean class="de.hybris.platform.ordermanagementwebservices.mapping.converters.returns.CancelReasonConverter"/>
+	<bean class="de.hybris.platform.ordermanagementwebservices.mapping.converters.returns.CreditCardPaymentInfoDataMapper"
+		  parent="abstractCustomMapper"/>
+
+	<!-- Field mapping configuration -->
+	<bean id="dataMapper"
+	      class="de.hybris.platform.webservicescommons.mapping.impl.DefaultDataMapper">
+		<property name="fieldSetBuilder" ref="fieldSetBuilder"/>
+	</bean>
+
+	<bean id="fieldSetBuilder"
+	      class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetBuilder">
+		<property name="defaultRecurrencyLevel" value="4"/>
+		<property name="defaultMaxFieldSetSize" value="50000"/>
+		<property name="fieldSetLevelHelper" ref="fieldSetLevelHelper"/>
+	</bean>
+
+	<alias alias="fieldSetLevelHelper" name="defaultFieldSetLevelHelper"/>
+	<bean id="defaultFieldSetLevelHelper"
+	      class="de.hybris.platform.webservicescommons.mapping.impl.DefaultFieldSetLevelHelper">
+	</bean>
+
+	<bean class="de.hybris.platform.webservicescommons.mapping.filters.GeneralFieldFilter">
+		<property name="fieldSelectionStrategy" ref="fieldSelectionStrategy"/>
+	</bean>
+
+	<!-- Field mapping -->
+	<bean parent="fieldMapper">
+		<property name="sourceClass"
+		          value="de.hybris.platform.commerceservices.search.pagedata.PaginationData"/>
+		<property name="destClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="totalNumberOfResults" value="totalResults"/>
+				<entry key="numberOfPages" value="totalPages"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commercefacades.order.data.OrderData"/>
+		<property name="destClass" value="de.hybris.platform.commercewebservicescommons.dto.order.OrderWsDTO"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.order.OrderSearchPageWsDto"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="orders"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.order.OrderEntrySearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="orderEntries"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnSearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="returns"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.commerceservices.search.pagedata.SearchPageData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnEntrySearchPageWsDTO"/>
+		<property name="fieldMapping">
+			<map>
+				<entry key="results" value="returnEntries"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Return Field mapping -->
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.returns.data.ReturnRequestData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnRequestWsDTO"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.returns.data.ReturnEntryData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnEntryWsDTO"/>
+	</bean>
+
+    <bean parent="fieldMapper">
+        <property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.returns.data.CancelReturnRequestData"/>
+        <property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.returns.CancelReturnRequestWsDTO"/>
+    </bean>
+
+	<!-- Fraud report field mapping -->
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.fraud.data.FraudReportData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.fraud.FraudReportWsDTO"/>
+	</bean>
+
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.fraud.data.FraudSymptomScoringsData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.fraud.FraudSymptomScoringsWsDTO"/>
+	</bean>
+
+	<!-- Payment transaction mapping -->
+	<bean parent="fieldMapper">
+		<property name="sourceClass" value="de.hybris.platform.ordermanagementfacades.payment.data.PaymentTransactionEntryData"/>
+		<property name="destClass" value="de.hybris.platform.ordermanagementwebservices.dto.payment.PaymentTransactionEntryWsDTO"/>
+	</bean>
+
+	<!-- Fieldset mapping -->
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.order.OrderSearchPageWsDto"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="orders(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="orders(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="orders(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.OrderWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code,entries(BASIC)"/>
+				<entry key="DEFAULT" value="code,user,created,status,deliveryMode(DEFAULT),entries(BASIC)"/>
+				<entry key="FULL"
+				       value="code,user,created,status,deliveryMode(FULL),paymentAddress(FULL),deliveryAddress(FULL),entries(DEFAULT),subTotal(FULL),totalTax(FULL),deliveryCost(FULL),totalDiscounts(FULL),totalPrice(FULL),consignments(FULL),store"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.order.OrderEntrySearchPageWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="orderEntries(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="orderEntries(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="orderEntries(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="code"/>
+				<entry key="DEFAULT" value="code,shippingAddress"/>
+				<entry key="FULL" value="code,status"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.user.AddressWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="firstName,lastName,postalCode"/>
+				<entry key="DEFAULT" value="firstName,lastName,line1,line2,town,postalCode"/>
+				<entry key="FULL" value="firstName,lastName,line1,line2,region(FULL),postalCode,country(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<!--Returns-->
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnSearchPageWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="returns(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="returns(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="returns(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+				  value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnEntrySearchPageWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="returnEntries(BASIC),pagination(BASIC)"/>
+				<entry key="DEFAULT" value="returnEntries(DEFAULT),pagination(DEFAULT)"/>
+				<entry key="FULL" value="returnEntries(FULL),pagination(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnRequestWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="rma"/>
+				<entry key="DEFAULT" value="rma,status,returnEntries(DEFAULT),order(DEFAULT),refundDeliveryCost"/>
+				<entry key="FULL" value="rma,status,returnEntries(FULL),order(FULL),refundDeliveryCost"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.returns.ReturnEntryWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="receivedQuantity,expectedQuantity"/>
+				<entry key="DEFAULT" value="receivedQuantity,expectedQuantity,orderEntry(DEFAULT),refundAmount, refundReason"/>
+				<entry key="FULL" value="receivedQuantity,expectedQuantity,orderEntry(FULL),refundAmount, refundReason"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.commercewebservicescommons.dto.search.pagedata.PaginationWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="totalResults"/>
+				<entry key="DEFAULT" value="totalResults,pageSize,currentPage"/>
+				<entry key="FULL" value="totalResults,pageSize,currentPage,totalPages,sort"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Fraud report -->
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.fraud.FraudReportWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="status,timestamp"/>
+				<entry key="DEFAULT" value="explanation,status,timestamp"/>
+				<entry key="FULL" value="provider,explanation,status,timestamp,fraudSymptomScorings(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.fraud.FraudSymptomScoringsWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="name"/>
+				<entry key="DEFAULT" value="explanation,name"/>
+				<entry key="FULL" value="explanation,name,score"/>
+			</map>
+		</property>
+	</bean>
+
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+		          value="de.hybris.platform.ordermanagementwebservices.dto.fraud.FraudReportListWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="reports(BASIC)"/>
+				<entry key="DEFAULT" value="reports(DEFAULT)"/>
+				<entry key="FULL" value="reports(FULL)"/>
+			</map>
+		</property>
+	</bean>
+
+	<!-- Payment transaction field mapping -->
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass"
+				  value="de.hybris.platform.ordermanagementwebservices.dto.payment.PaymentTransactionEntryWsDTO"/>
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="transactionStatus,transactionStatusDetails"/>
+				<entry key="DEFAULT" value="amount,currencyIsocode,transactionStatus,transactionStatusDetails"/>
+				<entry key="FULL" value="amount,currencyIsocode,time,transactionStatus,transactionStatusDetails,type"/>
+			</map>
+		</property>
+	</bean>
+</beans>

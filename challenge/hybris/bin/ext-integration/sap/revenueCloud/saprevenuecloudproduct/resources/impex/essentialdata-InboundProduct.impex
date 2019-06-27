@@ -1,0 +1,36 @@
+INSERT_UPDATE IntegrationObject; code[unique = true]; integrationType(code) 
+; OutboundSapRevenueCloudProductCronjob; INBOUND 
+ 
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique=true]; code[unique = true]; type(code) 
+; OutboundSapRevenueCloudProductCronjob	; SapRevenueCloudProductCronjob     	; SapRevenueCloudProductCronjob 
+; OutboundSapRevenueCloudProductCronjob	; SapRevenueCloudReplicationModeEnum	; SapRevenueCloudReplicationModeEnum 
+ 
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false] 
+; OutboundSapRevenueCloudProductCronjob:SapRevenueCloudProductCronjob     	; code           	; SapRevenueCloudProductCronjob:code           	;                                                                         	; true 
+; OutboundSapRevenueCloudProductCronjob:SapRevenueCloudProductCronjob     	; replicationTime	; SapRevenueCloudProductCronjob:replicationTime	;                                                                         	;  
+; OutboundSapRevenueCloudProductCronjob:SapRevenueCloudProductCronjob     	; replicationMode	; SapRevenueCloudProductCronjob:replicationMode	; OutboundSapRevenueCloudProductCronjob:SapRevenueCloudReplicationModeEnum	; true 
+; OutboundSapRevenueCloudProductCronjob:SapRevenueCloudReplicationModeEnum	; code           	; SapRevenueCloudReplicationModeEnum:code      	;                                                                         	; true 
+
+
+
+INSERT_UPDATE OAuthClientDetails; clientId[unique = true]; oAuthUrl; scope
+; <clientID>; https://[oauthasservices-lusl98x2ze.int.sap.hana.ondemand.com]/oauth2/api/v1/token?grant_type=client_credentials
+INSERT_UPDATE ExposedOAuthCredential; id[unique = true]   ; oAuthClientDetails(clientId); password
+; scpiOauthCredential ; <clientID> ; <clientSecret>
+
+#**********************************#
+#************  Endpoints  *********#
+#**********************************#
+INSERT_UPDATE Endpoint; id[unique = true]; version[unique = true]; specUrl; name
+; scpiProductEndpoint; unknown; "https://[c1501-iflmap.hcisb.int.sap.hana.ondemand.com]/http/revenuecloud/product"; scpiProductEndpoint
+
+INSERT_UPDATE DestinationTarget; id[unique=true]
+; stoutoutboundtest
+
+#**********************************************#
+#************  Consumed Destinations  *********#
+#**********************************************#
+INSERT_UPDATE ConsumedDestination; id[unique = true]; url; endpoint(id, version); credential(id); additionalProperties;destinationTarget(id)[default=stoutoutboundtest]
+; scpiProductDestination; "https://[c1501-iflmap.hcisb.int.sap.hana.ondemand.com]/http/revenuecloud/product"                 ; scpiProductEndpoint:unknown          ; scpiOauthCredential ;
+
+

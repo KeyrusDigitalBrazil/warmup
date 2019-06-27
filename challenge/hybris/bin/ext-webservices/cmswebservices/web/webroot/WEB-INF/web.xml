@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<web-app id="cmswebservices" version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" 
+         metadata-complete="true">
+  <absolute-ordering />
+  
+	<display-name>cmswebservices</display-name>
+	<filter>
+	   <filter-name>XSSFilter</filter-name>
+	   <filter-class>de.hybris.platform.servicelayer.web.XSSFilter</filter-class>
+	   <async-supported>true</async-supported>
+	</filter>
+	 
+	<filter-mapping>
+	   <filter-name>XSSFilter</filter-name>
+	   <url-pattern>/*</url-pattern>
+	</filter-mapping>        
+        
+	<!-- SessionHidingRequestFilter prevents creating Http session.
+		 If you want to track user session :
+		  - comment or remove SessionHidingRequestFilter
+		  - uncomment sessionFilter in cmswebservices-web-spring.xml
+		  - comment or remove restSessionFilter in cmswebservices-web-spring.xml
+	-->
+	<filter>
+		<filter-name>SessionHidingRequestFilter</filter-name>
+		<filter-class>de.hybris.platform.webservicescommons.filter.SessionHidingFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>SessionHidingRequestFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>        
+        
+	<filter>
+		<filter-name>cmswebservicesPlatformFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>cmswebservicesPlatformFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>	
+        
+<!--
+        Enabling a Spring web application context with 'session' and 'request' scope.
+        - The 'contextConfigLocation' param specifies where your configuration files are located.
+        - The HybrisContextLoaderListener extends the usual SpringContextLoaderListener (which loads
+          the context from specified location) by adding the global application context of
+          the platform as parent context. With having the global context set as parent you can access
+          or override beans of the global context and get the 'tenant' scope.
+        - The RequestContextListener is needed for exposing the 'request' scope to the context.
+          Furthermore it is needed when overriding the 'jalosession' bean for your web application.
+ -->
+        <context-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>WEB-INF/cmswebservices-web-spring.xml</param-value>
+        </context-param>
+
+        <listener>
+                <listener-class>de.hybris.platform.spring.HybrisContextLoaderListener</listener-class>
+        </listener>
+
+        <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+        </listener>
+
+        <servlet>
+                <description>
+                        DispatcherServlet
+                        Spring MVC dispatcher servlet. This is the entry point for the Spring MVC application.
+                </description>
+                <servlet-name>DispatcherServlet</servlet-name>
+                <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+                <init-param>
+                        <description>
+                                Specifies the location for Spring MVC to load an additional XML configuration file.
+                                Because hybris is already configured with the XML spring configuration files to load
+                                we must set this param value to EMPTY in order to prevent loading of the default
+                                /WEB-INF/applicationContext.xml file.
+                        </description>
+                        <param-name>contextConfigLocation</param-name>
+                        <param-value></param-value>
+                </init-param>
+                <load-on-startup>1</load-on-startup>
+        </servlet>
+
+        <servlet-mapping>
+                <servlet-name>DispatcherServlet</servlet-name>
+                <url-pattern>/</url-pattern>
+        </servlet-mapping>
+
+        <context-param>
+            <param-name>contextInitializerClasses</param-name>
+            <param-value>de.hybris.platform.webservicescommons.initializer.HybrisPropertiesWebApplicationContextInitializer</param-value>
+        </context-param>
+</web-app>

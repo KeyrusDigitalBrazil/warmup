@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+	
+
+	<bean id="cxPromotionRulePopulator" class="de.hybris.platform.personalizationpromotionsweb.populators.CxPromotionRulePopulator" />
+	
+	<bean id="cxPromotionRulePopulators" parent="abstractPopulatorList" >
+		<property name="populators">
+			<list>
+				<ref bean="cxPromotionRulePopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="defaultCxPromotionRuleConverter" parent="cxConverter" >
+		<property name="targetClass" value="de.hybris.platform.personalizationpromotionsweb.data.PromotionRuleWsDTO" />
+		<property name="populators">
+			<map>
+				<entry key="BASE" value-ref="cxPromotionRulePopulators" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="cxpromotionsforcatalog" class="de.hybris.platform.personalizationpromotionsweb.queries.CxPromotionsForCatalogQueryExecutor" parent="abstractRestQueryExecutor">
+		<property name="promotionConverter" ref="defaultCxPromotionRuleConverter" />
+		<property name="sourceRuleInspector" ref="sourceRuleInspector" />
+		<property name="ruleService" ref="ruleService" />
+		<property name="catalogVersionService" ref="catalogVersionService" />
+	</bean>
+	
+
+
+	<!-- beans below needs to be reviewed as they were created for old promotions -->
+	<beans>
+		<!-- Validation -->
+		<bean name="promotionActionValidator" class="de.hybris.platform.personalizationpromotionsweb.validator.PromotionActionValidator" />
+	
+		<!-- Personalization API extension -->
+		<bean id="cxPromotionActionSubclassMapping" parent="subclassMapping">
+			<property name="parentClass" value="de.hybris.platform.personalizationfacades.data.ActionData" />
+			<property name="subclassesSet" value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData" />
+		</bean>
+		
+	   	<bean id="cxPromotionActionDataFieldMapper" parent="fieldMapper">
+			<property name="sourceClass" value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData"/>
+			<property name="destClass"   value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData"/>
+		</bean>
+
+		<bean id="cxPromotionActionDataFieldSetLevelMapping" parent="fieldSetLevelMapping">
+			<property name="dtoClass" value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData"/>
+			<property name="levelMapping">
+				<map>
+					<entry key="BASIC" value="code"/>
+					<entry key="DEFAULT" value="code,promotionId"/>
+					<entry key="FULL" value="code,promotionId"/>
+				</map>
+			</property>
+		</bean>
+
+		<!-- conversion -->	
+		<bean id="cxPromotionActionPopulator" class="de.hybris.platform.personalizationpromotionsweb.populators.CxPromotionActionPopulator" />
+	
+		<bean id="cxPromotionActionPopulators" parent="abstractPopulatorList" >
+			<property name="populators">
+				<list>
+					<ref bean="cxPromotionActionPopulator" />
+					<ref bean="cxActionPopulator" />
+				</list>
+			</property>
+		</bean>
+	
+		<bean id="defaultCxPromotionActionConverter" parent="cxActionPopulatingConverter" >
+			<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationpromotions.model.CxPromotionActionModel" />		
+			<property name="targetClass" value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData" />
+			<property name="populators">
+				<map>
+					<entry key="BASE" value-ref="cxPromotionActionPopulators" />
+				</map>
+			</property>
+		</bean>
+		
+		<!-- Action reverse conversion -->	
+		<bean id="cxPromotionActionReversePopulator" class="de.hybris.platform.personalizationpromotionsweb.populators.CxPromotionActionReversePopulator" />
+		
+		<bean id="cxPromotionActionReversePopulators" parent="abstractPopulatorList" >
+			<property name="populators">
+				<list>
+					<ref bean="cxPromotionActionReversePopulator" />
+					<ref bean="cxActionReversePopulator" />
+				</list>
+			</property>
+		</bean>
+		
+		
+		<bean id="defaultCxPromotionActionReverseConverter" parent="cxActionReversePopulatingConverter"  >
+			<constructor-arg name="sourceClass" value="de.hybris.platform.personalizationpromotionsweb.data.CxPromotionActionData" />		
+			<property name="targetClass" value="de.hybris.platform.personalizationpromotions.model.CxPromotionActionModel" />
+			<property name="populators" >
+				<map>
+					<entry key="BASE" value-ref="cxPromotionActionReversePopulators" />
+				</map>
+			</property>
+		</bean>
+	</beans>
+	
+		
+</beans>

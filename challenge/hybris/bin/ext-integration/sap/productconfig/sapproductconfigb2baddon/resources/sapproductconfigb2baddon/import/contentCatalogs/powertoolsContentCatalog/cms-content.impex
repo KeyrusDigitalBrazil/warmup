@@ -1,0 +1,24 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2017 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$contentCatalog=powertoolsContentCatalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+
+###### Restriction Start ######
+INSERT_UPDATE CMSActionRestriction;$contentCV[unique=true];uid[unique=true];name;
+;;ActionRestriction;A CMSAction restriction;
+
+INSERT_UPDATE CPQReorderAction;$contentCV[unique=true];uid[unique=true];url;name;restrictions(uid,$contentCV);&actionRef
+;;CPQReorderAction;/checkout/summary/reorder;CPQ Reorder Action;ActionRestriction;CPQReorderAction
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;AccountOrderDetailsOverviewComponent;Account Order Details Overview Info Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailOverview.jsp;CPQReorderAction;AccountOrderDetailsOverviewComponent
+;;AccountOrderDetailsReorderComponent;Account Order Details Reorder Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailReorder.jsp;CPQReorderAction;AccountOrderDetailsReorderComponent

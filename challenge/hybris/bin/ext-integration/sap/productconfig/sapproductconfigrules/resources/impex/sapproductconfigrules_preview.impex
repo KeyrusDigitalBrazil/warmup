@@ -1,0 +1,20 @@
+INSERT_UPDATE DroolsKIEModule;name[unique=true];mvnGroupId;mvnArtifactId;mvnVersion;ruleType(code);active;version;
+;productconfig-preview-module;hybris-rules;productconfig-preview;1.0.0;PRODUCTCONFIG;true;-1;
+
+INSERT_UPDATE DroolsKIEModule;name[unique=true];allowedTargets(name)
+;productconfig-preview-module;productconfig-module
+
+INSERT_UPDATE DroolsKIEBase;name[unique=true];kieModule(name)[unique=true];equalityBehavior(code);eventProcessingMode(code)
+;productconfig-preview-base;productconfig-preview-module;EQUALITY;STREAM
+
+INSERT_UPDATE DroolsKIESession;name[unique=true];kieBase(name)[unique=true];sessionType(code)
+;productconfig-preview-session;productconfig-preview-base;STATELESS
+
+INSERT_UPDATE DroolsRuleEngineContext;name[unique=true];kieSession(name);ruleFiringLimit
+;productconfig-preview-context;productconfig-preview-session;200;
+
+UPDATE DroolsKIEModule;name[unique=true];defaultKIEBase(name)
+;productconfig-preview-module;productconfig-preview-base
+
+UPDATE DroolsKIEBase;name[unique=true];defaultKIESession(name)
+;productconfig-preview-base;productconfig-preview-session

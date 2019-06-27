@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+
+	<alias alias="sapProductConfigAbstractOrderEntryLinkStrategy" name="sapProductConfigDefaultConfigurationAbstractOrderEntryLinkStrategy"></alias>
+	<bean id="sapProductConfigDefaultConfigurationAbstractOrderEntryLinkStrategy" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultConfigurationAbstractOrderEntryLinkStrategyImpl"
+		parent="sapProductConfigAbstractSessionServiceAware">
+	</bean>
+	
+	<alias alias="sapProductConfigConfigurationAbstractOrderIntegrationStrategy" name="sapProductConfigDefaultConfigurationAbstractOrderIntegrationStrategy"></alias>
+	<bean id="sapProductConfigDefaultConfigurationAbstractOrderIntegrationStrategy" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultConfigurationAbstractOrderIntegrationStrategyImpl"
+		parent="sapProductConfigAbstractSessionServiceAware">
+		<property name="recorder" ref="sapProductConfigTrackingRecorder"></property>
+		<property name="configurationService" ref="sapProductConfigConfigurationService" />
+		<property name="modelService" ref="modelService" />
+		<property name="configurationVariantUtil" ref="sapProductConfigVariantUtil" />								
+	</bean>
+
+	<alias alias="sapProductConfigProductLinkStrategy" name="sapProductConfigDefaultConfigurationProductLinkStrategy"></alias>
+	<bean id="sapProductConfigDefaultConfigurationProductLinkStrategy" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultProductLinkStrategyImpl"
+		parent="sapProductConfigAbstractSessionServiceAware">
+	</bean>
+
+	<alias alias="sapProductConfigConfigurationCopyStrategy" name="sapProductConfigDefaultConfigurationCopyStrategy"></alias>
+	<bean id="sapProductConfigDefaultConfigurationCopyStrategy" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultConfigurationCopyStrategyImpl">
+		<property name="configDeepCopyHandler" ref="sapProductConfigConfigurationDeepCopyHandler" />
+	</bean>
+	
+	<alias alias="sapProductConfigConfigurationLifecycleStrategy" name="sapProductConfigDefaultConfigurationLifecycleStrategy"></alias>
+	<bean id="sapProductConfigDefaultConfigurationLifecycleStrategy" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultConfigurationLifecycleStrategyImpl"
+		parent="sapProductConfigAbstractSessionServiceAware">
+		<property name="providerFactory" ref="sapProductConfigProviderFactory" />
+	</bean>
+	
+	<alias alias="sapProductConfigConfigurationAssignmentResolverStrategy" name="sapProductConfigDefaultConfigurationAssignmentResolverStrategy" />
+	<bean id="sapProductConfigDefaultConfigurationAssignmentResolverStrategy"
+		class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultConfigurationAssignmentResolverStrategyImpl">
+	   <property name="sessionAccessService" ref="sapProductConfigSessionAccessService" />
+	   <property name="flexibleSearchService" ref="flexibleSearchService" />
+	</bean>
+			
+	<!-- Helper class for integration tests -->
+	<bean id="sapProductConfigDefaultLifecycleTestChecker" class="de.hybris.platform.sap.productconfig.services.ssc.strategies.lifecycle.impl.DefaultLifecycleStrategiesTestChecker"/>
+			
+</beans>

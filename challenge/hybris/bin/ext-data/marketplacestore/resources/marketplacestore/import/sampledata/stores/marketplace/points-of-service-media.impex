@@ -1,0 +1,33 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+# ImpEx for Importing Media into Marketplace Store
+
+# Macros / Replacement Parameter definitions
+$productCatalog=globalMarketplaceProductCatalog
+$productCatalogName=Marketplace Product Catalog
+$catalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+$media=@media[translator=de.hybris.platform.impex.jalo.media.MediaDataTranslator]
+$siteResource=jar:de.hybris.platform.marketplacestore.constants.MarketplacestoreConstants&/marketplacestore/import/sampledata/stores/marketplace
+$medias=medias(code, $catalogVersion)
+
+# Create medias
+INSERT_UPDATE Media;mediaFormat(qualifier);code[unique=true];$media;mime[default='image/jpeg'];$catalogVersion;folder(qualifier)
+;365Wx246H;/365Wx246H/saphybris_store_01;$siteResource/images/storefinder/saphybris_store_365x246_01.jpg;;;images
+;365Wx246H;/365Wx246H/saphybris_store_02;$siteResource/images/storefinder/saphybris_store_365x246_02.jpg;;;images
+;365Wx246H;/365Wx246H/saphybris_store_03;$siteResource/images/storefinder/saphybris_store_365x246_03.jpg;;;images
+;65Wx65H;/65Wx65H/saphybris_store_01;$siteResource/images/storefinder/saphybris_store_65x65_01.jpg;;;images
+;65Wx65H;/65Wx65H/saphybris_store_02;$siteResource/images/storefinder/saphybris_store_65x65_02.jpg;;;images
+;65Wx65H;/65Wx65H/saphybris_store_03;$siteResource/images/storefinder/saphybris_store_65x65_03.jpg;;;images
+
+INSERT_UPDATE MediaContainer;qualifier[unique=true];$medias;$catalogVersion
+;saphybris_store_01;/365Wx246H/saphybris_store_01,/65Wx65H/saphybris_store_01
+;saphybris_store_02;/365Wx246H/saphybris_store_02,/65Wx65H/saphybris_store_02
+;saphybris_store_03;/365Wx246H/saphybris_store_03,/65Wx65H/saphybris_store_03

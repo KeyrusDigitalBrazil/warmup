@@ -1,0 +1,40 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$catalog-id=testCatalog
+$catalog-version=Online
+
+INSERT_UPDATE Currency;isocode[unique=true];active;conversion;digits;symbol
+;USD;true;1.5;2;"$"
+
+INSERT_UPDATE Catalog;id[unique=true]
+;$catalog-id
+
+INSERT_UPDATE CatalogVersion; catalog(id)[unique=true]; version[unique=true]; active;defaultCurrency(isocode)
+;$catalog-id;$catalog-version;true;USD
+
+INSERT_UPDATE Country;isocode[unique=true];name[lang=en];active
+;US;United States of America;true
+
+INSERT_UPDATE UserGroup;uid[unique=true];
+;customergroup;
+
+INSERT_UPDATE Customer;uid[unique=true];customerID;name;description;sessionLanguage(isocode);sessionCurrency(isocode);groups(uid);password;
+;bundle;K2006-C0008;John Doe;;en;USD;customergroup;123456;
+
+INSERT_UPDATE Address;owner(Customer.uid)[unique=true];streetname[unique=true];streetnumber[unique=true];postalcode[unique=true];duplicate[unique=true];town;country(isocode);billingAddress;contactAddress;shippingAddress;unloadingAddress;firstname;lastname;email;gender(code);middlename;phone1;title(code);url;company;fax;department
+;bundle;Feldweg;7;18551;false;Sagard;US;true;false;true;true;Arin;Brode;arin@wow-europe.com;MALE;;;;;hybris GmbH;;
+
+INSERT_UPDATE Customer;uid[unique=true];defaultPaymentaddress(owner(Customer.uid), streetname, streetnumber, postalcode,duplicate);defaultShipmentAddress(owner(Customer.uid), streetname, streetnumber, postalcode, duplicate);
+;bundle;bundle:Feldweg:7:18551:false;bundle:Feldweg:7:18551:false;
+
+INSERT_UPDATE Cart;user(uid);code[unique=true];currency(isocode);date[dateformat=dd.MM.yyyy HH:mm:ss];net;calculated;
+;bundle;bundleCart1;USD;21.05.2012 00:00:00;false;false;

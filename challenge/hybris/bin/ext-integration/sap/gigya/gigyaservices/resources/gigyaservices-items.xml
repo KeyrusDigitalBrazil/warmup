@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+	
+        <enumtype code="GigyaSyncDirection">
+            <value code="G2H"/>
+            <value code="H2G"/>
+            <value code="BOTH"/>
+        </enumtype>
+        
+        <enumtype code="GyAttributeType" generate="true" autocreate="true">
+            <value code="integer"/>
+            <value code="boolean"/>
+            <value code="long"/>
+            <value code="date"/>
+            <value code="string"/>
+            <value code="complex"/>
+        </enumtype>
+        
+        <enumtype code="GigyaUserManagementMode">
+            <value code="raas"/>
+        </enumtype>
+        
+	</enumtypes>
+	
+	<relations>
+	
+        <relation code="GigyaConfigToFieldMapping" localized="false" >
+            <sourceElement type="GigyaFieldMapping" qualifier="gigyaFieldMappings" cardinality="many" />
+            <targetElement type="GigyaConfig" qualifier="gigyaConfig" cardinality="one">
+                <modifiers  optional="false"/>
+            </targetElement>
+        </relation>
+        
+    </relations>
+
+	<itemtypes>
+
+		<itemtype code="GigyaConfig" generate="true" autocreate="true" 
+			jaloclass="de.hybris.platform.gigya.gigyaservices.jalo.GigyaConfig" >
+            <deployment table="gigyaconfiguration" typecode="9356"/>
+
+            <attributes>
+
+            		<attribute qualifier="code" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers unique="true" />
+                </attribute>
+
+                <attribute qualifier="gigyaApiKey"  type="java.lang.String">
+                    <modifiers optional="false" initial="true" unique="false" />
+					<persistence type="property" />
+                </attribute>
+                
+                <attribute qualifier="gigyaSiteSecret" type="java.lang.String">
+                    <modifiers removable="false" />
+					<persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gigyaDataCenter" type="java.lang.String">
+                		<modifiers optional="false" />
+                     <persistence type="property" />
+                    <defaultvalue>
+                        new java.lang.String( "us1.gigya.com" )
+                    </defaultvalue>
+                </attribute>
+                
+                <attribute qualifier="gigyaUserSecret" type="java.lang.String">
+					<persistence type="property" />
+                </attribute>
+                
+                <attribute qualifier="gigyaUserKey" type="java.lang.String">
+					<persistence type="property" />
+                </attribute>
+
+                <attribute qualifier="deleteUser" type="java.lang.Boolean">
+                    <persistence type="property"/>
+                    <defaultvalue>new java.lang.Boolean( "true" )</defaultvalue>
+                </attribute>
+
+                <attribute qualifier="mode" type="GigyaUserManagementMode" >
+                    <persistence type="property" qualifier=""/>
+                    <modifiers read="true" write="true" search="false" encrypted="false"
+                               optional="false" removable="true" initial="false" unique="false" private="false"
+                               partof="false"/>
+                    <defaultvalue>em().getEnumerationValue("gigyaUserManagementMode", "raas")</defaultvalue>
+                </attribute>
+
+            </attributes>
+            
+        </itemtype>
+        
+        <itemtype code="GigyaFieldMapping" generate="true" autocreate="true" 
+        		jaloclass="de.hybris.platform.gigya.gigyaservices.jalo.GigyaFieldMapping">
+            <deployment table="gigyafieldmapping" typecode="9357"/>
+
+            <attributes>
+
+                <attribute qualifier="code" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers unique="true" />
+                </attribute>
+
+                <attribute qualifier="syncDirection" type="GigyaSyncDirection">
+                    <persistence type="property"/>
+                    <modifiers write="false" read="true" optional="false" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="hybrisAttributeName" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" optional="false" initial="true" write="false"/>
+                </attribute>
+
+                <attribute qualifier="gigyaAttributeName" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" optional="false" initial="true" write="false"/>
+                </attribute>
+
+                <attribute qualifier="hybrisType" type="GyAttributeType">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="false" optional="false" initial="true"/>
+                </attribute>
+
+                <attribute qualifier="custom" type="boolean">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="false" initial="true"/>
+                </attribute>
+
+            </attributes>
+
+        </itemtype>
+        
+        <itemtype code="Customer" generate="false" autocreate="false" >
+
+            <attributes>
+            
+                <attribute qualifier="gyApiKey" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyUID" type="java.lang.String" >
+                    <modifiers read="true" write="true" search="true" />
+                    <description>User UID at gigya</description>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyIsOriginGigya" type="boolean">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyCreated" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyCreatedTimestamp" type="long">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyIsActive" type="boolean">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyIsLockedOut" type="boolean">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyIsRegistered" type="boolean">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyIsVerified" type="boolean">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyLastLoginTimestamp" type="long">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyLastUpdated" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyLastUpdatedTimestamp" type="long">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyLoginProvider" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyOldestDataUpdated" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyOldestDataUpdatedTimestamp" type="long">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyRegistered" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyRegisteredTimestamp" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gySocialProviders" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyVerified" type="java.lang.String">
+                    <modifiers read="true" write="true"/>
+                    <persistence type="property"/>
+                </attribute>
+
+                <attribute qualifier="gyVerifiedTimestamp" type="java.lang.String">
+                    <persistence type="property"/>
+                    <modifiers read="true" write="true"/>
+                </attribute>
+
+            </attributes>
+        </itemtype>
+        
+	</itemtypes>
+	
+</items>

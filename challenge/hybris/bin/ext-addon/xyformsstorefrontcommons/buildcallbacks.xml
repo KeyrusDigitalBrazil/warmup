@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="xyformsstorefrontcommons_buildcallbacks">
+	<macrodef name="xyformsstorefrontcommons_after_addoninstall">
+		<sequential>
+			<echo message="xyformsstorefrontcommons_after_addoninstall"/>
+			<for list="${storefrontNames}" param="storefrontName">
+				<sequential>
+					<if>
+						<length string="${storefrontName}" trim="true" when="greater" length="0"/>
+						<then>
+							<sequential>
+								<xyformsstorefrontcommons_set_storefront yforms.storefront="@{storefrontName}"/>
+								<xyformsstorefrontcommons_install_acceleratorstorefront yforms.storefront="@{storefrontName}"/>
+								<xyformsstorefrontcommons_patch_xyformsservices_hybris_proxy_key/>
+								<xyformsstorefrontcommons_copy_orbeon_patch_config/>
+							</sequential>
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_set_storefront">
+		<attribute name="yforms.storefront" default="yacceleratorstorefront"/>
+		<sequential>
+			<property name="yforms.storefront.path" value="${ext.@{yforms.storefront}.path}"/>
+			<echo message="[yForms] storefront: @{yforms.storefront} "/>
+			<echo message="[yForms] path: ${yforms.storefront.path}"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_after_addonuninstall">
+		<sequential>
+			<echo message="xyformsstorefrontcommons_after_addonuninstall"/>
+			<for list="${storefrontNames}" param="storefrontName">
+				<sequential>
+					<if>
+						<length string="${storefrontName}" trim="true" when="greater" length="0"/>
+						<then>
+							<sequential>
+								<xyformsstorefrontcommons_set_storefront yforms.storefront="@{storefrontName}"/>
+								<!-- remove orbeon config folders -->
+								<xyformsstorefrontcommons_uninstall_orbeon_config/>
+								<!-- restore backup dir -->
+								<xyformsstorefrontcommons_restore_acceleratorstorefront_backup/>
+							</sequential>
+						</then>
+					</if>
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_uninstall_orbeon_config">
+		<sequential>
+			<!-- remove config dir -->
+			<xyformsstorefrontcommons_remove_orbeon_config_dir/>
+			<!-- remove log dir -->
+			<xyformsstorefrontcommons_remove_orbeon_log_dir/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_restore_acceleratorstorefront_backup">
+		<sequential>
+			<echo level="info" message="restoring ${yforms.storefront} files"/>
+			<if>
+				<available file="${ext.xyformsstorefrontcommons.path}/backup/${yforms.storefront}-web.xml"/>
+				<then>
+					<copy file="${ext.xyformsstorefrontcommons.path}/backup/${yforms.storefront}-web.xml"
+						  tofile="${yforms.storefront.path}/web/webroot/WEB-INF/web.xml" overwrite="true" verbose="true"/>
+					<delete includeEmptyDirs="true">
+						<fileset dir="${ext.xyformsstorefrontcommons.path}/backup"/>
+					</delete>
+					<delete file="${yforms.storefront.path}/web/webroot/WEB-INF/urlrewrite.xml"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_uninstall_addons">
+		<attribute name="addon" default="xyformsstorefrontcommons"/>
+		<sequential>
+			<echo level="info" message="uninstalling FS AddOns : @{addon} for ${yforms.storefront}"/>
+			<antcall target="addonuninstall">
+				<param name="addonnames" value="@{addon}"/>
+				<param name="addonStorefront.${yforms.storefront.template}" value="${yforms.storefront}"/>
+			</antcall>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_remove_orbeon_config_dir">
+		<sequential>
+			<echo level="info" message="removing orbeon config dir..."/>
+			<delete includeEmptyDirs="true" failonerror="false">
+				<fileset dir="${HYBRIS_CONFIG_DIR}/orbeon"/>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_remove_orbeon_log_dir">
+		<sequential>
+			<echo level="info" message="removing orbeon log dir..."/>
+			<delete includeEmptyDirs="true" failonerror="false">
+				<fileset dir="${HYBRIS_LOG_DIR}/orbeon"/>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_install_acceleratorstorefront">
+		<attribute name="yforms.storefront" default="yacceleratorstorefront"/>
+		<sequential>
+			<echo level="info" message="patching xyformsstorefrontcommons to extension @{yforms.storefront}..."/>
+			<if>
+				<available file="${ext.xyformsstorefrontcommons.path}/backup/@{yforms.storefront}-web.xml"/>
+				<then>
+					<echo level="info" message="@{yforms.storefront} has been already patched, recovering files"/>
+					<xyformsstorefrontcommons_restore_acceleratorstorefront_backup/>
+				</then>
+			</if>
+			<mkdir dir="${ext.xyformsstorefrontcommons.path}/backup/"/>
+			<copy file="${yforms.storefront.path}/web/webroot/WEB-INF/web.xml"
+				  tofile="${ext.xyformsstorefrontcommons.path}/backup/@{yforms.storefront}-web.xml" overwrite="none"
+				  verbose="true"/>
+			<xyformsstorefrontcommons_patch_acceleratorstorefront_web_xml yforms.storefront="@{yforms.storefront}"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_patch_acceleratorstorefront_web_xml">
+		<attribute name="yforms.storefront" default="yacceleratorstorefront"/>
+		<sequential>
+			<echo level="info" message="patching @{yforms.storefront}'s web.xml to support yForms proxying..."/>
+			<mkdir dir="${ext.xyformsstorefrontcommons.path}/temp/"/>
+			<property name="yforms.storefront.path" value="${ext.@{yforms.storefront}.path}"/>
+			<xmltask source="${yforms.storefront.path}/web/webroot/WEB-INF/web.xml"
+					 dest="${ext.xyformsstorefrontcommons.path}/temp/web.xml">
+				<remove path="//*[name()='servlet'][contains(.//*[name()='servlet-name'], 'YFormsProxyServlet')]"/>
+				<remove path="//*[name()='servlet-mapping'][contains(.//*[name()='servlet-name'], 'YFormsProxyServlet')]"/>
+				<insert path="//*[name()='servlet'][last()]" position="after">
+					<![CDATA[
+					<servlet xmlns="http://java.sun.com/xml/ns/javaee">
+						<servlet-name>YFormsProxyServlet</servlet-name>
+						<servlet-class>de.hybris.platform.xyformsfacades.proxy.servlet.YFormsProxyServlet</servlet-class>
+					</servlet>
+					<servlet-mapping xmlns="http://java.sun.com/xml/ns/javaee">
+						<servlet-name>YFormsProxyServlet</servlet-name>
+						<url-pattern>/orbeon/*</url-pattern>
+					</servlet-mapping>
+					]]>
+				</insert>
+			</xmltask>
+			<copy file="${ext.xyformsstorefrontcommons.path}/temp/web.xml"
+				  tofile="${yforms.storefront.path}/web/webroot/WEB-INF/web.xml" overwrite="true" verbose="true"/>
+			<delete includeEmptyDirs="true">
+				<fileset dir="${ext.xyformsstorefrontcommons.path}/temp/"/>
+			</delete>
+		</sequential>
+	</macrodef>
+
+	<scriptdef name="generateguid" language="javascript">
+		<attribute name="property"/>
+		<![CDATA[
+	 	    project.setProperty( attributes.get( "property" ), java.util.UUID.randomUUID() );
+		]]>
+	</scriptdef>
+
+	<macrodef name="xyformsstorefrontcommons_patch_xyformsservices_hybris_proxy_key">
+		<sequential>
+			<generateguid property="proxy_name_generated_key"/>
+			<generateguid property="proxy_value_generated_key"/>
+			<propertyfile file="${ext.xyformsservices.path}/project.properties">
+				<entry key="xyformsservices.orbeon.hybris-proxy-header" operation="="
+					   value="hybris-Proxy-${proxy_name_generated_key}"/>
+				<entry key="xyformsservices.orbeon.hybris-proxy-value" operation="=" value="${proxy_value_generated_key}"/>
+			</propertyfile>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_copy_orbeon_patch_config">
+		<sequential>
+			<echo level="info" message="patch urlrewrite.xml..."/>
+			<copy todir="${ext.orbeonweb.path}/web/webroot/WEB-INF" overwrite="true" verbose="true" filtering="true">
+				<filterset begintoken="${" endtoken="}" recurse="true">
+					<filtersfile file="${ext.xyformsservices.path}/project.properties"/>
+					<filtersfile file="${ext.xyformsstorefrontcommons.path}/project.properties"/>
+					<filtersfile file="${yforms.storefront.path}/project.properties"/>
+					<filtersfile file="project.properties"/>
+					<filtersfile file="${HYBRIS_CONFIG_DIR}/local.properties"/>
+				</filterset>
+				<!-- We patch the urlrewrite.xml -->
+				<fileset dir="${ext.xyformsstorefrontcommons.path}/orbeon/patch/">
+					<include name="**/urlrewrite.xml"/>
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<!-- deprecated installer tasks -->
+	<target name="install.xyformsstorefrontcommons" depends="xyformsstorefrontcommons_check_storefront"
+			description="Installing the xyformsstorefrontcommons AddOn">
+		<sequential>
+			<xyformsstorefrontcommons_install_addons/>
+			<xyformsstorefrontcommons_install_acceleratorstorefront/>
+			<xyformsstorefrontcommons_configure_orbeon/>
+		</sequential>
+	</target>
+
+	<target name="xyformsstorefrontcommons_check_storefront">
+		<sequential>
+			<xyformsstorefrontcommons_check_storefront/>
+		</sequential>
+	</target>
+
+	<macrodef name="xyformsstorefrontcommons_check_storefront">
+		<sequential>
+			<property name="yforms.storefront" value="yacceleratorstorefront"/>
+			<xyformsstorefrontcommons_check_storefront_properties yforms.storefront="${yforms.storefront}"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_check_storefront_properties">
+		<attribute name="yforms.storefront" default="yacceleratorstorefront"/>
+		<sequential>
+			<property name="yforms.storefront.template" value="yacceleratorstorefront"/>
+			<property name="yforms.storefront.path" value="${ext.@{yforms.storefront}.path}"/>
+			<echo message="[yForms] storefront: ${yforms.storefront} "/>
+			<echo message="[yForms] path: ${yforms.storefront.path}"/>
+			<echo message="[yForms] template: ${yforms.storefront.template}"/>
+		</sequential>
+	</macrodef>
+
+	<target name="uninstall.xyformsstorefrontcommons" depends="xyformsstorefrontcommons_check_storefront"
+			description="Uninstalling the xyformsstorefrontcommons AddOn">
+		<sequential>
+			<!-- remove orbeon config folders -->
+			<xyformsstorefrontcommons_uninstall_orbeon_config/>
+			<!-- restore backup dir -->
+			<xyformsstorefrontcommons_restore_acceleratorstorefront_backup/>
+			<!-- uninstall addon -->
+			<xyformsstorefrontcommons_uninstall_addons addon="xyformsstorefrontcommons"/>
+		</sequential>
+	</target>
+
+	<macrodef name="xyformsstorefrontcommons_configure_orbeon">
+		<sequential>
+			<!-- generates a new proxy-key -->
+			<xyformsstorefrontcommons_patch_xyformsservices_hybris_proxy_key/>
+			<!-- copy patch files to modify orbeons behaviour -->
+			<xyformsstorefrontcommons_copy_orbeon_patch_config/>
+			<!-- create orbeon config folder -->
+			<xyformsstorefrontcommons_create_config_dir/>
+			<!-- copy config files into ${HYBRIS_BIN_DIR}/../config, only if directory does not exist -->
+			<xyformsstorefrontcommons_copy_orbeon_config/>
+			<!-- create orbeon log directory -->
+			<xyformsstorefrontcommons_create_log_dir/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_copy_orbeon_config">
+		<sequential>
+			<echo level="info" message="copy orbeon config to hybris config dir..."/>
+			<copy todir="${HYBRIS_CONFIG_DIR}/orbeon" overwrite="false" verbose="true" filtering="false">
+				<fileset dir="${ext.xyformsstorefrontcommons.path}/orbeon/resources">
+					<include name="**/**.*"/>
+					<exclude name="**/properties-*.xml"/>
+				</fileset>
+			</copy>
+			<pathconvert targetos="unix" property="platformhome.unix">
+				<path>
+					<pathelement path="${platformhome}"/>
+				</path>
+			</pathconvert>
+			<touch file="${ext.xyformsstorefrontcommons.path}/project.storefront.properties"/>
+			<copy todir="${HYBRIS_CONFIG_DIR}/orbeon" overwrite="false" verbose="true" filtering="true">
+				<filterset begintoken="${" endtoken="}" recurse="true">
+					<filter token="platformhome" value="${platformhome.unix}"/>
+					<filtersfile file="${ext.xyformsstorefrontcommons.path}/project.properties"/>
+					<filtersfile file="${yforms.storefront.path}/project.properties"/>
+					<filtersfile file="${ext.xyformsstorefrontcommons.path}/project.storefront.properties"/>
+					<filtersfile file="project.properties"/>
+					<filtersfile file="${HYBRIS_CONFIG_DIR}/local.properties"/>
+					<filtersfile file="${ext.orbeonweb.path}/project.properties"/>
+				</filterset>
+				<fileset dir="${ext.xyformsstorefrontcommons.path}/orbeon/resources">
+					<include name="**/properties-*.xml"/>
+				</fileset>
+			</copy>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_create_config_dir">
+		<sequential>
+			<echo level="info" message="creating orbeon config dir..."/>
+			<mkdir dir="${HYBRIS_CONFIG_DIR}/orbeon"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_create_log_dir">
+		<sequential>
+			<echo level="info" message="creating orbeon log dir..."/>
+			<mkdir dir="${HYBRIS_LOG_DIR}/orbeon"/>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_install_addons">
+		<attribute name="addon" default="xyformsstorefrontcommons"/>
+		<sequential>
+			<echo level="info" message="installing FS AddOns : @{addon} for ${yforms.storefront}"/>
+			<antcall target="addoninstall">
+				<param name="addonnames" value="@{addon}"/>
+				<param name="addonStorefront.${yforms.storefront.template}" value="${yforms.storefront}"/>
+			</antcall>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="xyformsstorefrontcommons_uninstall_addons">
+		<attribute name="addon" default="xyformsstorefrontcommons"/>
+		<sequential>
+			<echo level="info" message="uninstalling FS AddOns : @{addon} for ${yforms.storefront}"/>
+			<antcall target="addonuninstall">
+				<param name="addonnames" value="@{addon}"/>
+				<param name="addonStorefront.${yforms.storefront.template}" value="${yforms.storefront}"/>
+			</antcall>
+		</sequential>
+	</macrodef>
+	<!-- deprecated installer tasks -->
+
+</project>

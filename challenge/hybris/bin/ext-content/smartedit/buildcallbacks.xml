@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="smartedit_buildcallbacks">
+
+
+    <patternset id="extension.smartedit.binary.filter">
+        <patternset refid="extension.binary.filter"/>
+        <exclude name="build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+        <exclude name="smartedit-custom-build/generated/"/>
+    </patternset>
+
+    <patternset id="extension.smartedit.source.filter">
+        <patternset refid="extension.source.filter"/>
+        <exclude name="build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+        <exclude name="smartedit-custom-build/generated/"/>
+    </patternset>
+
+	<patternset id="extension.smartedit.production.filter">
+	    <patternset refid="extension.production.filter" />
+        <exclude name="build/"/>
+        <exclude name="node_modules/"/>
+        <exclude name="jsTarget/"/>
+        <exclude name="package.json"/>
+        <exclude name="smartedit-custom-build/generated/"/>
+    </patternset>
+	
+    <macrodef name="smartedit_before_clean">
+        <sequential>
+			<if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+				<then>
+					<delete dir="${ext.smartedit.path}${file.separator}temp" />
+					<delete dir="${ext.smartedit.path}${file.separator}jsTarget" />
+					<delete dir="${ext.smartedit.path}${file.separator}web${file.separator}webroot${file.separator}static-resources${file.separator}dist${file.separator}smartedit${file.separator}css" />
+					<delete dir="${ext.smartedit.path}${file.separator}web${file.separator}webroot${file.separator}static-resources${file.separator}dist${file.separator}smartedit${file.separator}js" />
+
+                    <!--DEPRECATED in 6.7 -->
+                    <!--Keep this here for now to cleanup environments, we should remove it in 1808 or later -->
+                    <smarteditLegacyLinks path="${ext.smartedit.path}" set="false"/>
+
+					<removeNodeModulesSymlink path="${ext.smartedit.path}"/>
+				</then>
+			</if>
+        </sequential>
+    </macrodef>
+    <macrodef name="smartedit_before_build">
+        <sequential>
+            <if>
+            	<not>
+            		<isset property="smarteditHasBuilt"/>
+            	</not>
+                <then>
+        			<if>
+        				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+        				<then>
+		                	<gruntBuild path="${ext.smartedit.path}" phase="packageSkipTests"/>
+							<property name="smarteditHasBuilt" value="true"/>
+        				</then>
+        			</if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="smartedit_before_yunit">
+        <sequential>
+			<if>
+				<available file="${ext.npmancillary.path}${file.separator}resources${file.separator}npm${file.separator}node_modules" type="dir"/>
+				<then>
+		            <gruntBuild path="${ext.smartedit.path}" phase="test_only"/>
+				</then>
+			</if>
+        </sequential>
+    </macrodef>
+
+    <!--DEPRECATED in 6.7 -->
+    <macrodef name="smarteditLegacyLinks">
+        <attribute name="path" default="NOT SET" />
+        <attribute name="set" default="false"/>
+        <sequential>
+            <validatePathAttribute path="@{path}" message="smarteditLegacyLinks path not defined" />
+
+            <!--Always unlink to cleanup peoples workspace. In 1808 or later we can remove this whole macro -->
+            <safeUnLink targetPath="@{path}${file.separator}smartedit-build${file.separator}test${file.separator}unitUtils.js"/>
+            <safeUnLink targetPath="@{path}${file.separator}build${file.separator}bundle"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="linkSmarteditBundle">
+        <attribute name="target" default="NOT_SET"/>
+        <sequential>
+            <local name="sourcePath"></local>
+            <local name="targetPath"></local>
+            <echo message="linkSmarteditBundle executing with target: @{target}" level="info"/>
+            <property name="sourcePath" value="${ext.smartedit.path}${file.separator}smartedit-build"/>
+            <property name="targetPath" value="@{target}${file.separator}smartedit-build"/>
+            <echo message="Linking smartedit bundle to ${targetPath}" level="info"/>
+            <safeLink targetPath="${targetPath}" sourcePath="${sourcePath}" />
+            <smarteditLegacyLinks path="@{target}" set="false"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="unLinkSmarteditBundle">
+        <attribute name="target" default="NOT_SET"/>
+        <sequential>
+            <echo message="Removing SmartEdit bundle link @{target}${file.separator}smartedit-build" level="info"/>
+            <safeUnLink targetPath="@{target}${file.separator}smartedit-build"/>
+            <smarteditLegacyLinks path="@{target}" set="false"/>
+        </sequential>
+    </macrodef>
+
+</project>

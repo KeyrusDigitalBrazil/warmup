@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="webLazyInitOverrideBeanFactoryPostProcessor" parent="lazyInitOverrideBeanFactoryPostProcessor"/>
+    <bean id="listMergeBeanPostProcessor" class="de.hybris.platform.spring.config.ListMergeDirectiveBeanPostProcessor"/>
+
+    <bean id="warehousingbackofficeLabelLocator" class="com.hybris.cockpitng.util.labels.ResourcesLabelLocator" scope="singleton"
+          init-method="init" lazy-init="false">
+        <property name="location" value="/warehousingbackoffice-backoffice-labels/"/>
+        <property name="name" value="labels"/>
+    </bean>
+
+    <bean id="nestedAttributePanelRenderer" class="de.hybris.platform.omsbackoffice.renderers.NestedAttributePanelRenderer"
+          parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="nestedAttributeUtils" ref="nestedAttributeUtils"/>
+    </bean>
+
+    <bean id="warehouseVendorNestedAttributePanelRenderer" parent="nestedAttributePanelRenderer"/>
+
+    <bean id="productNestedAttributePanelRenderer" parent="nestedAttributePanelRenderer"/>
+
+    <bean id="atpFormulaPanelRenderer" class="de.hybris.platform.warehousingbackoffice.renderers.AtpFormulaPanelRenderer"
+          parent="editorAreaPanelRenderer">
+        <property name="typeFacade" ref="typeFacade"/>
+        <property name="objectFacade" ref="objectFacade"/>
+        <property name="atpFormulaVar2ArithmeticOperatorMap" ref="atpFormulaVar2ArithmeticOperatorMap"/>
+    </bean>
+
+    <bean id="editPackageInfoButtonRenderer"
+          class="de.hybris.platform.warehousingbackoffice.renderers.EditPackageInfoButtonRenderer">
+        <property name="permissionFacade" ref="permissionFacade"/>
+    </bean>
+
+    <bean id="consignmentMenuRenderer" class="de.hybris.platform.warehousingbackoffice.renderers.ConsignmentMenuRenderer"/>
+
+    <bean id="consignmentAssigneeListRenderer"
+          class="de.hybris.platform.warehousingbackoffice.renderers.ConsignmentAssigneeListRenderer"/>
+
+    <bean id="consignmentAssigneePanelRenderer"
+          class="de.hybris.platform.warehousingbackoffice.renderers.ConsignmentAssigneePanelRenderer"
+          parent="editorAreaPanelRenderer"/>
+
+    <bean id="warehousingQuickListRenderer"
+          class="de.hybris.platform.warehousingbackoffice.renderers.WarehousingQuickListRenderer" parent="quickListItemRenderer"/>
+
+    <alias name="defaultConsignmentPrintPickSlipStrategy" alias="consignmentPrintPickSlipStrategy"/>
+    <bean id="defaultConsignmentPrintPickSlipStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintPickSlipStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+    </bean>
+
+    <alias name="defaultConsolidatedConsignmentPrintPickSlipStrategy" alias="consolidatedConsignmentPrintPickSlipStrategy"/>
+    <bean id="defaultConsolidatedConsignmentPrintPickSlipStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsolidatedConsignmentPrintPickSlipStrategy"/>
+
+    <alias name="defaultConsignmentPrintPackSlipStrategy" alias="consignmentPrintPackSlipStrategy"/>
+    <bean id="defaultConsignmentPrintPackSlipStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintPackSlipStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+    </bean>
+
+    <alias name="defaultConsignmentPrintShippingLabelStrategy" alias="consignmentPrintShippingLabelStrategy"/>
+    <bean id="defaultConsignmentPrintShippingLabelStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintShippingLabelStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+        <property name="deliveryTrackingIdStrategy" ref="deliveryTrackingIdStrategy"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultConsignmentPrintExportFormStrategy" alias="consignmentPrintExportFormStrategy"/>
+    <bean id="defaultConsignmentPrintExportFormStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintExportFormStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+    </bean>
+
+    <alias name="defaultConsignmentPrintReturnFormStrategy" alias="consignmentPrintReturnFormStrategy"/>
+    <bean id="defaultConsignmentPrintReturnFormStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintReturnFormStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <alias name="defaultConsignmentPrintReturnShippingLabelStrategy" alias="consignmentPrintReturnShippingLabelStrategy"/>
+    <bean id="defaultConsignmentPrintReturnShippingLabelStrategy"
+          class="de.hybris.platform.warehousingbackoffice.labels.strategy.impl.ConsignmentPrintReturnShippingLabelStrategy">
+        <property name="printMediaService" ref="printMediaService"/>
+        <property name="consignmentBusinessProcessService" ref="consignmentBusinessProcessService"/>
+        <property name="modelService" ref="modelService"/>
+    </bean>
+
+    <bean depends-on="validOrderStatusForResourcing" parent="listMergeDirective">
+        <property name="add">
+            <value type="de.hybris.platform.core.enums.OrderStatus">ON_HOLD</value>
+        </property>
+    </bean>
+
+    <bean depends-on="notCancellableConsignmentStatus" parent="listMergeDirective">
+        <property name="add">
+            <value type="de.hybris.platform.basecommerce.enums.ConsignmentStatus">READY_FOR_SHIPPING</value>
+        </property>
+    </bean>
+</beans>

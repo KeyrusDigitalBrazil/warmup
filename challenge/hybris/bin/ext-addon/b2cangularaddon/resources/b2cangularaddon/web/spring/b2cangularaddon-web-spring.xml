@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+
+	<!-- Expose /acceleratoraddon/web/webroot/WEB-INF/messages/base.js.properties  resource bundle as javascript variables -->
+	<bean id="defaultB2cangularaddonJavaScriptMessageResourceAccessor" parent="abstractJavaScriptMessageResourceAccessor">
+		<property name="addOnName" value="b2cangularaddon"/>
+	</bean>
+
+	<bean id="defaultB2cangularaddonBeforeViewJsPropsHandlerAdaptee" parent="abstractBeforeViewJsPropsHandlerAdaptee" class="de.hybris.platform.addonsupport.interceptors.ExportJsPropertiesBeforeViewHandler">
+		<property name="messageSource" ref="defaultB2cangularaddonJavaScriptMessageResourceAccessor"/>
+	</bean>
+
+	<bean id="getB2cangularaddonBeforeViewHandler" parent="beforeViewHandlerAdapter">
+		<property name="adaptee">
+			<ref bean="defaultB2cangularaddonBeforeViewJsPropsHandlerAdaptee"/>
+		</property>
+	</bean>
+	<bean id="B2cangularaddonBeforeViewHandlerListMergeDirective" depends-on="beforeViewHandlersList" parent="listMergeDirective">
+		<property name="add" ref="getB2cangularaddonBeforeViewHandler"/>
+	</bean>
+
+	<bean id="b2cAngularScriptRendererMapping" parent="addonCmsComponentRendererMapping">
+		<property name="typeCode" value="AngularScriptComponent" />
+		<property name="renderer" ref="genericAddOnCMSComponentRenderer" />
+	</bean>
+
+    <!-- Angular authentication configuration -->
+
+    <bean id="abstractAngularSecureCookieGenerator"
+          class="de.hybris.platform.yacceleratorstorefront.security.cookie.EnhancedCookieGenerator" abstract="true">
+        <property name="cookieSecure" value="true"/>
+        <property name="httpOnly" value="false"/>
+    </bean>
+
+    <alias name="defaultAngularTokenCookieGenerator" alias="angularTokenCookieGenerator"/>
+    <bean id="defaultAngularTokenCookieGenerator"
+          class="de.hybris.platform.yacceleratorstorefront.security.cookie.EnhancedCookieGenerator"
+          parent="abstractAngularSecureCookieGenerator">
+        <property name="cookieName" value="angularToken"/>
+    </bean>
+
+    <alias name="defaultAngularUserIdCookieGenerator" alias="angularUserIdCookieGenerator"/>
+    <bean id="defaultAngularUserIdCookieGenerator"
+          class="de.hybris.platform.yacceleratorstorefront.security.cookie.EnhancedCookieGenerator"
+          parent="abstractAngularSecureCookieGenerator">
+        <property name="cookieName" value="userId"/>
+    </bean>
+
+    <bean id="angularOAuth2RequestFactory"
+          class="org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory">
+        <constructor-arg ref="oauthClientDetails"/>
+    </bean>
+
+    <bean id="angularResourceOwnerPasswordTokenGranter"
+          class="org.springframework.security.oauth2.provider.password.ResourceOwnerPasswordTokenGranter">
+        <constructor-arg name="authenticationManager" ref="authenticationManager"/>
+        <constructor-arg name="tokenServices" ref="oauthTokenServices"/>
+        <constructor-arg name="clientDetailsService" ref="oauthClientDetails"/>
+        <constructor-arg name="requestFactory" ref="angularOAuth2RequestFactory"/>
+    </bean>
+
+    <bean id="abstractAngularAuthenticationStrategy" class="de.hybris.b2cangularaddon.security.impl.DefaultAngularAuthenticationStrategy" abstract="true">
+        <property name="tokenCookieGenerator" ref="angularTokenCookieGenerator"/>
+        <property name="userIdCookieGenerator" ref="angularUserIdCookieGenerator"/>
+        <property name="tokenGranter" ref="angularResourceOwnerPasswordTokenGranter"/>
+        <property name="oauthTokenService" ref="oauthTokenService"/>
+        <property name="clientId" value="${oauth.client.id}"/>
+        <property name="clientSecret" value="${oauth.client.secret}"/>
+    </bean>
+
+    <bean id="angularAuthenticationStrategy" class="de.hybris.b2cangularaddon.security.impl.DefaultAngularAuthenticationStrategy" parent="abstractAngularAuthenticationStrategy">
+        <property name="usernameParameter" value="${login.username.parameter}"/>
+        <property name="passwordParameter" value="${login.password.parameter}"/>
+    </bean>
+
+    <!-- Angular regular login -->
+
+    <alias name="angularLoginAuthenticationSuccessHandler" alias="loginAuthenticationSuccessHandler"/>
+    <bean id="angularLoginAuthenticationSuccessHandler"
+          class="de.hybris.b2cangularaddon.security.AngularAuthenticationSuccessHandler">
+        <property name="authenticationSuccessHandler" ref="defaultLoginAuthenticationSuccessHandler"/>
+        <property name="angularAuthenticationStrategy" ref="angularAuthenticationStrategy"/>
+    </bean>
+
+    <!-- Angular checkout login -->
+
+    <alias name="angularLoginCheckoutAuthenticationSuccessHandler" alias="loginCheckoutAuthenticationSuccessHandler"/>
+    <bean id="angularLoginCheckoutAuthenticationSuccessHandler"
+          class="de.hybris.b2cangularaddon.security.AngularAuthenticationSuccessHandler">
+        <property name="authenticationSuccessHandler" ref="defaultLoginCheckoutAuthenticationSuccessHandler"/>
+        <property name="angularAuthenticationStrategy" ref="angularAuthenticationStrategy"/>
+    </bean>
+
+    <!-- Angular auto-login -->
+
+    <bean id="angularAutoLoginAuthenticationStrategy" class="de.hybris.b2cangularaddon.security.impl.DefaultAngularAuthenticationStrategy" parent="abstractAngularAuthenticationStrategy">
+        <property name="usernameParameter" value="${auto.login.username.parameter}"/>
+        <property name="passwordParameter" value="${auto.login.password.parameter}"/>
+    </bean>
+
+    <alias name="angularAutoLoginStrategy" alias="autoLoginStrategy"/>
+    <bean id="angularAutoLoginStrategy"
+          class="de.hybris.b2cangularaddon.security.AngularAutoLoginStrategy">
+        <property name="autoLoginStrategy" ref="defaultAutoLoginStrategy"/>
+        <property name="angularAuthenticationStrategy" ref="angularAutoLoginAuthenticationStrategy"/>
+    </bean>
+
+    <!-- Angular logout -->
+
+    <alias name="angularLogoutSuccessHandler" alias="logoutSuccessHandler"/>
+    <bean id="angularLogoutSuccessHandler"
+          class="de.hybris.b2cangularaddon.security.AngularLogoutSuccessHandler">
+        <property name="logoutSuccessHandler" ref="defaultLogoutSuccessHandler"/>
+        <property name="angularAuthenticationStrategy" ref="angularAuthenticationStrategy"/>
+    </bean>
+
+</beans>

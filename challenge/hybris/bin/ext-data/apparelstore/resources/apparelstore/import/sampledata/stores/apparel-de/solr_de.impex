@@ -1,0 +1,64 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Localization de
+#
+$lang=de
+
+$facetSearchConfigName=apparel-deIndex
+$indexedType=apparel-deProductType
+$contentCatalogName=apparel-deContentCatalog
+$contentCatalogVersion=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalogName]),CatalogVersion.version[default=Staged])[default=$contentCatalogName:Staged]
+$productCatalog=apparelProductCatalog
+$productCatalogVersion=catalogversion(catalog(id[default=$productCatalog]),version[default='Staged'])[unique=true,default=$productCatalog:Staged]
+
+# Solr Indexed Property
+UPDATE SolrIndexedProperty;solrIndexedType(identifier)[unique=true,default=$indexedType];name[unique=true];displayName[lang=$lang]
+
+# Redirect page URL
+INSERT_UPDATE SolrURIRedirect;url[unique=true];&redirectRefID
+;"/cart";$contentCatalogName-redirectRefID-cart
+;"http://www.hybris.com/multichannel-accelerator";$contentCatalogName-redirectRefID-accelerator
+
+UPDATE SolrPageRedirect;redirectItem(uid,$contentCatalogVersion)[unique=true];&redirectRefID
+;faq;$contentCatalogName-redirectRefID-help
+
+# Category Redirect (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrCategoryRedirect;redirectItem(code,$productCatalogVersion)[unique=true];&redirectRefID
+;snow;$productCatalog-redirectRefID-snow
+;350000;$productCatalog-redirectRefID-surf
+
+# Synonyms (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrSynonymConfig;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];synonymFrom[unique=true];synonymTo
+ ;;;"Hüte";"Mützen"
+ ;;;"Schuhe,Sneaker,Sneaker,Turnschuhe";"Schuh"
+ ;;;"Sonnenbrille,Brillen";"Sonnenbrillen"
+ 
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"Accelerator";EXACT;$contentCatalogName-redirectRefID-accelerator;
+ ;;;"hymacc";EXACT;$contentCatalogName-redirectRefID-accelerator;
+
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"Warenkorb";EXACT;$contentCatalogName-redirectRefID-cart;
+ ;;;"Warenkorb";EXACT;$contentCatalogName-redirectRefID-cart;
+
+# Keyword Redirects (Must use INSERT_UPDATE here)
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"Hilfe";EXACT;$contentCatalogName-redirectRefID-help;
+
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"Lieferung";STARTS_WITH;$contentCatalogName-redirectRefID-help;
+
+INSERT_UPDATE SolrFacetSearchKeywordRedirect;facetSearchConfig(name)[unique=true,default=$facetSearchConfigName];language(isocode)[unique=true,default=$lang];keyword[unique=true];matchType(code)[unique=true];redirect(&redirectRefID);ignoreCase[default=true]
+ ;;;"(Ski|Skifahren)";REGEX;$productCatalog-redirectRefID-snow;
+ ;;;"(Surfen|Surfing|Strand)";REGEX;$productCatalog-redirectRefID-surf;

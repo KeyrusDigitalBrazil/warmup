@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+		   http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd">
+           
+    <alias name="defaultScpiQuoteProcessDefinitionResource" alias="scpiQuoteProcessDefinitionResource" />
+	<bean id="defaultScpiQuoteProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/sapquoteintegration/process/sap-cpi-quote-buyer-submit-process.xml" />
+	</bean>
+	
+	 <alias name="defaultScpiQuoteStatusProcessDefinitionResource" alias="scpiQuoteStatusProcessDefinitionResource" />
+	<bean id="defaultScpiQuoteStatusProcessDefinitionResource" class="de.hybris.platform.processengine.definition.ProcessDefinitionResource">
+		<property name="resource" value="classpath:/sapquoteintegration/process/sap-cpi-quote-completed-process.xml" />
+	</bean>
+           
+   <alias alias="sapSendQuoteAction" name="sapCpiSendQuoteAction"/>
+   <bean id="sapCpiSendQuoteAction" class="com.sap.hybris.sapquoteintegration.outbound.actions.SapCpiSendQuoteAction" parent="abstractAction">
+   		<property name="quoteService" ref="quoteService"/>
+   		<property name="quoteConversionService" ref="quoteConversionService" />
+   		<property name="sapCpiOutboundQuoteService" ref="sapCpiOutboundQuoteService"/>
+   		<property name="modelService" ref="modelService"/>
+   </bean>
+   
+   <alias alias="sapSendQuoteStatusAction" name="sapCpiSendQuoteStatusAction"/>
+   <bean id="sapCpiSendQuoteStatusAction" class="com.sap.hybris.sapquoteintegration.outbound.actions.SapCpiSendQuoteStatusAction" parent="abstractAction">
+   		<property name="quoteService" ref="quoteService"/>
+   		<property name="quoteConversionService" ref="quoteConversionService" />
+   		<property name="sapCpiOutboundQuoteService" ref="sapCpiOutboundQuoteService"/>
+   		<property name="modelService" ref="modelService"/>
+   </bean>
+   
+   <alias alias="sapCheckQuoteStateAction" name="sapCpiCheckQuoteStateAction"/>
+   <bean id="sapCpiCheckQuoteStateAction" class="com.sap.hybris.sapquoteintegration.outbound.actions.SapCpiCheckQuoteStateAction" parent="abstractAction">
+   		<property name="quoteService" ref="quoteService"/>
+   </bean>
+           
+    <alias alias="quoteBuyerSubmitEventListener" name="defaultScpiquoteBuyerSubmitEventListener" />
+	<bean id="defaultScpiquoteBuyerSubmitEventListener" class="com.sap.hybris.sapquoteintegration.events.SapCpiQuoteBuyerSubmitEventListener"
+		  parent="abstractEventListener">
+		<property name="modelService" ref="modelService"/>
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+	
+		<alias alias="quoteBuyerOrderPlacedEventListener" name="defaultSapCpiQuoteOrderPlacedEventListener"/>
+	<bean id="defaultSapCpiQuoteOrderPlacedEventListener"	class="com.sap.hybris.sapquoteintegration.events.SapCpiQuoteOrderPlacedEventListener"
+		parent="abstractEventListener">
+		<property name="commerceQuoteService" ref="commerceQuoteService" />
+		<property name="modelService" ref="modelService" />
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+	
+	<alias alias="quoteCancelEventListener" name="defaultSapCpiQuoteCancelEventListener"/>
+	<bean id="defaultSapCpiQuoteCancelEventListener" class="com.sap.hybris.sapquoteintegration.events.SapCpiQuoteCancelEventListener"
+		parent="abstractEventListener">
+		<property name="modelService" ref="modelService" />
+		<property name="businessProcessService" ref="businessProcessService"/>
+	</bean>
+	
+	 <!-- Quote Mappers -->
+    <alias alias="sapCpiQuoteMappers" name="sapCpiQuoteMapperServices"/>
+    <util:list id="sapCpiQuoteMapperServices" value-type="com.sap.hybris.sapquoteintegration.outbound.service.SapCpiQuoteMapperService"/>
+    
+      <!-- Quote Mapper -->
+    <alias alias="sapCpiQuoteMapperService" name="defaultSapCpiQuoteMapperService"/>
+    <bean id="defaultSapCpiQuoteMapperService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiQuoteMapperService">
+    	<property name="customerNameStrategy" ref="customerNameStrategy" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="promotionsService" ref="promotionsService"/>
+		<property name="quoteService" ref="quoteService"/>
+    </bean>
+
+    <!-- Add Quote Mapper -->
+    <bean id="sapCpiQuoteMapper" depends-on="sapCpiQuoteMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiQuoteMapperService" />
+    </bean>
+
+	 <!-- Quote Entry Mappers -->
+    <alias alias="sapCpiQuoteEntryMappers" name="sapCpiQuoteEntryMapperServices"/>
+    <util:list id="sapCpiQuoteEntryMapperServices" value-type="com.sap.hybris.sapquoteintegration.outbound.service.SapCpiQuoteEntryMapperService"/>
+    
+      <!-- Quote Entry Mapper -->
+    <alias alias="sapCpiQuoteEntryMapperService" name="defaultSapCpiQuoteEntryMapperService"/>
+    <bean id="defaultSapCpiQuoteEntryMapperService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiQuoteEntryMapperService">
+    </bean>
+
+    <!-- Add Quote Entry Mapper -->
+    <bean id="sapCpiQuoteEntryMapper" depends-on="sapCpiQuoteEntryMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiQuoteEntryMapperService" />
+    </bean>
+    
+     <!-- Quote Comment Mappers -->
+    <alias alias="sapCpiQuoteCommentMappers" name="sapCpiQuoteCommentMapperServices"/>
+    <util:list id="sapCpiQuoteCommentMapperServices" value-type="com.sap.hybris.sapquoteintegration.outbound.service.SapCpiQuoteCommentMapperService"/>
+    
+      <!-- Quote Comment Mapper -->
+    <alias alias="sapCpiQuoteCommentMapperService" name="defaultSapCpiQuoteCommentMapperService"/>
+    <bean id="defaultSapCpiQuoteCommentMapperService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiQuoteCommentMapperService">
+    </bean>
+
+    <!-- Add Quote Comment Mapper -->
+    <bean id="sapCpiQuoteCommentMapper" depends-on="sapCpiQuoteCommentMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiQuoteCommentMapperService" />
+    </bean>
+    
+        <!-- Quote Status Mappers -->
+    <alias alias="sapCpiQuoteStatusMappers" name="sapCpiQuoteStatusMapperServices"/>
+    <util:list id="sapCpiQuoteStatusMapperServices" value-type="com.sap.hybris.sapquoteintegration.outbound.service.SapCpiQuoteStatusMapperService"/>
+    
+      <!-- Quote Status Mapper -->
+    <alias alias="sapCpiQuoteStatusMapperService" name="defaultSapCpiQuoteStatusMapperService"/>
+    <bean id="defaultSapCpiQuoteStatusMapperService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiQuoteStatusMapperService">
+    </bean>
+
+    <!-- Add Quote Status Mapper -->
+    <bean id="sapCpiQuoteStatusMapper" depends-on="sapCpiQuoteStatusMappers" parent="listMergeDirective">
+        <property name="add" ref="sapCpiQuoteStatusMapperService" />
+    </bean>
+	
+	<alias alias="quoteConversionService" name="defaultQuoteConversionService"/>
+	<bean id="defaultQuoteConversionService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiOutboundQuoteConversionService">
+		<property name="sapCpiQuoteMappers" ref="sapCpiQuoteMappers"/>
+		<property name="sapCpiQuoteEntryMappers" ref="sapCpiQuoteEntryMappers"/>
+		<property name="sapCpiQuoteCommentMappers" ref="sapCpiQuoteCommentMappers"/>
+		<property name="sapCpiQuoteStatusMappers" ref="sapCpiQuoteStatusMappers"/>
+		<property name="quoteService" ref="quoteService"/>
+	</bean>
+	
+	<alias alias="sapCpiOutboundQuoteService" name="defaultSapCpiOutboundQuoteService" />
+	<bean id="defaultSapCpiOutboundQuoteService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiOutboundQuoteService">
+		<property name="outboundServiceFacade" ref="sapCpiOutboundServiceFacade" />
+	</bean>
+	
+	 <alias name="defaultSapCpiQuoteOrderMethodHook" alias="commercePlaceQuoteOrderMethodHook"/>
+    <bean id="defaultSapCpiQuoteOrderMethodHook" class="com.sap.hybris.sapquoteintegration.outbound.hook.SapCpiQuoteOrderMethodHook" parent="defaultCommercePlaceQuoteOrderMethodHook">
+	</bean>
+
+	<alias alias="commerceQuoteService" name="defaultSapCpiQuoteService"/>
+	<bean id="defaultSapCpiQuoteService" class="com.sap.hybris.sapquoteintegration.outbound.service.impl.DefaultSapCpiQuoteService" parent="defaultCommerceQuoteService" />
+
+
+	 <!-- Inbound Quote Helpers List-->
+    <alias alias="sapInboundQuoteHelpers" name="sapInboundQuoteHelpers"/>
+    <util:list id="sapInboundQuoteHelpers" value-type="com.sap.hybris.sapquoteintegration.inbound.helper.InboundQuoteHelper"/>
+
+    <!-- Inbound Quote Helper -->			   
+    <alias name="defaultInboundQuoteHelper" alias="inboundQuoteHelper" />
+	<bean id="defaultInboundQuoteHelper" class="com.sap.hybris.sapquoteintegration.inbound.helper.impl.DefaultInboundQuoteHelper">
+		<property name="quoteService" ref="quoteService" />
+		<property name="userService" ref="userService" />
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="commentService" ref="commentService" />
+		<property name="baseStoreService" ref="baseStoreService" />
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="catalogService" ref="catalogService" />
+		<property name="modelService" ref="modelService" />
+		<property name="mediaService" ref="mediaService" />
+		<property name="sapQuoteService" ref="sapQuoteService" />
+	</bean>
+	
+	<alias name="defaultInboundQuoteOrderHelper" alias="sapDataHubInboundOrderHelper" />
+	<bean id="defaultInboundQuoteOrderHelper" class="com.sap.hybris.sapquoteintegration.inbound.helper.impl.DefaultInboundQuoteOrderHelper"
+		parent="defaultSapDataHubInboundOrderHelper">
+	</bean>
+	
+	<!-- Add Inbound Quote Helper -->
+    <bean id="sapInboundQuoteHelper" depends-on="sapInboundQuoteHelpers" parent="listMergeDirective">
+        <property name="add" ref="inboundQuoteHelper" />     
+    </bean>
+	
+	
+    <bean id="sapCpiInboundQuotePersistenceHook"
+          class="com.sap.hybris.sapquoteintegration.inbound.SapCpiInboundQuotePersistenceHook">
+        <property name="sapInboundQuoteHelpers" ref="sapInboundQuoteHelpers"/>
+    </bean>
+
+	<alias alias="sapQuoteService" name="defaultSapQuoteService"/>
+	<bean id="defaultSapQuoteService" class="com.sap.hybris.sapquoteintegration.service.impl.DefaultSapQuoteService">
+	        <property name="flexibleSearchService" ref="flexibleSearchService"/>
+	</bean>
+
+	 <!-- Inbound Quote Entry Helpers List-->
+    <alias alias="sapInboundQuoteEntryHelpers" name="sapInboundQuoteEntryHelpers"/>
+	<util:list id="sapInboundQuoteEntryHelpers" value-type="com.sap.hybris.sapquoteintegration.inbound.helper.InboundQuoteEntryHelper"/>
+
+    <alias name="defaultInboundQuoteEntryHelper" alias="inboundQuoteEntryHelper" />
+	<bean id="defaultInboundQuoteEntryHelper" class="com.sap.hybris.sapquoteintegration.inbound.helper.impl.DefaultInboundQuoteEntryHelper">
+		<property name="quoteService" ref="quoteService" />
+		<property name="userService" ref="userService" />
+		<property name="keyGenerator" ref="orderCodeGenerator"/>
+		<property name="sapQuoteService" ref="sapQuoteService" />
+		<property name="commentService" ref="commentService" />
+		<property name="calculationService" ref="calculationService" />
+		<property name="productService" ref="productService" />
+	</bean>
+	
+	<!-- Add Inbound Quote Helper -->
+    <bean id="sapInboundQuoteEntryHelper" depends-on="sapInboundQuoteEntryHelpers" parent="listMergeDirective">
+        <property name="add" ref="inboundQuoteEntryHelper" />
+    </bean>
+	
+    <bean id="sapCpiInboundQuoteEntryPersistenceHook"
+          class="com.sap.hybris.sapquoteintegration.inbound.SapCpiInboundQuoteEntryPersistenceHook">
+        <property name="sapInboundQuoteEntryHelpers" ref="sapInboundQuoteEntryHelpers"/>
+    </bean>
+ 
+     <bean id="sapCpiInboundQuoteEntryPostPersistenceHook"
+          class="com.sap.hybris.sapquoteintegration.inbound.SapCpiInboundQuoteEntryPostPersistenceHook">
+        <property name="sapInboundQuoteEntryHelper" ref="inboundQuoteEntryHelper"/>
+    </bean>   	
+    
+
+    <alias name="defaultSapQuoteCartValidationStrategy" alias="quoteCartValidationStrategy" />
+	<bean id="defaultSapQuoteCartValidationStrategy"
+		  class="com.sap.hybris.sapquoteintegration.strategy.impl.DefaultSapQuoteCartValidationStrategy" parent="defaultQuoteCartValidationStrategy">
+	</bean>	
+
+	<alias name="sapCommerceQuoteCartCalculationMethodHook" alias="commerceQuoteCartCalculationMethodHook" />
+	<bean id="sapCommerceQuoteCartCalculationMethodHook" class="com.sap.hybris.sapquoteintegration.outbound.hook.SapCommerceQuoteCartCalculationMethodHook" parent="defaultCommerceQuoteCartCalculationMethodHook" />
+		
+	<alias name="sapQuoteSalesConditionsContributor" alias="sapSalesConditionsContributor" />
+    <bean id="sapQuoteSalesConditionsContributor"
+        class="com.sap.hybris.sapquoteintegration.outbound.contributor.DefaultSapQuoteSalesConditionsContributor"
+        parent="defaultSapSalesConditionsContributor" />
+        
+    <!-- Customer cleanup -->
+    <bean id="sapCpiCustomerCleanupHook" class="com.sap.hybris.sapquoteintegration.retention.impl.SapCpiCustomerCleanupHook" />
+ 
+   	<bean id="sapCpiCustomerCleanupHookMergeDirective" depends-on="customerCleanupHooks" parent="listMergeDirective" >
+        <property name="add" ref="sapCpiCustomerCleanupHook" />
+    </bean>    
+        
+</beans>

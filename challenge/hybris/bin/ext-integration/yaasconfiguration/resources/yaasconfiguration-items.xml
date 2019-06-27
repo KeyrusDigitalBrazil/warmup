@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+ [y] hybris Platform
+ 
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+ 
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<relations>
+		<relation code="YaasOrganisationProjectRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="yaasOrganisation" type="YaasOrganisation" cardinality="one"/>
+			<targetElement qualifier="yaasProjects" type="YaasProject" cardinality="many" collectiontype="set"/>
+		</relation>
+
+		<relation code="BaseSiteYaasProjectRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="baseSite" type="BaseSite" cardinality="one"/>
+			<targetElement qualifier="yaasProjects" type="YaasProject" cardinality="many" collectiontype="set" ordered="true"/>
+		</relation>
+
+		 <relation code="YaasProjectClientCredentialRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="yaasProject" type="YaasProject" cardinality="one"/>
+			<targetElement qualifier="yaasClientCredentials" type="YaasClientCredential" cardinality="many" collectiontype="set"/>
+		</relation>
+
+		 <relation code="ServiceYaasMappingRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="yaasService" type="YaasService" cardinality="one">
+				<modifiers unique="true" optional="false" />
+			</sourceElement>
+			<targetElement qualifier="yaasServiceMappings" type="AbstractYaasServiceMapping" cardinality="many" collectiontype="set" />
+		</relation>
+
+		 <relation code="CredentialYaasMappingRelation" localized="false" generate="true" autocreate="true">
+			<sourceElement qualifier="yaasClientCredential" type="YaasClientCredential" cardinality="one">
+				<modifiers optional="false" />
+			</sourceElement>
+			<targetElement qualifier="yaasServiceMappings" type="AbstractYaasServiceMapping" cardinality="many" collectiontype="set"/>
+		</relation>
+
+	</relations>
+
+	<itemtypes>
+		<itemtype code="YaasOrganisation" extends="GenericItem"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.YaasOrganisation"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="YaasOrganisation" typecode="6600"/>
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+				<attribute qualifier="basePath" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="YaasProject" extends="GenericItem"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.YaasProject"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="YaasProject" typecode="6601"/>
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String">
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="YaasService" extends="GenericItem"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.YaasService"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="YaasService" typecode="6604"/>
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false" unique="true"/>
+				</attribute>
+				 <attribute qualifier="serviceURL" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				 <attribute qualifier="serviceScope" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="additionalConfigurations" type="String2StringMapType">
+					<modifiers read="true" write="true" search="true" optional="true"/>
+					<persistence type="property"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="YaasClientCredential" extends="GenericItem"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.YaasClientCredential"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="YaasClientCredential" typecode="6605"/>
+			<attributes>
+				<attribute qualifier="identifier" type="java.lang.String" >
+					<persistence type="property"/>
+					<modifiers optional="false" unique="true" />
+				</attribute>
+				<attribute qualifier="clientId" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="clientSecret" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="false"/>
+				</attribute>
+				<attribute qualifier="pubsubClient" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+				 <attribute qualifier="oauthURL" type="java.lang.String">
+					<persistence type="property"/>
+					<modifiers optional="true"/>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		 <itemtype code="AbstractYaasServiceMapping" extends="GenericItem"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.AbstractYaasServiceMapping"
+				  autocreate="true"
+				  generate="true">
+			<deployment table="AbstractServiceMapping" typecode="6606"/>
+		</itemtype>
+
+		<itemtype code="BaseSiteServiceMapping" extends="AbstractYaasServiceMapping"
+				  jaloclass="de.hybris.platform.yaasconfiguration.jalo.BaseSiteServiceMapping"
+				  autocreate="true"
+				  generate="true">
+				<attributes>
+					 <attribute qualifier="baseSite" type="java.lang.String" >
+						<persistence type="property"/>
+						<modifiers optional="false" unique="true" />
+					</attribute>
+				</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

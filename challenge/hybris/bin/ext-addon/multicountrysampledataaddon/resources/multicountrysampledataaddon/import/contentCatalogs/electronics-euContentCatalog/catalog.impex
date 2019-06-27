@@ -1,0 +1,26 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+#
+# Import the Electronics Content Catalog
+#
+$masterContentCatalog=electronicsContentCatalog
+$contentCatalog=electronics-euContentCatalog
+$languages=en,de
+
+# Content catalog for CMS contents
+INSERT_UPDATE ContentCatalog;id[unique=true];supercatalog(id)
+;$masterContentCatalog;;
+;$contentCatalog;$masterContentCatalog;
+
+# Catalog versions for content catalogs
+INSERT_UPDATE CatalogVersion;catalog(id)[unique=true];version[unique=true];active;languages(isoCode);writePrincipals(usergroup.uid)[mode=append];readPrincipals(usergroup.uid)[mode=append]
+;$contentCatalog;Staged;false;$languages;electronics-eu-cmsmanagergroup,electronics-euzone-cmsmanagergroup,electronics-cmsmanagergroup,cmsmanagergroup;
+;$contentCatalog;Online;true;$languages;;electronics-de-cmsmanagergroup,electronics-uk-cmsmanagergroup,electronics-eu-cmsmanagergroup,electronics-euzone-cmsmanagergroup,electronics-cmsmanagergroup,cmsmanagergroup;

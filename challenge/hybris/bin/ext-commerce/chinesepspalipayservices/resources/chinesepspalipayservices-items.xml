@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<enumtypes>
+		<enumtype code="PaymentTransactionType" autocreate="false" generate="false" dynamic="false">
+			<value code="REQUEST" />
+		</enumtype>
+		<enumtype code="AlipayPayMethod" autocreate="true" generate="true" >
+			<value code="DIRECTPAY"/>
+			<value code="BANKPAY"/>
+			<value code="CARTOON"/>
+			<value code="CREDITPAY"/>
+			<value code="CASH"/>
+		</enumtype>
+		<enumtype code="ServiceType" autocreate="false" generate="false" dynamic="true">
+			<value code="DirectPay" />
+			<value code="ExpressPay" />
+		</enumtype>
+		
+		<enumtype code="PaymentStatus" autocreate="false" generate="false" dynamic="true">
+            <value code="REFUNDED"/>
+        </enumtype>
+		
+	</enumtypes>
+
+	<itemtypes>
+		<itemtype code="AlipayPaymentTransactionEntry" extends="PaymentTransactionEntry" generate="false" singleton="false"
+			jaloonly="false" autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="payerEmail" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				
+				<attribute type="java.lang.String" qualifier="payerId" autocreate="true" >
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				
+				<attribute type="java.lang.Double" qualifier="adjustedAmount" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				
+				<attribute type="java.lang.Boolean" qualifier="couponUsed" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				
+				<attribute type="java.lang.Boolean" qualifier="locked" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.Double" qualifier="sellerFee" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="java.lang.String" qualifier="supplementaryStatus" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+			</attributes>
+		</itemtype>
+
+		<itemtype code="AlipayPaymentTransaction" extends="PaymentTransaction" generate="false" singleton="false" jaloonly="false"
+			autocreate="true">
+			<attributes>
+				<attribute type="java.lang.String" qualifier="paymentUrl" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property">
+						<columntype>
+							<value>HYBRIS.LONG_STRING</value>
+						</columntype>
+					</persistence>
+				</attribute>
+				<attribute type="java.lang.String" qualifier="alipayCode" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute type="AlipayPayMethod" qualifier="payMethod" autocreate="true">
+					<modifiers read="true" write="true" search="true" optional="true" />
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="transactionInitiateDate" type="java.util.Date" generate="true" autocreate="true">
+					<persistence type="property" />
+					<modifiers partof="true" optional="true" />
+					<description>Attribute to store the date for initiating the call to the Alipay transaction.</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+
+	</itemtypes>
+</items>

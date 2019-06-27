@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <alias name="defaultProcessesFacade" alias="cronJobHistoryFacade"/>
+    <bean id="defaultProcessesFacade" class="com.hybris.backoffice.cronjob.DefaultCronJobHistoryFacade">
+        <property name="cronJobHistoryService" ref="cronJobHistoryService"/>
+        <property name="cockpitUserService" ref="cockpitUserService"/>
+        <property name="userService" ref="userService"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="cronJobService" ref="cronJobService"/>
+        <property name="labelService" ref="labelService"/>
+        <property name="synchronizationFacade" ref="synchronizationFacade"/>
+        <property name="cronJobHistoryIncludes" ref="backofficeCronJobHistoryIncludes"/>
+    </bean>
+
+    <util:list id="processesQueryDecorators"
+               value-type="com.hybris.backoffice.widgets.processes.ProcessesQueryDecorator">
+        <bean class="com.hybris.backoffice.sync.decorators.SyncJobProcessQueryDecorator"/>
+    </util:list>
+
+    <alias name="defaultProcessListItemRenderer" alias="processesListItemRenderer"/>
+    <bean id="defaultProcessListItemRenderer"
+          class="com.hybris.backoffice.widgets.processes.renderer.DefaultProcessesListItemRenderer">
+        <property name="cronJobHistoryFacade" ref="cronJobHistoryFacade"/>
+        <property name="cockpitUserService" ref="cockpitUserService"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="labelService" ref="labelService"/>
+        <property name="permissionFacade" ref="permissionFacade"/>
+        <property name="processItemRenderingStrategyRegistry" ref="processItemRenderingStrategyRegistry"/>
+        <property name="cronJobService" ref="cronJobService"/>
+    </bean>
+
+    <alias name="defaultProcessesUpdatersRegistry" alias="processesUpdatersRegistry"/>
+    <bean id="defaultProcessesUpdatersRegistry"
+          class="com.hybris.backoffice.widgets.processes.updater.DefaultProcessesUpdaterRegistry">
+        <property name="widgetUtils" ref="widgetUtils"/>
+        <property name="processesUpdaters">
+            <list>
+                <bean class="com.hybris.backoffice.sync.updaters.SyncFinishedUpdater"/>
+                <bean class="com.hybris.backoffice.sync.updaters.SyncStartedUpdater"/>
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultProcessItemRenderingStrategyRegistry" alias="processItemRenderingStrategyRegistry"/>
+    <bean id="defaultProcessItemRenderingStrategyRegistry"
+          class="com.hybris.backoffice.widgets.processes.renderer.ProcessItemRenderingStrategyRegistry">
+        <property name="defaultStrategy" ref="processItemRenderingStrategy"/>
+        <property name="strategies">
+            <list value-type="com.hybris.backoffice.widgets.processes.ProcessItemRenderingStrategy">
+                <ref bean="syncProcessItemRenderingStrategy"/>
+                <ref bean="excelImportProcessItemRenderingStrategy" />
+                <ref bean="personalDataReportProcessItemRenderingStrategy" />
+            </list>
+        </property>
+    </bean>
+
+    <alias name="defaultProcessItemRenderingStrategy" alias="processItemRenderingStrategy"/>
+    <bean id="defaultProcessItemRenderingStrategy"
+          class="com.hybris.backoffice.widgets.processes.renderer.DefaultProcessItemRenderingStrategy">
+        <property name="labelService" ref="labelService"/>
+        <property name="permissionCheckingService" ref="permissionCheckingService"/>
+        <property name="cronJobService" ref="cronJobService"/>
+    </bean>
+
+	<alias name="defaultSyncProcessItemRenderingStrategy" alias="syncProcessItemRenderingStrategy" />
+	<bean id="defaultSyncProcessItemRenderingStrategy" class="com.hybris.backoffice.sync.renderers.SyncProcessItemRenderingStrategy"
+		parent="defaultProcessItemRenderingStrategy">
+		<property name="cockpitUserService" ref="cockpitUserService" />
+		<property name="synchronizationFacade" ref="synchronizationFacade" />
+		<property name="notificationService" ref="notificationService" />
+		<property name="order" value="100" />
+	</bean>
+
+    <alias name="defaultPersonalDataReportProcessItemRenderingStrategy" alias="personalDataReportProcessItemRenderingStrategy"/>
+    <bean id="defaultPersonalDataReportProcessItemRenderingStrategy"
+          class="com.hybris.backoffice.auditreport.imp.PersonalDataReportProcessItemRenderingStrategy"
+          parent="defaultProcessItemRenderingStrategy">
+        <property name="order" value="200"/>
+    </bean>
+
+</beans>

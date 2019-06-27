@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+
+    <!-- SAP Digital payment poll card process actions -->
+    
+	 <bean id="sapDigiPayCheckSessionAction" parent="abstractAction"
+          class="de.hybris.platform.cissapdigitalpayment.actions.SapDigitalPayCheckSessionAction">
+    </bean>
+    
+    <bean id="sapDigiPaySavePollCardResultAction" parent="abstractAction"
+          class="de.hybris.platform.cissapdigitalpayment.actions.SapDigitalPaySavePollCardResultAction">
+           <property name="cisSapDigitalPaymentService" ref="cisSapDigitalPaymentService"/>
+           <property name="cisSapDigitalPaymentPaymentInfoConverter" ref="cisSapDigitalPaymentPaymentInfoConverter"/>
+           <property name="sapDigitalPaymentService" ref="sapDigitalPaymentService"/>
+           
+    </bean>
+
+    
+    <util:map id="sapDigiPayPollCardStatusMap" >
+	    <entry key="01" value="SUCCESS" />
+	    <entry key="03" value="PENDING" />
+	    <entry key="04" value="TIMEOUT" />
+	    <entry key="05" value="CANCELLED" />
+	</util:map>
+	
+	
+</beans>

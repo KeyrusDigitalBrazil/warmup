@@ -1,0 +1,47 @@
+# -----------------------------------------------------------------------
+# [y] hybris Platform
+#
+# Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+#
+# This software is the confidential and proprietary information of SAP
+# ("Confidential Information"). You shall not disclose such Confidential
+# Information and shall use it only in accordance with the terms of the
+# license agreement you entered into with SAP.
+# -----------------------------------------------------------------------
+
+$solrIndexedTypes = solrIndexedTypes(identifier);
+$solrIndexedType = solrIndexedType(identifier)[unique = true, default = 'BackofficeProduct'];
+$classSystemVersion = systemVersion(catalog(id[default = 'MarketplaceClassification']), version[default = '1.0'])
+$classCatalogVersion = catalogVersion(catalog(id[default = 'MarketplaceClassification']), version[default = '1.0'])
+$classAttribute = classificationAttribute(code, $classSystemVersion)
+$classClass = classificationClass(code, $classCatalogVersion)
+$classAttributeAssignment = classAttributeAssignment($classClass, $classAttribute, $classSystemVersion)
+$contentCatalogName = marketplaceContentCatalog
+$contentCatalogVersion = catalogVersion(CatalogVersion.catalog(Catalog.id[default = $contentCatalogName]), CatalogVersion.version[default = Staged])[default = $contentCatalogName:Staged]
+$productCatalog = globalMarketplaceProductCatalog
+$productCatalogVersion = catalogversion(catalog(id[default = $productCatalog]), version[default = 'Staged'])[unique = true, default = $productCatalog:Staged]
+$solrValueRangeSets = solrValueRangeSets(name)
+$solrValueRangeSet = solrValueRangeSet(name)
+$solrValueRanges = solrValueRanges(name);
+
+INSERT_UPDATE SolrValueRangeSet; name[unique = true]      ; type  ; $solrValueRanges;
+                               ; pcmBackofficeWeightRanges; double; 0-100,101-200,201-300,301-400,401-500,501-10000;
+
+INSERT_UPDATE SolrValueRange; name[unique = true]; from; to   ; $solrValueRangeSet;
+                            ; 0-100              ; 0   ; 100  ; pcmBackofficeWeightRanges;
+                            ; 101-200            ; 101 ; 200  ; pcmBackofficeWeightRanges;
+                            ; 201-300            ; 201 ; 300  ; pcmBackofficeWeightRanges;
+                            ; 301-400            ; 301 ; 400  ; pcmBackofficeWeightRanges;
+                            ; 401-500            ; 401 ; 500  ; pcmBackofficeWeightRanges;
+                            ; 501-10000          ; 501 ; 10000; pcmBackofficeWeightRanges;
+
+INSERT_UPDATE SolrIndexedProperty; name[unique = true]; $solrIndexedType; type(code); includeInResponse[default = true]; facet[default = true];
+                                 ; approvalStatus     ;                 ; string    ;                                 ;                      ;
+                                 ; itemtype           ;                 ; string    ;                                 ;                      ;
+
+INSERT_UPDATE SolrIndexedProperty; name[unique = true]; backofficeDisplayName[lang = en]; $solrIndexedType; type(code); facet[default = true]; rangeSet(name); facetDisplayNameProvider; fieldValueProvider                          ; $classAttributeAssignment         ; includeInResponse[default = true]; rangeSets(name); facetType(code)[unique = true, default = 'MultiSelectOr']; localized[default = false]; currency[default = false]; multiValue[default = false]; useForSpellChecking[default = false]; valueProviderParameters(key, value);
+                                 ; colour             ; Colour                          ;                 ; string    ; true                 ;               ;                         ; productClassificationAttributesValueResolver; 2762:::Colour of product, 1766::::;                                  ;                ;                                                          ; false                     ;                          ;                            ;                                     ; "format->lowerCaseFormat"          ;
+                                 ; audiorecorder      ; Audio recorder                  ;                 ; boolean   ; true                 ;               ;                         ; productClassificationAttributesValueResolver; 2760:::Audio recorder, 85::::     ;                                  ;                ; Refine                                                   ; false                     ;                          ;                            ;                                     ;
+                                 ; height             ; Height                          ;                 ; double    ; true                 ;               ;                         ; productClassificationAttributesValueResolver; 2623:::Height, 1464::::           ;                                  ;                ;                                                          ; false                     ;                          ;                            ;                                     ;
+                                 ; weight             ; Weight                          ;                 ; double    ; true                 ;               ;                         ; productClassificationAttributesValueResolver; 2623:::Weight, 94::::             ;                                  ;                ;                                                          ; false                     ;                          ;                            ;                                     ;
+                                 ; width              ; Width                           ;                 ; double    ; true                 ;               ;                         ; productClassificationAttributesValueResolver; 2623:::Width, 1649::::            ;                                  ;                ;                                                          ; false                     ;                          ;                            ;                                     ;

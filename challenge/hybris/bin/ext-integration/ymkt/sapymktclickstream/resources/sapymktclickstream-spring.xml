@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	                       http://www.springframework.org/schema/beans/spring-beans.xsd
+	                       http://www.springframework.org/schema/util
+	                       http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias name="defaultymktClickStreamInteractionTypeMapping" alias="ymktClickStreamInteractionTypeMapping"/>
+	<util:map id="defaultymktClickStreamInteractionTypeMapping" key-type="java.lang.String" value-type="java.lang.String">
+		<entry key="ProductReviewsViewEvent" value="PROD_REVIEW_VIEW" />
+		<entry key="CartAbandonedEvent" value="SHOP_CART_ABANDONED" />
+		<entry key="CartViewEvent" value="SHOP_CART_VIEW" />
+		<entry key="ProceedToCheckoutEvent" value="SHOP_CHECKOUT_START" />
+		<entry key="SuccessfulCheckoutEvent" value="SHOP_CHECKOUT_SUCCES" />
+		<entry key="AddToCartEvent" value="SHOP_ITEM_ADD" />
+		<entry key="RemoveFromCartEvent" value="SHOP_ITEM_REMOVE" />
+		<entry key="ProductDetailPageViewEvent" value="SHOP_ITEM_VIEW" />
+	</util:map>
+
+	<bean id="ymktClickStreamService" class="com.hybris.ymkt.clickstream.services.ClickStreamService">
+		<property name="ODataService" ref="ODataService_CUAN_IMPORT_SRV" />
+		<property name="productURLService" ref="ymktProductURLService" />
+		<property name="interactionTypeMapping" ref="ymktClickStreamInteractionTypeMapping" />
+		<property name="linkAnonymousAndLoggedInUsers" value="#{configurationService.configuration.getProperty('sapymktclickstream.service.user.linkAnonymousToLoggedIn')}" />
+	</bean>
+
+	<alias name="defaultymktClickStreamAllowedEvents" alias="ymktClickStreamAllowedEvents"/>
+	<util:list id="defaultymktClickStreamAllowedEvents" value-type="java.lang.String">
+		<value>AddToCartEvent</value>
+		<value>RemoveFromCartEvent</value>
+		<value>SuccessfulCheckoutEvent</value>
+		<value>ProductDetailPageViewEvent</value>
+		<value>ProductReviewsViewEvent</value>
+	</util:list>
+
+    <bean id="ymktClickStreamListener" class="com.hybris.ymkt.clickstream.listeners.ClickStreamListener" parent="abstractEventListener">
+      	<property name="allowedEvents" ref="ymktClickStreamAllowedEvents" />
+      	<property name="batchSize" value="#{configurationService.configuration.getProperty('sapymktclickstream.listener.events.batchSize')}" />
+      	<property name="clickStreamService" ref="ymktClickStreamService" />
+      	<property name="flexibleSearchService" ref="flexibleSearchService" />
+      	<property name="userContextService" ref="userContextService" />
+		<property name="ymktConsentService" ref="ymktConsentService" />
+	</bean>
+
+	<bean id="ymktLoginEventListener" class="com.hybris.ymkt.clickstream.listeners.LoginEventListener">
+		<property name="baseSiteService" ref="baseSiteService" />
+		<property name="clickStreamService" ref="ymktClickStreamService" />
+		<property name="userContextService" ref="userContextService" />
+	</bean>
+
+	<bean id="ymktRegistrationEventListener" class="com.hybris.ymkt.clickstream.listeners.RegistrationEventListener" parent="abstractEventListener">
+		<property name="clickStreamService" ref="ymktClickStreamService" />
+		<property name="userContextService" ref="userContextService" />
+	</bean>
+</beans>

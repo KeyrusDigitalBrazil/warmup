@@ -1,0 +1,64 @@
+<div>
+    <ul class="nav nav-tabs  multi-tabs"
+        data-ng-if="yTabset.tabsList.length > 1">
+        <li ng-if="yTabset.tabsList.length!=yTabset.numTabsDisplayed"
+            data-ng-repeat="tab in yTabset.tabsList.slice( 0, yTabset.numTabsDisplayed-1 ) track by $index"
+            data-ng-class="{'active': tab.active }"
+            data-tab-id="{{tab.id}}">
+            <a data-ng-class="{'sm-tab-error': tab.hasErrors}"
+                data-ng-click="yTabset.selectTab(tab)"
+                data-ng-if="!tab.message">{{tab.title | translate}}</a>
+            <a data-ng-class="{'sm-tab-error': tab.hasErrors}"
+                data-ng-click="yTabset.selectTab(tab)"
+                data-ng-if="tab.message"
+                data-popover="{{tab.message}}"
+                data-popover-trigger="mouseenter">{{tab.title | translate}}</a>
+        </li>
+        <li ng-if="yTabset.tabsList.length==yTabset.numTabsDisplayed"
+            data-ng-repeat="tab in yTabset.tabsList.slice( 0, yTabset.numTabsDisplayed ) track by $index"
+            data-ng-class="{'active': tab.active }"
+            data-tab-id="{{tab.id}}">
+            <a data-ng-class="{'sm-tab-error': tab.hasErrors}"
+                data-ng-click="yTabset.selectTab(tab)"
+                data-ng-if="!tab.message">{{tab.title | translate}}</a>
+            <a data-ng-class="{'sm-tab-error': tab.hasErrors}"
+                data-ng-click="yTabset.selectTab(tab)"
+                data-ng-if="tab.message"
+                data-popover="{{tab.message}}"
+                data-popover-trigger="mouseenter">{{tab.title | translate}}</a>
+        </li>
+        <li data-uib-dropdown
+            data-ng-if="yTabset.tabsList.length > yTabset.numTabsDisplayed"
+            class="more-tab"
+            data-ng-class="{'active': yTabset.isActiveInMoreTab()}">
+            <a data-ng-class="{'sm-tab-error': yTabset.dropDownHasErrors()}"
+                class="dropdown-toggle"
+                data-uib-dropdown-toggle>
+                <span data-ng-if="!yTabset.isActiveInMoreTab()"
+                    class="multi-tabs__more-span"
+                    data-translate="se.ytabset.tabs.more"></span>
+                <span data-ng-if="yTabset.isActiveInMoreTab()"
+                    class="multi-tabs__more-span">{{yTabset.selectedTab.title | translate}}</span>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu"
+                data-uib-dropdown-menu>
+                <li ng-if="yTabset.tabsList.length!=yTabset.numTabsDisplayed"
+                    data-ng-repeat="tab in yTabset.tabsList.slice( yTabset.numTabsDisplayed-1)"
+                    data-tab-id="{{tab.id}}">
+                    <a data-ng-class="{'sm-tab-error': tab.hasErrors}"
+                        data-ng-click="yTabset.selectTab(tab)">{{tab.title | translate}}</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <div>
+        <y-tab data-ng-repeat="tab in yTabset.tabsList"
+            ng-show="tab.active"
+            data-tab-id="{{tab.id}}"
+            content="tab.templateUrl"
+            data-model="yTabset.model"
+            tab-control="yTabset.tabControl">
+        </y-tab>
+    </div>
+</div>

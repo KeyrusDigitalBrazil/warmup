@@ -1,0 +1,75 @@
+$testSystem = ERP_CLASSIFICATION_3000
+$testSystemVersion = ERP_IMPORT
+$testClassificationSystemVersion = $testSystem:$testSystemVersion
+
+INSERT_UPDATE ClassificationSystem; id[unique = true]; name[lang = en];
+; $testSystem ; $testSystem
+
+INSERT_UPDATE ClassificationSystemVersion; catalog(id)[unique = true]; version[unique = true]; active;
+; $testSystem ; $testSystemVersion ; true
+
+INSERT_UPDATE ClassificationClass; code[unique = true]; name[lang = en]; catalogVersion(catalog(id), version)
+; WEC_CDRAGON_CAR ; Dragon Car ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttribute; code[unique = true]; name[lang = en]; systemVersion(catalog(id), version)
+; WEC_DC_COLOR ; Dark Blue ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttributeValue; code[unique = true]; name[lang = en]; systemVersion(catalog(id), version)
+; WEC_DC_COLOR ; Dark Blue ; $testClassificationSystemVersion
+
+INSERT_UPDATE ClassificationAttributeUnit; code[unique = true]; unitType[unique = true]; systemVersion(catalog(id), version); symbol
+; WTT ; SAP-POWER ; $testClassificationSystemVersion ; aSymbol
+
+INSERT_UPDATE IntegrationObject; code[unique = true]
+; ClassAttributeAssignment
+
+INSERT_UPDATE IntegrationObjectItem; integrationObject(code)[unique = true]; code[unique = true]; type(code)
+; ClassAttributeAssignment ; ClassAttributeAssignment        ; ClassAttributeAssignment
+; ClassAttributeAssignment ; ClassificationClass             ; ClassificationClass
+; ClassAttributeAssignment ; CatalogVersion                  ; CatalogVersion
+; ClassAttributeAssignment ; Catalog                         ; Catalog
+; ClassAttributeAssignment ; ClassificationSystem            ; ClassificationSystem
+; ClassAttributeAssignment ; ClassificationSystemVersion     ; ClassificationSystemVersion
+; ClassAttributeAssignment ; ClassificationAttributeTypeEnum ; ClassificationAttributeTypeEnum
+
+; ClassAttributeAssignment ; ClassificationAttributeUnit     ; ClassificationAttributeUnit
+; ClassAttributeAssignment ; ClassificationAttribute         ; ClassificationAttribute
+
+INSERT_UPDATE IntegrationObjectItemAttribute; integrationObjectItem(integrationObject(code), code)[unique = true]; attributeName[unique = true]; attributeDescriptor(enclosingType(code), qualifier); returnIntegrationObjectItem(integrationObject(code), code); unique[default = false]
+; ClassAttributeAssignment:ClassAttributeAssignment        ; classificationClass     ; ClassAttributeAssignment:classificationClass     ; ClassAttributeAssignment:ClassificationClass             ; true
+; ClassAttributeAssignment:ClassAttributeAssignment        ; classificationAttribute ; ClassAttributeAssignment:classificationAttribute ; ClassAttributeAssignment:ClassificationAttribute         ; true
+; ClassAttributeAssignment:ClassAttributeAssignment        ; attributeType           ; ClassAttributeAssignment:attributeType           ; ClassAttributeAssignment:ClassificationAttributeTypeEnum ; true
+; ClassAttributeAssignment:ClassAttributeAssignment        ; multiValued             ; ClassAttributeAssignment:multiValued             ;                                                          ;
+; ClassAttributeAssignment:ClassAttributeAssignment        ; unit                    ; ClassAttributeAssignment:unit                    ; ClassAttributeAssignment:ClassificationAttributeUnit     ; true
+; ClassAttributeAssignment:ClassAttributeAssignment        ; formatDefinition        ; ClassAttributeAssignment:formatDefinition        ;                                                          ;
+; ClassAttributeAssignment:ClassAttributeAssignment        ; range                   ; ClassAttributeAssignment:range                   ;                                                          ;
+
+
+; ClassAttributeAssignment:ClassificationClass             ; code                    ; ClassificationClass:code                         ;                                                          ; true
+; ClassAttributeAssignment:ClassificationClass             ; catalogVersion          ; ClassificationClass:catalogVersion               ; ClassAttributeAssignment:ClassificationSystemVersion     ; true
+
+
+; ClassAttributeAssignment:CatalogVersion                  ; catalog                 ; CatalogVersion:catalog                           ; ClassAttributeAssignment:Catalog                         ; true
+; ClassAttributeAssignment:CatalogVersion                  ; version                 ; CatalogVersion:version                           ;                                                          ; true
+; ClassAttributeAssignment:CatalogVersion                  ; active                  ; CatalogVersion:active                            ;                                                          ;
+
+; ClassAttributeAssignment:Catalog                         ; id                      ; Catalog:id                                       ;                                                          ; true
+
+
+; ClassAttributeAssignment:ClassificationAttribute         ; code                    ; ClassificationAttribute:code                     ;                                                          ; true
+; ClassAttributeAssignment:ClassificationAttribute         ; systemVersion           ; ClassificationAttribute:systemVersion            ; ClassAttributeAssignment:ClassificationSystemVersion     ; true
+
+
+; ClassAttributeAssignment:ClassificationSystemVersion     ; version                 ; ClassificationSystemVersion:version              ;                                                          ; true
+; ClassAttributeAssignment:ClassificationSystemVersion     ; catalog                 ; ClassificationSystemVersion:catalog              ; ClassAttributeAssignment:Catalog                         ; true
+
+
+; ClassAttributeAssignment:ClassificationSystem            ; id                      ; ClassificationSystem:id                          ;                                                          ; true
+
+
+; ClassAttributeAssignment:ClassificationAttributeTypeEnum ; code                    ; ClassificationAttributeTypeEnum:code             ;                                                          ; true
+
+
+; ClassAttributeAssignment:ClassificationAttributeUnit     ; code                    ; ClassificationAttributeUnit:code                 ;                                                          ; true
+; ClassAttributeAssignment:ClassificationAttributeUnit     ; unitType                ; ClassificationAttributeUnit:unitType             ;                                                          ; true
+; ClassAttributeAssignment:ClassificationAttributeUnit     ; systemVersion           ; ClassificationAttributeUnit:systemVersion        ; ClassAttributeAssignment:ClassificationSystemVersion     ; true

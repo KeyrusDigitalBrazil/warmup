@@ -1,0 +1,89 @@
+$contentCatalog=powertoolsContentCatalog
+$contentCatalogName=Powertools Content Catalog
+$contentCV=catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]),CatalogVersion.version[default=Staged])[default=$contentCatalog:Staged]
+$addonExtensionName=ysapordermgmtb2baddon
+
+
+# Account Page Template
+# Template used for all of the Account pages
+INSERT_UPDATE ContentSlotName;name[unique=true];template(uid,$contentCV)[unique=true][default='AccountPageTemplate'];validComponentTypes(code);compTypeGroup(code)
+;SapBodyContent;;;wide
+#### Jsp Include Component ####
+
+INSERT_UPDATE JspIncludeComponent;$contentCV[unique=true];uid[unique=true];name;page;actions(uid,$contentCV);&componentRef
+;;SapAccountOrderHistoryComponent;Account History Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountOrderHistoryPage.jsp;;SapAccountOrderHistoryComponent
+;;SapAccountOrderDetailsReorderComponent;Account Order Details Reorder Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountOrderDetailReorder.jsp;;SapAccountOrderDetailsReorderComponent
+;;SapAccountMyQuotesComponent;Account My Quotes Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountMyQuotesPage.jsp;;SapAccountMyQuotesComponent
+;;SapAccountMyReplenishmentOrdersComponent;Account My Replenishment Orders Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountReplenishmentSchedule.jsp;;SapAccountMyReplenishmentOrdersComponent
+;;SapAccountSavedCartsComponent;Sap Account Saved Carts Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountSavedCartsPage.jsp;;SapAccountSavedCartsComponent
+;;SapAccountOrderDetailsItemsComponent;Account Order Details Items Info Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountOrderDetailItems.jsp;;SapAccountOrderDetailsItemsComponent
+;;SapOrderConfirmationItemsComponent;Order Confirmation Items Info Component;/WEB-INF/views/addons/$addonExtensionName/responsive/pages/account/accountOrderDetailItems.jsp;;SapOrderConfirmationItemsComponent
+;;AccountOrderDetailsHeadlineComponent;Account Order Details Headline Component;accountOrderDetailHeadline.jsp;;AccountOrderDetailsHeadlineComponent
+;;AccountOrderDetailsTotalsComponent;Account Order Details Order Totals Component;accountOrderDetailOrderTotals.jsp;;AccountOrderDetailsTotalsComponent
+;;AccountOrderDetailsReplenishmentInformationComponent;Account Order Details Replenishment Information Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailReplenishmentInformation.jsp;;AccountOrderDetailsReplenishmentInformationComponent
+;;AccountOrderDetailsShippingComponent;Account Order Details Shipping Info Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailShippingInfo.jsp;;AccountOrderDetailsShippingComponent
+;;AccountOrderDetailsApprovalDetailsComponent;Account Order Details Approval Details Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailApprovalDetails.jsp;;AccountOrderDetailsApprovalDetailsComponent
+;;AccountOrderDetailsOverviewComponent;Account Order Details Overview Info Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailOverview.jsp;;AccountOrderDetailsOverviewComponent
+
+;;OrderConfirmationThankMessageComponent;Order Confirmaiton Thank You Message Component;/WEB-INF/views/responsive/pages/checkout/checkoutConfirmationThankMessage.jsp;;OrderConfirmationThankMessageComponent
+;;OrderConfirmationOverviewComponent;Order Confirmaiton Overview Info Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailOverview.jsp;;OrderConfirmationOverviewComponent
+;;OrderConfirmationTotalsComponent;Order Confirmation Totals Component;/WEB-INF/views/responsive/pages/account/accountOrderDetailOrderTotals.jsp;;OrderConfirmationTotalsComponent
+;;OrderConfirmationShippingComponent;Order Confirmation Shipping Info Component;/WEB-INF/views/addons/b2bacceleratoraddon/responsive/pages/account/accountOrderDetailShippingInfo.jsp;;OrderConfirmationShippingComponent
+;;OrderConfirmationContinueButtonComponent;Order Confirmaiton Continue Button Component;/WEB-INF/views/responsive/pages/checkout/checkoutConfirmationContinueButton.jsp;;OrderConfirmationContinueButtonComponent
+
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-orders;Body Content Slot for My Account Order History;true;SapAccountOrderHistoryComponent;;;
+
+
+
+###### Powertools Account Order History ######
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orders'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-orders;SapBodyContent;;SapBodyContent-orders;;;
+
+
+###### Account Order Details Start ######
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='order'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-orderdetail;SapBodyContent;;SapBodyContent-orderdetail;;;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-orderdetail;Body Content Slot for My Account Order Details;true;AccountOrderDetailsHeadlineComponent,AccountOrderDetailsOverviewComponent,SapAccountOrderDetailsItemsComponent,AccountOrderDetailsShippingComponent,AccountOrderDetailsApprovalDetailsComponent,AccountOrderDetailsTotalsComponent,SapAccountOrderDetailsReorderComponent;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-my-quotes;Body Content Slot for My Account My Quotes;true;SapAccountMyQuotesComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='my-quotes'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-my-quotes;SapBodyContent;;SapBodyContent-my-quotes;;;
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-my-replenishment-orders;Body Content Slot for My Account Replenishment Orders;true;SapAccountMyReplenishmentOrdersComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='my-replenishment-orders'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-my-replenishment-orders;SapBodyContent;;SapBodyContent-my-replenishment-orders;;;
+
+
+# ContentSlot
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-saved-carts;Body Content Slot for Saved Carts;true;SapAccountSavedCartsComponent;;;
+
+# ContentSlotForPage
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='saved-carts'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-saved-carts;SapBodyContent;;SapBodyContent-saved-carts;;;
+
+
+###### Order Confirmation Page Start ######
+INSERT_UPDATE ContentSlotForPage;$contentCV[unique=true];uid[unique=true];position[unique=true];page(uid,$contentCV)[unique=true][default='orderConfirmationPage'];contentSlot(uid,$contentCV)[unique=true];;;
+;;SapBodyContent-orderConfirmation;SapBodyContent;;SapBodyContent-orderConfirmation;;;
+
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];name;active;cmsComponents(&componentRef);;;
+;;SapBodyContent-orderConfirmation;Body Content Slot for Order Confirmation;true;OrderConfirmationThankMessageComponent,OrderConfirmationOverviewComponent,SapOrderConfirmationItemsComponent,OrderConfirmationShippingComponent,OrderConfirmationTotalsComponent,OrderConfirmationContinueButtonComponent;;;
+
+
+

@@ -1,0 +1,783 @@
+<?xml version="1.0"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="backoffice_buildcallbacks">
+
+	<!-- Sets path to jruby which will be used in backoffice_sass_collect_and_compile_all_sass_files -->
+	<path id="backoffice_sass_jruby">
+		<fileset file="${ext.backoffice.path}/build-tool/jruby-complete-*.jar"/>
+	</path>
+
+	<!-- Main macro responsible for unzipping sass gem, collecting all scss files and compiling them -->
+	<macrodef name="backoffice_sass_collect_and_compile_all_sass_files">
+		<sequential>
+			<replaceBackslashesInExtensionPath extensionname="backoffice" property="backofficePath" />
+			<backoffice_sass_unzip_sass_gems/>
+			<backoffice_sass_copy_all_sass_files_to_generated_dir/>
+			<backoffice_sass_replace_import_placeholders/>
+			<echo message="Compiling scss files..." />
+			<property name="sourceDir" value="${backofficePath}/resources/backoffice/generated/**/[^_]*.scss" />
+			<property name="targetDir" value="${backofficePath}/resources/backoffice/generated" />
+			<script language="ruby" classpathref="backoffice_sass_jruby">
+				<![CDATA[
+					require $project.getProperty('backoffice_sass_gems_path')
+					require 'sass/exec'
+					sourceMap = $project.getProperty('backoffice.sass.source.map.enabled') == 'true' ? 'file' : 'none'
+					sourceDir = $project.getProperty('sourceDir');
+					targetDir = $project.getProperty('targetDir');
+					files = Dir.glob(sourceDir);
+					Dir.mkdir(targetDir) unless File.exists?(targetDir)
+					files.each do
+						| file |
+						destinationFile = File.join(File.dirname(file), File.basename(file, ".*") + '.css')
+						puts "[SASS compiled] : " + destinationFile
+						opts = Sass::Exec::SassScss.new(["--load-path", File.dirname(targetDir), file, destinationFile, "--sourcemap="+sourceMap, "--cache-location", $project.getProperty('platformhome')+"/.sass-cache"], "sass")
+						opts.parse
+					end
+				]]>
+			</script>
+			<echo message="Compiled all scss files" />
+			<if>
+				<available file="${platformhome}/.sass-cache" type="dir" />
+				<then>
+					<delete includeemptydirs="true">
+						<fileset dir="${platformhome}/.sass-cache" includes="**/*"/>
+					</delete>
+					<delete dir="${platformhome}/.sass-cache"/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_sass_unzip_sass_gems">
+		<sequential>
+			<unzip dest="${HYBRIS_TEMP_DIR}/sassgem" overwrite="true">
+				<fileset dir="${backofficePath}/build-tool/" includes="sass-java-gems-*.jar" />
+			</unzip>
+			<dirset dir="${HYBRIS_TEMP_DIR}/sassgem/gems" includes="sass-*/lib/sass" id="path_to_sass" />
+			<property name="backoffice_sass_gems_path" value="${HYBRIS_TEMP_DIR}/sassgem/gems/${toString:path_to_sass}" />
+		</sequential>
+	</macrodef>
+
+	<!--
+		 Replaces all placeholders (@EXTENSION_VARIABLES_PLACEHOLDER extension@) with '@import extension-variables.scss'; or removes placeholder
+		 in case when extension-variables.scss doesn't exist. Macro takes into account cockpitng-globals.scss, backoffice-variables.scss, file indicated
+		 in local.properties (backoffice.sass.preferred.variables.file) and variables files from all registered extensions
+	 	 (${backofficePath}${file.separator}sassExtensions file contains list of all registered extensions)
+	-->
+	<macrodef name="backoffice_sass_replace_import_placeholders">
+		<sequential>
+			<if>
+				<available file="${backofficePath}${file.separator}sassExtensions" />
+				<then>
+					<loadfile property="backofficeRegisteredSassExtensions" srcfile="${backofficePath}${file.separator}sassExtensions" />
+				</then>
+			</if>
+			<script language="javascript">
+				<![CDATA[
+							var backofficeDir = project.getProperty("backofficePath");
+							var backofficeGeneratedDir = backofficeDir + "/resources/backoffice/generated/";
+
+							var removeAllImportsFromFile = function(file) {
+								var replaceTask = project.createTask("replaceregexp");
+								replaceTask.setFile(new java.io.File(file));
+								replaceTask.setMatch("@EXTENSION_VARIABLES_PLACEHOLDER (.*)@");
+								replaceTask.setReplace("");
+								replaceTask.setByLine(true);
+								replaceTask.perform();
+							}
+
+							var prepareVariableFiles = function() {
+								var variableFiles = [];
+
+								// cockpitng
+								variableFiles.push({ extension : "cockpitng", scssFile : backofficeGeneratedDir + "cockpitng/cng/scss/cockpitng-globals.scss"});
+
+								// backoffice
+								variableFiles.push({ extension : "backoffice", scssFile : backofficeGeneratedDir + "backoffice/scss/backoffice-variables.scss"});
+
+								// registered extensions
+								var registeredExtensions = project.getProperty("backofficeRegisteredSassExtensions");
+								if(registeredExtensions) {
+									var lines = registeredExtensions.split(project.getProperty("line.separator"));
+									var addedExtensions = [];
+									for(var i = 0; i < lines.length; i++) {
+										var parts = lines[i].split(";");
+										var extensionname = parts[0];
+										if(extensionname)
+										{
+											if(addedExtensions.indexOf(extensionname) == -1)
+											{
+												addedExtensions.push(extensionname);
+												// extensions' variables can be stored in two places: backoffice/scss/ or cocpitng/scss. We need to check which file exists and add it as an import
+												var backofficeExtensionsVariablesDir = backofficeGeneratedDir + "backoffice/scss/";
+												var cockpitngExtensionsVariablesDir = backofficeGeneratedDir + "cockpitng/scss/";
+												var scssFile = new java.io.File(backofficeExtensionsVariablesDir + extensionname + "-variables.scss");
+												if(scssFile.exists()) {
+													variableFiles.push({ extension: extensionname, scssFile : backofficeGeneratedDir + "backoffice/scss/" + extensionname + "-variables.scss"});
+												} else {
+													scssFile = new java.io.File(cockpitngExtensionsVariablesDir+ extensionname + "-variables.scss");
+													if(scssFile.exists()) {
+														variableFiles.push({ extension: extensionname, scssFile : backofficeGeneratedDir + "cockpitng/scss/" + extensionname + "-variables.scss"});
+													} else {
+														variableFiles.push({ extension: extensionname, scssFile : null});
+													}
+												}
+											}
+										}
+									}
+								}
+
+								return variableFiles;
+							}
+
+							var replacePlaceholders = function(filesWithVariables) {
+								var replaceTask = project.createTask("replace");
+								replaceTask.setDir(new java.io.File(backofficeGeneratedDir));
+								replaceTask.setIncludes("**/*.scss");
+
+								for(var i = 0; i < filesWithVariables.length; i++) {
+									var replaceFilter = replaceTask.createReplacefilter();
+									replaceFilter.setToken("@EXTENSION_VARIABLES_PLACEHOLDER " + filesWithVariables[i].extension+ "@");
+									if(filesWithVariables[i].scssFile) {
+										removeAllImportsFromFile(filesWithVariables[i].scssFile);
+									}
+
+									var importValue = filesWithVariables[i].scssFile ? "@import '" + filesWithVariables[i].scssFile + "';" : "";
+									replaceFilter.setValue(importValue);
+								}
+								replaceTask.perform();
+							}
+
+							removeAllImportsFromFile(project.getProperty("backofficePath") + "/resources/backoffice/generated/cockpitng/cng/scss/cockpitng-globals.scss");
+							var variableFiles = prepareVariableFiles();
+							replacePlaceholders(variableFiles);
+						]]>
+			</script>
+			<backoffice_sass_add_import_from_preferred_extension />
+		</sequential>
+	</macrodef>
+
+	<!-- It is possible to override all scss variables declared in cockpitng, backoffice and backoffice's extensions.
+		 To do this "backoffice.sass.preferred.extension" and "backoffice.sass.preferred.variables.file" should be specified in local.properties
+	 	 Import to the file will be add below the last @import in a scss file. This macro finds all scss files from {backofficePath}/generated directory, finds
+	 	 last @import in given file, adds @import with preferred variable file below the last @import and save the file.
+	-->
+	<macrodef name="backoffice_sass_add_import_from_preferred_extension" >
+		<sequential>
+			<replaceBackslashesInExtensionPath extensionname="backoffice" property="backofficePath" />
+			<script language="javascript">
+				<![CDATA[
+						var backofficeDir = project.getProperty("backofficePath");
+						var backofficeGeneratedDir = backofficeDir + "/resources/backoffice/generated/";
+						var lineSeparator = project.getProperty("line.separator");
+						var preferredExtension = project.getProperty("backoffice.sass.preferred.extension");
+                        var preferredVariableFile = project.getProperty("backoffice.sass.preferred.variables.file");
+
+						function addImportFromPreferredExtensionToAllScssFiles(dir)
+						{
+							var directory = new java.io.File(dir);
+							var files = directory.listFiles();
+							for(var fileIndex in files)
+							{
+								var file = new java.io.File(files[fileIndex]);
+								if(file.isFile() && file.getAbsolutePath().endsWith(".scss"))
+								{
+									insertImportToScssFile(file);
+								}
+								else if(file.isDirectory)
+								{
+									addImportFromPreferredExtensionToAllScssFiles(file.getAbsolutePath(), files);
+								}
+							}
+						}
+
+						function insertImportToScssFile(file)
+						{
+							var stream = new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream(new java.io.File(file))));
+							var line = stream.readLine();
+							var lastImportLine = null;
+							var content = "";
+							while(line != null)
+							{
+								content += line + lineSeparator;
+								if(line.startsWith("@import "))
+								{
+									lastImportLine = line;
+								}
+								line = stream.readLine();
+							}
+							stream.close();
+
+                            var normalizeTask = project.createTask("replaceBackslashesInExtensionPath");
+                            normalizeTask.setDynamicAttribute("extensionname", preferredExtension);
+                            normalizeTask.setDynamicAttribute("property", "preferredExtensionNormalizedPath");
+							normalizeTask.perform();
+                            var scssFile = project.getProperty("preferredExtensionNormalizedPath") + "/" + preferredVariableFile;
+                            var modifiedLastImportLine = lastImportLine + lineSeparator + "@import '" + scssFile + "';";
+
+							content = content.replace(lastImportLine, modifiedLastImportLine);
+							var writer = new java.io.PrintWriter(file);
+							writer.print(content);
+							writer.close();
+						}
+
+						if(preferredExtension && preferredVariableFile) {
+                          	var extensionPath = project.getProperty("ext."+preferredExtension+".path");
+                           	var preferredFile = new java.io.File(extensionPath + "/" + preferredVariableFile);
+                           	if(preferredFile.exists()) {
+								addImportFromPreferredExtensionToAllScssFiles(backofficeGeneratedDir);
+                           	}
+                        }
+				]]>
+			</script>
+		</sequential>
+	</macrodef>
+
+	<!-- Windows returns C:\work\hybris for ${ext.backoffice.path}. Single \ is special char in javascript, therefore such path causes errors.
+	  	 This function replaces \ to / for path to given extension. First parameter is extension's name. The second parameter is property name
+	  	 where converted value should be set.
+	  -->
+	<macrodef name="replaceBackslashesInExtensionPath">
+		<attribute name="extensionname"/>
+		<attribute name="property"/>
+		<sequential>
+			<propertyregex property="@{property}" input="${ext.@{extensionname}.path}" regexp="\\" replace="/" global="true" override="true" defaultValue="${ext.@{extensionname}.path}" />
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss files from cockpitng's jar, backoffice, registered backoffice's extensions and additional resources (indicated in local.properties)  -->
+	<macrodef name="backoffice_sass_copy_all_sass_files_to_generated_dir" >
+		<sequential>
+			<backoffice_sass_copy_sass_from_cockpitng />
+			<backoffice_sass_copy_sass_from_backoffice/>
+			<backoffice_sass_copy_sass_from_registered_extensions/>
+			<backoffice_sass_copy_scss_from_additional_resource_loader />
+		</sequential>
+	</macrodef>
+
+	<!-- Unzips cockpitng's jars into ${HYBRIS_TEMP_DIR}/cockpitng directory and copies scss files to generated directory -->
+	<macrodef name="backoffice_sass_copy_sass_from_cockpitng">
+		<sequential>
+			<unzip dest="${HYBRIS_TEMP_DIR}/cockpitng" overwrite="true">
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="backoffice-core-*.jar" />
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="backoffice-widgets-*.jar" />
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="cockpitadmin-*.jar" />
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="cockpitframework-*.jar" />
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="cockpit-standard-editors-*.jar" />
+				<fileset dir="${backofficePath}/web/webroot/WEB-INF/lib/" includes="cockpitwidgets-*.jar" />
+			</unzip>
+			<copy_scss_files sourceDir="${HYBRIS_TEMP_DIR}/cockpitng" targetDir="${backofficePath}/resources/backoffice/generated" />
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss files from backoffice -->
+	<macrodef name="backoffice_sass_copy_sass_from_backoffice">
+		<sequential>
+			<copy_scss_files sourceDir="${backofficePath}/resources" targetDir="${backofficePath}/resources/backoffice/generated" />
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss files from registered extensions based on ${backofficePath}${file.separator}sassExtensions file -->
+	<macrodef name="backoffice_sass_copy_sass_from_registered_extensions">
+		<sequential>
+			<if>
+				<available file="${backofficePath}${file.separator}sassExtensions" />
+				<then>
+					<loadfile property="registeredExtensions" srcfile="${backofficePath}${file.separator}sassExtensions" />
+					<script language="javascript">
+						<![CDATA[
+							var registeredExtensions = project.getProperty("registeredExtensions");
+							var lines = registeredExtensions.split(project.getProperty("line.separator"));
+
+							for(var i = 0; i < lines.length; i++) {
+								var parts = lines[i].split(";");
+
+								var resources = parts[1];
+								var destination = parts[2];
+
+								if(!resources && !destination) {
+									resources = 'backoffice/resources';
+									destination = 'cockpitng';
+								}
+
+								var extensionname = parts[0];
+								if(extensionname)
+								{
+									if(resources === 'backoffice/resources') {
+										var task = project.createTask('backoffice_sass_copy_scss_files_from_bof_jar');
+										task.setDynamicAttribute("extension", extensionname);
+										task.perform();
+									}
+
+									var task = project.createTask('backoffice_sass_copy_scss_files_from_extension');
+									task.setDynamicAttribute( "sourcedir", resources );
+									task.setDynamicAttribute( "targetdir", destination );
+									task.setDynamicAttribute( "extensionname", extensionname );
+									task.perform();
+								}
+							}
+						]]>
+					</script>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss file from single registered extension -->
+	<macrodef name="backoffice_sass_copy_scss_files_from_extension">
+		<attribute name="sourcedir" default="" />
+		<attribute name="targetdir" default="" />
+		<attribute name="extensionname" default="" />
+		<sequential>
+			<var name="extensionPath" value="${ext.@{extensionname}.path}${file.separator}@{sourcedir}" />
+			<copy_scss_files sourceDir="${extensionPath}" targetDir="${backofficePath}/resources/backoffice/generated/@{targetdir}" additionalPlaceholders="@EXTENSION_VARIABLES_PLACEHOLDER @{extensionname}@${line.separator}" />
+		</sequential>
+	</macrodef>
+
+	<!-- Checks whether extension_bof.jar exists. If so then the jar file is unzipped and scss files are copied to generated dir -->
+	<macrodef name="backoffice_sass_copy_scss_files_from_bof_jar">
+		<attribute name="extension" />
+		<sequential>
+			<var name="extensionBofPath" value="${ext.@{extension}.path}${file.separator}resources${file.separator}backoffice${file.separator}@{extension}_bof.jar"/>
+			<if>
+				<available file="${extensionBofPath}" />
+				<then>
+					<unzip src="${extensionBofPath}" dest="${HYBRIS_TEMP_DIR}${file.separator}@{extension}" />
+					<copy_scss_files sourceDir="${HYBRIS_TEMP_DIR}${file.separator}@{extension}" targetDir="${backofficePath}/resources/backoffice/generated" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss files from paths indicated in backoffice.cockpitng.additionalResourceLoader.path (local.properties) -->
+	<macrodef name="backoffice_sass_copy_scss_from_additional_resource_loader">
+		<sequential>
+			<for list="${backoffice.cockpitng.additionalResourceLoader.path}" delimiter=";" param="path">
+				<sequential>
+					<copy_scss_files sourceDir="@{path}" targetDir="${backofficePath}/resources/backoffice/generated" />
+				</sequential>
+			</for>
+		</sequential>
+	</macrodef>
+
+	<!-- Copies scss files from source directory to target directory. During the copying process the following placeholders are added to each file:
+	 	 @EXTENSION_VARIABLES_PLACEHOLDER cockpitng@
+	 	 @EXTENSION_VARIABLES_PLACEHOLDER backoffice@
+	 	 @{additionalplaceholders}
+	 -->
+	<macrodef name="copy_scss_files">
+		<attribute name="sourcedir" default="" />
+		<attribute name="targetdir" default="" />
+		<attribute name="additionalplaceholders" default="" />
+		<sequential>
+			<if>
+			<available file="@{sourcedir}" />
+			<then>
+				<echo message="@EXTENSION_VARIABLES_PLACEHOLDER cockpitng@${line.separator}@EXTENSION_VARIABLES_PLACEHOLDER backoffice@${line.separator}@{additionalplaceholders}${line.separator}" file="${HYBRIS_TEMP_DIR}/cockpitng/placeholder.txt"/>
+				<copy todir="@{targetdir}" overwrite="true">
+					<fileset dir="@{sourcedir}">
+						<include name="**/*.scss"/>
+						<exclude name="backoffice/generated/**/*.scss" />
+					</fileset>
+					<filterset begintoken="@" endtoken=";">
+						<filter token='import "cockpitng-globals.scss"' value=""/>
+						<filter token="import 'cockpitng-globals.scss'" value=""/>
+					</filterset>
+					<filterchain>
+						<concatfilter prepend="${HYBRIS_TEMP_DIR}/cockpitng/placeholder.txt"/>
+					</filterchain>
+				</copy>
+			</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<property name="webFragmentsSrcDir" value="${ext.backoffice.path}/web/webroot/WEB-INF/web-fragments" />
+	<property name="backofficeLibDir" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib" />
+	<property name="backofficeFragmentPattern" value="webfragment*_" />
+	<property name="backofficeCoreFragmentPrefix" value="webfragmentCore_" />
+
+	<target name="sasscompile" description="copies and compiles .scss files from extensions and jar files">
+		<copy_and_compile_sass_files />
+	</target>
+
+	<target name="sassclean" description="removes resources/backoffice/generated directory">
+		<remove_backoffice_sass_generated_directory />
+	</target>
+
+	<macrodef name="backoffice_after_clean">
+		<sequential>
+			<sequential>
+				<echo level="info" message="Deleting backoffice jars" />
+				<delete quiet="true">
+					<fileset dir="${ext.backoffice.path}/web/webroot/WEB-INF/lib">
+						<include name="*_bof.jar" />
+					</fileset>
+				</delete>
+
+				<backoffice_remove_web_fragments />
+				<remove_backoffice_sass_generated_directory />
+			</sequential>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="remove_backoffice_sass_generated_directory">
+		<sequential>
+			<delete quiet="true" dir="${ext.backoffice.path}/resources/backoffice/generated" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="_before_build">
+		<sequential>
+			<if>
+				<equals arg1="${backoffice.sass.enabled}" arg2="true" />
+				<then>
+					<delete file="${ext.backoffice.path}${file.separator}sassExtensions" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_after_build_all_extensions">
+		<sequential>
+			<check_if_scss_has_been_changed />
+			<if>
+				<or>
+					<not>
+						<available file="${ext.backoffice.path}${file.separator}resources${file.separator}backoffice${file.separator}generated${file.separator}.sasscompiled" />
+					</not>
+					<equals arg1="${backoffice.sass.recompileFiles}" arg2="true" />
+				</or>
+				<then>
+					<copy_and_compile_sass_files />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="update_sass_compilation_timestamp">
+		<sequential>
+			<script language="javascript">
+				<![CDATA[
+					var fileSeparator = project.getProperty("file.separator");
+					var sassCompiledFile = new java.io.File(project.getProperty("ext.backoffice.path") + fileSeparator + "resources" + fileSeparator + "backoffice" + fileSeparator + "generated" + fileSeparator + ".sasscompiled");
+					if(!sassCompiledFile.exists())
+					{
+						sassCompiledFile.getParentFile().mkdirs();
+						sassCompiledFile.createNewFile();
+					}
+					var echo = project.createTask("echo");
+					echo.setMessage(new Date().getTime());
+					echo.setFile(sassCompiledFile);
+					echo.perform();
+				]]>
+			</script>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="check_if_scss_has_been_changed">
+		<sequential>
+			<if>
+				<available file="${ext.backoffice.path}${file.separator}sassExtensions" />
+				<then>
+					<loadfile property="registeredExtensions" srcfile="${ext.backoffice.path}${file.separator}sassExtensions" />
+					<script language="javascript">
+						<![CDATA[
+							project.setProperty("backoffice.sass.recompileFiles", false);
+							var fileSeparator = project.getProperty("file.separator");
+							var registeredExtensions = project.getProperty("registeredExtensions");
+							var lines = registeredExtensions.split(project.getProperty("line.separator"));
+							var sassCompiledFile = new java.io.File(project.getProperty("ext.backoffice.path") + fileSeparator + "resources" + fileSeparator + "backoffice" + fileSeparator + "generated" + fileSeparator + ".sasscompiled");
+							var localExtensionsFile = new java.io.File(project.getProperty("HYBRIS_CONFIG_DIR") + fileSeparator + "localextensions.xml");
+
+							var checkIfNewExtensionHasBeenAdded = function()
+							{
+								return localExtensionsFile.lastModified() > sassCompiledFile.lastModified()
+							}
+
+							var checkRegisteredExtensions = function()
+							{
+								if (checkIfNewExtensionHasBeenAdded())
+								{
+									setShouldRecompileScssVariable(true);
+									return true;
+								}
+								for (var i = 0; i < lines.length; ++i) {
+									var parts = lines[i].split(";");
+
+									var resources = parts[1];
+									var destination = parts[2];
+
+									if (!resources && !destination) {
+										resources = 'backoffice/resources';
+										destination = 'cockpitng';
+									}
+
+									if (parts[0])
+									{
+										var registeredExtensionResourcePath = project.getProperty("ext." + parts[0] + ".path") + fileSeparator + resources;
+										if (checkScssFilesInDirectory(registeredExtensionResourcePath))
+										{
+											setShouldRecompileScssVariable(true);
+											return true;
+										}
+									}
+								}
+								return false;
+							}
+
+							var checkBackofficeExtension = function()
+							{
+								if (checkScssFilesInDirectory(project.getProperty("ext.backoffice.path") + fileSeparator + "resources" + fileSeparator + "backoffice" + fileSeparator + "scss"))
+								{
+									setShouldRecompileScssVariable(true);
+									return true;
+								}
+								if (checkScssFilesInDirectory(project.getProperty("ext.backoffice.path") + fileSeparator + "resources" + fileSeparator + "cockpitng"))
+								{
+									setShouldRecompileScssVariable(true);
+									return true;
+								}
+							}
+
+							var checkAdditionalResourcesPath = function()
+							{
+								var additionalResources = project.getProperty("backoffice.cockpitng.additionalResourceLoader.path");
+								if (additionalResources)
+								{
+									var arrayOfResources = additionalResources.split(";");
+
+									for (var i = 0; i < arrayOfResources.length; ++i)
+									{
+										if (arrayOfResources[i] && checkScssFilesInDirectory(arrayOfResources[i]))
+										{
+											setShouldRecompileScssVariable(true);
+											return true;
+										}
+									}
+								}
+								return false;
+							}
+
+							var checkScssFilesInDirectory = function(directoryPath)
+							{
+								var dir = new java.io.File(directoryPath);
+								if (!dir.exists())
+								{
+									return false;
+								}
+
+								var fileset = project.createDataType("fileset");
+								fileset.setDir(dir);
+								fileset.setIncludes("**/*.scss");
+
+								var directoryScanner = fileset.getDirectoryScanner(project);
+								var foundScssFiles = directoryScanner.getIncludedFiles();
+								for (var i = 0; i < foundScssFiles.length; ++i)
+								{
+									 var foundScssFile = new java.io.File(directoryPath + fileSeparator + foundScssFiles[i]);
+									 if (foundScssFile.lastModified() > sassCompiledFile.lastModified())
+									 {
+										 return true;
+									 }
+								 }
+								 return false;
+							}
+
+							var setShouldRecompileScssVariable = function(value)
+							{
+								project.setProperty("backoffice.sass.recompileFiles", value);
+							}
+
+							if (!checkRegisteredExtensions())
+							{
+								if (!checkAdditionalResourcesPath())
+								{
+									checkBackofficeExtension();
+								}
+							}
+						]]>
+					</script>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="copy_and_compile_sass_files">
+		<sequential>
+			<if>
+				<and>
+					<equals arg1="${backoffice.sass.enabled}" arg2="true" />
+				</and>
+				<then>
+					<update_sass_compilation_timestamp />
+					<backoffice_sass_collect_and_compile_all_sass_files/>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="register_sass_extension">
+		<attribute name="extensionname" default="" />
+		<attribute name="resources" default="" />
+		<attribute name="destination" default="" />
+		<sequential>
+			<if>
+				<equals arg1="${backoffice.sass.enabled}" arg2="true" />
+				<then>
+					<echo file="${ext.backoffice.path}${file.separator}sassExtensions" append="true" message="@{extensionname};@{resources};@{destination}${line.separator}" />
+					<echo message="Registered @{extensionname} as SASS extensions" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_after_build">
+		<sequential>
+			<backoffice_create_web_fragments />
+		</sequential>
+	</macrodef>
+
+	<target name="widgetsxsddoc">
+		<callback extname="backoffice" target="widgetsxsddoc" />
+	</target>
+
+	<macrodef name="backoffice_widgetsxsddoc">
+		<sequential>
+			<mkdir dir="${ext.backoffice.path}/resources/doc" />
+			<tempfile property="temp.dir" destDir="${java.io.tmpdir}" prefix="xslt" />
+			<mkdir dir="${temp.dir}" />
+			<echo message="Generating widgets.xsd documentation..." />
+			<get src="http://www.hybris.com/schema/cockpitng/widgets.xsd" dest="${temp.dir}/widgets.xsd" verbose="false" usetimestamp="false" />
+			<xslt in="${temp.dir}/widgets.xsd" out="${ext.backoffice.path}/resources/doc/widgets-xsd.html" style="${platformhome}/resources/xsl/xsd-doc.xsl" force="true" />
+			<delete dir="${temp.dir}" />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_remove_web_fragments">
+		<sequential>
+			<if>
+				<available file="${backofficeLibDir}" type="dir" />
+				<then>
+					<delete includeemptydirs="true">
+						<fileset dir="${backofficeLibDir}" includes="**/${backofficeFragmentPattern}*.jar" />
+					</delete>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_create_web_fragments">
+		<sequential>
+			<if>
+				<available file="${webFragmentsSrcDir}" />
+				<then>
+					<for param="dirPath">
+						<path>
+							<dirset dir="${webFragmentsSrcDir}">
+								<include name="*" />
+							</dirset>
+						</path>
+						<sequential>
+							<var name="dirName" unset="true" />
+							<basename property="dirName" file="@{dirPath}" />
+							<jar destfile="${backofficeLibDir}/${backofficeCoreFragmentPrefix}${dirName}.jar">
+								<metainf dir="@{dirPath}" includes="**/web-fragment.xml" />
+							</jar>
+						</sequential>
+					</for>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="backoffice_before_dist">
+		<sequential>
+			<if>
+				<available file="${ext.backoffice.path}/src" type="dir" />
+				<then>
+					<if>
+						<available file="${ext.backoffice.path}/doc/sources/backoffice-module-sources.jar" type="file" />
+						<then>
+							<delete file="${ext.backoffice.path}/doc/sources/backoffice-module-sources.jar" />
+						</then>
+					</if>
+					<jar destfile="${ext.backoffice.path}/doc/sources/backoffice-module-sources.jar">
+						<fileset dir="${ext.backoffice.path}/src" >
+							<include name="com/hybris/**/*.java" />
+						</fileset>
+						<fileset dir="${ext.backoffice.path}/gensrc" >
+							<include name="backoffice/**/*.java" />
+							<include name="com/hybris/**/*.java" />
+						</fileset>
+						<fileset dir="${ext.backoffice.path}/web/src" >
+							<include name="com/hybris/**/*.java" />
+						</fileset>
+					</jar>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<patternset id="backoffice.localization.pattern">
+		<!-- core and hmc -->
+		<include name="**/*locales*_en.properties" />
+		<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*" />
+		<exclude name="**/unittest/**/*" />
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties" />
+		<include name="**/labels_en.properties" />
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties" />
+		<include name="**/*messages.properties" />
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties" />
+
+		<!-- csv and impex -->
+		<include name="**/*_en.csv" />
+		<include name="**/*_en.impex" />
+
+		<include name="**/lang-en.properties" />
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties" />
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties" />
+	</patternset>
+	<patternset id="extension.backoffice.binary.filter">
+		<patternset refid="extension.binary.filter" />
+		<exclude name="resources/backoffice/generated/**" />
+		<exclude name="web/webroot/WEB-INF/lib/${backofficeFragmentPattern}*.jar" />
+		<exclude name="sassExtensions" />
+	</patternset>
+	<patternset id="extension.backoffice.source.filter">
+		<patternset refid="extension.source.filter" />
+		<exclude name="resources/backoffice/generated/**" />
+		<exclude name="web/webroot/WEB-INF/lib/${backofficeFragmentPattern}*.jar" />
+		<exclude name="sassExtensions" />
+	</patternset>
+	<patternset id="extension.backoffice.devzip.filter">
+		<patternset refid="extension.source.filter" />
+		<exclude name="resources/backoffice/generated/**" />
+		<exclude name="web/webroot/WEB-INF/lib/${backofficeFragmentPattern}*.jar" />
+		<exclude name="sassExtensions" />
+	</patternset>
+	<patternset id="extension.backoffice.production.filter">
+		<patternset refid="extension.production.filter" />
+		<exclude name="resources/backoffice/generated/**/*.scss" />
+		<exclude name="resources/backoffice/generated/**/*.map" />
+	</patternset>
+</project>

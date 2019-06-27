@@ -1,0 +1,734 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!-- Abstract converter declarations -->
+    <bean id="cxConverter" abstract="true" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableConverter">
+        <property name="defaultOptions" value="BASE"/>
+    </bean>
+
+    <bean id="cxSubtypeConverter" abstract="true" parent="cxConverter" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableSubtypeConverter"/>
+
+    <bean id="cxSubtypeAwareConverter" abstract="true" parent="cxConverter" class="de.hybris.platform.personalizationfacades.converters.impl.DefaultConfigurableSubtypeAwareConverter"/>
+
+    <!-- Action conversion -->
+    <beans>
+        <alias name="defaultCxActionPopulator" alias="cxActionPopulator"/>
+        <bean id="defaultCxActionPopulator" class="de.hybris.platform.personalizationfacades.action.converters.populator.ActionPopulator"/>
+
+        <!-- Subtype aware converter that uses other converters to do its job -->
+        <alias name="defaultCxActionConverter" alias="cxActionConverter"/>
+        <bean id="defaultCxActionConverter" parent="cxSubtypeAwareConverter">
+            <property name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionConverter"/>
+        </bean>
+
+        <bean id="cxActionPopulatingConverter" abstract="true" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionConverter"/>
+        </bean>
+
+        <!-- Action reverse conversion -->
+
+        <alias name="defaultCxActionReversePopulator" alias="cxActionReversePopulator"/>
+        <bean id="defaultCxActionReversePopulator" class="de.hybris.platform.personalizationfacades.action.converters.populator.ActionReversePopulator"/>
+
+        <alias name="defaultCxActionReverseConverter" alias="cxActionReverseConverter"/>
+        <bean id="defaultCxActionReverseConverter" parent="cxSubtypeAwareConverter">
+            <property name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionReverseConverter"/>
+        </bean>
+
+        <bean id="cxActionReversePopulatingConverter" abstract="true" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionReverseConverter"/>
+        </bean>
+
+        <!-- Action full data conversion -->
+        <alias name="defaultCxActionFullPopulator" alias="cxActionFullPopulator"/>
+        <bean id="defaultCxActionFullPopulator" class="de.hybris.platform.personalizationfacades.action.converters.populator.ActionFullPopulator"/>
+
+        <alias name="defaultCxActionFullConverter" alias="cxActionFullConverter"/>
+        <bean id="defaultCxActionFullConverter" parent="cxSubtypeAwareConverter">
+            <property name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionFullConverter"/>
+        </bean>
+
+        <bean id="cxActionFullPopulatingConverter" abstract="true" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.action.converters.ActionFullConverter"/>
+        </bean>
+
+    </beans>
+
+    <!--  Customer conversion -->
+    <beans>
+        <alias name="defaultCxCustomerPopulator" alias="cxCustomerPopulator"/>
+        <bean id="defaultCxCustomerPopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerPopulator"/>
+
+        <alias name="defaultCxCustomerPopulators" alias="cxCustomerPopulators"/>
+        <bean id="defaultCxCustomerPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerConverter" alias="cxCustomerConverter"/>
+        <bean id="defaultCxCustomerConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.CustomerData"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxCustomerPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Customer reverse conversion -->
+
+        <alias name="defaultCxCustomerReversePopulator" alias="cxCustomerReversePopulator"/>
+        <bean id="defaultCxCustomerReversePopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerReversePopulator"/>
+
+        <alias name="defaultCxCustomerReversePopulators" alias="cxCustomerReversePopulators"/>
+        <bean id="defaultCxCustomerReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerReverseConverter" alias="cxCustomerReverseConverter"/>
+        <bean id="defaultCxCustomerReverseConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.core.model.user.UserModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxCustomerReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+    <!-- Customization conversion -->
+    <beans>
+        <alias name="defaultCxCustomizationPopulator" alias="cxCustomizationPopulator"/>
+        <bean id="defaultCxCustomizationPopulator" class="de.hybris.platform.personalizationfacades.customization.converters.populator.CustomizationPopulator"/>
+
+        <alias name="defaultCxCustomizationWithVariationPopulator" alias="cxCustomizationWithVariationPopulator"/>
+        <bean id="defaultCxCustomizationWithVariationPopulator" class="de.hybris.platform.personalizationfacades.customization.converters.populator.CustomizationWithVariationPopulator">
+            <property name="variationConverter" ref="cxVariationConfigurableConverter"/>
+        </bean>
+
+        <alias name="defaultCxCustomizationPopulators" alias="cxCustomizationPopulators"/>
+        <bean id="defaultCxCustomizationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomizationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomizationForVariationPopulators" alias="cxCustomizationForVariationPopulators"/>
+        <bean id="defaultCxCustomizationForVariationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomizationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomizationFullPopulators" alias="cxCustomizationFullPopulators"/>
+        <bean id="defaultCxCustomizationFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomizationPopulator"/>
+                    <ref bean="cxCustomizationWithVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomizationConfigurableConverter" alias="cxCustomizationConfigurableConverter"/>
+        <bean id="defaultCxCustomizationConfigurableConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.CustomizationData"/>
+            <property name="defaultOptions">
+                <value type="de.hybris.platform.personalizationfacades.enums.CustomizationConversionOptions">BASE</value>
+            </property>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.CustomizationConversionOptions">
+                    <entry key="BASE" value-ref="cxCustomizationPopulators"/>
+                    <entry key="FOR_VARIATION" value-ref="cxCustomizationForVariationPopulators"/>
+                    <entry key="FULL" value-ref="cxCustomizationFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Customization reverse conversion -->
+
+        <alias name="defaultCxCustomizationReversePopulator" alias="cxCustomizationReversePopulator"/>
+        <bean id="defaultCxCustomizationReversePopulator" class="de.hybris.platform.personalizationfacades.customization.converters.populator.CustomizationReversePopulator"/>
+
+        <alias name="defaultCxCustomizationReversePopulators" alias="cxCustomizationReversePopulators"/>
+        <bean id="defaultCxCustomizationReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomizationReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomizationReverseConverter" alias="cxCustomizationReverseConverter"/>
+        <bean id="defaultCxCustomizationReverseConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxCustomizationModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxCustomizationReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+    <!-- CustomerSegmentation conversion -->
+    <beans>
+        <alias name="defaultCxCustomerSegmentationPopulator" alias="cxCustomerSegmentationPopulator"/>
+        <bean id="defaultCxCustomerSegmentationPopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerSegmentationPopulator">
+            <property name="segmentationHelper" ref="cxSegmentationHelper"/>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationWithSegmentPopulator" alias="cxCustomerSegmentationWithSegmentPopulator"/>
+        <bean id="defaultCxCustomerSegmentationWithSegmentPopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerSegmentationWithSegmentPopulator">
+            <property name="segmentConverter" ref="cxSegmentConverter"/>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationWithCustomerPopulator" alias="cxCustomerSegmentationWithCustomerPopulator"/>
+        <bean id="defaultCxCustomerSegmentationWithCustomerPopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerSegmentationWithCustomerPopulator">
+            <property name="customerConverter" ref="cxCustomerConverter"/>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationPopulators" alias="cxCustomerSegmentationPopulators"/>
+        <bean id="defaultCxCustomerSegmentationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerSegmentationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationForCustomerPopulators" alias="cxCustomerSegmentationForCustomerPopulators"/>
+        <bean id="defaultCxCustomerSegmentationForCustomerPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerSegmentationPopulator"/>
+                    <ref bean="cxCustomerSegmentationWithSegmentPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationForSegmentPopulators" alias="cxCustomerSegmentationForSegmentPopulators"/>
+        <bean id="defaultCxCustomerSegmentationForSegmentPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerSegmentationPopulator"/>
+                    <ref bean="cxCustomerSegmentationWithCustomerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationFullPopulators" alias="cxCustomerSegmentationFullPopulators"/>
+        <bean id="defaultCxCustomerSegmentationFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxCustomerSegmentationPopulator"/>
+                    <ref bean="cxCustomerSegmentationWithCustomerPopulator"/>
+                    <ref bean="cxCustomerSegmentationWithSegmentPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationConfigurableConverter" alias="cxCustomerSegmentationConfigurableConverter"/>
+        <bean id="defaultCxCustomerSegmentationConfigurableConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.CustomerSegmentationData"/>
+            <property name="defaultOptions">
+                <value type="de.hybris.platform.personalizationfacades.enums.CustomerSegmentationConversionOptions">BASE</value>
+            </property>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.CustomerSegmentationConversionOptions">
+                    <entry key="BASE" value-ref="cxCustomerSegmentationPopulators"/>
+                    <entry key="FOR_CUSTOMER" value-ref="cxCustomerSegmentationForCustomerPopulators"/>
+                    <entry key="FOR_SEGMENT" value-ref="cxCustomerSegmentationForSegmentPopulators"/>
+                    <entry key="FULL" value-ref="cxCustomerSegmentationFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- CustomerSegmentation reverse conversion -->
+
+        <alias name="defaultCxCustomerSegmentationReversePopulator" alias="cxCustomerSegmentationReversePopulator"/>
+        <bean id="defaultCxCustomerSegmentationReversePopulator" class="de.hybris.platform.personalizationfacades.customersegmentation.converters.populator.CustomerSegmentationReversePopulator"/>
+
+        <alias name="defaultCxCustomerSegmentationReversePopulators" alias="cxCustomerSegmentationReversePopulators"/>
+        <bean id="defaultCxCustomerSegmentationReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxCustomerSegmentationReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxCustomerSegmentationReverseConverter" alias="cxCustomerSegmentationReverseConverter"/>
+        <bean id="defaultCxCustomerSegmentationReverseConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxUserToSegmentModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxCustomerSegmentationReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+    <!-- Segment conversion -->
+    <beans>
+        <alias name="defaultCxSegmentPopulator" alias="cxSegmentPopulator"/>
+        <bean id="defaultCxSegmentPopulator" class="de.hybris.platform.personalizationfacades.segment.converters.populator.SegmentPopulator"/>
+
+        <alias name="defaultCxSegmentWithTriggerPopulator" alias="cxSegmentWithTriggerPopulator"/>
+        <bean id="defaultCxSegmentWithTriggerPopulator" class="de.hybris.platform.personalizationfacades.segment.converters.populator.SegmentWithTriggerPopulator">
+            <property name="segmentTriggerConverter" ref="cxSegmentTriggerConfigurableConverter"/>
+        </bean>
+
+        <alias name="defaultCxSegmentPopulators" alias="cxSegmentPopulators"/>
+        <bean id="defaultCxSegmentPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxSegmentPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentFullPopulators" alias="cxSegmentFullPopulators"/>
+        <bean id="defaultCxSegmentFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxSegmentPopulator"/>
+                    <!-- currently information provided by trigger populator is incomplete (lacks catalog version) so its disabled by default -->
+                    <!-- <ref bean="cxSegmentWithTriggerPopulator" /> -->
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentConverter" alias="cxSegmentConverter"/>
+        <bean id="defaultCxSegmentConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.SegmentData"/>
+            <property name="defaultOptions">
+                <value type="de.hybris.platform.personalizationfacades.enums.SegmentConversionOptions">BASE</value>
+            </property>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.SegmentConversionOptions">
+                    <entry key="BASE" value-ref="cxSegmentPopulators"/>
+                    <entry key="FULL" value-ref="cxSegmentFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Segment reverse conversion -->
+
+        <alias name="defaultCxSegmentReversePopulator" alias="cxSegmentReversePopulator"/>
+        <bean id="defaultCxSegmentReversePopulator" class="de.hybris.platform.personalizationfacades.segment.converters.populator.SegmentReversePopulator"/>
+
+        <alias name="defaultCxSegmentReversePopulators" alias="cxSegmentReversePopulators"/>
+        <bean id="defaultCxSegmentReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxSegmentReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentReverseConverter" alias="cxSegmentReverseConverter"/>
+        <bean id="defaultCxSegmentReverseConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxSegmentModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxSegmentReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+
+    </beans>
+
+    <!-- Variation conversion -->
+    <beans>
+        <alias name="defaultCxVariationPopulator" alias="cxVariationPopulator"/>
+        <bean id="defaultCxVariationPopulator" class="de.hybris.platform.personalizationfacades.variation.converters.populator.VariationPopulator"/>
+
+        <alias name="defaultCxVariationWithActionPopulator" alias="cxVariationWithActionPopulator"/>
+        <bean id="defaultCxVariationWithActionPopulator" class="de.hybris.platform.personalizationfacades.variation.converters.populator.VariationWithActionPopulator">
+            <property name="actionConverter" ref="cxActionConverter"/>
+        </bean>
+
+        <alias name="defaultCxVariationWithCustomizationPopulator" alias="cxVariationWithCustomizationPopulator"/>
+        <bean id="defaultCxVariationWithCustomizationPopulator" class="de.hybris.platform.personalizationfacades.variation.converters.populator.VariationWithCustomizationPopulator">
+            <property name="customizationConverter" ref="cxCustomizationConfigurableConverter"/>
+        </bean>
+
+        <alias name="defaultCxVariationWithTriggerPopulator" alias="cxVariationWithTriggerPopulator"/>
+        <bean id="defaultCxVariationWithTriggerPopulator" class="de.hybris.platform.personalizationfacades.variation.converters.populator.VariationWithTriggerPopulator">
+            <property name="triggerConverter" ref="cxTriggerConfigurableConverter"/>
+        </bean>
+
+        <alias name="defaultCxVariationPopulators" alias="cxVariationPopulators"/>
+        <bean id="defaultCxVariationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationForActionPopulators" alias="cxVariationForActionPopulators"/>
+        <bean id="defaultCxVariationForActionPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationPopulator"/>
+                    <ref bean="defaultCxVariationWithCustomizationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationForCustomizationPopulators" alias="cxVariationForCustomizationPopulators"/>
+        <bean id="defaultCxVariationForCustomizationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationPopulator"/>
+                    <ref bean="defaultCxVariationWithActionPopulator"/>
+                    <ref bean="defaultCxVariationWithTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationForTriggerPopulators" alias="cxVariationForTriggerPopulators"/>
+        <bean id="defaultCxVariationForTriggerPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationPopulator"/>
+                    <ref bean="defaultCxVariationWithCustomizationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationFullPopulators" alias="cxVariationFullPopulators"/>
+        <bean id="defaultCxVariationFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationPopulator"/>
+                    <ref bean="defaultCxVariationWithActionPopulator"/>
+                    <ref bean="defaultCxVariationWithCustomizationPopulator"/>
+                    <ref bean="defaultCxVariationWithTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationConfigurableConverter" alias="cxVariationConfigurableConverter"/>
+        <bean id="defaultCxVariationConfigurableConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.VariationData"/>
+            <property name="defaultOptions">
+                <value type="de.hybris.platform.personalizationfacades.enums.VariationConversionOptions">BASE</value>
+            </property>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.VariationConversionOptions">
+                    <entry key="BASE" value-ref="cxVariationPopulators"/>
+                    <entry key="FOR_ACTION" value-ref="cxVariationForActionPopulators"/>
+                    <entry key="FOR_CUSTOMIZATION" value-ref="cxVariationForCustomizationPopulators"/>
+                    <entry key="FOR_TRIGGER" value-ref="cxVariationForTriggerPopulators"/>
+                    <entry key="FULL" value-ref="cxVariationFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Variation reverse conversion -->
+
+        <alias name="defaultCxVariationReversePopulator" alias="cxVariationReversePopulator"/>
+        <bean id="defaultCxVariationReversePopulator" class="de.hybris.platform.personalizationfacades.variation.converters.populator.VariationReversePopulator"/>
+
+        <alias name="defaultCxVariationReversePopulators" alias="cxVariationReversePopulators"/>
+        <bean id="defaultCxVariationReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="defaultCxVariationReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxVariationReverseConverter" alias="cxVariationReverseConverter"/>
+        <bean id="defaultCxVariationReverseConverter" parent="cxConverter">
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxVariationModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxVariationReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+    </beans>
+
+    <!-- Trigger conversion -->
+    <beans>
+        <alias name="defaultCxTriggerPopulator" alias="cxTriggerPopulator"/>
+        <bean id="defaultCxTriggerPopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.TriggerPopulator"/>
+
+        <alias name="defaultCxTriggerWithVariationPopulator" alias="cxTriggerWithVariationPopulator"/>
+        <bean id="defaultCxTriggerWithVariationPopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.TriggerWithVariationPopulator">
+            <property name="variationConfigurableConverter" ref="cxVariationConfigurableConverter"/>
+        </bean>
+
+        <!-- Segment trigger conversion -->
+        <alias name="defaultCxSegmentTriggerPopulator" alias="cxSegmentTriggerPopulator"/>
+        <bean id="defaultCxSegmentTriggerPopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.SegmentTriggerPopulator">
+            <property name="segmentConverter" ref="cxSegmentConverter"/>
+        </bean>
+
+        <alias name="defaultCxTriggerPopulators" alias="cxTriggerPopulators"/>
+        <bean id="defaultCxTriggerPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerForSegmentPopulators" alias="cxSegmentTriggerForSegmentPopulators"/>
+        <bean id="defaultCxSegmentTriggerForSegmentPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxTriggerWithVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerForVariationPopulators" alias="cxSegmentTriggerForVariationPopulators"/>
+        <bean id="defaultCxSegmentTriggerForVariationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxSegmentTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerFullPopulators" alias="cxSegmentTriggerFullPopulators"/>
+        <bean id="defaultCxSegmentTriggerFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxSegmentTriggerPopulator"/>
+                    <ref bean="cxTriggerWithVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerConfigurableConverter" alias="cxSegmentTriggerConfigurableConverter"/>
+        <bean id="defaultCxSegmentTriggerConfigurableConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationservices.model.CxSegmentTriggerModel"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.SegmentTriggerData"/>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.TriggerConversionOptions">
+                    <entry key="BASE" value-ref="cxTriggerPopulators"/>
+                    <entry key="FOR_SEGMENT" value-ref="cxSegmentTriggerForSegmentPopulators"/>
+                    <entry key="FOR_VARIATION" value-ref="cxSegmentTriggerForVariationPopulators"/>
+                    <entry key="FULL" value-ref="cxSegmentTriggerFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Expression trigger conversion -->
+        <alias name="defaultCxExpressionTriggerPopulator" alias="cxExpressionTriggerPopulator"/>
+        <bean id="defaultCxExpressionTriggerPopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.ExpressionTriggerPopulator"/>
+
+        <alias name="defaultCxExpressionTriggerForVariationPopulators" alias="cxExpressionTriggerForVariationPopulators"/>
+        <bean id="defaultCxExpressionTriggerForVariationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxExpressionTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxExpressionTriggerFullPopulators" alias="cxExpressionTriggerFullPopulators"/>
+        <bean id="defaultCxExpressionTriggerFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxExpressionTriggerPopulator"/>
+                    <ref bean="cxTriggerWithVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxExpressionTriggerConfigurableConverter" alias="cxExpressionTriggerConfigurableConverter"/>
+        <bean id="defaultCxExpressionTriggerConfigurableConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationservices.model.CxExpressionTriggerModel"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData"/>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.TriggerConversionOptions">
+                    <entry key="BASE" value-ref="cxTriggerPopulators"/>
+                    <entry key="FOR_VARIATION" value-ref="cxExpressionTriggerForVariationPopulators"/>
+                    <entry key="FULL" value-ref="cxExpressionTriggerFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- DefaultTrigger conversion -->
+
+        <alias name="defaultCxDefaultTriggerForVariationPopulators" alias="cxDefaultTriggerForVariationPopulators"/>
+        <bean id="defaultCxDefaultTriggerForVariationPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxDefaultTriggerFullPopulators" alias="cxDefaultTriggerFullPopulators"/>
+        <bean id="defaultCxDefaultTriggerFullPopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerPopulator"/>
+                    <ref bean="cxTriggerWithVariationPopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxDefaultTriggerConfigurableConverter" alias="cxDefaultTriggerConfigurableConverter"/>
+        <bean id="defaultCxDefaultTriggerConfigurableConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationservices.model.CxDefaultTriggerModel"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationfacades.data.DefaultTriggerData"/>
+            <property name="populators">
+                <map key-type="de.hybris.platform.personalizationfacades.enums.TriggerConversionOptions">
+                    <entry key="BASE" value-ref="cxTriggerPopulators"/>
+                    <entry key="FOR_VARIATION" value-ref="cxDefaultTriggerForVariationPopulators"/>
+                    <entry key="FULL" value-ref="cxDefaultTriggerFullPopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Main configurable converter for Triggers collecting subclass converters -->
+
+        <alias name="defaultCxTriggerConfigurableConverter" alias="cxTriggerConfigurableConverter"/>
+        <bean id="defaultCxTriggerConfigurableConverter" parent="cxSubtypeAwareConverter">
+            <property name="defaultOptions">
+                <value type="de.hybris.platform.personalizationfacades.enums.TriggerConversionOptions">BASE</value>
+            </property>
+            <property name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerConverter"/>
+        </bean>
+
+        <!-- Trigger reverse conversion -->
+
+        <alias name="defaultCxTriggerReversePopulator" alias="cxTriggerReversePopulator"/>
+        <bean id="defaultCxTriggerReversePopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.TriggerReversePopulator"/>
+
+        <alias name="defaultCxSegmentTriggerReversePopulator" alias="cxSegmentTriggerReversePopulator"/>
+        <bean id="defaultCxSegmentTriggerReversePopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.SegmentTriggerReversePopulator">
+            <property name="enumerationService" ref="enumerationService"/>
+            <property name="cxSegmentService" ref="cxSegmentService"/>
+        </bean>
+
+        <!-- Segment trigger -->
+        <alias name="defaultCxTriggerReversePopulators" alias="cxTriggerReversePopulators"/>
+        <bean id="defaultCxTriggerReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerReversePopulators" alias="cxSegmentTriggerReversePopulators"/>
+        <bean id="defaultCxSegmentTriggerReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerReversePopulators"/>
+                    <ref bean="cxSegmentTriggerReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxSegmentTriggerReverseConverter" alias="cxSegmentTriggerReverseConverter"/>
+        <bean id="defaultCxSegmentTriggerReverseConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerReverseConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.data.SegmentTriggerData"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxSegmentTriggerModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxSegmentTriggerReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Expression trigger -->
+        <alias name="defaultCxExpressionTriggerReversePopulator" alias="cxExpressionTriggerReversePopulator"/>
+        <bean id="defaultCxExpressionTriggerReversePopulator" class="de.hybris.platform.personalizationfacades.trigger.converters.populator.ExpressionTriggerReversePopulator">
+        </bean>
+
+        <alias name="defaultCxExpressionTriggerReversePopulators" alias="cxExpressionTriggerReversePopulators"/>
+        <bean id="defaultCxExpressionTriggerReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerReversePopulators"/>
+                    <ref bean="cxExpressionTriggerReversePopulator"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxExpressionTriggerReverseConverter" alias="cxExpressionTriggerReverseConverter"/>
+        <bean id="defaultCxExpressionTriggerReverseConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerReverseConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.data.ExpressionTriggerData"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxExpressionTriggerModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxExpressionTriggerReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Default trigger -->
+
+        <alias name="defaultCxDefaultTriggerReversePopulators" alias="cxDefaultTriggerReversePopulators"/>
+        <bean id="defaultCxDefaultTriggerReversePopulators" parent="abstractPopulatorList">
+            <property name="populators">
+                <list>
+                    <ref bean="cxTriggerReversePopulators"/>
+                </list>
+            </property>
+        </bean>
+
+        <alias name="defaultCxDefaultTriggerReverseConverter" alias="cxDefaultTriggerReverseConverter"/>
+        <bean id="defaultCxDefaultTriggerReverseConverter" parent="cxSubtypeConverter">
+            <constructor-arg name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerReverseConverter"/>
+            <constructor-arg name="sourceClass" value="de.hybris.platform.personalizationfacades.data.DefaultTriggerData"/>
+            <property name="targetClass" value="de.hybris.platform.personalizationservices.model.CxDefaultTriggerModel"/>
+            <property name="populators">
+                <map>
+                    <entry key="BASE" value-ref="cxDefaultTriggerReversePopulators"/>
+                </map>
+            </property>
+        </bean>
+
+        <!-- Main configurable reverse converter for Triggers collecting subclass reverse converters -->
+        <alias name="defaultCxTriggerReverseConverter" alias="cxTriggerReverseConverter"/>
+        <bean id="defaultCxTriggerReverseConverter" parent="cxSubtypeAwareConverter">
+            <property name="markerClass" value="de.hybris.platform.personalizationfacades.trigger.converters.TriggerReverseConverter"/>
+        </bean>
+
+    </beans>
+</beans>

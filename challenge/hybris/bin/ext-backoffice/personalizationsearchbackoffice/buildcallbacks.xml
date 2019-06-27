@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<project name="personalizationsearchbackoffice_buildcallbacks">
+	<property name="personalizationsearchbackofficeWebFragmentSrc" value="${ext.personalizationsearchbackoffice.path}/resources/web-fragment.xml" />
+	<property name="personalizationsearchbackofficeWebFragmentDestJar" value="${ext.backoffice.path}/web/webroot/WEB-INF/lib/webfragmentExt_personalizationsearchbackoffice.jar" />
+
+	<macrodef name="personalizationsearchbackoffice_after_clean">
+		<sequential>
+			<personalizationsearchbackoffice_remove_web_fragment />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="personalizationsearchbackoffice_after_build">
+		<sequential>
+			<personalizationsearchbackoffice_remove_web_fragment />
+			<personalizationsearchbackoffice_create_web_fragment />
+		</sequential>
+	</macrodef>
+
+	<macrodef name="personalizationsearchbackoffice_remove_web_fragment">
+		<sequential>
+			<if>
+				<available file="${personalizationsearchbackofficeWebFragmentDestJar}" />
+				<then>
+					<delete file="${personalizationsearchbackofficeWebFragmentDestJar}" />
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="personalizationsearchbackoffice_create_web_fragment">
+		<sequential>
+			<if>
+				<available file="${personalizationsearchbackofficeWebFragmentSrc}" />
+				<then>
+					<sequential>
+						<jar destfile="${personalizationsearchbackofficeWebFragmentDestJar}">
+							<metainf file="${personalizationsearchbackofficeWebFragmentSrc}" />
+						</jar>
+					</sequential>
+				</then>
+			</if>
+		</sequential>
+	</macrodef>
+
+	<patternset id="personalizationsearchbackoffice.localization.pattern">
+		<!-- core and hmc  -->
+		<include name="**/*locales*_en.properties" />
+		<exclude name="**/hmc/web/webroot/WEB-INF/classes/**/*" />
+		<exclude name="**/unittest/**/*" />
+
+		<!-- cockpit (ng) -->
+		<include name="**/i3-label_en.properties" />
+		<include name="**/labels_en.properties" />
+
+		<!-- messages -->
+		<include name="**/*messages_en.properties" />
+		<include name="**/*messages.properties" />
+
+		<!-- frontend properties files in WEB-INF/messages folder -->
+		<include name="**/WEB-INF/messages/*_en.properties" />
+
+		<!-- csv and impex -->
+		<include name="**/*_en.csv" />
+		<include name="**/*_en.impex" />
+
+		<include name="**/lang-en.properties" />
+
+		<!-- email localizations from yacceleratorcore -->
+		<include name="resources/**/messages/*_en.properties" />
+
+		<!-- include validation messages -->
+		<include name="resources/**/ValidationMessages.properties" />
+	</patternset>
+
+	<macrodef name="personalizationsearchbackoffice_before_build">
+		<sequential>
+			<register_sass_extension extensionname="personalizationsearchbackoffice" />
+			<register_sass_extension extensionname="personalizationsearchbackoffice" resources="resources" destination="" />
+		</sequential>
+	</macrodef>
+
+</project>

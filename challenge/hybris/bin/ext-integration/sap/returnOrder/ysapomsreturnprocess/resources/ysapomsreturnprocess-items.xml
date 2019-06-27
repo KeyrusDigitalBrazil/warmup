@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company. All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<!-- ATTENTION: This is just an example file. You have to edit it according 
+	to your needs. -->
+
+<items xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="items.xsd">
+
+
+	<collectiontypes>
+		<collectiontype elementtype="ConsignmentEntry" code="consignmentEntrySet"
+			autocreate="true" generate="true" type="set" />
+
+	</collectiontypes>
+
+	<enumtypes>
+		<enumtype code="SAPReturnRequestOrderStatus" autocreate="true"
+			generate="true" dynamic="true">
+			<value code="NOT_SENT_TO_BACKEND" />
+			<value code="SENT_TO_BACKEND" />
+			<value code="CONFIRMED_FROM_BACKEND" />
+			<value code="CANCELLED_FROM_BACKEND" />
+		</enumtype>
+	</enumtypes>
+
+	<relations>
+		<relation code="ReturnRequest2SapReturnRequests" generate="true"
+			localized="false" autocreate="true">
+			<sourceElement type="ReturnRequest" cardinality="one"
+				qualifier="returnRequest">
+				<modifiers read="true" write="true" search="true"
+					optional="false" />
+			</sourceElement>
+			<targetElement type="SAPReturnRequests" cardinality="many"
+				collectiontype="set" qualifier="sapReturnRequests" ordered="true">
+				<modifiers read="true" write="true" search="true"
+					optional="true" />
+			</targetElement>
+		</relation>
+	</relations>
+
+	<itemtypes>
+		<itemtype code="ReturnRequest" autocreate="false" generate="false">
+			<description>Extending Return order type with additional attributes.
+			</description>
+			<attributes>
+				<attribute qualifier="sapLogicalSystem" type="java.lang.String">
+					<description>SAP logical system</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapSalesOrganization" type="SAPSalesOrganization">
+					<description>SAP Sales Organization</description>
+					<persistence type="property" />
+				</attribute>
+				<attribute qualifier="sapSystemType" type="SapSystemType">
+					<description>SAP System Type</description>
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("SapSystemType", "SAP_ERP")
+					</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+		<itemtype code="SAPPlantLogSysOrg" extends="GenericItem"
+			autocreate="false" generate="false">
+			<attributes>
+				<attribute qualifier="reasonCodeCancellation" type="java.lang.String">
+					<modifiers read="true" write="true" search="true"
+						optional="true" />
+					<persistence type="property" />
+					<description>Reason Code For Cancellation</description>
+				</attribute>
+			</attributes>
+		</itemtype>
+		
+
+		<itemtype code="SAPReturnRequests" extends="GenericItem"
+			autocreate="true" generate="true"
+			jaloclass="de.hybris.platform.sap.sapmodel.jalo.SAPReturnRequests">
+			<deployment table="SAPReturnRequests" typecode="10125" />
+			<attributes>
+				<attribute qualifier="code" type="java.lang.String">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<description>SAP Return Request Order Number</description>
+				</attribute>
+				<attribute qualifier="sapReturnRequestOrderStatus" type="SAPReturnRequestOrderStatus">
+					<modifiers unique="true" />
+					<persistence type="property" />
+					<defaultvalue>em().getEnumerationValue("SAPReturnRequestOrderStatus",
+						"NOT_SENT_TO_BACKEND")</defaultvalue>
+					<description>Sap Return Request Order Status</description>
+				</attribute>
+				<attribute type="consignmentEntrySet" qualifier="consignmentsEntry">
+					<persistence type="property"></persistence>
+				</attribute>
+
+				<attribute type="java.lang.Boolean" qualifier="isDelivered">
+					<persistence type="property" />
+					<defaultvalue>Boolean.FALSE</defaultvalue>
+				</attribute>
+				<attribute qualifier="returnWarehouse" type="Warehouse">
+					<persistence type="property" />
+					<description>Determines the warehouse where the products need to be
+						returned by the customer</description>
+						
+				</attribute>
+			</attributes>
+		</itemtype>
+		<itemtype code="ConsignmentEntry" autocreate="false"
+			generate="false">
+			<attributes>
+				<attribute qualifier="returnQuantity" type="java.lang.Long">
+					<persistence type="property" />
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+				</attribute>
+				<attribute qualifier="quantityReturnedUptil" type="java.lang.Long">
+					<persistence type="property" />
+					<defaultvalue>Long.valueOf(0)</defaultvalue>
+				</attribute>
+				<attribute qualifier="amount" type="java.math.BigDecimal">
+					<persistence type="property" />
+					<defaultvalue>java.math.BigDecimal.valueOf(0D)</defaultvalue>
+				</attribute>
+			</attributes>
+		</itemtype>
+	</itemtypes>
+</items>

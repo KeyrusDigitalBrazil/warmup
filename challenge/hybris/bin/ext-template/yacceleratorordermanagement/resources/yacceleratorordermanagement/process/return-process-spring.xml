@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.
+ All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <!-- Return Process Actions -->
+
+    <bean id="initialReturnAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.InitialReturnAction" parent="abstractAction">
+	    <property name="restockWarehouseSelectionStrategy" ref="restockWarehouseSelectionStrategy"/>
+        <property name="restockConfigService" ref="restockConfigService"/>
+    </bean>
+
+    <bean id="captureRefundAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.CaptureRefundAction" parent="abstractAction">
+    	<property name="paymentService" ref="paymentService" />
+        <property name="refundAmountCalculationService" ref="refundAmountCalculationService" />
+    </bean>
+
+    <bean id="successCaptureAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.SuccessCaptureAction" parent="abstractAction"/>
+
+    <bean id="approveReturnAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.ApproveReturnAction" parent="abstractAction"/>
+
+    <bean id="cancelReturnAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.CancelReturnAction" parent="abstractAction">
+        <property name="orderReturnDao" ref="orderReturnDao" />
+    </bean>
+
+    <bean id="printReturnLabelAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.PrintReturnLabelAction" parent="abstractAction">
+        <property name="eventService" ref="eventService" />
+    </bean>
+
+    <bean id="printPackingLabelAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.PrintPackingLabelAction" parent="abstractAction"/>
+
+    <bean id="acceptGoodsAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.AcceptGoodsAction" parent="abstractAction"/>
+
+    <bean id="taxReverseAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.TaxReverseAction" parent="abstractAction"/>
+
+    <bean id="successTaxReverseAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.SuccessTaxReverseAction" parent="abstractAction"/>
+
+    <bean id="inventoryUpdateAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.InventoryUpdateAction" parent="abstractAction">
+        <property name="restockConfigService" ref="restockConfigService"/>
+        <property name="restockWarehouseSelectionStrategy" ref="restockWarehouseSelectionStrategy"/>
+        <property name="timeService" ref="timeService"/>
+        <property name="warehouseStockService" ref="warehouseStockService"/>
+    </bean>
+
+    <bean id="completeReturnAction" class="de.hybris.platform.yacceleratorordermanagement.actions.returns.CompleteReturnAction" parent="abstractAction">
+        <property name="orderReturnRecordsHandler" ref="orderReturnRecordsHandler"/>
+    </bean>
+
+</beans>

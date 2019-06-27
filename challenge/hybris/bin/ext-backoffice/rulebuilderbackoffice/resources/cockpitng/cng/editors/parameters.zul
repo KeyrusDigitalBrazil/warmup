@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<zk xmlns:h="xhtml">
+	<div  	sclass="yrb-parameters">
+		<forEach items="@bind(parameters)" var="parameter">
+			<idspace
+				zclass="@load(vm.join('yrb-parameter', parameter.value.required ? 'yrb-required-parameter' : null, parameter.value.validationStyleClass))">
+				<div zclass="yrb-label-container">
+					<label value="@load(parameter.value.name)" tooltiptext="@load(parameter.key)" />
+					<div popup="parameterDescriptionPopup" sclass="yrb-parameter-description">
+						<h:i class="z-icon-question-circle" />
+						<popup id="parameterDescriptionPopup" sclass="yrb-parameter-description-popup">
+							<label value="@load(parameter.value.uuid)" sclass="yrb-parameter-uuid" />
+							<label value="@load(parameter.value.description)" sclass="yrb-parameter-description" />
+						</popup>
+					</div>
+					<div popup="parameterValidationPopup" sclass="yrb-parameter-validation"
+						visible="@load(not parameter.value.valid)">
+						<h:i class="@load(parameter.value.validationIconStyleClass)" />
+						<popup id="parameterValidationPopup" sclass="yrb-parameter-validation-popup">
+							<forEach items="@bind(parameter.value.validationInfos)">
+								<div sclass="@load(vm.join('yrb-parameter-validation-info', each.styleClass))">
+									<h:i class="@load(each.iconStyleClass)" />
+									<label value="@load(each.message)" />
+								</div>
+							</forEach>
+						</popup>
+					</div>
+				</div>
+				<div zclass="yrb-editor-container">
+				<idspace>
+					<editor id="editorId" value="@load(parameter.value.value)" defaultEditor="@load(parameter.value.defaultEditor)" type="@load(parameter.value.type)" readOnly="@load(parameter.value.readOnly)"
+						 onValueChanged="@command('changeTreeNodeParameter', treeNode=treeNode, parameterId=parameter.key, parameterValue=event.data)" >
+						 <zk forEach="${parameter.value.customAttributes}">
+								<zscript>
+									editorId.setAttribute(each.key, each.value);
+								</zscript>
+						 </zk>
+					</editor>
+				</idspace>
+				</div>
+			</idspace>
+		</forEach>
+	</div>
+</zk>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ [y] hybris Platform
+
+ Copyright (c) 2018 SAP SE or an SAP affiliate company.  All rights reserved.
+
+ This software is the confidential and proprietary information of SAP
+ ("Confidential Information"). You shall not disclose such Confidential
+ Information and shall use it only in accordance with the terms of the
+ license agreement you entered into with SAP.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/aop
+           http://www.springframework.org/schema/aop/spring-aop.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<alias alias="ruleTargetCodeGenerator" name="droolsRuleTargetCodeGenerator" />
+
+	<alias alias="droolsRuleTargetCodeGenerator" name="defaultDroolsRuleTargetCodeGenerator" />
+	<bean id="defaultDroolsRuleTargetCodeGenerator" class="de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleTargetCodeGenerator">
+		<property name="ruleParametersService" ref="ruleParametersService" />
+		<property name="modelService" ref="modelService" />
+		<property name="platformRuleEngineService" ref="platformRuleEngineService" />
+		<property name="droolsRuleConditionsGenerator" ref="droolsRuleConditionsGenerator" />
+		<property name="droolsRuleActionsGenerator" ref="droolsRuleActionsGenerator" />
+		<property name="droolsRuleMetadataGenerator" ref="droolsRuleMetadataGenerator" />
+		<property name="commonI18NService" ref="commonI18NService" />
+		<property name="configurationService" ref="configurationService" />
+		<property name="ruleService" ref="ruleService" />
+		<property name="droolsKIEBaseFinderStrategy" ref="droolsKIEBaseFinderStrategy"/>
+		<property name="rulesModuleDao" ref="rulesModuleDao"/>
+	</bean>
+
+	<alias name="defaultDroolsRuleConditionsGenerator" alias="droolsRuleConditionsGenerator" />
+	<bean id="defaultDroolsRuleConditionsGenerator" class="de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleConditionsGenerator">
+		<property name="droolsRuleValueFormatter" ref="droolsRuleValueFormatter" />
+	</bean>
+
+	<alias name="defaultDroolsRuleActionsGenerator" alias="droolsRuleActionsGenerator" />
+	<bean id="defaultDroolsRuleActionsGenerator" class="de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleActionsGenerator">
+		<property name="droolsRuleValueFormatter" ref="actionsDroolsRuleValueFormatter"/>
+	</bean>
+
+	<alias name="defaultDroolsRuleValueFormatter" alias="droolsRuleValueFormatter" />
+	<bean id="defaultDroolsRuleValueFormatter" class="de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleValueFormatter" init-method="initFormatters"/>
+
+    <alias name="defaultActionsDroolsRuleValueFormatter" alias="actionsDroolsRuleValueFormatter"/>
+	<bean id="defaultActionsDroolsRuleValueFormatter" class="de.hybris.platform.droolsruleengineservices.compiler.impl.ActionsDroolsRuleValueFormatter" init-method="initFormatters"/>
+
+	<alias name="defaultDroolsRuleMetadataGenerator" alias="droolsRuleMetadataGenerator" />
+	<bean id="defaultDroolsRuleMetadataGenerator" class="de.hybris.platform.droolsruleengineservices.compiler.impl.DefaultDroolsRuleMetadataGenerator"/>
+</beans>
